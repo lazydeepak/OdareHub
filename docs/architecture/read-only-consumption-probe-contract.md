@@ -66,7 +66,7 @@ The probe is diagnostic-only. It inspects existing approved state and catalog me
 | Input | Description |
 |---|---|
 | `registry root path` | Path to approved registry storage (default: `storage/platform/style-registry/approved-values/`) |
-| `socket catalog path` | Path to Shell Style socket catalog directory (default: `apps/Shell/Style/Resources/socket-catalog/`) |
+| `socket catalog path` | Path to Shell Style socket catalog directory (default: `apps/Shell/DesignSystem/Resources/socket-catalog/`) |
 | `active theme identifier` | Current theme style preference for context reporting (read-only metadata) |
 | `optional socket key` | Single socket key to narrow diagnostics (e.g. `radius.scale`) |
 | `diagnostic mode` | Output verbosity: `summary` (default), `full`, `json-only` |
@@ -196,7 +196,7 @@ no exec shelling into compiler
 ### Path confinement
 
 - Registry root must resolve under project root and under `storage/platform/style-registry/`
-- Catalog path must resolve under project root and under `apps/Shell/Style/Resources/socket-catalog/`
+- Catalog path must resolve under project root and under `apps/Shell/DesignSystem/Resources/socket-catalog/`
 - Any input path that escapes confinement must emit `RSC-E001` and exit `2`
 
 ### Side-effect prohibition
@@ -240,7 +240,7 @@ Rules:
 
 Shell remains unchanged.
 
-The probe only reads Shell socket catalog metadata from `apps/Shell/Style/Resources/socket-catalog/`. It does not:
+The probe only reads Shell socket catalog metadata from `apps/Shell/DesignSystem/Resources/socket-catalog/`. It does not:
 
 - Modify Shell CSS (`apps/Shell/styles/*.css`)
 - Change Shell runtime behavior

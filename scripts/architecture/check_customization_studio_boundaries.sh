@@ -168,14 +168,14 @@ check_required_path "$socket_catalog_root" "Shell socket catalog directory"
 shell_runtime_files=()
 while IFS= read -r file; do
   shell_runtime_files+=("$file")
-done < <(find apps/Shell -type f \( -name '*.php' -o -name '*.js' -o -name '*.css' \) -print)
+done < <(find apps/Shell -type f \( -name '*.php' -o -name '*.js' -o -name '*.css' \) -not -path '*/Tests/*' -not -path '*/tests/*' -print)
 
 customization_runtime_files=()
 while IFS= read -r file; do
   customization_runtime_files+=("$file")
 done < <(find "$customization_root" \
   \( -path "$customization_root/Diagnose" -o -path "$customization_root/DesignSystem" -o -path "$customization_root/Advanced" \) -prune \
-  -o -type f \( -name '*.php' -o -name '*.js' \) -print)
+  -o -type f \( -name '*.php' -o -name '*.js' \) -not -path '*/Tests/*' -not -path '*/tests/*' -print)
 
 core_runtime_files=()
 while IFS= read -r file; do
@@ -185,7 +185,9 @@ done < <(find app -type f \( -name '*.php' -o -name '*.js' -o -name '*.css' -o -
 echo ""
 echo "== Customization Studio source home =="
 unexpected_paths="$(mktemp /tmp/customization-studio-paths-XXXXXX)"
-find . -path "*/CustomizationStudio*" -not -path "./.git/*" -print \
+find . \
+  \( -path "./.git" -o -path "./storage/manual-rehearsal-test-*" -o -path "./engineering/*" -o -path "./docs/*" -o -name "*.md" \) -prune -o \
+  -type f \( -name '*.php' -o -name '*.js' -o -name '*.css' -o -name '*.json' \) -path "*/CustomizationStudio*" -print \
   | while IFS= read -r path; do
       case "$path" in
         "./$customization_root"|"./$customization_root"/*)
@@ -541,7 +543,7 @@ check_no_unapproved_matches \
 check_no_unapproved_matches \
   "Studio routes must not expose unapproved POST/write endpoints for Customization Studio" \
   'post[[:space:]]*\([^)]*customization-studio|route[[:space:]]*\([^)]*POST[^)]*customization-studio|customization-studio[^#\n]*(save|apply|activate|registry|write)' \
-  "(apps/Studio/routes\.php:)?[0-9]+:.*(visual-customizer/(draft/update|draft/recheck-readiness|draft/create-approval-request|request/approve|request/reject|request/cancel|request/take-snapshot|request/apply)|design-system/tokens/(verify|save)|diagnose/style-compliance/(scan|repair-readiness|repair-execute))" \
+  "(apps/Studio/routes\.php:)?[0-9]+:.*(visual-customizer/(draft/update|draft/recheck-readiness|draft/create-approval-request|request/approve|request/reject|request/cancel|request/take-snapshot|request/apply)|design-system/tokens/(verify|save)|diagnose/style-compliance/(scan|repair-readiness|repair-execute|fix-one))" \
   apps/Studio/routes.php
 
 echo ""

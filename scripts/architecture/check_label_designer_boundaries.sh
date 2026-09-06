@@ -140,9 +140,9 @@ build_preview_contract_file() {
     "$tool_dir/Views/workspaces/rules.php" \
     "$tool_dir/Views/workspaces/preview.php" \
     "$tool_dir/Views/workspaces/governance.php" \
-    "$tool_dir/lang/en.php" \
-    "$tool_dir/lang/ja.php" \
-    "$tool_dir/lang/ne.php" \
+    "$tool_dir/Resources/lang/en.php" \
+    "$tool_dir/Resources/lang/ja.php" \
+    "$tool_dir/Resources/lang/ne.php" \
     "$tool_dir/Assets/label-designer.css" \
     "$tool_dir/Assets/label-designer.js"; do
     if [[ -f "$path" ]]; then
@@ -176,9 +176,9 @@ require_file "$tool_dir/Views/workspaces/preview.php" "Label Designer preview wo
 require_file "$tool_dir/Views/workspaces/governance.php" "Label Designer governance workspace"
 require_file "$tool_dir/Assets/label-designer.css" "Label Designer CSS asset"
 require_file "$tool_dir/Assets/label-designer.js" "Label Designer JS asset"
-require_file "$tool_dir/lang/en.php" "Label Designer English lang file"
-require_file "$tool_dir/lang/ja.php" "Label Designer Japanese lang file"
-require_file "$tool_dir/lang/ne.php" "Label Designer Nepali lang file"
+require_file "$tool_dir/Resources/lang/en.php" "Label Designer English lang file"
+require_file "$tool_dir/Resources/lang/ja.php" "Label Designer Japanese lang file"
+require_file "$tool_dir/Resources/lang/ne.php" "Label Designer Nepali lang file"
 require_text "$legacy_preview_file" "require __DIR__ . '/index.php';" "legacy preview is a thin compatibility include"
 forbid_pattern "$legacy_preview_file" 'LabelDesigner(Context|Template|Rule|Resource)|<form|ld-workspace|\$_GET|\$_POST' "legacy preview contains no independent controller/view/business logic"
 require_text "$controller_file" "Views/index.php" "controller renders Label Designer index compositor"

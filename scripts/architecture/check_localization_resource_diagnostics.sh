@@ -187,6 +187,12 @@ KEY_STORE="$TMPDIR/ls-resource-diag-keys-$$"
 rm -rf "$KEY_STORE" && mkdir -p "$KEY_STORE"
 trap 'rm -rf "$KEY_STORE"' EXIT
 
+# Diagnostic runs as a PHP file (not `php -r`): the script carries the canonical
+# `<?php` opener which PHP rejects inside `-r` argv code on PHP 8.5. Writing it
+# to a temp file keeps the opener valid and passes ROOT_DIR/FILE via argv.
+DIAGNOSTIC_FILE="$KEY_STORE/diagnostic.php"
+printf '%s\n' "$DIAGNOSTIC_SCRIPT" > "$DIAGNOSTIC_FILE"
+
 for file in "${LOCALE_FILES[@]}"; do
   rel="${file#./}"
 
@@ -207,7 +213,7 @@ for file in "${LOCALE_FILES[@]}"; do
   echo "$rel" >> "$KEY_STORE/owner_files_${owner//\//_}.txt"
 
   # Run PHP diagnostic
-  diag_output=$("$PHP_BIN" -r "$DIAGNOSTIC_SCRIPT" "$ROOT_DIR" "$file" 2>/dev/null || echo '{"error":"diagnostic_failed"}')
+  diag_output=$("$PHP_BIN" "$DIAGNOSTIC_FILE" "$ROOT_DIR" "$file" 2>/dev/null || echo '{"error":"diagnostic_failed"}')
   diag_result=$(echo "$diag_output" | "$PHP_BIN" -r '$d=json_decode(stream_get_contents(STDIN),true); if(!$d){echo "parse_error"; exit;} echo json_encode($d);' 2>/dev/null || echo '{"error":"json_parse"}')
 
   if echo "$diag_result" | "$PHP_BIN" -r '$d=json_decode(stream_get_contents(STDIN),true); echo isset($d["error"])?"error":"ok";' 2>/dev/null | grep -q "error"; then
