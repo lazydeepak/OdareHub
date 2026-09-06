@@ -1,0 +1,118 @@
+{
+    "schema_version": "studio.generated-module.v1",
+    "generated_by": "studio",
+    "generator_id": "erp_app_studio.first_apply.v1",
+    "compile_id": "compile:generated:6b5ea785231d834b",
+    "app_key": "manufacturing_studio",
+    "module_key": "manufacturing_studio",
+    "display_name": "Manufacturing Studio",
+    "app_display_name": "Manufacturing Studio",
+    "route_path": "/apps/manufacturing-studio/manufacturing-studio",
+    "view_file": "index.php",
+    "provider": {
+        "namespace": "Generated\\ManufacturingStudio\\Providers",
+        "class": "ManufacturingStudioProvider",
+        "file": "Providers/ManufacturingStudioProvider.php"
+    },
+    "snapshot_id": "cef52021-2020-5e73-ad52-e2640c0f1594",
+    "snapshot_hash": "snapshot:b5b23d28ace6a7185b5c66fcf30027483b7f328dab70fe4cdb59af0683fcb341",
+    "created_at": "2026-05-11T13:13:38+00:00",
+    "live_path": "apps/Generated/manufacturing_studio/manufacturing_studio",
+    "navigation": {
+        "label": "Manufacturing Studio",
+        "section": "Apps",
+        "key": "manufacturing_studio_manufacturing_studio",
+        "order": 10,
+        "priority": 100
+    },
+    "fields": [
+        {
+            "key": "qty",
+            "label": "qty",
+            "type": "string",
+            "required": true,
+            "default": "",
+            "options": []
+        },
+        {
+            "key": "coverage_pct",
+            "label": "coverage pct",
+            "type": "string",
+            "required": false,
+            "default": "",
+            "options": []
+        },
+        {
+            "key": "shortage_qty",
+            "label": "shortage qty",
+            "type": "string",
+            "required": false,
+            "default": "",
+            "options": []
+        },
+        {
+            "key": "order_date",
+            "label": "order date",
+            "type": "string",
+            "required": false,
+            "default": "",
+            "options": []
+        },
+        {
+            "key": "required_date",
+            "label": "required date",
+            "type": "string",
+            "required": false,
+            "default": "",
+            "options": []
+        },
+        {
+            "key": "customer_name",
+            "label": "customer name",
+            "type": "string",
+            "required": false,
+            "default": "",
+            "options": []
+        },
+        {
+            "key": "product_id",
+            "label": "product id",
+            "type": "string",
+            "required": false,
+            "default": "",
+            "options": []
+        },
+        {
+            "key": "parts_name",
+            "label": "parts name",
+            "type": "string",
+            "required": false,
+            "default": "",
+            "options": []
+        }
+    ],
+    "templates": {
+        "app": "business_app",
+        "module": "dashboard_module",
+        "view": "table_view"
+    },
+    "safety": {
+        "output_root": "apps/Generated",
+        "temp_root": "apps/Generated/tmp",
+        "raw_php_injection_allowed": false,
+        "db_schema_execution_allowed": false
+    },
+    "styles": [
+        {
+            "key": "generated.manufacturing_studio.manufacturing_studio",
+            "path": "styles.css",
+            "scope": "module",
+            "module": "manufacturing_studio",
+            "surfaces": [
+                "admin",
+                "operator"
+            ],
+            "order": 300
+        }
+    ]
+}

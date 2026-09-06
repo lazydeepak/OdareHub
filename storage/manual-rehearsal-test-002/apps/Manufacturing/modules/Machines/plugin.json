@@ -1,0 +1,55 @@
+{
+    "name": "Machines",
+    "display_name": "Machines",
+    "suite": "manufacturing",
+    "group": "ipm",
+    "category": "business",
+    "display_order": 20,
+    "type": "business",
+    "version": "1.0.0",
+    "description": "Machine master for IPM.",
+    "requires": [
+        "Base>=3.0.0"
+    ],
+    "entry": "routes.php",
+    "package_type": "module",
+    "owner_app": "manufacturing",
+    "module_key": "Machines",
+    "module_type": "business_entity",
+    "target_maturity_level": "L3",
+    "declared_capabilities": [
+        "routes",
+        "views",
+        "forms",
+        "schema",
+        "migrations",
+        "controllers",
+        "services",
+        "permissions",
+        "menus",
+        "reports",
+        "exports",
+        "lifecycle_hooks",
+        "localization"
+    ],
+    "lifecycle_contract": {
+        "routes": "active_only",
+        "menus": "active_only",
+        "widgets": "active_only",
+        "reports": "active_only",
+        "dashboards": "active_only",
+        "schema": "installed_or_active"
+    },
+    "reports": [
+        {
+            "report_key": "manufacturing.machines.overview",
+            "title": "Machines Report",
+            "view": "Views/report.php",
+            "export_view": "Views/export.php",
+            "owner": "module",
+            "scope": "machines",
+            "permission": "app.manufacturing.access",
+            "lifecycle": "active_only"
+        }
+    ]
+}

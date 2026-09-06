@@ -1,0 +1,27 @@
+/* Structural-only declarations — all should be structural_out_of_scope */
+.layout {
+    display: flex;
+    gap: 16px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 24px;
+}
+
+.card {
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.5;
+    text-align: left;
+}
+
+.item {
+    flex: 1;
+    max-width: 320px;
+    min-height: 48px;
+}
+
+.header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}

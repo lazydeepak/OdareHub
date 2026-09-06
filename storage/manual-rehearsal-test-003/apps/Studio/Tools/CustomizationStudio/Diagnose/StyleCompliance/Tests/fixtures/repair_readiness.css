@@ -1,0 +1,2 @@
+/* repair readiness fixture — produces deterministic ready preflight */
+.repair-fixture { color: var(--tone-danger); }

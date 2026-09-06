@@ -1,0 +1,28 @@
+{
+  "schema_version": "gui.focused-start.v1",
+  "goal": "No-code creation via GUI tool only",
+  "focus_track": "platform_governance",
+  "first_delivery_scope": {
+    "app_key": "platform",
+    "module_key": "design_studio",
+    "routes": [
+      "/ops/design-studio",
+      "/ops/design-studio/edit"
+    ],
+    "surfaces": ["admin"],
+    "locales": ["en", "ja", "ne"]
+  },
+  "must_pass_gates": [
+    "wrapper_confinement",
+    "role_gate_validation",
+    "csrf_for_mutations",
+    "i18n_complete",
+    "route_ownership_clean",
+    "lint_syntax_clean"
+  ],
+  "release_mode": {
+    "dry_run_required": true,
+    "preview_diff_required": true,
+    "approval_required": true
+  }
+}

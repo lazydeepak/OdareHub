@@ -1,0 +1,1551 @@
+{
+  "id": "manufacturing",
+  "app_key": "manufacturing",
+  "package_type": "bundle",
+  "name": "Manufacturing",
+  "version": "1.0.0",
+  "type": "business",
+  "min_core_version": "3.0.0",
+  "dependencies": [
+    "QRCode>=1.0.0"
+  ],
+  "entry": "routes.php",
+  "native_modules": [
+    "daily_orders",
+    "production_plans",
+    "production_queue",
+    "assembly_plans",
+    "assembly_entries"
+  ],
+  "legacy_bridge_plugins": [
+    "Products",
+    "Workflow",
+    "Supply",
+    "Coverage",
+    "MaterialManagement",
+    "Machines",
+    "PartMachineMap",
+    "PreOrders",
+    "DailyOrders",
+    "ProductionPlans",
+    "ProductionQueue",
+    "Ledger",
+    "ProductionEntries",
+    "AssemblyPlans",
+    "AssemblyEntries",
+    "QCPlans",
+    "QCEntries",
+    "DispatchEntries"
+  ],
+  "migrations_path": "migrations",
+  "permissions": [
+    "manufacturing.view",
+    "manufacturing.manage",
+    "materials.admin",
+    "materials.master.manage",
+    "materials.planning.manage",
+    "materials.orders.manage",
+    "materials.stock.adjust",
+    "materials.capacity.manage",
+    "materials.cost.manage",
+    "materials.stock.view",
+    "materials.coverage.view"
+  ],
+  "modules": [
+    {
+      "key": "production",
+      "name": "Production"
+    },
+    {
+      "key": "workflow",
+      "name": "Workflow"
+    },
+    {
+      "key": "supply",
+      "name": "Supply"
+    },
+    {
+      "key": "coverage",
+      "name": "Coverage"
+    },
+    {
+      "key": "materials",
+      "name": "Materials & Supply"
+    },
+    {
+      "key": "assembly",
+      "name": "Assembly"
+    },
+    {
+      "key": "quality",
+      "name": "Quality"
+    },
+    {
+      "key": "dispatch",
+      "name": "Dispatch"
+    }
+  ],
+  "hooks": [
+    {
+      "type": "boot",
+      "key": "manufacturing.bootstrap",
+      "handler_file": "bootstrap.php"
+    },
+    {
+      "type": "host_surface",
+      "key": "manufacturing.me.header_actions",
+      "surface": "me",
+      "region": "header_actions",
+      "provider": "Apps\\Manufacturing\\Services\\HostSurfaceContributionService::contribute",
+      "provider_file": "Services/HostSurfaceContributionService.php",
+      "order": 10
+    },
+    {
+      "type": "host_surface",
+      "key": "manufacturing.me.summary_cards",
+      "surface": "me",
+      "region": "summary_cards",
+      "provider": "Apps\\Manufacturing\\Services\\HostSurfaceContributionService::contribute",
+      "provider_file": "Services/HostSurfaceContributionService.php",
+      "order": 20
+    },
+    {
+      "type": "host_surface",
+      "key": "manufacturing.me.quick_links",
+      "surface": "me",
+      "region": "quick_links",
+      "provider": "Apps\\Manufacturing\\Services\\HostSurfaceContributionService::contribute",
+      "provider_file": "Services/HostSurfaceContributionService.php",
+      "order": 30
+    },
+    {
+      "type": "host_surface",
+      "key": "manufacturing.me.monitoring_sections",
+      "surface": "me",
+      "region": "monitoring_sections",
+      "provider": "Apps\\Manufacturing\\Services\\HostSurfaceContributionService::contribute",
+      "provider_file": "Services/HostSurfaceContributionService.php",
+      "order": 40
+    },
+    {
+      "type": "host_surface",
+      "key": "manufacturing.approval.header_actions",
+      "surface": "approval_inbox",
+      "region": "header_actions",
+      "provider": "Apps\\Manufacturing\\Services\\HostSurfaceContributionService::contribute",
+      "provider_file": "Services/HostSurfaceContributionService.php",
+      "order": 20
+    },
+    {
+      "type": "host_surface",
+      "key": "manufacturing.role_inbox.header_actions",
+      "surface": "role_inbox",
+      "region": "header_actions",
+      "provider": "Apps\\Manufacturing\\Services\\HostSurfaceContributionService::contribute",
+      "provider_file": "Services/HostSurfaceContributionService.php",
+      "order": 20
+    },
+    {
+      "type": "operator_surface",
+      "key": "manufacturing.operator.sidebar",
+      "surface": "operator",
+      "region": "sidebar",
+      "provider": "Apps\\Manufacturing\\Services\\OperatorSurfaceContributionService::contribute",
+      "provider_file": "Services/OperatorSurfaceContributionService.php",
+      "order": 10
+    },
+    {
+      "type": "operator_surface",
+      "key": "manufacturing.operator.focus_views",
+      "surface": "operator",
+      "region": "focus_views",
+      "provider": "Apps\\Manufacturing\\Services\\OperatorSurfaceContributionService::contribute",
+      "provider_file": "Services/OperatorSurfaceContributionService.php",
+      "order": 20
+    },
+    {
+      "type": "operator_surface",
+      "key": "manufacturing.operator.data_exchange",
+      "surface": "operator",
+      "region": "data_exchange",
+      "provider": "Apps\\Manufacturing\\Services\\OperatorSurfaceContributionService::contribute",
+      "provider_file": "Services/OperatorSurfaceContributionService.php",
+      "order": 25
+    },
+    {
+      "type": "operator_surface",
+      "key": "manufacturing.operator.breadcrumb_parents",
+      "surface": "operator",
+      "region": "breadcrumb_parents",
+      "provider": "Apps\\Manufacturing\\Services\\OperatorSurfaceContributionService::contribute",
+      "provider_file": "Services/OperatorSurfaceContributionService.php",
+      "order": 30
+    },
+    {
+      "type": "operator_surface",
+      "key": "manufacturing.operator.focus_labels",
+      "surface": "operator",
+      "region": "focus_labels",
+      "provider": "Apps\\Manufacturing\\Services\\OperatorSurfaceContributionService::contribute",
+      "provider_file": "Services/OperatorSurfaceContributionService.php",
+      "order": 35
+    },
+    {
+      "type": "operator_surface",
+      "key": "manufacturing.operator.bottom_actions",
+      "surface": "operator",
+      "region": "bottom_actions",
+      "provider": "Apps\\Manufacturing\\Services\\OperatorSurfaceContributionService::contribute",
+      "provider_file": "Services/OperatorSurfaceContributionService.php",
+      "order": 40
+    },
+    {
+      "type": "widget_builder_dataset",
+      "key": "manufacturing.widget_builder.datasets",
+      "provider": "Apps\\Manufacturing\\Services\\WidgetBuilderDatasetContributionService::contribute",
+      "provider_file": "Services/WidgetBuilderDatasetContributionService.php",
+      "order": 10
+    }
+  ],
+  "routes": [
+    {
+      "path": "/apps/manufacturing/products"
+    },
+    {
+      "path": "/machines"
+    },
+    {
+      "path": "/apps/manufacturing/daily-orders"
+    },
+    {
+      "path": "/apps/manufacturing/production-plans"
+    },
+    {
+      "path": "/manufacturing/production-queue"
+    },
+    {
+      "path": "/apps/manufacturing"
+    },
+    {
+      "path": "/apps/manufacturing/materials"
+    },
+    {
+      "path": "/apps/manufacturing/materials/master"
+    },
+    {
+      "path": "/apps/manufacturing/materials/mapping"
+    },
+    {
+      "path": "/apps/manufacturing/materials/stock"
+    },
+    {
+      "path": "/apps/manufacturing/materials/receipt"
+    },
+    {
+      "path": "/apps/manufacturing/materials/coverage"
+    },
+    {
+      "path": "/apps/manufacturing/materials/planning"
+    },
+    {
+      "path": "/apps/manufacturing/materials/orders"
+    },
+    {
+      "path": "/apps/manufacturing/materials/capacity"
+    },
+    {
+      "path": "/apps/manufacturing/materials/cost"
+    },
+    {
+      "path": "/apps/manufacturing/handoffs"
+    },
+    {
+      "path": "/apps/manufacturing/production-operation"
+    },
+    {
+      "path": "/apps/manufacturing/processing-operation"
+    },
+    {
+      "path": "/apps/manufacturing/processing-operation/assembly-update"
+    },
+    {
+      "path": "/apps/manufacturing/processing-operation/qc-update"
+    },
+    {
+      "path": "/manufacturing/demand-dashboard"
+    },
+    {
+      "path": "/manufacturing/demands"
+    },
+    {
+      "path": "/manufacturing/coverage"
+    },
+    {
+      "path": "/manufacturing/dispatch-ops"
+    },
+    {
+      "path": "/manufacturing/qc-queue"
+    },
+    {
+      "path": "/apps/manufacturing/assembly-queue"
+    },
+    {
+      "path": "/manufacturing/production-dashboard"
+    },
+    {
+      "path": "/manufacturing/assembly-dashboard"
+    },
+    {
+      "path": "/manufacturing/qc-dashboard"
+    },
+    {
+      "path": "/manufacturing/dispatch-dashboard"
+    },
+    {
+      "path": "/apps/manufacturing/assembly-plans"
+    },
+    {
+      "path": "/apps/manufacturing/assembly-workbench"
+    },
+    {
+      "path": "/apps/manufacturing/assembly-plans/detail"
+    },
+    {
+      "path": "/apps/manufacturing/assembly-plans/update"
+    },
+    {
+      "path": "/apps/manufacturing/assembly-plans/approve"
+    },
+    {
+      "path": "/apps/manufacturing/assembly-plans/execution-log"
+    },
+    {
+      "path": "/apps/manufacturing/assembly-plans/execution-approve"
+    },
+    {
+      "path": "/apps/manufacturing/assembly-plans/transition"
+    },
+    {
+      "path": "/manufacturing/stage-board"
+    },
+    {
+      "path": "/manufacturing/stage-release"
+    },
+    {
+      "path": "/manufacturing/stage-override"
+    },
+    {
+      "path": "/production-entries"
+    },
+    {
+      "path": "/qc-plans"
+    },
+    {
+      "path": "/qc-entries"
+    },
+    {
+      "path": "/dispatch-entries"
+    }
+  ],
+  "menus": [
+    {
+      "key": "app.mfg.root",
+      "label_key": "nav.manufacturing_portal",
+      "label": "Manufacturing",
+      "url": null,
+      "parent": "apps.root",
+      "order": 40
+    },
+    {
+      "key": "app.mfg.products",
+      "label_key": "nav.parts_master",
+      "label": "Products",
+      "url": "/apps/manufacturing/products",
+      "parent": "app.mfg.root",
+      "order": 41,
+      "perm": "manufacturing.view"
+    },
+    {
+      "key": "app.mfg.machines",
+      "label_key": "nav.machine_leader",
+      "label": "Machines",
+      "url": "/machines",
+      "parent": "app.mfg.root",
+      "order": 42,
+      "perm": "manufacturing.view"
+    },
+    {
+      "key": "app.mfg.daily_orders",
+      "label_key": "nav.daily_orders",
+      "label": "Daily Orders",
+      "url": "/apps/manufacturing/daily-orders",
+      "parent": "app.mfg.root",
+      "order": 43,
+      "perm": "manufacturing.view"
+    },
+    {
+      "key": "app.mfg.production_plans",
+      "label_key": "nav.production_plans",
+      "label": "Production Plans",
+      "url": "/apps/manufacturing/production-plans",
+      "parent": "app.mfg.root",
+      "order": 44,
+      "perm": "manufacturing.view"
+    },
+    {
+      "key": "app.mfg.queue",
+      "label_key": "nav.production_queue",
+      "label": "Production Queue",
+      "url": "/manufacturing/production-queue",
+      "parent": "app.mfg.root",
+      "order": 45,
+      "perm": "manufacturing.view"
+    },
+    {
+      "key": "app.mfg.dashboard",
+      "label_key": "nav.manufacturing_portal",
+      "label": "Manufacturing Workspace",
+      "url": "/apps/manufacturing",
+      "parent": "app.mfg.root",
+      "order": 46,
+      "perm": "manufacturing.view"
+    },
+    {
+      "key": "app.mfg.materials_supply",
+      "label": "Materials & Supply",
+      "url": null,
+      "parent": "app.mfg.root",
+      "order": 46,
+      "perm": "materials.stock.view"
+    },
+    {
+      "key": "app.mfg.materials",
+      "label": "Materials Workspace",
+      "url": "/apps/manufacturing/materials",
+      "parent": "app.mfg.materials_supply",
+      "order": 1,
+      "perm": "materials.stock.view"
+    },
+    {
+      "key": "app.mfg.materials_stock",
+      "label": "Material Stock",
+      "url": "/apps/manufacturing/materials/stock",
+      "parent": "app.mfg.materials_supply",
+      "order": 2,
+      "perm": "materials.stock.view"
+    },
+    {
+      "key": "app.mfg.materials_orders",
+      "label": "Material Orders",
+      "url": "/apps/manufacturing/materials/orders",
+      "parent": "app.mfg.materials_supply",
+      "order": 3,
+      "perm": "materials.orders.manage"
+    },
+    {
+      "key": "app.mfg.materials_receipt",
+      "label": "Material Receipt",
+      "url": "/apps/manufacturing/materials/receipt",
+      "parent": "app.mfg.materials_supply",
+      "order": 4,
+      "perm": "materials.orders.manage"
+    },
+    {
+      "key": "app.mfg.handoffs",
+      "label_key": "nav.cross_role_handoff",
+      "label": "Cross-Role Handoff Board",
+      "url": "/apps/manufacturing/handoffs",
+      "parent": "app.mfg.root",
+      "order": 47,
+      "perm": "manufacturing.manage"
+    },
+    {
+      "key": "app.mfg.production_operation",
+      "label": "Production Operation",
+      "url": "/apps/manufacturing/production-operation",
+      "parent": "app.mfg.root",
+      "order": 25,
+      "perm": "manufacturing.view"
+    },
+    {
+      "key": "app.mfg.processing_operation",
+      "label": "Processing Operation",
+      "url": "/apps/manufacturing/processing-operation",
+      "parent": "app.mfg.root",
+      "order": 45,
+      "perm": "manufacturing.view"
+    },
+    {
+      "key": "app.mfg.demand_dashboard",
+      "label_key": "nav.demand_dashboard",
+      "label": "Demand Workspace",
+      "url": "/apps/manufacturing/demand-dashboard",
+      "parent": "app.mfg.root",
+      "order": 47,
+      "perm": "manufacturing.view"
+    },
+    {
+      "key": "app.mfg.demands",
+      "label_key": "nav.demand_workspace",
+      "label": "Demand Workspace",
+      "url": "/apps/manufacturing/demands",
+      "parent": "app.mfg.root",
+      "order": 46,
+      "perm": "manufacturing.manage"
+    },
+    {
+      "key": "app.mfg.coverage",
+      "label_key": "nav.coverage_dashboard",
+      "label": "Coverage Analytics",
+      "url": "/apps/manufacturing/coverage",
+      "parent": "app.mfg.root",
+      "order": 46,
+      "perm": "manufacturing.view"
+    },
+    {
+      "key": "app.mfg.order_processing_list",
+      "label_key": "nav.dispatch_ops",
+      "label": "Dispatch Ops",
+      "url": "/apps/manufacturing/dispatch-ops",
+      "parent": "app.mfg.root",
+      "order": 47,
+      "perm": "manufacturing.manage"
+    },
+    {
+      "key": "app.mfg.order_processing_form",
+      "label_key": "nav.order_processing_prep",
+      "label": "Order Preparation Form",
+      "url": "/apps/manufacturing/dispatch-ops/preparation",
+      "parent": "app.mfg.root",
+      "order": 48,
+      "perm": "manufacturing.manage"
+    },
+    {
+      "key": "app.mfg.qc_demand",
+      "label_key": "nav.qc_queue",
+      "label": "QC Demand Queue",
+      "url": "/manufacturing/qc-queue",
+      "parent": "app.mfg.root",
+      "order": 48,
+      "perm": "manufacturing.view"
+    },
+    {
+      "key": "app.mfg.assembly_demand",
+      "label_key": "nav.assembly_queue",
+      "label": "Assembly Queue",
+      "url": "/apps/manufacturing/assembly-queue",
+      "parent": "app.mfg.root",
+      "order": 49,
+      "perm": "manufacturing.view"
+    },
+    {
+      "key": "app.mfg.assembly_plans",
+      "label_key": "nav.assembly_plans",
+      "label": "Assembly Plans",
+      "url": "/apps/manufacturing/assembly-plans",
+      "parent": "app.mfg.root",
+      "order": 50,
+      "perm": "manufacturing.view"
+    },
+    {
+      "key": "app.mfg.stage_board",
+      "label_key": "nav.stage_board",
+      "label": "Stage Readiness Board",
+      "url": "/manufacturing/stage-board",
+      "parent": "app.mfg.root",
+      "order": 50,
+      "perm": "manufacturing.manage"
+    },
+    {
+      "key": "app.mfg.qc",
+      "label_key": "nav.qc_workboard",
+      "label": "QC Entries",
+      "url": "/qc-entries",
+      "parent": "app.mfg.root",
+      "order": 51,
+      "perm": "manufacturing.view"
+    },
+    {
+      "key": "app.mfg.dispatch_list",
+      "label_key": "nav.dispatch_leader",
+      "label": "Dispatch List",
+      "url": "/dispatch-entries",
+      "parent": "app.mfg.root",
+      "order": 52,
+      "perm": "manufacturing.view"
+    },
+    {
+      "key": "app.mfg.dispatch_form",
+      "label_key": "nav.dispatch_workbench",
+      "label": "Dispatch Form",
+      "url": "/dispatch-entries/add",
+      "parent": "app.mfg.root",
+      "order": 53,
+      "perm": "manufacturing.view"
+    }
+  ],
+  "widgets": [
+    {
+      "key": "mfg.widget.machine_leader_overview",
+      "title_key": "nav.machine_leader",
+      "title": "Production Workspace",
+      "url": "/apps/manufacturing/production-dashboard",
+      "order": 8,
+      "domain": "manufacturing",
+      "zone": "manufacturing",
+      "visible_if": "role_machine_leader",
+      "module_key": "manufacturing_ipm",
+      "source_plugin": "Machines"
+    },
+    {
+      "key": "mfg.widget.qc_leader_overview",
+      "title_key": "nav.qc_leader",
+      "title": "QC Workspace",
+      "url": "/apps/manufacturing/qc-dashboard",
+      "order": 9,
+      "domain": "manufacturing",
+      "zone": "manufacturing",
+      "visible_if": "role_qc_leader",
+      "module_key": "manufacturing_ipm",
+      "source_plugin": "QCEntries"
+    },
+    {
+      "key": "mfg.widget.dispatch_leader_overview",
+      "title_key": "nav.dispatch_leader",
+      "title": "Dispatch Workspace",
+      "url": "/apps/manufacturing/dispatch-dashboard",
+      "order": 10,
+      "domain": "manufacturing",
+      "zone": "manufacturing",
+      "visible_if": "role_dispatch_leader",
+      "module_key": "manufacturing_ipm",
+      "source_plugin": "DispatchEntries"
+    },
+    {
+      "key": "mfg.widget.daily_orders",
+      "title_key": "nav.daily_orders",
+      "title": "Daily Orders",
+      "url": "/apps/manufacturing/daily-orders",
+      "order": 10,
+      "domain": "manufacturing",
+      "zone": "manufacturing"
+    },
+    {
+      "key": "mfg.widget.production_plans",
+      "title_key": "nav.production_plans",
+      "title": "Production Plans",
+      "url": "/apps/manufacturing/production-plans",
+      "order": 11,
+      "domain": "manufacturing",
+      "zone": "manufacturing"
+    },
+    {
+      "key": "mfg.widget.production_queue",
+      "title_key": "nav.production_queue",
+      "title": "Production Queue",
+      "url": "/manufacturing/production-queue",
+      "order": 12,
+      "domain": "manufacturing",
+      "zone": "manufacturing"
+    },
+    {
+      "key": "mfg.widget.assembly_plans",
+      "title_key": "nav.assembly_plans",
+      "title": "Assembly Plans",
+      "url": "/apps/manufacturing/assembly-plans",
+      "order": 13,
+      "domain": "manufacturing",
+      "zone": "manufacturing",
+      "module_key": "assembly_plans"
+    },
+    {
+      "key": "mfg.widget.dispatch",
+      "title_key": "nav.dispatch_workbench",
+      "title": "Dispatch Entries",
+      "url": "/dispatch-entries",
+      "order": 14,
+      "domain": "manufacturing",
+      "zone": "manufacturing"
+    }
+  ],
+  "runtime_contract": {
+    "routes": [
+      {
+        "path": "/apps/manufacturing",
+        "feature_key": "manufacturing_portal",
+        "kind": "canonical",
+        "nav_visible": true,
+        "search_visible": true,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/apps/manufacturing/production-operation",
+        "feature_key": "production_operation",
+        "kind": "canonical",
+        "nav_visible": true,
+        "search_visible": true,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/apps/manufacturing/processing-operation",
+        "feature_key": "processing_operation",
+        "kind": "canonical",
+        "nav_visible": true,
+        "search_visible": true,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/apps/manufacturing/materials",
+        "feature_key": "material_management",
+        "kind": "canonical",
+        "nav_visible": true,
+        "search_visible": true,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/apps/manufacturing/materials/master",
+        "feature_key": "material_master",
+        "kind": "canonical",
+        "nav_visible": false,
+        "search_visible": false,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/apps/manufacturing/materials/mapping",
+        "feature_key": "material_mapping",
+        "kind": "canonical",
+        "nav_visible": false,
+        "search_visible": false,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/apps/manufacturing/materials/stock",
+        "feature_key": "material_stock",
+        "kind": "canonical",
+        "nav_visible": true,
+        "search_visible": true,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/apps/manufacturing/materials/receipt",
+        "feature_key": "material_receipt",
+        "kind": "canonical",
+        "nav_visible": true,
+        "search_visible": true,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/apps/manufacturing/materials/coverage",
+        "feature_key": "material_coverage",
+        "kind": "canonical",
+        "nav_visible": false,
+        "search_visible": false,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/apps/manufacturing/materials/planning",
+        "feature_key": "material_planning",
+        "kind": "canonical",
+        "nav_visible": false,
+        "search_visible": false,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/apps/manufacturing/materials/orders",
+        "feature_key": "material_orders",
+        "kind": "canonical",
+        "nav_visible": true,
+        "search_visible": true,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/apps/manufacturing/materials/capacity",
+        "feature_key": "material_capacity",
+        "kind": "canonical",
+        "nav_visible": false,
+        "search_visible": false,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/apps/manufacturing/materials/cost",
+        "feature_key": "material_cost",
+        "kind": "canonical",
+        "nav_visible": false,
+        "search_visible": false,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/apps/manufacturing/handoffs",
+        "feature_key": "cross_role_handoff",
+        "kind": "canonical",
+        "nav_visible": true,
+        "search_visible": true,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/apps/manufacturing/daily-orders",
+        "feature_key": "daily_orders",
+        "kind": "canonical",
+        "nav_visible": true,
+        "search_visible": true,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/apps/manufacturing/production-plans",
+        "feature_key": "production_plans",
+        "kind": "canonical",
+        "nav_visible": true,
+        "search_visible": true,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/apps/manufacturing/products",
+        "feature_key": "parts_master",
+        "kind": "canonical",
+        "nav_visible": true,
+        "search_visible": true,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/apps/manufacturing/demands",
+        "feature_key": "demand_workspace",
+        "kind": "canonical",
+        "nav_visible": true,
+        "search_visible": true,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/apps/manufacturing/coverage",
+        "feature_key": "coverage_dashboard",
+        "kind": "canonical",
+        "nav_visible": true,
+        "search_visible": true,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/manufacturing/production-queue",
+        "feature_key": "production_queue",
+        "kind": "canonical",
+        "nav_visible": true,
+        "search_visible": true,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/manufacturing/qc-queue",
+        "feature_key": "qc_queue",
+        "kind": "canonical",
+        "nav_visible": true,
+        "search_visible": true,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/manufacturing/dispatch-ops",
+        "feature_key": "dispatch_ops",
+        "kind": "canonical",
+        "nav_visible": true,
+        "search_visible": true,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/apps/manufacturing/assembly-queue",
+        "feature_key": "assembly_queue",
+        "kind": "canonical",
+        "nav_visible": true,
+        "search_visible": true,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/apps/manufacturing/assembly-plans",
+        "feature_key": "assembly_plans",
+        "kind": "canonical",
+        "nav_visible": true,
+        "search_visible": true,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/apps/manufacturing/production-dashboard",
+        "feature_key": "production_dashboard",
+        "kind": "canonical",
+        "nav_visible": true,
+        "search_visible": true,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/apps/manufacturing/assembly-dashboard",
+        "feature_key": "assembly_dashboard",
+        "kind": "canonical",
+        "nav_visible": true,
+        "search_visible": true,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/apps/manufacturing/qc-dashboard",
+        "feature_key": "qc_dashboard",
+        "kind": "canonical",
+        "nav_visible": true,
+        "search_visible": true,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/apps/manufacturing/dispatch-dashboard",
+        "feature_key": "dispatch_dashboard",
+        "kind": "canonical",
+        "nav_visible": true,
+        "search_visible": true,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/dispatch",
+        "feature_key": "dispatch_entries",
+        "kind": "alias",
+        "canonical_target": "/dispatch-entries",
+        "compatibility": true,
+        "deprecated": false,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/qc",
+        "feature_key": "qc_entries",
+        "kind": "alias",
+        "canonical_target": "/qc-entries",
+        "compatibility": true,
+        "deprecated": false,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/production",
+        "feature_key": "production_queue",
+        "kind": "alias",
+        "canonical_target": "/manufacturing/production-queue",
+        "compatibility": true,
+        "deprecated": false,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/mfg",
+        "feature_key": "manufacturing_portal",
+        "kind": "alias",
+        "canonical_target": "/apps/manufacturing",
+        "compatibility": true,
+        "deprecated": false,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/ops/handoff-board",
+        "feature_key": "cross_role_handoff",
+        "kind": "alias",
+        "canonical_target": "/apps/manufacturing/handoffs",
+        "compatibility": true,
+        "deprecated": false,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/assembly-plans",
+        "feature_key": "assembly_plans",
+        "kind": "alias",
+        "canonical_target": "/apps/manufacturing/assembly-plans",
+        "compatibility": true,
+        "deprecated": false,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/manufacturing/assembly-queue",
+        "feature_key": "assembly_queue",
+        "kind": "alias",
+        "canonical_target": "/apps/manufacturing/assembly-queue",
+        "compatibility": true,
+        "deprecated": false,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/manufacturing/assembly-plans",
+        "feature_key": "assembly_plans",
+        "kind": "alias",
+        "canonical_target": "/apps/manufacturing/assembly-plans",
+        "compatibility": true,
+        "deprecated": false,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/ops/production-dashboard",
+        "feature_key": "production_dashboard",
+        "kind": "alias",
+        "canonical_target": "/apps/manufacturing/production-dashboard",
+        "compatibility": true,
+        "deprecated": false,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/ops/assembly-dashboard",
+        "feature_key": "assembly_dashboard",
+        "kind": "alias",
+        "canonical_target": "/apps/manufacturing/assembly-dashboard",
+        "compatibility": true,
+        "deprecated": false,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/ops/qc-dashboard",
+        "feature_key": "qc_dashboard",
+        "kind": "alias",
+        "canonical_target": "/apps/manufacturing/qc-dashboard",
+        "compatibility": true,
+        "deprecated": false,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/ops/dispatch-dashboard",
+        "feature_key": "dispatch_dashboard",
+        "kind": "alias",
+        "canonical_target": "/apps/manufacturing/dispatch-dashboard",
+        "compatibility": true,
+        "deprecated": false,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/ops/production-leader-dashboard",
+        "feature_key": "production_dashboard",
+        "kind": "alias",
+        "canonical_target": "/apps/manufacturing/production-dashboard",
+        "compatibility": true,
+        "deprecated": true,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/ops/assembly-leader-dashboard",
+        "feature_key": "assembly_dashboard",
+        "kind": "alias",
+        "canonical_target": "/apps/manufacturing/assembly-dashboard",
+        "compatibility": true,
+        "deprecated": true,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/ops/qc-leader-dashboard",
+        "feature_key": "qc_dashboard",
+        "kind": "alias",
+        "canonical_target": "/apps/manufacturing/qc-dashboard",
+        "compatibility": true,
+        "deprecated": true,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/ops/dispatch-leader-dashboard",
+        "feature_key": "dispatch_dashboard",
+        "kind": "alias",
+        "canonical_target": "/apps/manufacturing/dispatch-dashboard",
+        "compatibility": true,
+        "deprecated": true,
+        "lifecycle_bound": true
+      }
+    ],
+    "charts": [
+      {
+        "key": "throughput_trend",
+        "feature_key": "production_dashboard",
+        "label_key": "chart.throughput_trend",
+        "url": "/manufacturing/production-dashboard",
+        "search_visible": true,
+        "meta": "Production throughput analytics"
+      },
+      {
+        "key": "plan_vs_actual",
+        "feature_key": "production_dashboard",
+        "label_key": "chart.plan_vs_actual",
+        "url": "/manufacturing/production-dashboard",
+        "search_visible": true,
+        "meta": "Planning adherence chart"
+      },
+      {
+        "key": "assembly_output",
+        "feature_key": "assembly_dashboard",
+        "label_key": "chart.assembly_output",
+        "url": "/apps/manufacturing/assembly-dashboard",
+        "search_visible": true,
+        "meta": "Assembly productivity chart"
+      },
+      {
+        "key": "qc_pass_rate",
+        "feature_key": "qc_dashboard",
+        "label_key": "chart.qc_pass_rate",
+        "url": "/manufacturing/qc-dashboard",
+        "search_visible": true,
+        "meta": "Quality performance chart"
+      },
+      {
+        "key": "dispatch_volume",
+        "feature_key": "dispatch_dashboard",
+        "label_key": "chart.dispatch_volume",
+        "url": "/manufacturing/dispatch-dashboard",
+        "search_visible": true,
+        "meta": "Dispatch throughput chart"
+      }
+    ],
+    "dashboards": [
+      {
+        "key": "production_dashboard",
+        "feature_key": "production_dashboard",
+        "label_key": "nav.machine_leader",
+        "url": "/manufacturing/production-dashboard",
+        "nav_visible": true,
+        "search_visible": true,
+        "role_visibility": [
+          "role_machine_leader"
+        ]
+      },
+      {
+        "key": "assembly_dashboard",
+        "feature_key": "assembly_dashboard",
+        "label_key": "nav.assembly_leader",
+        "url": "/apps/manufacturing/assembly-dashboard",
+        "nav_visible": true,
+        "search_visible": true,
+        "role_visibility": [
+          "role_assembly_leader"
+        ]
+      },
+      {
+        "key": "qc_dashboard",
+        "feature_key": "qc_dashboard",
+        "label_key": "nav.qc_leader",
+        "url": "/manufacturing/qc-dashboard",
+        "nav_visible": true,
+        "search_visible": true,
+        "role_visibility": [
+          "role_qc_leader"
+        ]
+      },
+      {
+        "key": "dispatch_dashboard",
+        "feature_key": "dispatch_dashboard",
+        "label_key": "nav.dispatch_leader",
+        "url": "/manufacturing/dispatch-dashboard",
+        "nav_visible": true,
+        "search_visible": true,
+        "role_visibility": [
+          "role_dispatch_leader"
+        ]
+      }
+    ],
+    "search_entries": [
+      {
+        "key": "material_management",
+        "feature_key": "material_management",
+        "label": "Materials Workspace",
+        "url": "/apps/manufacturing/materials",
+        "search_visible": true
+      },
+      {
+        "key": "material_stock",
+        "feature_key": "material_stock",
+        "label": "Material Stock",
+        "url": "/apps/manufacturing/materials/stock",
+        "search_visible": true
+      },
+      {
+        "key": "material_receipt",
+        "feature_key": "material_receipt",
+        "label": "Material Receipt",
+        "url": "/apps/manufacturing/materials/receipt",
+        "search_visible": true
+      },
+      {
+        "key": "material_orders",
+        "feature_key": "material_orders",
+        "label": "Material Orders",
+        "url": "/apps/manufacturing/materials/orders",
+        "search_visible": true
+      },
+      {
+        "key": "daily_orders",
+        "feature_key": "daily_orders",
+        "label_key": "nav.daily_orders",
+        "url": "/apps/manufacturing/daily-orders",
+        "search_visible": true
+      },
+      {
+        "key": "production_plans",
+        "feature_key": "production_plans",
+        "label_key": "nav.production_plans",
+        "url": "/apps/manufacturing/production-plans",
+        "search_visible": true
+      },
+      {
+        "key": "parts_master",
+        "feature_key": "parts_master",
+        "label_key": "nav.parts_master",
+        "url": "/apps/manufacturing/products",
+        "search_visible": true
+      },
+      {
+        "key": "demand_workspace",
+        "feature_key": "demand_workspace",
+        "label_key": "nav.demand_workspace",
+        "url": "/apps/manufacturing/demands",
+        "search_visible": true
+      },
+      {
+        "key": "coverage_dashboard",
+        "feature_key": "coverage_dashboard",
+        "label_key": "nav.coverage_dashboard",
+        "url": "/apps/manufacturing/coverage",
+        "search_visible": true
+      }
+    ],
+    "notifications": [
+      {
+        "key": "workflow_notifications",
+        "feature_key": "workflow",
+        "target_table": "workflow_notifications",
+        "lifecycle_bound": false
+      },
+      {
+        "key": "handoff_tracking",
+        "feature_key": "handoff",
+        "target_table": "handoff_tracking",
+        "lifecycle_bound": false
+      }
+    ],
+    "resolvers": [
+      {
+        "key": "handoff.assembly",
+        "feature_key": "assembly",
+        "target_service": "App\\Core\\HandoffEngine::setAssemblyResolvers",
+        "description": "Assembly stage context + completed qty resolver"
+      },
+      {
+        "key": "coverage.handoff_sync",
+        "feature_key": "coverage",
+        "target_service": "Plugins\\Coverage\\Services\\CoverageService::setResolvers",
+        "description": "Coverage-to-handoff risk sync resolver"
+      }
+    ],
+    "module_contracts": [
+      {
+        "feature_key": "daily_orders",
+        "canonical_surfaces": [
+          "/apps/manufacturing/daily-orders"
+        ],
+        "compatibility_surfaces": [
+          "/daily-orders"
+        ],
+        "nav_visible": true,
+        "search_visible": true,
+        "role_scoped": true
+      },
+      {
+        "feature_key": "production_plans",
+        "canonical_surfaces": [
+          "/apps/manufacturing/production-plans"
+        ],
+        "compatibility_surfaces": [
+          "/production-plans"
+        ],
+        "nav_visible": true,
+        "search_visible": true,
+        "role_scoped": true
+      },
+      {
+        "feature_key": "production_queue",
+        "canonical_surfaces": [
+          "/manufacturing/production-queue"
+        ],
+        "compatibility_surfaces": [
+          "/production"
+        ],
+        "nav_visible": true,
+        "search_visible": true,
+        "role_scoped": true
+      },
+      {
+        "feature_key": "assembly_plans",
+        "canonical_surfaces": [
+          "/apps/manufacturing/assembly-plans"
+        ],
+        "compatibility_surfaces": [
+          "/assembly-plans",
+          "/manufacturing/assembly-plans"
+        ],
+        "nav_visible": true,
+        "search_visible": true,
+        "role_scoped": true
+      },
+      {
+        "feature_key": "assembly_entries",
+        "canonical_surfaces": [
+          "/apps/manufacturing/assembly-queue"
+        ],
+        "compatibility_surfaces": [
+          "/manufacturing/assembly-queue"
+        ],
+        "nav_visible": true,
+        "search_visible": true,
+        "role_scoped": true
+      },
+      {
+        "feature_key": "materials",
+        "canonical_surfaces": [
+          "/apps/manufacturing/materials",
+          "/apps/manufacturing/materials/stock",
+          "/apps/manufacturing/materials/orders",
+          "/apps/manufacturing/materials/receipt"
+        ],
+        "compatibility_surfaces": [],
+        "nav_visible": true,
+        "search_visible": true,
+        "role_scoped": true
+      }
+    ],
+    "plugin_modules": [
+      {
+        "name": "MaterialManagement",
+        "feature_key": "materials",
+        "runtime_surfaces": [
+          "/apps/manufacturing/materials",
+          "/apps/manufacturing/materials/stock",
+          "/apps/manufacturing/materials/orders",
+          "/apps/manufacturing/materials/receipt"
+        ],
+        "kind": "canonical",
+        "nav_visible": true,
+        "search_visible": true,
+        "role_scoped": true
+      },
+      {
+        "name": "Machines",
+        "feature_key": "production_dashboard",
+        "runtime_surfaces": [
+          "/apps/manufacturing/production-dashboard",
+          "/apps/manufacturing/production-workboard"
+        ],
+        "kind": "compatibility",
+        "nav_visible": true,
+        "search_visible": true,
+        "role_scoped": true
+      },
+      {
+        "name": "QCEntries",
+        "feature_key": "qc_dashboard",
+        "runtime_surfaces": [
+          "/manufacturing/qc-dashboard",
+          "/manufacturing/qc-workboard",
+          "/qc-entries"
+        ],
+        "kind": "compatibility",
+        "nav_visible": true,
+        "search_visible": true,
+        "role_scoped": true
+      },
+      {
+        "name": "AssemblyPlans",
+        "feature_key": "assembly_plans",
+        "runtime_surfaces": [
+          "/apps/manufacturing/assembly-plans"
+        ],
+        "kind": "canonical",
+        "nav_visible": true,
+        "search_visible": true,
+        "role_scoped": true
+      },
+      {
+        "name": "AssemblyEntries",
+        "feature_key": "assembly_entries",
+        "runtime_surfaces": [
+          "/apps/manufacturing/assembly-queue"
+        ],
+        "kind": "canonical",
+        "nav_visible": true,
+        "search_visible": true,
+        "role_scoped": true
+      },
+      {
+        "name": "DispatchEntries",
+        "feature_key": "dispatch_dashboard",
+        "runtime_surfaces": [
+          "/manufacturing/dispatch-dashboard",
+          "/manufacturing/dispatch-workboard",
+          "/dispatch-entries"
+        ],
+        "kind": "compatibility",
+        "nav_visible": true,
+        "search_visible": true,
+        "role_scoped": true
+      },
+      {
+        "name": "Products",
+        "feature_key": "parts_master",
+        "runtime_surfaces": [
+          "/apps/manufacturing/products"
+        ],
+        "kind": "compatibility",
+        "nav_visible": true,
+        "search_visible": true,
+        "role_scoped": false
+      }
+    ]
+  },
+  "purge": {
+    "tables": [
+      "mfg_part_demands",
+      "mfg_stage_readiness",
+      "mfg_assembly_entries"
+    ],
+    "drop_columns": [
+      {
+        "table": "products",
+        "column": "production_source"
+      },
+      {
+        "table": "products",
+        "column": "requires_qc"
+      },
+      {
+        "table": "products",
+        "column": "requires_assembly"
+      },
+      {
+        "table": "products",
+        "column": "dispatch_as_is"
+      },
+      {
+        "table": "products",
+        "column": "delivery_flow"
+      },
+      {
+        "table": "products",
+        "column": "activity_type"
+      },
+      {
+        "table": "dispatch_entries",
+        "column": "cases_count"
+      },
+      {
+        "table": "dispatch_entries",
+        "column": "pallets_count"
+      },
+      {
+        "table": "dispatch_entries",
+        "column": "dispatch_mode"
+      },
+      {
+        "table": "dispatch_entries",
+        "column": "delivery_flow"
+      },
+      {
+        "table": "dispatch_entries",
+        "column": "source_type"
+      },
+      {
+        "table": "dispatch_entries",
+        "column": "prepared_by"
+      },
+      {
+        "table": "dispatch_entries",
+        "column": "prepared_at"
+      },
+      {
+        "table": "dispatch_entries",
+        "column": "dispatch_completed_by"
+      },
+      {
+        "table": "dispatch_entries",
+        "column": "dispatch_completed_at"
+      },
+      {
+        "table": "dispatch_entries",
+        "column": "completion_status"
+      },
+      {
+        "table": "dispatch_entries",
+        "column": "third_party_reference"
+      }
+    ]
+  },
+  "can_disable": true,
+  "can_uninstall": true,
+  "can_export": true,
+  "styles": [
+    {
+      "key": "manufacturing.app",
+      "path": "styles/manufacturing.css",
+      "scope": "app",
+      "surfaces": [
+        "admin",
+        "operator",
+        "work-entry",
+        "display"
+      ],
+      "order": 200
+    },
+    {
+      "key": "manufacturing.display_floor",
+      "path": "styles/display-floor.css",
+      "scope": "app",
+      "surfaces": [
+        "display"
+      ],
+      "order": 210
+    },
+    {
+      "key": "manufacturing.module.production_entries",
+      "path": "modules/ProductionEntries/styles.css",
+      "scope": "module",
+      "module": "production_entries",
+      "surfaces": [
+        "operator",
+        "work-entry"
+      ],
+      "order": 300
+    },
+    {
+      "key": "manufacturing.module.machines",
+      "path": "modules/Machines/styles.css",
+      "scope": "module",
+      "module": "machines",
+      "surfaces": [
+        "admin"
+      ],
+      "order": 310
+    },
+    {
+      "key": "manufacturing.module.dispatch_entries",
+      "path": "modules/DispatchEntries/styles.css",
+      "scope": "module",
+      "module": "dispatch_entries",
+      "surfaces": [
+        "admin"
+      ],
+      "order": 320
+    },
+    {
+      "key": "manufacturing.module.qc_plans",
+      "path": "modules/QCPlans/styles.css",
+      "scope": "module",
+      "module": "qc_plans",
+      "surfaces": [
+        "admin"
+      ],
+      "order": 330
+    },
+    {
+      "key": "manufacturing.module.qc_entries",
+      "path": "modules/QCEntries/styles.css",
+      "scope": "module",
+      "module": "qc_entries",
+      "surfaces": [
+        "admin"
+      ],
+      "order": 340
+    },
+    {
+      "key": "manufacturing.module.coverage",
+      "path": "modules/Coverage/styles.css",
+      "scope": "module",
+      "module": "coverage",
+      "surfaces": [
+        "admin"
+      ],
+      "order": 350
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+@layer rendering {
+  :root {
+    --render-space-1: 6px;
+    --render-space-2: 10px;
+    --render-space-3: 14px;
+    --render-space-4: 18px;
+    --render-space-5: 24px;
+    --render-radius-sm: 10px;
+    --render-radius-md: 14px;
+    --render-radius-lg: 18px;
+    --render-radius-panel: 20px;
+    --render-radius-pill: 999px;
+    --render-border-width: 1px;
+    --render-card-radius: var(--render-radius-md);
+    --render-card-padding: 16px;
+    --render-icon-chip-size: 32px;
+    --render-icon-chip-radius: var(--render-radius-sm);
+    --render-control-height: 42px;
+    --render-control-font-size: 16px;
+    --render-control-line-height: 1.25;
+    --render-control-radius: 12px;
+    --render-control-padding-block: 10px;
+    --render-control-padding-inline: 12px;
+    --render-control-padding-inline-select: 40px;
+    --render-control-padding-inline-date: 42px;
+    --render-control-gap: 10px;
+    --render-control-gap-tight: 8px;
+    --render-control-field-min: 180px;
+    --render-control-field-wide-min: 240px;
+    --render-control-field-compact-min: 148px;
+    --render-choice-size: 18px;
+    --render-checkbox-radius: 4px;
+    --render-radio-radius: 50%;
+    --render-shadow-control: 0 8px 20px rgba(25, 52, 92, .12);
+    --render-shadow-surface: 0 18px 40px rgba(25, 52, 92, .16);
+    --render-duration-fast: 120ms;
+    --render-duration-normal: 180ms;
+  }
+}

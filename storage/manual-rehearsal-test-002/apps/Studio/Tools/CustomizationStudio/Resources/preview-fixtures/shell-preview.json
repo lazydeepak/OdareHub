@@ -1,0 +1,21 @@
+{
+  "fixture": "shell-preview",
+  "owner": "studio",
+  "tool_area": "customization-studio",
+  "purpose": "Describes a future real-Shell preview frame without connecting to Shell runtime.",
+  "runtime_status": "fixture_catalog_only_not_rendered",
+  "renders_ui": false,
+  "connects_to_shell": false,
+  "reads_studio_drafts": false,
+  "uses_active_registry_truth": false,
+  "examples": [
+    {
+      "example": "admin-shell-frame",
+      "label": "Shell frame preview",
+      "description": "A representative admin wrapper frame with header, sidebar, content area, footer, app switcher, and notification area.",
+      "socket_catalogs": ["root-mode", "core-tokens", "shell-chrome", "navigation", "layout", "overlays"],
+      "preview_modes": ["simple", "advanced"],
+      "notes": "Catalog only. No Shell files read or rendered."
+    }
+  ]
+}

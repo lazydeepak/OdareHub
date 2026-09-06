@@ -1,0 +1,11 @@
+/* Calibration: Owner file with effect property.
+   Expected: current_domain=special_effect, required_domain=special_effect,
+   migration_state=future_handoff, target_owner=Special Effects Pipeline,
+   target_tool=special_effects. */
+.glass-overlay {
+    backdrop-filter: blur(12px);
+}
+
+.frost-panel {
+    backdrop-filter: blur(8px);
+}

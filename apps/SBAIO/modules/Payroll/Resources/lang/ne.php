@@ -1,0 +1,28 @@
+<?php
+
+return [
+    'app.sbaio.payroll.index.table.title' => '',
+    'app.sbaio.payroll.index.table.display_name' => '',
+    'app.sbaio.payroll.parity.kpi.title' => '',
+    'app.sbaio.payroll.parity.kpi.display_name' => '',
+    'sbaio.payroll.parity.status.match' => '',
+    'sbaio.payroll.parity.status.mismatch' => '',
+    'sbaio.payroll.parity.status.missing_imported_source' => '',
+    'sbaio.payroll.parity.status.missing_payroll_record' => '',
+    'sbaio.payroll.parity.status.unmatched_staff_mapping' => '',
+    'sbaio.payroll.parity.status.deferred' => '',
+    'sbaio.payroll.parity.employee' => '',
+    'sbaio.payroll.parity.period' => '',
+    'sbaio.payroll.parity.type' => '',
+    'sbaio.payroll.parity.variant' => '',
+    'sbaio.payroll.parity.overall' => '',
+    'sbaio.payroll.parity.reference' => '',
+    'sbaio.payroll.parity.base' => '',
+    'sbaio.payroll.parity.hourly' => '',
+    'sbaio.payroll.parity.health' => '',
+    'sbaio.payroll.parity.pension' => '',
+    'sbaio.payroll.parity.deductions' => '',
+    'sbaio.payroll.parity.gross' => '',
+    'sbaio.payroll.parity.net_cash' => '',
+    'sbaio.payroll.parity.details' => '',
+];

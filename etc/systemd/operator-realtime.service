@@ -1,0 +1,48 @@
+[Unit]
+Description=Operator Realtime WebSocket Server
+Documentation=file:///app/docs/operator-realtime-deployment.md
+After=network.target
+PartOf=multi-user.target
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/app
+
+; Environment variables
+Environment="APP_ROOT=/app"
+EnvironmentFile=-/etc/sbaio/realtime.env
+
+; Main process
+ExecStart=/opt/homebrew/bin/php /app/bin/operator-realtime-server --port=8001 --host=127.0.0.1
+
+; Process management
+Restart=always
+RestartSec=10
+StartLimitInterval=300
+StartLimitBurst=5
+
+; Security and isolation
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=true
+
+; Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=operator-realtime
+
+; Resource limits
+LimitNOFILE=65536
+LimitNPROC=16384
+
+; Graceful shutdown
+KillMode=process
+KillSignal=SIGTERM
+TimeoutStopSec=30
+
+[Install]
+WantedBy=multi-user.target

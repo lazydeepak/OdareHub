@@ -1,0 +1,31 @@
+{
+  "schema_version": "studio.module-manifest.v1",
+  "status": "draft",
+  "module": {
+    "app_key": "sample_app",
+    "module_key": "sample_module",
+    "display_name": "Sample Module",
+    "description": "Non-writing sample module draft.",
+    "module_type": "crud",
+    "target_maturity_level": "L1",
+    "declared_capabilities": [],
+    "route_base": "/apps/sample-app/sample-module"
+  },
+  "data_policy": {
+    "surface_mode": "readonly_first",
+    "mutations_require_csrf": true,
+    "direct_db_mutation_allowed": false
+  },
+  "contracts": {
+    "owns_routes": true,
+    "owns_views": true,
+    "requires_health_check": true,
+    "requires_localization": true,
+    "requires_permission_policy": true
+  },
+  "audit": {
+    "draft_id": "",
+    "created_by": "",
+    "created_at": ""
+  }
+}

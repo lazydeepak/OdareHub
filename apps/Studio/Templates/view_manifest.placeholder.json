@@ -1,0 +1,39 @@
+{
+  "schema_version": "studio.view-manifest.v1",
+  "status": "draft",
+  "view": {
+    "app_key": "sample_app",
+    "module_key": "sample_module",
+    "view_key": "index",
+    "view_kind": "table",
+    "route_path": "/apps/sample-app/sample-module",
+    "surface": "admin",
+    "wrapper": "admin",
+    "required_role": "platform_admin",
+    "title_key": "studio.sample_module.index.title",
+    "description_key": "studio.sample_module.index.description"
+  },
+  "layout": {
+    "kind": "table",
+    "uses_shared_tokens": true,
+    "local_style_system": false
+  },
+  "data_contract": {
+    "adapter_class": "",
+    "allowed_filters": [],
+    "required_fields": [],
+    "empty_state_key": "studio.sample_module.index.empty"
+  },
+  "security": {
+    "requires_auth": true,
+    "required_role": "platform_admin",
+    "allowed_roles": ["platform_admin"],
+    "csrf_for_mutations": true,
+    "direct_db_mutation_allowed": false
+  },
+  "audit": {
+    "draft_id": "",
+    "created_by": "",
+    "created_at": ""
+  }
+}

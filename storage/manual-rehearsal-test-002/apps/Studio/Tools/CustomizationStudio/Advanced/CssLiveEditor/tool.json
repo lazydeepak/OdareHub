@@ -1,0 +1,10 @@
+{
+  "key": "css-live-editor",
+  "name": "CSS Live Editor",
+  "status": "read_only_preview",
+  "owner": "Studio",
+  "routes_enabled": true,
+  "runtime_behavior": false,
+  "route": "/apps/studio/tools/customization-studio/advanced/css-live-editor",
+  "description": "Dynamic same-origin route preview with sandboxed read-only component inspection. Editing and saving are disabled."
+}

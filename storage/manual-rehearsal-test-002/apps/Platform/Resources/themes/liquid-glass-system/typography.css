@@ -1,0 +1,7 @@
+@layer theme {
+  :root {
+    --theme-font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --theme-body-size: 14px;
+    --theme-control-size: 16px;
+  }
+}

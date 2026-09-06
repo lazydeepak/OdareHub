@@ -1,0 +1,18 @@
+{
+  "key": "dark",
+  "label": "Dark",
+  "status": "draft",
+  "extends": "default",
+  "tokens": {
+    "bg": "#0b1222",
+    "panel": "#101c35",
+    "text": "#f0f5ff",
+    "muted": "#a6b8dc",
+    "line": "#223356",
+    "accent": "#6f95ff"
+  },
+  "metadata": {
+    "owner": "studio",
+    "version": 1
+  }
+}

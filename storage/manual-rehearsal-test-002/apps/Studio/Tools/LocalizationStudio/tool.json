@@ -1,0 +1,9 @@
+{
+  "key": "localization-studio",
+  "name": "Localization Studio",
+  "status": "active",
+  "owner": "Studio",
+  "routes_enabled": true,
+  "runtime_behavior": true,
+  "description": "Localization discovery, inspection, and simple owner locale file editing. Routes enabled, runtime behavior enabled for write operations."
+}

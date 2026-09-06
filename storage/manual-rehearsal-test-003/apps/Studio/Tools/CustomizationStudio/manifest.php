@@ -1,0 +1,28 @@
+<?php
+return [
+    'tool_key' => 'customization_studio',
+    'key' => 'customization_studio',
+    'label' => 'Customization Studio',
+    'name' => 'Customization Studio',
+    'name_key' => 'studio.tool.customization_studio.name',
+    'description_key' => 'studio.tool.customization_studio.description',
+    'category' => 'authoring',
+    'home_group' => 'design_content',
+    'status' => 'preview',
+    'canonical_route' => '/apps/studio/tools/customization-studio',
+    'placeholder' => false,
+    'risk_level' => 'medium',
+    'default_enabled' => true,
+    'can_disable' => true,
+    'can_load' => ['view', 'component', 'dashboard', 'theme'],
+    'can_modify' => false,
+    'requires_approval' => true,
+    'writes_to_owner_artifact' => false,
+    'supports_diff' => true,
+    'supports_snapshot' => true,
+    'supports_rollback' => false,
+    'migration' => [
+        'status' => 'preview_bridge',
+        'note' => 'Existing visual customization experiments are being consolidated under the governed Studio tool registry.',
+    ],
+];

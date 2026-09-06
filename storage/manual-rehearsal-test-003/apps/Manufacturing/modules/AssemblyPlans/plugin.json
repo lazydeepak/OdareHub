@@ -1,0 +1,60 @@
+{
+    "name": "AssemblyPlans",
+    "display_name": "Assembly Plans",
+    "suite": "manufacturing",
+    "group": "ipm",
+    "category": "business",
+    "display_order": 70,
+    "type": "business",
+    "version": "1.0.0",
+    "description": "Demand-backed assembly planning before QC.",
+    "requires": [
+        "Base>=3.0.0",
+        "Products>=1.0.0",
+        "DailyOrders>=1.0.0",
+        "ProductionEntries>=1.0.0"
+    ],
+    "entry": "routes.php",
+    "package_type": "module",
+    "owner_app": "manufacturing",
+    "module_key": "AssemblyPlans",
+    "module_type": "planning",
+    "target_maturity_level": "L3",
+    "declared_capabilities": [
+        "routes",
+        "views",
+        "forms",
+        "schema",
+        "migrations",
+        "controllers",
+        "services",
+        "permissions",
+        "menus",
+        "widgets",
+        "reports",
+        "exports",
+        "lifecycle_hooks",
+        "localization"
+    ],
+    "lifecycle_contract": {
+        "routes": "active_only",
+        "menus": "active_only",
+        "widgets": "active_only",
+        "reports": "active_only",
+        "dashboards": "active_only",
+        "schema": "installed_or_active"
+    },
+    "activation_contract_enforced": true,
+    "reports": [
+        {
+            "report_key": "manufacturing.assembly_plans.readiness",
+            "title": "Assembly Plan Readiness",
+            "view": "Views/report.php",
+            "export_view": "Views/export.php",
+            "owner": "module",
+            "scope": "assembly_plans",
+            "permission": "manufacturing.assembly_plans.view",
+            "lifecycle": "active_only"
+        }
+    ]
+}

@@ -1,0 +1,173 @@
+{
+  "id": "procurement",
+  "app_key": "procurement",
+  "package_type": "bundle",
+  "name": "Procurement",
+  "version": "0.1.0",
+  "type": "business",
+  "min_core_version": "3.0.0",
+  "dependencies": [],
+  "entry": "routes.php",
+  "migrations_path": "migrations",
+  "permissions": [
+    "procurement.view",
+    "procurement.manage",
+    "procurement.approve"
+  ],
+  "modules": [
+    {
+      "key": "suppliers",
+      "name": "Suppliers"
+    },
+    {
+      "key": "requests",
+      "name": "Requests"
+    },
+    {
+      "key": "purchase_orders",
+      "name": "Purchase Orders"
+    },
+    {
+      "key": "receipts",
+      "name": "Receipts"
+    }
+  ],
+  "hooks": [
+    {
+      "type": "boot",
+      "key": "procurement.bootstrap",
+      "handler_file": "bootstrap.php"
+    }
+  ],
+  "routes": [
+    {
+      "path": "/apps/procurement"
+    },
+    {
+      "path": "/apps/procurement/requests"
+    },
+    {
+      "path": "/apps/procurement/orders"
+    },
+    {
+      "path": "/apps/procurement/receipts"
+    }
+  ],
+  "menus": [
+    {
+      "key": "app.procurement.root",
+      "label": "Procurement",
+      "url": "/apps/procurement",
+      "parent": "apps.root",
+      "order": 60,
+      "perm": "procurement.view"
+    },
+    {
+      "key": "app.procurement.requests",
+      "label": "Requests",
+      "url": "/apps/procurement/requests",
+      "parent": "app.procurement.root",
+      "order": 61,
+      "perm": "procurement.view"
+    },
+    {
+      "key": "app.procurement.orders",
+      "label": "Purchase Orders",
+      "url": "/apps/procurement/orders",
+      "parent": "app.procurement.root",
+      "order": 62,
+      "perm": "procurement.view"
+    },
+    {
+      "key": "app.procurement.receipts",
+      "label": "Receipts",
+      "url": "/apps/procurement/receipts",
+      "parent": "app.procurement.root",
+      "order": 63,
+      "perm": "procurement.view"
+    }
+  ],
+  "widgets": [
+    {
+      "key": "procurement.widget.dashboard",
+      "title": "Procurement",
+      "url": "/apps/procurement",
+      "order": 30,
+      "domain": "procurement",
+      "zone": "procurement"
+    }
+  ],
+  "search_entries": [
+    {
+      "key": "procurement_dashboard",
+      "label": "Procurement",
+      "url": "/apps/procurement"
+    },
+    {
+      "key": "procurement_requests",
+      "label": "Procurement Requests",
+      "url": "/apps/procurement/requests"
+    },
+    {
+      "key": "procurement_orders",
+      "label": "Purchase Orders",
+      "url": "/apps/procurement/orders"
+    },
+    {
+      "key": "procurement_receipts",
+      "label": "Receipts",
+      "url": "/apps/procurement/receipts"
+    }
+  ],
+  "runtime_contract": {
+    "routes": [
+      {
+        "path": "/apps/procurement",
+        "feature_key": "procurement_home",
+        "kind": "canonical",
+        "nav_visible": true,
+        "search_visible": true,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/apps/procurement/requests",
+        "feature_key": "procurement_requests",
+        "kind": "canonical",
+        "nav_visible": true,
+        "search_visible": true,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/apps/procurement/orders",
+        "feature_key": "procurement_orders",
+        "kind": "canonical",
+        "nav_visible": true,
+        "search_visible": true,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/apps/procurement/receipts",
+        "feature_key": "procurement_receipts",
+        "kind": "canonical",
+        "nav_visible": true,
+        "search_visible": true,
+        "lifecycle_bound": true
+      }
+    ]
+  },
+  "can_disable": true,
+  "can_uninstall": true,
+  "can_export": true,
+  "styles": [
+    {
+      "key": "procurement.app",
+      "path": "styles/procurement.css",
+      "scope": "app",
+      "surfaces": [
+        "admin",
+        "operator"
+      ],
+      "order": 200
+    }
+  ]
+}

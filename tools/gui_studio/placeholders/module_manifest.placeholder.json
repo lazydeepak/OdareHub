@@ -1,0 +1,34 @@
+{
+  "schema_version": "gui.module-manifest.v1",
+  "status": "draft",
+  "module": {
+    "app_key": "",
+    "module_key": "",
+    "display_name": "",
+    "title_key": "",
+    "display_name_key": "",
+    "description": "",
+    "description_key": "",
+    "module_type": "",
+    "target_maturity_level": "L1",
+    "declared_capabilities": [],
+    "route_base": ""
+  },
+  "lifecycle": {
+    "installable": true,
+    "activatable": true,
+    "deactivatable": true,
+    "removable": false
+  },
+  "contracts": {
+    "owns_routes": true,
+    "owns_views": true,
+    "requires_health_check": true,
+    "requires_localization": true
+  },
+  "audit": {
+    "draft_id": "",
+    "created_by": "",
+    "created_at": ""
+  }
+}

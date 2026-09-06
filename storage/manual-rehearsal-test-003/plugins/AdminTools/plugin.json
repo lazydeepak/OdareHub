@@ -1,0 +1,21 @@
+{
+  "name": "AdminTools",
+  "display_name": "System Tools",
+  "suite": "core",
+  "group": "platform",
+  "category": "system",
+  "display_order": 70,
+  "type": "engine",
+  "is_core": true,
+  "is_system": true,
+  "is_business": false,
+  "admin_only": true,
+  "experimental": false,
+  "version": "1.0.0",
+  "description": "Core admin toolkit: apps manager, routes manager, DB and demo tooling entry points.",
+  "requires": [
+    "Base>=3.0.0"
+  ],
+  "package_type": "plugin",
+  "entry": "routes.php"
+}

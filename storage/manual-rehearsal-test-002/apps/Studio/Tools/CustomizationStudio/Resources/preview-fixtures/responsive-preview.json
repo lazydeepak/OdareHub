@@ -1,0 +1,21 @@
+{
+  "fixture": "responsive-preview",
+  "owner": "studio",
+  "tool_area": "customization-studio",
+  "purpose": "Describes future desktop, tablet, and mobile preview scenarios.",
+  "runtime_status": "fixture_catalog_only_not_rendered",
+  "renders_ui": false,
+  "connects_to_shell": false,
+  "reads_studio_drafts": false,
+  "uses_active_registry_truth": false,
+  "examples": [
+    {
+      "example": "responsive-shell-and-content",
+      "label": "Responsive preview",
+      "description": "Desktop, tablet, and mobile examples for collapsed sidebar, mobile drawer, touch spacing, and table-to-card switching.",
+      "socket_catalogs": ["root-mode", "layout", "responsive", "navigation", "tables-grids", "data-display"],
+      "preview_modes": ["simple", "advanced"],
+      "notes": "Catalog only. No viewport renderer exists yet."
+    }
+  ]
+}

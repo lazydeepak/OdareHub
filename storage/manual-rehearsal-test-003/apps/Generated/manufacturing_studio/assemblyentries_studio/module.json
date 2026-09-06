@@ -1,0 +1,28 @@
+{
+    "schema_version": "studio.generated-module-contract.v1",
+    "app_key": "manufacturing_studio",
+    "module_key": "assemblyentries_studio",
+    "display_name": "Assemblyentries Studio",
+    "route_path": "/apps/manufacturing-studio/assemblyentries-studio",
+    "template": "crud_module",
+    "compile_id": "compile:generated:9ba9f391a9edf4b7",
+    "snapshot_id": "91ea7606-253e-52a9-81e6-26016713ffd6",
+    "fields": [
+        {
+            "key": "name",
+            "label": "name",
+            "type": "string",
+            "required": true,
+            "default": "",
+            "options": []
+        },
+        {
+            "key": "status",
+            "label": "status",
+            "type": "string",
+            "required": false,
+            "default": "",
+            "options": []
+        }
+    ]
+}

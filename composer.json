@@ -1,0 +1,28 @@
+{
+  "name": "lazydeepak/erp-engine-v3",
+  "description": "Susankhya modular ERP runtime and app platform.",
+  "type": "project",
+  "license": "proprietary",
+  "autoload": {
+    "psr-4": {
+      "App\\": "app/",
+      "Apps\\": "apps/",
+      "Platform\\": "platform/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Tests\\": "tests/"
+    }
+  },
+  "require": {
+    "dompdf/dompdf": "^3.1",
+    "endroid/qr-code": "^5.0",
+    "phpmailer/phpmailer": "^6.10",
+    "lbuchs/webauthn": "^2.2",
+    "cboden/ratchet": "^0.4"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^13.1"
+  }
+}

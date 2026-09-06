@@ -1,0 +1,32 @@
+/* SBAIO app styles */
+
+/* SBAIO module layout primitives */
+.form-grid-2{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.form-grid-4{grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.form-grid-6{grid-template-columns:repeat(6,minmax(0,1fr));gap:10px}
+.col-span-full{grid-column:1/-1}
+.row-stats{display:flex;gap:20px;flex-wrap:wrap}
+.row-distribute{display:flex;gap:30px;flex-wrap:wrap;align-items:flex-start}
+.row-spread{gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.flex-col-md{flex:1;min-width:260px}
+.table-narrow{max-width:420px}
+.d-flex-end{display:flex;align-items:flex-end}
+.label-inline-check{display:flex;align-items:center;gap:8px;margin-top:24px}
+
+.sbaio-payroll-parity-summary-value{font-size:22px;font-weight:700;color:var(--text)}
+.sbaio-payroll-parity-field-label{color:var(--muted);font-weight:600}
+.sbaio-payroll-parity-status,
+.sbaio-payroll-parity-overall{font-weight:700;color:var(--text)}
+.sbaio-payroll-parity-status--inline{font-weight:600}
+
+.sbaio-payroll-parity-status--ok,
+.sbaio-payroll-parity-overall--ok{color:var(--color-success-text)}
+.sbaio-payroll-parity-status--warn,
+.sbaio-payroll-parity-overall--warn{color:var(--color-warning-text)}
+.sbaio-payroll-parity-status--danger,
+.sbaio-payroll-parity-overall--danger{color:var(--color-danger-text)}
+.sbaio-payroll-parity-status--neutral,
+.sbaio-payroll-parity-overall--neutral{color:var(--muted)}
+
+.sbaio-dashboard-card-link{text-decoration:none;color:inherit}
+.sbaio-dashboard-quicklink-btn{padding:6px 10px}

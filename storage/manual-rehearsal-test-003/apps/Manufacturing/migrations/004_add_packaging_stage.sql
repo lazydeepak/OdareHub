@@ -1,0 +1,3 @@
+-- No-op compatibility migration retained for sequencing/history.
+-- Packaging is already present in 002_mfg_stage_transitions.sql, so fresh
+-- installs and schema re-syncs do not need an enum MODIFY here.

@@ -1,0 +1,23 @@
+/* Platform app styles */
+
+.platform-analytics-drilldown-link{
+	color: var(--link);
+	text-decoration: none;
+}
+
+.platform-analytics-overdue-badge{
+	font-size: 10px;
+}
+
+.platform-analytics-bar-fill-subtle{
+	background: var(--style-subtle-bg);
+}
+
+.platform-analytics-bar-fill-danger{
+	background: var(--color-danger-bg);
+}
+
+.platform-analytics-workload-fill{
+	height: 100%;
+	background: var(--style-subtle-bg);
+}

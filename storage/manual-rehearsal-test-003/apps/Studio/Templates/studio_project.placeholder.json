@@ -1,0 +1,24 @@
+{
+  "schema_version": "studio.project.v1",
+  "status": "draft",
+  "project": {
+    "project_key": "sample_project",
+    "display_name": "Sample Studio Project",
+    "owner_scope": "platform",
+    "description": "Non-persisted project draft used to validate Studio contracts."
+  },
+  "drafts": {
+    "app_manifest": "app_manifest",
+    "module_manifest": "module_manifest",
+    "view_manifest": "view_definition",
+    "navigation_manifest": "navigation_definition",
+    "template_manifest": "template_registry",
+    "artifact_manifest": "compile_plan"
+  },
+  "governance": {
+    "lifecycle": ["draft", "validate", "compile_plan", "diff_preview", "approval", "snapshot", "publish", "verify"],
+    "implemented_steps": ["draft", "validate_placeholder", "compile_plan_placeholder"],
+    "publish_locked": true,
+    "rollback_future": true
+  }
+}

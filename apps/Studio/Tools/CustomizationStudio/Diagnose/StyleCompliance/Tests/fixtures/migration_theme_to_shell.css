@@ -1,0 +1,16 @@
+/* Calibration: Theme source file with shared Shell chrome selector.
+   Expected: current_domain=theme, required_domain=shell_foundation,
+   migration_state=domain_migration, target_owner=Shell, target_tool=style_compliance,
+   migration_confidence=high.
+   Must be scanned with isThemeSource=true to simulate resources/themes/ path. */
+.app-shell {
+    background: var(--surface);
+}
+
+.layout-sidebar {
+    border-right: 1px solid var(--border-color, #e0e0e0);
+}
+
+.topbar {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}

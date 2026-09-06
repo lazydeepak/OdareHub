@@ -1,0 +1,29 @@
+{
+  "schema_version": "studio.navigation-manifest.v1",
+  "status": "draft",
+  "navigation": {
+    "scope": "admin",
+    "owner_app": "sample_app",
+    "key": "sample_app.sample_module",
+    "label_key": "studio.sample_module.nav",
+    "url": "/apps/sample-app/sample-module",
+    "section": "Sample App",
+    "order": 10,
+    "priority": 100,
+    "visible_if": "role_platform_admin_or_sysadmin"
+  },
+  "active_patterns": {
+    "exact": [],
+    "prefix": []
+  },
+  "governance": {
+    "wrapper_confinement_valid": true,
+    "no_cross_layer_escape": true,
+    "publish_locked": true
+  },
+  "audit": {
+    "draft_id": "",
+    "created_by": "",
+    "created_at": ""
+  }
+}

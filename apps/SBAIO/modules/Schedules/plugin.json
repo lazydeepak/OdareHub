@@ -1,0 +1,65 @@
+{
+    "name": "Schedules",
+    "display_name": "Schedules",
+    "suite": "sbaio",
+    "group": "operations",
+    "category": "business",
+    "display_order": 45,
+    "type": "business",
+    "version": "1.0.0",
+    "description": "Expected shift and schedule planning for the SBAIO suite.",
+    "requires": [
+        "Base>=3.0.0",
+        "Staff>=1.0.0"
+    ],
+    "optional": [
+        "ACL>=1.0.0",
+        "Audit>=1.0.0"
+    ],
+    "entry": "routes.php",
+    "package_type": "module",
+    "owner_app": "sbaio",
+    "module_key": "Schedules",
+    "required_tables": [
+        "sbaio_schedule_templates",
+        "sbaio_schedule_assignments"
+    ],
+    "module_type": "planning",
+    "target_maturity_level": "L2",
+    "declared_capabilities": [
+        "routes",
+        "views",
+        "forms",
+        "schema",
+        "migrations",
+        "controllers",
+        "services",
+        "permissions",
+        "menus",
+        "widgets",
+        "reports",
+        "exports",
+        "lifecycle_hooks",
+        "localization"
+    ],
+    "lifecycle_contract": {
+        "routes": "active_only",
+        "menus": "active_only",
+        "widgets": "active_only",
+        "reports": "active_only",
+        "dashboards": "active_only",
+        "schema": "installed_or_active"
+    },
+    "reports": [
+        {
+            "report_key": "sbaio.schedules.overview",
+            "title": "Schedules Report",
+            "view": "Views/report.php",
+            "export_view": "Views/export.php",
+            "owner": "module",
+            "scope": "schedules",
+            "permission": "app.sbaio.access",
+            "lifecycle": "active_only"
+        }
+    ]
+}

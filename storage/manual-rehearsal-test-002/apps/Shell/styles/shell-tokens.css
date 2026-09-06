@@ -1,0 +1,105 @@
+/* Shell tokens: z-index, breakpoints, and shared Shell layout/surface variables. */
+:root {
+  /* Theme-independent spacing, shape, and safe-area compatibility aliases. */
+  --space-1: var(--render-space-1);
+  --space-2: var(--render-space-2);
+  --space-3: var(--render-space-3);
+  --space-4: var(--render-space-4);
+  --space-5: var(--render-space-5);
+  --radius-sm: var(--render-radius-sm);
+  --radius-md: var(--render-radius-md);
+  --radius-lg: var(--render-radius-lg);
+  --radius-panel: var(--render-radius-panel);
+  --radius-pill: var(--render-radius-pill);
+  --radius: var(--render-radius-md);
+  --card-radius: var(--render-card-radius);
+  --icon-chip-size: var(--render-icon-chip-size);
+  --icon-chip-radius: var(--render-icon-chip-radius);
+  --safe-area-top: var(--sys-safe-area-top, 0px);
+  --safe-area-right: var(--sys-safe-area-right, 0px);
+  --safe-area-bottom: var(--sys-safe-area-bottom, 0px);
+  --safe-area-left: var(--sys-safe-area-left, 0px);
+
+  /* Appearance compatibility aliases used by legacy Shell component names. */
+  --border: var(--style-border-soft);
+  --surface: var(--style-content-bg);
+  --surface-2: var(--style-subtle-bg);
+  --surface-3: var(--style-subtle-bg-hover);
+
+  /* Theme-independent control geometry compatibility aliases. */
+  --control-height: var(--render-control-height);
+  --control-font-size: var(--render-control-font-size);
+  --control-line-height: var(--render-control-line-height);
+  --control-radius: var(--render-control-radius);
+  --control-padding-block: var(--render-control-padding-block);
+  --control-padding-inline: var(--render-control-padding-inline);
+  --control-padding-inline-select: var(--render-control-padding-inline-select);
+  --control-padding-inline-date: var(--render-control-padding-inline-date);
+  --control-gap: var(--render-control-gap);
+  --control-gap-tight: var(--render-control-gap-tight);
+  --control-field-min: var(--render-control-field-min);
+  --control-field-wide-min: var(--render-control-field-wide-min);
+  --control-field-compact-min: var(--render-control-field-compact-min);
+
+  /* Z-index layer map - canonical Shell layers */
+  --z-base: 0;
+  --z-workspace: 10;
+  --z-navigation: 20;
+  --z-topbar: 30;
+  --z-dropdown: 40;
+  --z-drawer: 50;
+  --z-backdrop: 60;
+  --z-modal: 70;
+  --z-overlay: 80;
+  --z-scanner: 90;
+  --z-system-emergency: 100;
+
+  /* Numeric compatibility aliases for legacy selectors. */
+  --shell-z-local: 1;
+  --shell-z-control: 2;
+  --shell-z-mobile-nav: 80;
+  --shell-z-mobile-dock: 85;
+  --shell-z-mobile-panel: 90;
+  --shell-z-topbar: 100;
+  --shell-z-floating-panel: 120;
+  --shell-z-action-panel: 129;
+  --shell-z-backdrop: 150;
+  --shell-z-search-backdrop: 155;
+  --shell-z-drawer: 160;
+  --shell-z-document-overlay: 200;
+  --shell-z-popover: 220;
+  --shell-z-search: 260;
+  --shell-z-overlay: 500;
+  --shell-z-menu: 1000;
+  --shell-z-emergency-banner: 9999;
+  --shell-z-scanner: 10060;
+
+  /* Breakpoint registry - canonical Shell breakpoints */
+  --bp-mobile: 480px;
+  --bp-tablet: 768px;
+  --bp-desktop: 1024px;
+  --bp-wide: 1366px;
+  --bp-ultrawide: 1920px;
+  --bp-display: 2560px;
+
+  /* Shared Shell surface primitives. */
+  --shell-surface-bg: var(--panel);
+  --shell-surface-subtle-bg: var(--style-subtle-bg);
+  --shell-surface-hover-bg: var(--style-subtle-bg-hover);
+  --shell-surface-border: var(--style-border-soft);
+  --shell-surface-border-strong: var(--style-border-strong);
+  --shell-surface-radius: var(--render-radius-md);
+  --shell-panel-radius: var(--render-control-radius);
+  --shell-overlay-bg: var(--style-subtle-bg);
+  --shell-overlay-blur: var(--glass-blur-shell);
+  --shell-card-blur: var(--glass-blur-card) saturate(170%);
+  --shell-control-blur: var(--glass-blur-control) saturate(140%);
+  --shell-popover-blur: var(--glass-blur-popover) saturate(145%);
+  --shell-surface-shadow: var(--style-surface-shadow);
+  --shell-card-shadow: var(--style-card-shadow);
+  --shell-control-shadow: var(--glass-highlights);
+  --shell-mobile-nav-bg: color-mix(in srgb, var(--panel) 22%, transparent);
+  --shell-mobile-nav-border: color-mix(in srgb, var(--style-border-soft) 35%, transparent);
+  --shell-mobile-nav-blur: blur(22px) saturate(180%);
+  --shell-scanner-blur: blur(2px);
+}

@@ -1,0 +1,21 @@
+{
+  "fixture": "visualization-preview",
+  "owner": "studio",
+  "tool_area": "customization-studio",
+  "purpose": "Describes future chart and data visualization preview examples.",
+  "runtime_status": "fixture_catalog_only_not_rendered",
+  "renders_ui": false,
+  "connects_to_shell": false,
+  "reads_studio_drafts": false,
+  "uses_active_registry_truth": false,
+  "examples": [
+    {
+      "example": "chart-gallery",
+      "label": "Visualization preview",
+      "description": "Chart canvas, title, axis, gridline, legend, tooltip, series color, labels, bar, line, area, pie/donut, gauge, heatmap, and sparkline examples.",
+      "socket_catalogs": ["core-tokens", "visualization", "data-display", "motion-transform", "accessibility"],
+      "preview_modes": ["simple", "advanced"],
+      "notes": "Catalog only. No chart library is invoked."
+    }
+  ]
+}

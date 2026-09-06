@@ -1,0 +1,92 @@
+/* Liquid-glass style source
+ * Runtime is source-driven via compile_theme_sources.php.
+ */
+[data-color-style="liquid-glass"] {
+  --card-border-base: rgba(255, 255, 255, 0.26);
+  --card-edge-fallback: rgba(255, 255, 255, 0.32);
+  --glass-highlights: inset 0 1px 0 rgba(255, 255, 255, 0.42), inset 0 -1px 0 rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="light"][data-color-style="liquid-glass"] {
+  --bg: #eef5ff;
+  --panel: rgba(244, 249, 255, 0.62);
+  --card: rgba(255, 255, 255, 0.5);
+  --text: #16243d;
+  --muted: #516887;
+  --line: rgba(74, 118, 182, 0.18);
+  --accent: #1f5ecf;
+  --glass: rgba(255, 255, 255, 0.18);
+  --glass-strong: rgba(255, 255, 255, 0.28);
+  --glass-border: rgba(96, 144, 212, 0.44);
+  --glass-shadow: 0 18px 36px rgba(48, 82, 136, 0.16);
+  --page-bg: radial-gradient(68rem 38rem at -8% -12%, rgba(111, 190, 255, 0.35), transparent 52%), radial-gradient(58rem 34rem at 108% -18%, rgba(131, 221, 255, 0.28), transparent 48%), linear-gradient(180deg, #f7fbff 0%, #edf5ff 52%, #e7f0ff 100%);
+  --topbar-bg: linear-gradient(180deg, rgba(252, 254, 255, 0.7), rgba(242, 248, 255, 0.54));
+  --sidebar-bg: linear-gradient(180deg, rgba(250, 253, 255, 0.66), rgba(239, 247, 255, 0.54));
+  --search-panel-bg: linear-gradient(180deg, rgba(250, 253, 255, 0.88), rgba(240, 246, 255, 0.8));
+  --card-surface: linear-gradient(180deg, rgba(255, 255, 255, 0.44), rgba(244, 249, 255, 0.28));
+  --style-shell-bg: linear-gradient(180deg, rgba(252, 254, 255, 0.6), rgba(242, 248, 255, 0.45));
+  --style-shell-raised-bg: linear-gradient(180deg, rgba(252, 254, 255, 0.84), rgba(242, 248, 255, 0.76));
+  --style-content-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.38), rgba(244, 249, 255, 0.22));
+  --style-content-bg-hover: linear-gradient(180deg, rgba(255, 255, 255, 0.5), rgba(244, 249, 255, 0.3));
+  --style-subtle-bg: rgba(255, 255, 255, 0.28);
+  --style-subtle-bg-hover: rgba(255, 255, 255, 0.42);
+  --style-control-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.44), rgba(244, 249, 255, 0.26));
+  --style-control-bg-hover: linear-gradient(180deg, rgba(255, 255, 255, 0.54), rgba(244, 249, 255, 0.34));
+  --style-control-bg-focus: linear-gradient(180deg, rgba(255, 255, 255, 0.62), rgba(244, 249, 255, 0.4));
+  --style-button-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.42), rgba(243, 248, 255, 0.24));
+  --style-button-bg-hover: linear-gradient(180deg, rgba(255, 255, 255, 0.56), rgba(243, 248, 255, 0.34));
+  --style-button-shadow: 0 10px 22px rgba(48, 82, 136, 0.12), var(--glass-highlights);
+  --style-button-shadow-hover: 0 14px 26px rgba(44, 114, 240, 0.16), var(--glass-highlights);
+  --style-border: rgba(96, 144, 212, 0.44);
+  --style-border-soft: rgba(96, 144, 212, 0.18);
+  --style-border-strong: rgba(44, 114, 240, 0.34);
+  --style-active-bg: rgba(44, 114, 240, 0.12);
+  --style-active-border: rgba(44, 114, 240, 0.36);
+  --style-table-bg: rgba(255, 255, 255, 0.3);
+  --style-table-head-bg: linear-gradient(180deg, rgba(252, 254, 255, 0.76), rgba(240, 246, 255, 0.6));
+  --style-table-row-hover: rgba(44, 114, 240, 0.08);
+  --style-card-shadow: 0 20px 40px rgba(48, 82, 136, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.52), inset 0 -1px 0 rgba(255, 255, 255, 0.08);
+  --style-surface-shadow: 0 14px 28px rgba(48, 82, 136, 0.12);
+}
+
+[data-theme="dark"][data-color-style="liquid-glass"] {
+  --bg: #07101f;
+  --panel: rgba(12, 24, 46, 0.62);
+  --card: rgba(15, 28, 54, 0.44);
+  --text: #edf4ff;
+  --muted: #a4badb;
+  --line: rgba(168, 206, 255, 0.18);
+  --accent: #8fc1ff;
+  --glass: rgba(255, 255, 255, 0.08);
+  --glass-strong: rgba(255, 255, 255, 0.16);
+  --glass-border: rgba(176, 214, 255, 0.2);
+  --glass-shadow: 0 18px 38px rgba(0, 0, 0, 0.3);
+  --page-bg: radial-gradient(72rem 40rem at -8% -14%, rgba(90, 175, 255, 0.28), transparent 52%), radial-gradient(60rem 36rem at 108% -18%, rgba(71, 227, 255, 0.22), transparent 48%), linear-gradient(180deg, #06101d 0%, #091628 54%, #07101f 100%);
+  --topbar-bg: linear-gradient(180deg, rgba(10, 20, 38, 0.72), rgba(8, 16, 30, 0.56));
+  --sidebar-bg: linear-gradient(180deg, rgba(10, 20, 38, 0.68), rgba(8, 16, 30, 0.58));
+  --search-panel-bg: linear-gradient(180deg, rgba(12, 22, 42, 0.88), rgba(8, 17, 32, 0.78));
+  --card-surface: linear-gradient(180deg, rgba(16, 31, 58, 0.36), rgba(10, 20, 38, 0.22));
+  --style-shell-bg: linear-gradient(180deg, rgba(10, 20, 38, 0.64), rgba(8, 16, 30, 0.5));
+  --style-shell-raised-bg: linear-gradient(180deg, rgba(12, 22, 42, 0.84), rgba(8, 17, 32, 0.76));
+  --style-content-bg: linear-gradient(180deg, rgba(16, 31, 58, 0.34), rgba(10, 20, 38, 0.2));
+  --style-content-bg-hover: linear-gradient(180deg, rgba(18, 35, 66, 0.44), rgba(10, 20, 38, 0.28));
+  --style-subtle-bg: rgba(255, 255, 255, 0.06);
+  --style-subtle-bg-hover: rgba(255, 255, 255, 0.1);
+  --style-control-bg: linear-gradient(180deg, rgba(16, 31, 58, 0.4), rgba(10, 20, 38, 0.24));
+  --style-control-bg-hover: linear-gradient(180deg, rgba(18, 35, 66, 0.48), rgba(10, 20, 38, 0.28));
+  --style-control-bg-focus: linear-gradient(180deg, rgba(20, 39, 72, 0.56), rgba(10, 20, 38, 0.34));
+  --style-button-bg: linear-gradient(180deg, rgba(19, 37, 68, 0.42), rgba(10, 20, 38, 0.26));
+  --style-button-bg-hover: linear-gradient(180deg, rgba(23, 44, 78, 0.52), rgba(10, 20, 38, 0.34));
+  --style-button-shadow: 0 12px 26px rgba(0, 0, 0, 0.24), var(--glass-highlights);
+  --style-button-shadow-hover: 0 16px 30px rgba(143, 193, 255, 0.18), var(--glass-highlights);
+  --style-border: rgba(176, 214, 255, 0.22);
+  --style-border-soft: rgba(176, 214, 255, 0.14);
+  --style-border-strong: rgba(143, 193, 255, 0.34);
+  --style-active-bg: rgba(143, 193, 255, 0.14);
+  --style-active-border: rgba(143, 193, 255, 0.34);
+  --style-table-bg: rgba(9, 19, 34, 0.3);
+  --style-table-head-bg: linear-gradient(180deg, rgba(13, 25, 45, 0.76), rgba(9, 18, 34, 0.62));
+  --style-table-row-hover: rgba(143, 193, 255, 0.08);
+  --style-card-shadow: 0 22px 44px rgba(0, 0, 0, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.26), inset 0 -1px 0 rgba(255, 255, 255, 0.04);
+  --style-surface-shadow: 0 16px 30px rgba(0, 0, 0, 0.2);
+}

@@ -1,0 +1,48 @@
+{
+    "schema_version": "susankhya.local-apply-plan.v1",
+    "created_at": "2026-08-18T17:25:38Z",
+    "final_state": "prepared_without_live_mutation",
+    "channel_dir": "storage/update-channels/local",
+    "staging_dir": "storage/manual-apply-prepare-test-20260819022534",
+    "payload_dir": "/var/folders/_w/4wgfpvdd1_55pjmgt2yt99740000gn/T/susankhya-local-apply-payload-b171a939833932f2",
+    "release": {
+        "channel": "local",
+        "release_version": "0.5.0",
+        "build_id": "git:f3971b30788cbfdd4c3296043acc26b927265b02",
+        "package_sha256": "6302c3d3dcc3cb19d38b4b5b972b4f4923c19ef4f96887c0064656956ec237dd",
+        "package_size_bytes": 26429322
+    },
+    "package": {
+        "path": "storage/update-channels/local/releases/susankhya-os-0.5.0-git-f3971b30788cbfdd4c3296043acc26b927265b02.zip",
+        "entry_count": 5022,
+        "entries_sha256": "52fc12dab322e99916c19a9f4ae463c7f689fa02c9210e842163d5d25f523afb",
+        "sample_entries": [
+            "app/AGENTS.md",
+            "app/Actions/actions.php",
+            "app/Admin/ArchitectureHealthController.php",
+            "app/AppManager/Controllers/AppManagerController.php",
+            "app/AppManager/Controllers/SearchController.php",
+            "app/AppManager/Controllers/SetupController.php",
+            "app/AppManager/migrations/20260401_000001_create_core_app_platform_tables.sql",
+            "app/AppManager/migrations/20260417_000002_create_core_runtime_history_and_security_tables.sql",
+            "app/AppManager/routes.php",
+            "app/Core/AccessGuard.php",
+            "app/Core/AclPolicy.php",
+            "app/Core/ActionBuilder.php",
+            "app/Core/Application.php",
+            "app/Core/AuditLogService.php",
+            "app/Core/Auth.php",
+            "app/Core/Company/CompanyConfig.php",
+            "app/Core/Container.php",
+            "app/Core/DB.php",
+            "app/Core/DashboardBuilder.php",
+            "app/Core/EntityContext.php"
+        ]
+    },
+    "preserve_paths": [
+        "storage",
+        "packages"
+    ],
+    "live_mutation_performed": false,
+    "next_required_gate": "controlled_local_apply_requires_operator_approval_and_post_apply_verification"
+}

@@ -1,0 +1,10 @@
+{
+    "schema_version": "studio.generated-module-contract.v1",
+    "app_key": "lifecycle_app",
+    "module_key": "lifecycle_module",
+    "display_name": "Lifecycle Module",
+    "route_path": "/apps/lifecycle-app/lifecycle-module",
+    "template": "crud_module",
+    "compile_id": "compile:generated:826bf401cc344c75",
+    "snapshot_id": "d55be3e3-1d08-50a7-adc3-141a0c45d8cf"
+}

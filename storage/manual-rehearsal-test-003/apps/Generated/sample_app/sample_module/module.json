@@ -1,0 +1,10 @@
+{
+    "schema_version": "studio.generated-module-contract.v1",
+    "app_key": "sample_app",
+    "module_key": "sample_module",
+    "display_name": "Sample Module",
+    "route_path": "/apps/sample-app/sample-module",
+    "template": "crud_module",
+    "compile_id": "compile:generated:d35e00820ad73b93",
+    "snapshot_id": "18ff974b-7006-5ec9-a504-994f8a0b83f0"
+}

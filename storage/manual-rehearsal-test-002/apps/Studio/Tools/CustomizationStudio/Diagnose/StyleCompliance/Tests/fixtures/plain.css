@@ -1,0 +1,32 @@
+/* Plain CSS: token alias, literal values, mixed */
+:root {
+    --primary: #3366cc;
+    --surface: #ffffff;
+    --radius: 8px;
+}
+
+.card {
+    color: var(--primary);
+    background-color: var(--surface);
+    border: 1px solid #e0e0e0;
+    border-radius: var(--radius);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+    background: linear-gradient(135deg, #3366cc, #5588ee);
+    color: #ffffff;
+    padding: 12px;
+}
+
+.badge {
+    background-color: #ff6b6b;
+    color: white;
+    font-size: 12px;
+}
+
+.alert {
+    color: #333;
+    background-color: #fff3cd;
+    border-color: #ffeeba;
+}

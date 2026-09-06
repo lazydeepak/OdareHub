@@ -1,0 +1,71 @@
+{
+  "schema": "susankhya.system_tools_registry.v1",
+  "owner": "System Tools",
+  "source_of_truth": "scripts/system/tools.registry.json",
+  "tools": [
+    {
+      "key": "deployment_readiness",
+      "path": "scripts/system/check_deployment_readiness.sh",
+      "kind": "orchestrator",
+      "mode": "validation",
+      "preferred_entrypoint": true,
+      "description": "Fresh-clone and deployment readiness validation."
+    },
+    {
+      "key": "deployment_readiness_portable",
+      "path": "scripts/system/check_deployment_readiness_portable.php",
+      "kind": "orchestrator",
+      "mode": "validation",
+      "preferred_entrypoint": false,
+      "description": "Portable local deployment readiness helper that delegates to bash when available and otherwise runs a PHP-only subset."
+    },
+    {
+      "key": "system_tools_inventory",
+      "path": "scripts/system/check_system_tools_inventory.sh",
+      "kind": "diagnostic",
+      "mode": "read_only",
+      "preferred_entrypoint": false,
+      "description": "Validates registered System Tools entry points and documentation references."
+    },
+    {
+      "key": "backfill_utility_aging",
+      "path": "scripts/system/check_backfill_utility_aging.sh",
+      "kind": "diagnostic",
+      "mode": "read_only",
+      "preferred_entrypoint": false,
+      "description": "Keeps task-specific backfill scripts out of the active readiness flow unless explicitly promoted."
+    },
+    {
+      "key": "recovery_point",
+      "path": "scripts/system/recovery_point.php",
+      "kind": "orchestrator",
+      "mode": "guarded_apply",
+      "preferred_entrypoint": false,
+      "description": "Creates and verifies explicit recovery point directories for local deployment/update recovery."
+    },
+    {
+      "key": "architecture_gates",
+      "path": "scripts/architecture/run_architecture_gates.sh",
+      "kind": "diagnostic_orchestrator",
+      "mode": "read_only",
+      "preferred_entrypoint": false,
+      "description": "Aggregate architecture boundary validation."
+    },
+    {
+      "key": "registered_css_publisher",
+      "path": "scripts/assets/publish_registered_css.php",
+      "kind": "asset_publisher",
+      "mode": "guarded_apply",
+      "preferred_entrypoint": false,
+      "description": "Publishes reproducible CSS delivery assets from app/module owner source CSS."
+    },
+    {
+      "key": "first_boot_css_compiler",
+      "path": "scripts/assets/compile_first_boot_css.php",
+      "kind": "asset_publisher",
+      "mode": "guarded_apply",
+      "preferred_entrypoint": false,
+      "description": "Publishes the static Shell and Platform CSS chain required before database setup."
+    }
+  ]
+}

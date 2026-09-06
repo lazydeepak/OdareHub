@@ -1,0 +1,105 @@
+/* GENERATED FILE: public/assets/system/semantic-aliases.css */
+/* Source manifest: scripts/assets/first_boot_css_manifest.json */
+
+/* source: apps/Platform/Resources/css/semantic-aliases.css */
+@layer semantic {
+  :root {
+    --surface-page: var(--color-page);
+    --surface-page-gradient: var(--color-page-gradient);
+    --surface-panel: var(--color-panel);
+    --surface-card: var(--color-card);
+    --surface-control: var(--color-control);
+    --surface-subtle: var(--color-panel);
+    --surface-border: var(--color-border);
+    --surface-border-soft: var(--color-border);
+    --surface-border-strong: var(--color-border-strong);
+    --text-primary: var(--color-text);
+    --text-muted: var(--color-text-muted);
+    --text-font-family: var(--theme-font-sans);
+    --accent-primary: var(--color-accent);
+    --accent-focus: var(--color-accent-focus);
+    --status-success-bg: var(--color-success-bg);
+    --status-success-text: var(--color-success-text);
+    --status-success-border: var(--color-success-border);
+    --status-info-bg: var(--color-info-bg);
+    --status-info-text: var(--color-info-text);
+    --status-info-border: var(--color-info-border);
+    --status-warning-bg: var(--color-warning-bg);
+    --status-warning-text: var(--color-warning-text);
+    --status-warning-border: var(--color-warning-border);
+    --status-danger-bg: var(--color-danger-bg);
+    --status-danger-text: var(--color-danger-text);
+    --status-danger-border: var(--color-danger-border);
+    --status-neutral-bg: var(--surface-subtle);
+    --status-neutral-text: var(--text-muted);
+    --status-neutral-border: var(--surface-border-soft);
+    --radius-control: var(--render-radius-sm);
+    --radius-card: var(--render-radius-md);
+    --card-radius: var(--render-card-radius);
+    --icon-chip-size: var(--render-icon-chip-size);
+    --icon-chip-radius: var(--render-icon-chip-radius);
+    --shadow-control: var(--render-shadow-control);
+    --shadow-surface: var(--render-shadow-surface);
+    --duration-fast: var(--render-duration-fast);
+    --duration-normal: var(--render-duration-normal);
+
+    /* Compatibility aliases for existing Shell setup/component CSS. */
+    --bg: var(--surface-page);
+    --panel: var(--surface-panel);
+    --card: var(--surface-card);
+    --text: var(--text-primary);
+    --muted: var(--text-muted);
+    --line: var(--surface-border);
+    --accent: var(--accent-primary);
+    --page-bg: var(--surface-page-gradient);
+    --style-content-bg: var(--surface-card);
+    --style-subtle-bg: var(--surface-subtle);
+    --style-control-bg: var(--surface-control);
+    --style-control-bg-focus: var(--surface-control);
+    --style-button-bg: var(--surface-control);
+    --style-button-bg-hover: var(--surface-subtle);
+    --style-border: var(--surface-border);
+    --style-border-soft: var(--surface-border-soft);
+    --style-border-strong: var(--surface-border-strong);
+    --style-card-shadow: var(--shadow-surface);
+    --style-surface-shadow: var(--shadow-surface);
+    --style-button-shadow: var(--shadow-control);
+    --style-button-shadow-hover: var(--shadow-surface);
+    --glass-border: var(--surface-border);
+    --glass-highlights: none;
+    --glass-blur-shell: var(--fx-glass-blur-shell);
+    --glass-blur-card: var(--fx-glass-blur-card);
+    --glass-blur-popover: var(--fx-glass-blur-popover);
+    --glass-blur-control: var(--fx-glass-blur-control);
+    --focus-ring: 0 0 0 3px rgba(77, 137, 235, .22);
+    --control-height: var(--render-control-height);
+    --control-font-size: var(--render-control-font-size);
+    --control-line-height: var(--render-control-line-height);
+    --control-radius: var(--render-control-radius);
+    --control-padding-block: var(--render-control-padding-block);
+    --control-padding-inline: var(--render-control-padding-inline);
+    --control-padding-inline-select: var(--render-control-padding-inline-select);
+    --control-padding-inline-date: var(--render-control-padding-inline-date);
+    --control-gap: var(--render-control-gap);
+    --control-gap-tight: var(--render-control-gap-tight);
+    --control-field-min: var(--render-control-field-min);
+    --control-field-wide-min: var(--render-control-field-wide-min);
+    --control-field-compact-min: var(--render-control-field-compact-min);
+    --tone-success-bg: var(--status-success-bg);
+    --tone-success-text: var(--status-success-text);
+    --tone-success-border: var(--status-success-border);
+    --tone-info-bg: var(--status-info-bg);
+    --tone-info-text: var(--status-info-text);
+    --tone-info-border: var(--status-info-border);
+    --tone-warning-bg: var(--status-warning-bg);
+    --tone-warning-text: var(--status-warning-text);
+    --tone-warning-border: var(--status-warning-border);
+    --tone-danger-bg: var(--status-danger-bg);
+    --tone-danger-text: var(--status-danger-text);
+    --tone-danger-border: var(--status-danger-border);
+    --tone-neutral-bg: var(--status-neutral-bg);
+    --tone-neutral-text: var(--status-neutral-text);
+    --tone-neutral-border: var(--status-neutral-border);
+  }
+}
+

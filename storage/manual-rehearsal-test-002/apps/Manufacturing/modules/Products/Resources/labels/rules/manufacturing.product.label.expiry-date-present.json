@@ -1,0 +1,28 @@
+{
+    "schema": "susankhya.label.rule.v1",
+    "rule_key": "manufacturing.product.label.expiry-date-present",
+    "owner_key": "Manufacturing/Products",
+    "owner_type": "module",
+    "owner_root": "apps/Manufacturing/modules/Products",
+    "context_key": "manufacturing.product.label",
+    "template_key": "manufacturing.product.label.100x50_mm",
+    "enabled": true,
+    "conditions": [
+        {
+            "source": "field",
+            "field_key": "expiry_date",
+            "operator": "not_empty",
+            "value": "",
+            "value_type": "string"
+        }
+    ],
+    "effects": [
+        {
+            "type": "show_badge",
+            "target": "expiry_date",
+            "value": "Expiry date present"
+        }
+    ],
+    "write_status": "active",
+    "resource_type": "rule"
+}

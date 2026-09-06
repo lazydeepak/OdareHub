@@ -1,0 +1,49 @@
+{
+  "schema": "susankhya.first_boot_css_manifest.v1",
+  "assets": [
+    {
+      "target": "public/assets/system/shell-essential.css",
+      "sources": [
+        "apps/Shell/Resources/css/essential/shell-essential.css"
+      ]
+    },
+    {
+      "target": "public/assets/rendering/foundation.css",
+      "sources": [
+        "apps/Shell/Resources/rendering/foundation.css"
+      ]
+    },
+    {
+      "target": "public/assets/effects/effects-none.css",
+      "sources": [
+        "apps/Platform/Resources/effects/effects-none.css"
+      ]
+    },
+    {
+      "target": "public/assets/themes/liquid-glass-system.css",
+      "sources": [
+        "apps/Platform/Resources/themes/liquid-glass-system/colors.css",
+        "apps/Platform/Resources/themes/liquid-glass-system/typography.css",
+        "apps/Platform/Resources/themes/liquid-glass-system/modes.css"
+      ]
+    },
+    {
+      "target": "public/assets/system/semantic-aliases.css",
+      "sources": [
+        "apps/Platform/Resources/css/semantic-aliases.css"
+      ]
+    },
+    {
+      "target": "public/assets/system/setup.css",
+      "sources": [
+        "apps/Shell/styles/shell-setup.css"
+      ]
+    },
+    {
+      "target": "public/assets/system/auth.css",
+      "sources": [
+        "apps/Shell/Resources/css/essential/auth.css"
+      ]
+    }
+  ]
+}

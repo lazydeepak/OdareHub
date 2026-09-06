@@ -1,0 +1,44 @@
+{
+    "schema_version": "susankhya.rehearsal.v1",
+    "created_at": "2026-08-18T17:11:07Z",
+    "recovery_point_id": "rp-20260818170616-c536b57f",
+    "recovery_point_dir": "storage/manual-recovery-test-001",
+    "isolated_dir": "storage/manual-rehearsal-test-003",
+    "rehearsal_database": "os_susankhya_rehearsal_003",
+    "ok": true,
+    "final_state": "restored",
+    "errors": [],
+    "warnings": [],
+    "database": {
+        "ok": true,
+        "provider": "mysql",
+        "rehearsal_database": "os_susankhya_rehearsal_003"
+    },
+    "filesystem": {
+        "ok": true,
+        "entry_count": 4975,
+        "entries_sha256": "f51df175b161209749efe7b48e290e1aa97df9222aefd170e3384c85c7f8dabd",
+        "sample_entries": [
+            "app/AppManager/migrations/20260417_000002_create_core_runtime_history_and_security_tables.sql",
+            "app/AppManager/migrations/20260401_000001_create_core_app_platform_tables.sql",
+            "app/AppManager/routes.php",
+            "app/AppManager/Controllers/SearchController.php",
+            "app/AppManager/Controllers/SetupController.php",
+            "app/AppManager/Controllers/AppManagerController.php",
+            "app/Locale/en.php",
+            "app/Locale/ja.php",
+            "app/Locale/ne.php",
+            "app/locales/en_US.php",
+            "app/Core/EventBus.php",
+            "app/Core/TOTP.php",
+            "app/Core/Application.php",
+            "app/Core/MyWorkEntityQuery.php",
+            "app/Core/RouteRuntimeAuthority.php",
+            "app/Core/EntityWorkflowGuard.php",
+            "app/Core/SidebarBuilder.php",
+            "app/Core/Container.php",
+            "app/Core/EntityDefinitionValidator.php",
+            "app/Core/Auth.php"
+        ]
+    }
+}

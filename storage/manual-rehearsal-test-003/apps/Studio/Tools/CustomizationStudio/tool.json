@@ -1,0 +1,9 @@
+{
+  "key": "customization-studio",
+  "name": "Customization Studio",
+  "status": "disabled_preview_skeleton",
+  "owner": "Studio",
+  "routes_enabled": true,
+  "runtime_behavior": false,
+  "description": "Disabled preview skeleton entry for the Studio-owned governed customization tool area."
+}

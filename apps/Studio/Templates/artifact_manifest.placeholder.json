@@ -1,0 +1,84 @@
+{
+  "schema_version": "studio.artifact-manifest.v1",
+  "status": "compile_plan_placeholder",
+  "artifacts": [
+    {
+      "artifact_id": "artifact:app:sample_app",
+      "artifact_type": "app",
+      "owning_app": "sample_app",
+      "owning_module": "",
+      "ownership_scope": "managed",
+      "upgrade_safe": true,
+      "customization_zone": "generated",
+      "target_path": "apps/SampleApp/manifest.json",
+      "source_template": "business_app",
+      "template_version": "studio.template.v1",
+      "change_type": "create",
+      "risk_level": "medium",
+      "dependencies": [],
+      "generated_by": "erp_app_studio.compile_plan.v1",
+      "studio_project_id": "studio_project:sample",
+      "content_hash": "placeholder:not-generated",
+      "before_hash": "placeholder:before:empty",
+      "after_hash": "placeholder:after:not-generated",
+      "target_exists": false,
+      "drift_status": "clean",
+      "diff_status": "pending",
+      "diff_summary": "New managed artifact target is ready for future diff preview.",
+      "human_diff_summary": "New managed artifact target is ready for future diff preview.",
+      "machine_diff_summary": {
+        "artifact_id": "artifact:app:sample_app",
+        "before_hash": "placeholder:before:empty",
+        "after_hash": "placeholder:after:not-generated",
+        "drift_status": "clean",
+        "change_type": "create",
+        "risk_level": "medium"
+      },
+      "human_summary": "Plan app manifest target only; no file write.",
+      "machine_summary": {
+        "target_exists": false,
+        "safe_target_path": true,
+        "supported_artifact_type": true,
+        "ownership_scope": "managed",
+        "customization_zone": "generated",
+        "drift_status": "clean",
+        "missing_dependency": false,
+        "upgrade_safe": true
+      }
+    }
+  ],
+  "compile_snapshot": {
+    "schema_version": "studio.compile-plan.v1",
+    "compile_id": "compile:placeholder",
+    "bundle_hash": "placeholder:bundle:not-persisted",
+    "artifact_count": 1,
+    "dependency_check_count": 0,
+    "conflict_check_count": 0,
+    "drift_check_count": 1,
+    "generated_at": "deterministic:dry-run-not-persisted"
+  },
+  "summary_groups": {
+    "added_artifacts": ["artifact:app:sample_app -> apps/SampleApp/manifest.json"],
+    "changed_artifacts": [],
+    "noop_artifacts": [],
+    "conflicts": [],
+    "blocked_items": [],
+    "ownership_warnings": [],
+    "drift_warnings": []
+  },
+  "layers": {
+    "app_layer": ["artifact:app:sample_app"],
+    "module_layer": [],
+    "view_layer": [],
+    "navigation_layer": [],
+    "permission_layer": [],
+    "package_layer": []
+  },
+  "guardrails": {
+    "writes_files": false,
+    "executes_migrations": false,
+    "mutates_database": false,
+    "publishes_packages": false,
+    "edits_arbitrary_code": false
+  }
+}

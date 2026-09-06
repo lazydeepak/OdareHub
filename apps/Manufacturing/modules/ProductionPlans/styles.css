@@ -1,0 +1,7 @@
+/* ProductionPlans-specific filter field sizing */
+
+.pp-filter-date{flex:1 1 172px;min-width:min(172px,100%)}
+
+.pp-filter-machine{flex:1 1 190px;min-width:min(190px,100%)}
+
+.pp-filter-status{flex:1 1 172px;min-width:min(172px,100%)}

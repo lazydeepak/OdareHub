@@ -1,0 +1,82 @@
+{
+    "schema": "susankhya.label.context.v1",
+    "context_key": "manufacturing.products.product.label",
+    "owner": {
+        "owner_key": "manufacturing/products",
+        "owner_type": "module",
+        "root_path": "apps/Manufacturing/modules/Products",
+        "resource_path": "{OwnerRoot}/Resources/labels/contexts/"
+    },
+    "purpose": "Product Label",
+    "allowed_fields": [
+        {
+            "field_key": "id",
+            "label": "Id",
+            "source_column": "id",
+            "data_type": "int",
+            "is_nullable": "NO"
+        },
+        {
+            "field_key": "dispatch_date",
+            "label": "Dispatch Date",
+            "source_column": "dispatch_date",
+            "data_type": "date",
+            "is_nullable": "NO"
+        },
+        {
+            "field_key": "daily_order_id",
+            "label": "Daily Order Id",
+            "source_column": "daily_order_id",
+            "data_type": "int",
+            "is_nullable": "YES"
+        },
+        {
+            "field_key": "production_plan_id",
+            "label": "Production Plan Id",
+            "source_column": "production_plan_id",
+            "data_type": "int",
+            "is_nullable": "YES"
+        },
+        {
+            "field_key": "production_entry_id",
+            "label": "Production Entry Id",
+            "source_column": "production_entry_id",
+            "data_type": "int",
+            "is_nullable": "YES"
+        },
+        {
+            "field_key": "qc_entry_id",
+            "label": "Qc Entry Id",
+            "source_column": "qc_entry_id",
+            "data_type": "int",
+            "is_nullable": "YES"
+        },
+        {
+            "field_key": "product_id",
+            "label": "Product Id",
+            "source_column": "product_id",
+            "data_type": "int",
+            "is_nullable": "NO"
+        },
+        {
+            "field_key": "dispatchable_qty",
+            "label": "Dispatchable Qty",
+            "source_column": "dispatchable_qty",
+            "data_type": "decimal",
+            "is_nullable": "NO"
+        }
+    ],
+    "data_source_boundary": {
+        "source_name": "dispatch_entries",
+        "source_type": "BASE TABLE",
+        "status": "owner_scoped_candidate_selected"
+    },
+    "print_locations": {
+        "status": "owner_defined_later"
+    },
+    "template_ref": {
+        "status": "owner_template_selected_later"
+    },
+    "rules_refs": [],
+    "permissions": []
+}

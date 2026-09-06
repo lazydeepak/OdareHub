@@ -1,0 +1,22 @@
+CREATE TABLE IF NOT EXISTS permissions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    perm_key VARCHAR(150) NOT NULL UNIQUE,
+    description VARCHAR(255) NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS role_permissions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    role VARCHAR(50) NOT NULL,
+    perm_key VARCHAR(150) NOT NULL,
+    UNIQUE KEY uniq_role_perm (role, perm_key)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS menus (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    menu_key VARCHAR(150) NOT NULL UNIQUE,
+    label VARCHAR(150) NOT NULL,
+    url VARCHAR(255) NULL,
+    parent_key VARCHAR(150) NULL,
+    display_order INT DEFAULT 100,
+    perm_key VARCHAR(150) NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

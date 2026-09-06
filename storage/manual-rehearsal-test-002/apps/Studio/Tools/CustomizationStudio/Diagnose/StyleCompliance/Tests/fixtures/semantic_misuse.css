@@ -1,0 +1,17 @@
+/* Semantic token role misuse: tokens are present, but used for the wrong visual role. */
+.locale-actions .open-tool {
+    background: var(--tone-info-border, rgba(0, 120, 255, 0.3));
+    color: var(--tone-info-text);
+    border-color: var(--tone-info-border);
+}
+
+.locale-actions .create-file {
+    background: var(--tone-success);
+    color: var(--tone-success-bg);
+}
+
+.locale-actions .valid-neutral {
+    background: var(--tone-info-bg);
+    color: var(--tone-info-text);
+    border-color: var(--tone-info-border);
+}

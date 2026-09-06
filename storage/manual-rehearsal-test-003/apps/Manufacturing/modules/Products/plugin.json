@@ -1,0 +1,59 @@
+{
+    "name": "Products",
+    "display_name": "Parts",
+    "suite": "manufacturing",
+    "group": "ipm",
+    "category": "business",
+    "display_order": 10,
+    "type": "business",
+    "version": "1.0.0",
+    "description": "Parts master for IPM workflows.",
+    "requires": [
+        "Base>=3.0.0"
+    ],
+    "optional": [
+        "ACL>=1.0.0",
+        "Audit>=1.0.0"
+    ],
+    "entry": "routes.php",
+    "package_type": "module",
+    "owner_app": "manufacturing",
+    "module_key": "Products",
+    "module_type": "business_entity",
+    "target_maturity_level": "L3",
+    "declared_capabilities": [
+        "routes",
+        "views",
+        "forms",
+        "schema",
+        "migrations",
+        "controllers",
+        "services",
+        "permissions",
+        "menus",
+        "reports",
+        "exports",
+        "lifecycle_hooks",
+        "localization"
+    ],
+    "lifecycle_contract": {
+        "routes": "active_only",
+        "menus": "active_only",
+        "widgets": "active_only",
+        "reports": "active_only",
+        "dashboards": "active_only",
+        "schema": "installed_or_active"
+    },
+    "reports": [
+        {
+            "report_key": "manufacturing.products.overview",
+            "title": "Parts Report",
+            "view": "Views/report.php",
+            "export_view": "Views/export.php",
+            "owner": "module",
+            "scope": "products",
+            "permission": "app.manufacturing.access",
+            "lifecycle": "active_only"
+        }
+    ]
+}

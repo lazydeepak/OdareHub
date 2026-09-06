@@ -1,0 +1,43 @@
+/* Machines leader workboard styles */
+.ml-hero{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;align-items:flex-start}
+.ml-title{margin:0;font-size:1.45rem}
+.ml-sub{margin-top:6px;color:var(--muted);font-size:.9rem;max-width:760px}
+.ml-pill{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;border:1px solid var(--glass-border);background: var(--style-subtle-bg);font-size:.78rem;color:var(--muted)}
+.ml-kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-top:12px}
+.ml-kpi{background: var(--style-subtle-bg);border:1px solid var(--glass-border);border-radius:12px;padding:10px 12px}
+.ml-kpi-label{font-size:.73rem;color:var(--muted)}
+.ml-kpi-value{margin-top:3px;font-size:1.35rem;font-weight:700}
+.ml-progress{height:7px;background: var(--style-subtle-bg);border-radius:10px;overflow:hidden;margin-top:7px}
+.ml-progress>span{display:block;height:100%;background: var(--style-subtle-bg)}
+.ml-filter-row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+.ml-machine-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.ml-chip{border:1px solid var(--glass-border);border-radius:999px;padding:6px 10px;font-size:.78rem;background: var(--style-subtle-bg)}
+.ml-grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:12px}
+.ml-priority-board{margin-top:12px;border: 1px solid var(--style-border-soft);background: var(--style-subtle-bg);border-radius:12px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.ml-priority-text{font-size:.9rem}
+.ml-priority-count{font-size:1.15rem;font-weight:800}
+.ml-alert-links{display:flex;gap:8px;flex-wrap:wrap}
+.ml-strong-board{border: 1px solid var(--style-border-soft);background: var(--style-subtle-bg)}
+.ml-card{background: var(--style-subtle-bg);border:1px solid var(--glass-border);border-radius:12px;padding:12px}
+.ml-card h3{margin:0 0 8px;font-size:1rem}
+.ml-row{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.ml-job-title{font-weight:700;line-height:1.35}
+.ml-meta{color:var(--muted);font-size:.8rem;margin-top:2px}
+.ml-mono{font-variant-numeric:tabular-nums}
+.ml-risk{border-radius:999px;padding:2px 8px;font-size:.72rem;border:1px solid;white-space:nowrap}
+.risk-high{color: var(--color-warning-text);border-color: var(--color-warning-border);background: var(--color-warning-bg)}
+.risk-medium{color: var(--color-warning-text);border-color: var(--color-warning-border);background: var(--color-warning-bg)}
+.risk-low{color: var(--color-warning-text);border-color: var(--color-warning-border);background: var(--color-warning-bg)}
+.ml-list{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px}
+.ml-list li{border:1px solid var(--glass-border);border-radius:10px;padding:10px;background: var(--style-subtle-bg)}
+.ml-run-list li{border-color: var(--style-border-soft);background: var(--style-subtle-bg)}
+.ml-run-list .ml-job-title{font-size:1.02rem}
+.ml-table-wrap{overflow:auto;border:1px solid var(--glass-border);border-radius:12px}
+.ml-table{width:100%;border-collapse:collapse;min-width:720px}
+.ml-table th,.ml-table td{padding:9px 10px;border-bottom: 1px solid var(--style-border-soft);text-align:left;font-size:.84rem;vertical-align:top}
+.ml-table th{color:var(--muted);font-weight:600;background: var(--style-subtle-bg)}
+.ml-alert{border: 1px solid var(--color-warning-border);background: var(--color-warning-bg);color: var(--color-warning-text);border-radius:10px;padding:9px 11px;font-size:.83rem}
+.ml-empty{color:var(--muted);font-size:.86rem;padding:4px 0}
+.ml-section-title{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+
+@media (max-width:768px){.ml-table{min-width:640px}}

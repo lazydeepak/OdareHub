@@ -1,0 +1,378 @@
+{
+    "schema_version": "studio.generated-module.v1",
+    "generated_by": "studio",
+    "generator_id": "erp_app_studio.first_apply.v1",
+    "compile_id": "compile:generated:e313542c7a7a733f",
+    "app_key": "rollback_app",
+    "module_key": "rollback_module",
+    "display_name": "Rollback Module",
+    "app_display_name": "Rollback App",
+    "route_path": "/apps/rollback-app/rollback-module",
+    "view_file": "index.php",
+    "snapshot_id": "91f7d4cf-384c-53fc-953d-2d83c1aa7e9c",
+    "snapshot_hash": "snapshot:09e64b22683592b707b6e3073ef12be25e5a3c18c251b1fe63f50bfec573e902",
+    "created_at": "2026-05-09T05:34:05+00:00",
+    "live_path": "apps/Generated/rollback_app/rollback_module",
+    "navigation": {
+        "label": "Rollback Module",
+        "section": "Rollback App",
+        "key": "rollback_app_rollback_module",
+        "order": 10,
+        "priority": 100
+    },
+    "provider": {
+        "namespace": "Generated\\RollbackApp\\Providers",
+        "class": "RollbackModuleProvider",
+        "file": "Providers/RollbackModuleProvider.php"
+    },
+    "fields": [
+        {
+            "key": "name",
+            "label": "Name",
+            "type": "string",
+            "required": true,
+            "default": "",
+            "options": []
+        },
+        {
+            "key": "version",
+            "label": "Version",
+            "type": "string",
+            "required": false,
+            "default": "",
+            "options": []
+        }
+    ],
+    "templates": {
+        "app": "business_app",
+        "module": "crud_module",
+        "view": "table_view"
+    },
+    "safety": {
+        "output_root": "apps/Generated",
+        "temp_root": "apps/Generated/tmp",
+        "raw_php_injection_allowed": false,
+        "db_schema_execution_allowed": false
+    },
+    "runtime": {
+        "renderer": "generated.runtime.v1",
+        "view_definition": {
+            "layout": {
+                "type": "grid",
+                "columns": 12,
+                "rows": "auto",
+                "items": [
+                    {
+                        "id": "text_intro",
+                        "component": "text",
+                        "x": 0,
+                        "y": 0,
+                        "w": 7,
+                        "h": 2,
+                        "group": "intro",
+                        "props": {
+                            "title": "Rollback Module",
+                            "body": "Rollback Module"
+                        },
+                        "data_binding": "module.description"
+                    },
+                    {
+                        "id": "kpi_total",
+                        "component": "kpi_card",
+                        "x": 7,
+                        "y": 0,
+                        "w": 5,
+                        "h": 2,
+                        "group": "summary",
+                        "props": {
+                            "label": "Total Records",
+                            "value": "0",
+                            "delta": ""
+                        },
+                        "data_binding": "module.metrics.total"
+                    },
+                    {
+                        "id": "table_main",
+                        "component": "table",
+                        "x": 0,
+                        "y": 2,
+                        "w": 8,
+                        "h": 7,
+                        "group": "data",
+                        "props": {
+                            "title": "Rollback Module",
+                            "sample_rows": 10,
+                            "density": "comfortable"
+                        },
+                        "data_binding": "module.rows"
+                    },
+                    {
+                        "id": "form_main",
+                        "component": "form",
+                        "x": 8,
+                        "y": 2,
+                        "w": 4,
+                        "h": 7,
+                        "group": "actions",
+                        "props": {
+                            "title": "Create Record",
+                            "submit_label": "Save",
+                            "show_required": true
+                        },
+                        "data_binding": "module.fields"
+                    }
+                ],
+                "relations": []
+            },
+            "component_registry": {
+                "version": "runtime.generated.v1",
+                "components": [
+                    "kpi_card",
+                    "table",
+                    "form",
+                    "text"
+                ]
+            },
+            "studio_views": {
+                "active_view_id": "view_main",
+                "views": [
+                    {
+                        "id": "view_main",
+                        "name": "Rollback Module",
+                        "route_path": "/apps/rollback-app/rollback-module",
+                        "view_kind": "dashboard",
+                        "layout": {
+                            "type": "grid",
+                            "columns": 12,
+                            "rows": "auto",
+                            "items": [
+                                {
+                                    "id": "text_intro",
+                                    "component": "text",
+                                    "x": 0,
+                                    "y": 0,
+                                    "w": 7,
+                                    "h": 2,
+                                    "group": "intro",
+                                    "props": {
+                                        "title": "Rollback Module",
+                                        "body": "Rollback Module"
+                                    },
+                                    "data_binding": "module.description"
+                                },
+                                {
+                                    "id": "kpi_total",
+                                    "component": "kpi_card",
+                                    "x": 7,
+                                    "y": 0,
+                                    "w": 5,
+                                    "h": 2,
+                                    "group": "summary",
+                                    "props": {
+                                        "label": "Total Records",
+                                        "value": "0",
+                                        "delta": ""
+                                    },
+                                    "data_binding": "module.metrics.total"
+                                },
+                                {
+                                    "id": "table_main",
+                                    "component": "table",
+                                    "x": 0,
+                                    "y": 2,
+                                    "w": 8,
+                                    "h": 7,
+                                    "group": "data",
+                                    "props": {
+                                        "title": "Rollback Module",
+                                        "sample_rows": 10,
+                                        "density": "comfortable"
+                                    },
+                                    "data_binding": "module.rows"
+                                },
+                                {
+                                    "id": "form_main",
+                                    "component": "form",
+                                    "x": 8,
+                                    "y": 2,
+                                    "w": 4,
+                                    "h": 7,
+                                    "group": "actions",
+                                    "props": {
+                                        "title": "Create Record",
+                                        "submit_label": "Save",
+                                        "show_required": true
+                                    },
+                                    "data_binding": "module.fields"
+                                }
+                            ],
+                            "relations": []
+                        },
+                        "links": []
+                    }
+                ]
+            }
+        }
+    },
+    "view_definition": {
+        "layout": {
+            "type": "grid",
+            "columns": 12,
+            "rows": "auto",
+            "items": [
+                {
+                    "id": "text_intro",
+                    "component": "text",
+                    "x": 0,
+                    "y": 0,
+                    "w": 7,
+                    "h": 2,
+                    "group": "intro",
+                    "props": {
+                        "title": "Rollback Module",
+                        "body": "Rollback Module"
+                    },
+                    "data_binding": "module.description"
+                },
+                {
+                    "id": "kpi_total",
+                    "component": "kpi_card",
+                    "x": 7,
+                    "y": 0,
+                    "w": 5,
+                    "h": 2,
+                    "group": "summary",
+                    "props": {
+                        "label": "Total Records",
+                        "value": "0",
+                        "delta": ""
+                    },
+                    "data_binding": "module.metrics.total"
+                },
+                {
+                    "id": "table_main",
+                    "component": "table",
+                    "x": 0,
+                    "y": 2,
+                    "w": 8,
+                    "h": 7,
+                    "group": "data",
+                    "props": {
+                        "title": "Rollback Module",
+                        "sample_rows": 10,
+                        "density": "comfortable"
+                    },
+                    "data_binding": "module.rows"
+                },
+                {
+                    "id": "form_main",
+                    "component": "form",
+                    "x": 8,
+                    "y": 2,
+                    "w": 4,
+                    "h": 7,
+                    "group": "actions",
+                    "props": {
+                        "title": "Create Record",
+                        "submit_label": "Save",
+                        "show_required": true
+                    },
+                    "data_binding": "module.fields"
+                }
+            ],
+            "relations": []
+        },
+        "studio_views": {
+            "active_view_id": "view_main",
+            "views": [
+                {
+                    "id": "view_main",
+                    "name": "Rollback Module",
+                    "route_path": "/apps/rollback-app/rollback-module",
+                    "view_kind": "dashboard",
+                    "layout": {
+                        "type": "grid",
+                        "columns": 12,
+                        "rows": "auto",
+                        "items": [
+                            {
+                                "id": "text_intro",
+                                "component": "text",
+                                "x": 0,
+                                "y": 0,
+                                "w": 7,
+                                "h": 2,
+                                "group": "intro",
+                                "props": {
+                                    "title": "Rollback Module",
+                                    "body": "Rollback Module"
+                                },
+                                "data_binding": "module.description"
+                            },
+                            {
+                                "id": "kpi_total",
+                                "component": "kpi_card",
+                                "x": 7,
+                                "y": 0,
+                                "w": 5,
+                                "h": 2,
+                                "group": "summary",
+                                "props": {
+                                    "label": "Total Records",
+                                    "value": "0",
+                                    "delta": ""
+                                },
+                                "data_binding": "module.metrics.total"
+                            },
+                            {
+                                "id": "table_main",
+                                "component": "table",
+                                "x": 0,
+                                "y": 2,
+                                "w": 8,
+                                "h": 7,
+                                "group": "data",
+                                "props": {
+                                    "title": "Rollback Module",
+                                    "sample_rows": 10,
+                                    "density": "comfortable"
+                                },
+                                "data_binding": "module.rows"
+                            },
+                            {
+                                "id": "form_main",
+                                "component": "form",
+                                "x": 8,
+                                "y": 2,
+                                "w": 4,
+                                "h": 7,
+                                "group": "actions",
+                                "props": {
+                                    "title": "Create Record",
+                                    "submit_label": "Save",
+                                    "show_required": true
+                                },
+                                "data_binding": "module.fields"
+                            }
+                        ],
+                        "relations": []
+                    },
+                    "links": []
+                }
+            ]
+        }
+    },
+    "styles": [
+        {
+            "key": "generated.rollback_app.rollback_module",
+            "path": "styles.css",
+            "scope": "module",
+            "module": "rollback_module",
+            "surfaces": [
+                "admin",
+                "operator"
+            ],
+            "order": 300
+        }
+    ]
+}

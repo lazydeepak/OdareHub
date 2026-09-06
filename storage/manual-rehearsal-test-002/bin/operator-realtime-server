@@ -1,0 +1,136 @@
+#!/usr/bin/env php
+<?php
+/**
+ * Operator Realtime WebSocket Server
+ * 
+ * Executable entry point for operator layer real-time KPI push.
+ * 
+ * Usage:
+ *   php bin/operator-realtime-server [--port=8001] [--host=127.0.0.1]
+ * 
+ * Environment variables:
+ *   OPERATOR_REALTIME_PORT (default: 8001)
+ *   OPERATOR_REALTIME_HOST (default: 127.0.0.1)
+ *   OPERATOR_REALTIME_SHOW_DEPRECATIONS (default: 0)
+ *   REDIS_HOST (default: 127.0.0.1)
+ *   REDIS_PORT (default: 6379)
+ * 
+ * Supervisor config:
+ *   [program:operator-realtime]
+ *   command=php bin/operator-realtime-server
+ *   directory=/path/to/project
+ *   autorestart=true
+ *   autostart=true
+ *   stdout_logfile=/var/log/operator-realtime.log
+ *   stderr_logfile=/var/log/operator-realtime-error.log
+ */
+
+declare(strict_types=1);
+
+$showDeprecations = in_array(strtolower((string)(getenv('OPERATOR_REALTIME_SHOW_DEPRECATIONS') ?: '0')), ['1', 'true', 'yes', 'on'], true);
+if ($showDeprecations) {
+    error_reporting(E_ALL);
+} else {
+    error_reporting(E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED);
+}
+
+// Setup working directory and autoloader
+chdir(dirname(__DIR__));
+define('APP_ROOT', dirname(__DIR__));
+
+require 'vendor/autoload.php';
+require 'app/Core/helpers.php';
+
+use Ratchet\Server\IoServer;
+use Ratchet\Http\HttpServer;
+use Ratchet\WebSocket\WsServer;
+use Apps\Shell\Services\OperatorRealtimeService;
+
+// Parse command line arguments
+$options = getopt('h:', ['port:', 'host:', 'help']);
+$port = (int)($options['port'] ?? getenv('OPERATOR_REALTIME_PORT') ?: 8001);
+$host = $options['host'] ?? getenv('OPERATOR_REALTIME_HOST') ?: '127.0.0.1';
+
+if (isset($options['help']) || isset($options['h'])) {
+    echo <<<'HELP'
+Operator Realtime WebSocket Server
+
+Usage:
+  php bin/operator-realtime-server [--port=8001] [--host=127.0.0.1]
+
+Options:
+  --port=PORT      WebSocket server port (default: 8001)
+  --host=HOST      WebSocket server host (default: 127.0.0.1)
+  -h, --help       Show this help message
+
+Environment Variables:
+  OPERATOR_REALTIME_PORT    Default port if --port not specified
+  OPERATOR_REALTIME_HOST    Default host if --host not specified
+    OPERATOR_REALTIME_SHOW_DEPRECATIONS  Show PHP deprecation notices in CLI output
+  REDIS_HOST                Redis host (default: 127.0.0.1)
+  REDIS_PORT                Redis port (default: 6379)
+
+Examples:
+  # Start server on default port 8001
+  php bin/operator-realtime-server
+
+  # Start on custom port
+  php bin/operator-realtime-server --port=9001
+
+  # Start with Supervisor
+  supervisord -c etc/supervisor/operator-realtime.conf
+
+HELP;
+    exit(0);
+}
+
+echo "[" . date('Y-m-d H:i:s') . "] Starting Operator Realtime WebSocket Server\n";
+echo "[" . date('Y-m-d H:i:s') . "] Listening on ws://{$host}:{$port}\n";
+echo "[" . date('Y-m-d H:i:s') . "] Press Ctrl+C to stop\n";
+echo "\n";
+
+try {
+    // Create the WebSocket app
+    $realtimeService = new OperatorRealtimeService();
+    $wsServer = new WsServer($realtimeService);
+    $httpServer = new HttpServer($wsServer);
+    
+    // Create and start the server
+    $server = IoServer::factory($httpServer, $port, $host);
+    
+    // Setup periodic KPI broadcast (every 5 seconds)
+    $loop = $server->loop;
+    $loop->addPeriodicTimer(5, function () use ($realtimeService) {
+        try {
+            $realtimeService->broadcastKpiUpdate();
+            
+            // Log stats every 30 seconds
+            static $tick = 0;
+            if (++$tick % 6 === 0) {
+                $count = $realtimeService->getConnectionCount();
+                $subscribers = $realtimeService->getSubscribersByView();
+                $subscriberStr = implode(', ', array_map(fn($k, $v) => "$k:$v", array_keys($subscribers), $subscribers));
+                echo "[" . date('Y-m-d H:i:s') . "] Connections: {$count}, Subscribers: {$subscriberStr}\n";
+            }
+        } catch (Exception $e) {
+            error_log("Periodic broadcast error: {$e->getMessage()}");
+        }
+    });
+
+    // Handle shutdown gracefully
+    pcntl_signal(SIGTERM, function () use ($server) {
+        echo "\n[" . date('Y-m-d H:i:s') . "] Shutdown signal received, gracefully stopping...\n";
+        $server->loop->stop();
+    });
+    pcntl_signal(SIGINT, function () use ($server) {
+        echo "\n[" . date('Y-m-d H:i:s') . "] Interrupt signal received, gracefully stopping...\n";
+        $server->loop->stop();
+    });
+
+    $server->run();
+} catch (Exception $e) {
+    echo "[" . date('Y-m-d H:i:s') . "] FATAL ERROR: {$e->getMessage()}\n";
+    echo "[" . date('Y-m-d H:i:s') . "] Stack trace:\n";
+    echo $e->getTraceAsString() . "\n";
+    exit(1);
+}

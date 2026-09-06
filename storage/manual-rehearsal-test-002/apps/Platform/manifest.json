@@ -1,0 +1,215 @@
+{
+  "id": "platform",
+  "app_key": "platform",
+  "package_type": "bundle",
+  "name": "Platform",
+  "version": "1.0.0",
+  "type": "system",
+  "min_core_version": "3.0.0",
+  "dependencies": [],
+  "entry": "routes.php",
+  "migrations_path": "migrations",
+  "permissions": [],
+  "can_disable": true,
+  "can_uninstall": true,
+  "can_export": true,
+  "system_app_contract": {
+    "version": "system-app-contract.v1",
+    "owner_layer": "Platform",
+    "runtime_role": "platform_governance",
+    "lifecycle_policy": {
+      "disable": "restricted_contract_only",
+      "uninstall": "restricted_contract_only",
+      "export": "metadata_and_assets_only",
+      "notes": "Current can_disable/can_uninstall/can_export flags are runtime compatibility flags until lifecycle enforcement is updated."
+    },
+    "route_policy": {
+      "canonical_prefixes": [
+        "/apps/platform",
+        "/ops/*",
+        "/admin/*"
+      ],
+      "compatibility_surfaces": [
+        "/ops/dashboard",
+        "legacy Base/ops bridges documented in migration inventory"
+      ],
+      "must_not_reinterpret_routes": true
+    },
+    "source_of_truth_policy": "govern_and_diagnose_without_owning_runtime_business_meaning"
+  },
+  "ownership_contract": {
+    "owns": [
+      "platform governance surfaces",
+      "access-control and user-control operations",
+      "role/profile/assignment administration surfaces",
+      "diagnostics and route/app/system inspection surfaces",
+      "organization/platform settings",
+      "package/app lifecycle administration surfaces",
+      "System Tools entry points and diagnostics",
+      "conditional Studio entry links/diagnostics when Studio is installed/enabled"
+    ],
+    "must_not_own": [
+      "Core primitives",
+      "Shell runtime chrome or wrapper composition",
+      "app/module business workflows",
+      "app/module runtime capability catalogs",
+      "Studio editor/builder implementation or draft runtime truth",
+      "direct permission bypasses",
+      "uncontrolled admin shortcuts outside Core/auth/audit governance"
+    ],
+    "contributes_to": [
+      "platform administration",
+      "system diagnostics",
+      "governed lifecycle operations"
+    ],
+    "depends_on": [
+      "Core auth/audit/permission primitives",
+      "owner app/module contracts",
+      "Studio installed/enabled checks for Studio links"
+    ]
+  },
+  "modules": [],
+  "hooks": [
+    {
+      "type": "boot",
+      "key": "platform.bootstrap",
+      "handler_file": "bootstrap.php"
+    }
+  ],
+  "admin_parent_surfaces": [
+    {
+      "url": "/ops/access-control",
+      "label": "Access Control Board",
+      "description": "Dashboard assignments, access policy, and scope governance.",
+      "priority": 10,
+      "group": "governance"
+    },
+    {
+      "url": "/ops/user-control",
+      "label": "User Control Board",
+      "description": "User lifecycle operations and account-level controls.",
+      "priority": 20,
+      "group": "governance"
+    },
+    {
+      "url": "/ops/display-manager",
+      "label": "Display Manager",
+      "description": "Manage display device assignments and readonly display links.",
+      "priority": 25,
+      "group": "governance"
+    },
+    {
+      "url": "/ops/navigation-tree",
+      "label": "Navigation Tree",
+      "description": "Navigation ownership, hierarchy, and visibility review.",
+      "priority": 30,
+      "group": "governance"
+    },
+    {
+      "url": "/admin/apps",
+      "label": "Admin Tools",
+      "description": "App/package lifecycle controls and platform administration.",
+      "priority": 40,
+      "group": "platform"
+    },
+    {
+      "url": "/admin/setup",
+      "label": "Setup",
+      "description": "Core setup and configuration entry surface.",
+      "priority": 50,
+      "group": "platform"
+    },
+    {
+      "url": "/admin/routes",
+      "label": "Routes",
+      "description": "Route registry diagnostics and runtime route governance.",
+      "priority": 60,
+      "group": "diagnostics"
+    },
+    {
+      "url": "/admin/base",
+      "label": "Base",
+      "description": "Base schema builder and runtime contract surfaces.",
+      "priority": 70,
+      "group": "platform"
+    },
+    {
+      "url": "/admin/system-tools",
+      "label": "Logs / Diagnostics",
+      "description": "System-level diagnostics and runtime inspection parent tools.",
+      "priority": 80,
+      "group": "diagnostics"
+    }
+  ],
+  "routes": [
+    {
+      "path": "/apps/platform",
+      "kind": "canonical",
+      "feature_key": "platform_entry"
+    },
+    {
+      "path": "/ops/dashboard",
+      "kind": "compatibility",
+      "feature_key": "ops_dashboard"
+    },
+    {
+      "path": "/ops/access-control",
+      "kind": "canonical",
+      "feature_key": "access_control_board"
+    },
+    {
+      "path": "/ops/user-control",
+      "kind": "canonical",
+      "feature_key": "user_control_board"
+    },
+    {
+      "path": "/ops/display-manager",
+      "kind": "canonical",
+      "feature_key": "display_manager"
+    },
+    {
+      "path": "/ops/widget-builder",
+      "kind": "canonical",
+      "feature_key": "widget_builder"
+    },
+    {
+      "path": "/ops/navigation-tree",
+      "kind": "canonical",
+      "feature_key": "navigation_tree"
+    },
+    {
+      "path": "/ops/audit-log",
+      "kind": "canonical",
+      "feature_key": "audit_explorer"
+    },
+    {
+      "path": "/admin/base",
+      "kind": "canonical",
+      "feature_key": "base_schema_builder"
+    },
+    {
+      "path": "/admin/apps",
+      "kind": "canonical",
+      "feature_key": "apps_management"
+    },
+    {
+      "path": "/admin/routes",
+      "kind": "canonical",
+      "feature_key": "route_registry"
+    }
+  ],
+  "menus": [],
+  "widgets": [],
+  "styles": [
+    {
+      "key": "platform.app",
+      "path": "styles/platform.css",
+      "scope": "app",
+      "surfaces": [
+        "admin",
+        "operator"
+      ],
+      "order": 200
+    }
+  ]
+}

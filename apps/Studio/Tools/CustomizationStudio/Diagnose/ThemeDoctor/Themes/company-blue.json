@@ -1,0 +1,18 @@
+{
+  "key": "company-blue",
+  "label": "Company Blue",
+  "status": "draft",
+  "extends": "default",
+  "tokens": {
+    "bg": "#041b3d",
+    "panel": "#0a2b5f",
+    "text": "#edf4ff",
+    "muted": "#9bb5df",
+    "line": "#1f4d8d",
+    "accent": "#2e7ef7"
+  },
+  "metadata": {
+    "owner": "studio",
+    "version": 1
+  }
+}

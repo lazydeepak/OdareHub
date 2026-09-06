@@ -1,0 +1,32 @@
+{
+  "schema_version": "gui.view-definition.v1",
+  "status": "draft",
+  "view": {
+    "app_key": "",
+    "module_key": "",
+    "view_key": "",
+    "view_kind": "table",
+    "route_path": "",
+    "surface": "admin",
+    "wrapper": "admin",
+    "title_key": "",
+    "display_name_key": "",
+    "description_key": ""
+  },
+  "data_contract": {
+    "adapter_class": "",
+    "allowed_filters": [],
+    "required_fields": [],
+    "empty_state_key": ""
+  },
+  "security": {
+    "requires_auth": true,
+    "allowed_roles": ["platform_admin"],
+    "csrf_for_mutations": true
+  },
+  "audit": {
+    "draft_id": "",
+    "created_by": "",
+    "created_at": ""
+  }
+}

@@ -1,0 +1,11 @@
+{
+    "schema_version": "studio.generated-module-contract.v1",
+    "app_key": "inventory_app",
+    "module_key": "parts_master",
+    "display_name": "parts_master",
+    "route_path": "/apps/inventory-app/parts-master",
+    "template": "crud_module",
+    "compile_id": "compile:generated:f057231e3a4ff270",
+    "snapshot_id": "c5ec94ed-8144-5c53-b76a-c3f9f0f09e9c",
+    "fields": []
+}

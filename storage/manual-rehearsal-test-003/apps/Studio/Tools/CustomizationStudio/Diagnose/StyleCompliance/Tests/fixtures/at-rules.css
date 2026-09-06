@@ -1,0 +1,29 @@
+/* Nested at-rules */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --surface: #1a1a2e;
+        --text: #e0e0e0;
+    }
+
+    .card {
+        background-color: var(--surface);
+        color: var(--text);
+        border-color: #333;
+    }
+
+    @supports (color: oklch(50% 0.1 200)) {
+        .card {
+            border-color: oklch(60% 0.15 250);
+        }
+    }
+}
+
+@media (min-width: 768px) {
+    .card {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+}
+
+.standalone {
+    color: #222;
+}

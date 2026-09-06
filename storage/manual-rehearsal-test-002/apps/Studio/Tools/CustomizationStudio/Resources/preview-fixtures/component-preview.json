@@ -1,0 +1,21 @@
+{
+  "fixture": "component-preview",
+  "owner": "studio",
+  "tool_area": "customization-studio",
+  "purpose": "Describes isolated component examples for future socket previews.",
+  "runtime_status": "fixture_catalog_only_not_rendered",
+  "renders_ui": false,
+  "connects_to_shell": false,
+  "reads_studio_drafts": false,
+  "uses_active_registry_truth": false,
+  "examples": [
+    {
+      "example": "primitive-components",
+      "label": "Component set",
+      "description": "Buttons, icon buttons, cards, panels, inputs, selects, badges, chips, avatars, dividers, links, and icons.",
+      "socket_catalogs": ["core-tokens", "primitives", "states", "accessibility"],
+      "preview_modes": ["simple", "advanced"],
+      "notes": "Catalog only. Components are described, not rendered."
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "schema": "susankhya.theme.v1",
+  "id": "liquid-glass-system",
+  "name": "Liquid Glass System",
+  "mode": "system",
+  "sources": [
+    "colors.css",
+    "typography.css",
+    "modes.css"
+  ]
+}

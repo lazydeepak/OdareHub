@@ -1,0 +1,10 @@
+{
+    "schema_version": "studio.generated-module-contract.v1",
+    "app_key": "rollback_app",
+    "module_key": "rollback_module",
+    "display_name": "Rollback Module",
+    "route_path": "/apps/rollback-app/rollback-module",
+    "template": "crud_module",
+    "compile_id": "compile:generated:e313542c7a7a733f",
+    "snapshot_id": "91f7d4cf-384c-53fc-953d-2d83c1aa7e9c"
+}

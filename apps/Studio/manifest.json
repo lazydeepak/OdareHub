@@ -1,0 +1,494 @@
+{
+  "id": "studio",
+  "app_key": "studio",
+  "package_type": "bundle",
+  "name": "Susankhya Studio",
+  "version": "0.1.0",
+  "type": "system",
+  "min_core_version": "3.0.0",
+  "dependencies": [
+    "platform>=1.0.0"
+  ],
+  "entry": "routes.php",
+  "migrations_path": "migrations",
+  "permissions": [
+    "studio.view",
+    "studio.manage"
+  ],
+  "can_disable": true,
+  "can_uninstall": true,
+  "can_export": true,
+  "modules": [],
+  "hooks": [
+    {
+      "type": "host_surface",
+      "key": "studio.me.header_actions",
+      "surface": "me",
+      "region": "header_actions",
+      "provider": "Apps\\Studio\\Services\\HostSurfaceContributionService::contribute",
+      "provider_file": "Services/HostSurfaceContributionService.php",
+      "order": 40
+    },
+    {
+      "type": "host_surface",
+      "key": "studio.me.quick_links",
+      "surface": "me",
+      "region": "quick_links",
+      "provider": "Apps\\Studio\\Services\\HostSurfaceContributionService::contribute",
+      "provider_file": "Services/HostSurfaceContributionService.php",
+      "order": 40
+    }
+  ],
+  "routes": [
+    {
+      "path": "/apps/studio",
+      "kind": "canonical",
+      "feature_key": "studio_workspace"
+    },
+    {
+      "path": "/apps/studio/library",
+      "kind": "canonical",
+      "feature_key": "studio_library"
+    },
+    {
+      "path": "/apps/studio/system-library",
+      "kind": "canonical",
+      "feature_key": "studio_system_library"
+    },
+    {
+      "path": "/apps/studio/library/module",
+      "kind": "canonical",
+      "feature_key": "studio_library_module"
+    },
+    {
+      "path": "/apps/studio/library/load",
+      "kind": "canonical",
+      "feature_key": "studio_library_load"
+    },
+    {
+      "path": "/apps/studio/import-view",
+      "kind": "canonical",
+      "feature_key": "studio_import_view"
+    },
+    {
+      "path": "/apps/studio/lifecycle",
+      "kind": "canonical",
+      "feature_key": "studio_lifecycle"
+    },
+    {
+      "path": "/apps/studio/validate",
+      "kind": "canonical",
+      "feature_key": "studio_validate"
+    },
+    {
+      "path": "/apps/studio/preflight",
+      "kind": "canonical",
+      "feature_key": "studio_preflight"
+    },
+    {
+      "path": "/apps/studio/publish-gate",
+      "kind": "canonical",
+      "feature_key": "studio_publish_gate"
+    },
+    {
+      "path": "/apps/studio/compile-plan",
+      "kind": "canonical",
+      "feature_key": "studio_compile_plan"
+    },
+    {
+      "path": "/apps/studio/preview",
+      "kind": "canonical",
+      "feature_key": "studio_preview"
+    },
+    {
+      "path": "/apps/studio/approval-preview",
+      "kind": "canonical",
+      "feature_key": "studio_approval_preview"
+    },
+    {
+      "path": "/apps/studio/snapshot-preview",
+      "kind": "canonical",
+      "feature_key": "studio_snapshot_preview"
+    },
+    {
+      "path": "/apps/studio/execution-preview",
+      "kind": "canonical",
+      "feature_key": "studio_execution_preview"
+    },
+    {
+      "path": "/apps/studio/apply-snapshot",
+      "kind": "canonical",
+      "feature_key": "studio_apply_snapshot"
+    },
+    {
+      "path": "/apps/studio/apply",
+      "kind": "canonical",
+      "feature_key": "studio_apply"
+    },
+    {
+      "path": "/apps/studio/db-rows",
+      "kind": "canonical",
+      "feature_key": "studio_db_rows"
+    },
+    {
+      "path": "/apps/studio/db-rows/save",
+      "kind": "canonical",
+      "feature_key": "studio_db_rows_save"
+    },
+    {
+      "path": "/apps/studio/rollback",
+      "kind": "canonical",
+      "feature_key": "studio_rollback"
+    },
+    {
+      "path": "/apps/studio/rollback-preview",
+      "kind": "canonical",
+      "feature_key": "studio_rollback_preview"
+    },
+    {
+      "path": "/apps/studio/rollback-execute",
+      "kind": "canonical",
+      "feature_key": "studio_rollback_execute"
+    },
+    {
+      "path": "/apps/studio/history",
+      "kind": "canonical",
+      "feature_key": "studio_history"
+    },
+    {
+      "path": "/apps/studio/tools/nav-composer",
+      "kind": "canonical",
+      "feature_key": "studio_nav_composer"
+    },
+    {
+      "path": "/apps/studio/tools/registry",
+      "kind": "canonical",
+      "feature_key": "studio_tool_registry"
+    },
+    {
+      "path": "/apps/studio/resource-types",
+      "kind": "canonical",
+      "feature_key": "studio_resource_types"
+    },
+    {
+      "path": "/apps/studio/tools/localization-studio",
+      "kind": "canonical",
+      "feature_key": "studio_localization_studio"
+    },
+    {
+      "path": "/apps/studio/tools/customization-studio/design-system/tokens",
+      "kind": "canonical",
+      "feature_key": "studio_css_token_editor"
+    },
+    {
+      "path": "/apps/studio/tools/report-designer",
+      "kind": "canonical",
+      "feature_key": "studio_report_designer"
+    },
+    {
+      "path": "/apps/studio/tools/label-designer",
+      "kind": "canonical",
+      "feature_key": "studio_label_designer"
+    },
+    {
+      "path": "/apps/studio/tools/customization-studio",
+      "kind": "canonical",
+      "feature_key": "studio_customization_studio"
+    },
+    {
+      "path": "/apps/studio/tools/customization-studio/visual-customizer",
+      "kind": "canonical",
+      "feature_key": "studio_customization_studio_visual_customizer"
+    },
+    {
+      "path": "/apps/studio/tools/engineering-workspaces",
+      "kind": "canonical",
+      "feature_key": "studio_engineering_workspaces"
+    },
+    {
+      "path": "/apps/studio/export-package",
+      "kind": "canonical",
+      "feature_key": "studio_export_package"
+    },
+    {
+      "path": "/apps/studio/registry-install",
+      "kind": "canonical",
+      "feature_key": "studio_registry_install"
+    },
+    {
+      "path": "/ops/gui-studio",
+      "kind": "alias",
+      "canonical_target": "/apps/studio",
+      "compatibility": true,
+      "feature_key": "studio_workspace_legacy"
+    }
+  ],
+  "menus": [
+    {
+      "key": "studio.open",
+      "label": "Open Studio",
+      "label_key": "ops.platform_operations.card.gui_studio",
+      "url": "/apps/studio",
+      "parent": "apps.root",
+      "order": 26,
+      "perm": "studio.view",
+      "feature_key": "studio_workspace",
+      "visible_if": "role_platform_admin_or_sysadmin"
+    }
+  ],
+  "widgets": [],
+  "runtime_contract": {
+    "routes": [
+      {
+        "path": "/apps/studio",
+        "feature_key": "studio_workspace",
+        "kind": "canonical",
+        "nav_visible": true,
+        "search_visible": true,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/apps/studio/library",
+        "feature_key": "studio_library",
+        "kind": "canonical",
+        "nav_visible": false,
+        "search_visible": false,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/apps/studio/history",
+        "feature_key": "studio_history",
+        "kind": "canonical",
+        "nav_visible": false,
+        "search_visible": false,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/apps/studio/tools/nav-composer",
+        "feature_key": "studio_nav_composer",
+        "kind": "canonical",
+        "nav_visible": false,
+        "search_visible": false,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/apps/studio/tools/app-builder",
+        "feature_key": "studio_app_builder",
+        "kind": "canonical",
+        "nav_visible": false,
+        "search_visible": false,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/apps/studio/tools/module-builder",
+        "feature_key": "studio_module_builder",
+        "kind": "canonical",
+        "nav_visible": false,
+        "search_visible": false,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/apps/studio/tools/plugin-builder",
+        "feature_key": "studio_plugin_builder",
+        "kind": "canonical",
+        "nav_visible": false,
+        "search_visible": false,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/apps/studio/tools/package-tool",
+        "feature_key": "studio_package_tool",
+        "kind": "canonical",
+        "nav_visible": false,
+        "search_visible": false,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/apps/studio/tools/view-editor",
+        "feature_key": "studio_view_editor",
+        "kind": "canonical",
+        "nav_visible": false,
+        "search_visible": false,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/apps/studio/tools/route-designer",
+        "feature_key": "studio_route_designer",
+        "kind": "canonical",
+        "nav_visible": false,
+        "search_visible": false,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/apps/studio/tools/form-builder",
+        "feature_key": "studio_form_builder",
+        "kind": "canonical",
+        "nav_visible": false,
+        "search_visible": false,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/apps/studio/tools/widget-builder",
+        "feature_key": "studio_widget_builder",
+        "kind": "canonical",
+        "nav_visible": false,
+        "search_visible": false,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/apps/studio/tools/db-schema-tool",
+        "feature_key": "studio_db_schema_tool",
+        "kind": "canonical",
+        "nav_visible": false,
+        "search_visible": false,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/apps/studio/tools/workflow-designer",
+        "feature_key": "studio_workflow_designer",
+        "kind": "canonical",
+        "nav_visible": false,
+        "search_visible": false,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/apps/studio/tools/rule-designer",
+        "feature_key": "studio_rule_designer",
+        "kind": "canonical",
+        "nav_visible": false,
+        "search_visible": false,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/apps/studio/tools/integration-designer",
+        "feature_key": "studio_integration_designer",
+        "kind": "canonical",
+        "nav_visible": false,
+        "search_visible": false,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/apps/studio/tools/import-export-mapper",
+        "feature_key": "studio_import_export_mapper",
+        "kind": "canonical",
+        "nav_visible": false,
+        "search_visible": false,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/apps/studio/tools/customization-studio/diagnose/css-selector-inspector",
+        "feature_key": "studio_css_selector_tool",
+        "kind": "canonical",
+        "nav_visible": false,
+        "search_visible": false,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/apps/studio/tools/customization-studio/advanced/css-live-editor",
+        "feature_key": "studio_css_live_editor",
+        "kind": "canonical",
+        "nav_visible": false,
+        "search_visible": false,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/apps/studio/tools/notification-template-designer",
+        "feature_key": "studio_notification_template_designer",
+        "kind": "canonical",
+        "nav_visible": false,
+        "search_visible": false,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/apps/studio/tools/permission-profile-tool",
+        "feature_key": "studio_permission_profile_tool",
+        "kind": "canonical",
+        "nav_visible": false,
+        "search_visible": false,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/apps/studio/tools/change-control-center",
+        "feature_key": "studio_change_control_center",
+        "kind": "canonical",
+        "nav_visible": false,
+        "search_visible": false,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/apps/studio/tools/registry",
+        "feature_key": "studio_tool_registry",
+        "kind": "canonical",
+        "nav_visible": false,
+        "search_visible": false,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/apps/studio/resource-types",
+        "feature_key": "studio_resource_types",
+        "kind": "canonical",
+        "nav_visible": false,
+        "search_visible": false,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/apps/studio/tools/resource-explorer",
+        "feature_key": "studio_resource_explorer",
+        "kind": "canonical",
+        "nav_visible": false,
+        "search_visible": false,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/apps/studio/tools/report-designer",
+        "feature_key": "studio_report_designer",
+        "kind": "canonical",
+        "nav_visible": false,
+        "search_visible": false,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/apps/studio/tools/label-designer",
+        "feature_key": "studio_label_designer",
+        "kind": "canonical",
+        "nav_visible": false,
+        "search_visible": false,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/apps/studio/tools/customization-studio",
+        "feature_key": "studio_customization_studio",
+        "kind": "canonical",
+        "nav_visible": false,
+        "search_visible": false,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/apps/studio/tools/customization-studio/visual-customizer",
+        "feature_key": "studio_customization_studio_visual_customizer",
+        "kind": "canonical",
+        "nav_visible": false,
+        "search_visible": false,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/apps/studio/tools/engineering-workspaces",
+        "feature_key": "studio_engineering_workspaces",
+        "kind": "canonical",
+        "nav_visible": true,
+        "search_visible": true,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/ops/gui-studio",
+        "feature_key": "studio_workspace_legacy",
+        "kind": "alias",
+        "canonical_target": "/apps/studio",
+        "compatibility": true,
+        "nav_visible": false,
+        "search_visible": false,
+        "lifecycle_bound": true
+      }
+    ]
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "tool_key": "localization_scan_extraction",
+  "label": "Inline Localization Correction Tool",
+  "category": "inspection",
+  "canonical_route": "/apps/studio/tools/localization-scan-extraction",
+  "status": "scanner_wired",
+  "risk_level": "low",
+  "capabilities": {
+    "scan": true,
+    "extract": true,
+    "edit": true,
+    "write": true,
+    "apply": false
+  },
+  "scope": {
+    "owners": [],
+    "source_patterns": [],
+    "supported_locales": ["en", "ja", "ne"]
+  }
+}

@@ -1,0 +1,23 @@
+<?php
+return [
+    'app.sbaio.expenses.index.table.display_name' => 'SBAIO Expenses',
+    'app.sbaio.expenses.index.table.title' => 'Expenses',
+    'common.status_label' => 'Status',
+    'expenses.90_day_snapshot_title' => '90-Day Snapshot',
+    'expenses.approved_action' => 'Approved',
+    'expenses.by_status_title' => 'By Status',
+    'expenses.expenses_export_title' => 'Expenses Export',
+    'expenses.expenses_report_title' => 'Expenses Report',
+    'expenses.export_active_message' => 'Export is active for report key',
+    'expenses.export_unavailable_message' => 'Export is unavailable because its module is inactive or not registered.',
+    'expenses.open_link' => 'Open Export',
+    'expenses.pending_message' => 'Pending',
+    'expenses.report_description' => '90-day expense snapshot with status and category breakdowns.',
+    'expenses.report_key_label' => 'Report Key',
+    'expenses.report_unavailable_message' => 'This report is unavailable because its owner module is inactive or not registered.',
+    'sbaio.expenses.create' => 'Create Expense',
+    'sbaio.expenses.empty_desc' => 'No expense records yet. This module is installed and ready.',
+    'sbaio.expenses.form_desc' => 'Track operating expenses so SBAIO can grow into the workbook’s broader business reporting model.',
+    'sbaio.expenses.form_title' => 'Add Expense Record',
+    'sbaio.expenses.records' => 'Expense Records',
+];

@@ -1,0 +1,50 @@
+{
+    "name": "CompanySetup",
+    "display_name": "Company Setup",
+    "suite": "core",
+    "group": "platform",
+    "category": "system",
+    "display_order": 20,
+    "type": "engine",
+    "version": "1.0.0",
+    "description": "Legacy compatibility shim. Canonical company identity and organization settings now live in Organization.",
+    "requires": [
+        "Base>=3.0.0"
+    ],
+    "entry": "routes.php",
+    "package_type": "module",
+    "owner_app": "platform",
+    "module_key": "CompanySetup",
+    "deprecated": true,
+    "replaced_by": "Organization",
+    "hidden_from_catalog": true,
+    "compatibility_only": true,
+    "module_type": "integration",
+    "target_maturity_level": "L0",
+    "declared_capabilities": [
+        "routes",
+        "menus",
+        "dependencies",
+        "lifecycle_hooks"
+    ],
+    "lifecycle_contract": {
+        "routes": "active_only",
+        "menus": "active_only",
+        "widgets": "active_only",
+        "reports": "active_only",
+        "dashboards": "active_only",
+        "schema": "installed_or_active"
+    },
+    "reports": [
+        {
+            "report_key": "platform.company_setup.overview",
+            "title": "Company Setup Report",
+            "view": "Views/report.php",
+            "export_view": "Views/export.php",
+            "owner": "module",
+            "scope": "company_setup",
+            "permission": "app.platform.access",
+            "lifecycle": "active_only"
+        }
+    ]
+}

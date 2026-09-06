@@ -1,0 +1,9 @@
+/* Comments and strings edge cases */
+.element {
+    /* This is a comment with {braces} and ; semicolons */
+    color: #ff6600; /* inline comment */
+    background: url("https://example.com/bg?color=dark&type={test}");
+    border: 2px dashed /* comment inside value */ #9966cc;
+    content: "; not a declaration";
+    font-family: 'Test;Font', sans-serif;
+}

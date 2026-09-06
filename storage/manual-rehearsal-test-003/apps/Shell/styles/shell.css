@@ -1,0 +1,13 @@
+/* Shell CSS manifest - ordered import layer only. */
+@import url("./shell-tokens.css");
+@import url("./shell-header-geometry.css");
+@import url("./shell-sidebar-content-geometry.css");
+@import url("./shell-layout.css");
+@import url("./shell-surfaces.css");
+@import url("./shell-navigation.css");
+@import url("./shell-forms.css");
+@import url("./shell-components.css");
+@import url("./shell-admin.css");
+@import url("./shell-operator.css");
+@import url("./shell-auth.css");
+@import url("./shell-setup.css");

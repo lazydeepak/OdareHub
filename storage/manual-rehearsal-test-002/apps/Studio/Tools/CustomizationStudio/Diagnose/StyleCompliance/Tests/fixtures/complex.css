@@ -1,0 +1,26 @@
+/* Complex values: gradients, shadows, filters, color-mix */
+.palette {
+    --accent: #ff6600;
+    --bg-gradient: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+    --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+}
+
+.glossy {
+    background: linear-gradient(135deg, rgba(255,255,255,0.3) 0%, transparent 50%);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.2);
+    color: color-mix(in srgb, var(--accent), #ffffff 30%);
+}
+
+.image-overlay {
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    color: white;
+}
+
+.filtered {
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)) brightness(1.1);
+}
+
+.multi-ref {
+    color: color-mix(in oklab, var(--accent), var(--primary, #333) 50%);
+}

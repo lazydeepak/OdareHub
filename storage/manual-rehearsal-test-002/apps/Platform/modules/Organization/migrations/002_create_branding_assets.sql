@@ -1,0 +1,21 @@
+CREATE TABLE IF NOT EXISTS branding_assets (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    company_id INT NOT NULL,
+    asset_group VARCHAR(40) NOT NULL DEFAULT 'logo',
+    usage_key VARCHAR(64) NOT NULL DEFAULT 'primary',
+    variant_key VARCHAR(64) NOT NULL DEFAULT 'original',
+    display_name VARCHAR(190) NULL,
+    file_path VARCHAR(255) NOT NULL,
+    mime_type VARCHAR(120) NULL,
+    file_size_bytes BIGINT NOT NULL DEFAULT 0,
+    pixel_width INT NULL,
+    pixel_height INT NULL,
+    is_active TINYINT(1) NOT NULL DEFAULT 1,
+    source_kind VARCHAR(40) NOT NULL DEFAULT 'upload',
+    created_by VARCHAR(190) NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    KEY idx_branding_assets_company (company_id),
+    KEY idx_branding_assets_usage (company_id, asset_group, usage_key, is_active),
+    KEY idx_branding_assets_created (created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

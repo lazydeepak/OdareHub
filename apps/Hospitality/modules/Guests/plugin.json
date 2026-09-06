@@ -1,0 +1,38 @@
+{
+    "name": "Guests",
+    "display_name": "Guests",
+    "group": "hospitality",
+    "category": "business",
+    "display_order": 20,
+    "type": "business",
+    "version": "0.1.0",
+    "description": "Hospitality-local guest records; local stand-in until a shared Parties app is approved.",
+    "requires": [],
+    "optional": [],
+    "package_type": "module",
+    "owner_app": "hospitality",
+    "module_key": "Guests",
+    "required_tables": [
+        "hosp_guests"
+    ],
+    "module_type": "business_entity",
+    "target_maturity_level": "L2",
+    "declared_capabilities": [
+        "routes",
+        "views",
+        "forms",
+        "schema",
+        "migrations",
+        "controllers",
+        "permissions",
+        "localization"
+    ],
+    "lifecycle_contract": {
+        "routes": "active_only",
+        "menus": "active_only",
+        "widgets": "active_only",
+        "reports": "active_only",
+        "dashboards": "active_only",
+        "schema": "installed_or_active"
+    }
+}

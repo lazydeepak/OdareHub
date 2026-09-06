@@ -1,0 +1,361 @@
+{
+    "schema_version": "studio.generated-module.v1",
+    "generated_by": "studio",
+    "generator_id": "erp_app_studio.first_apply.v1",
+    "compile_id": "compile:generated:c2120c70c86f3bbd",
+    "app_key": "inventory_app",
+    "module_key": "stock_entries",
+    "display_name": "stock_entries",
+    "app_display_name": "inventory_app",
+    "route_path": "/apps/inventory-app/stock-entries",
+    "view_file": "index.php",
+    "provider": {
+        "namespace": "Generated\\InventoryApp\\Providers",
+        "class": "StockEntriesProvider",
+        "file": "Providers/StockEntriesProvider.php"
+    },
+    "snapshot_id": "587648ea-be92-5f39-b390-8c819d098f8c",
+    "snapshot_hash": "snapshot:b23027da09ca3cdf2da35519a4d747878aa8dfe32f588032b552578bd2b6822e",
+    "created_at": "2026-05-09T08:03:39+00:00",
+    "live_path": "apps/Generated/inventory_app/stock_entries",
+    "navigation": {
+        "label": "stock_entries",
+        "section": "inventory_app",
+        "key": "inventory_app_stock_entries",
+        "order": 10,
+        "priority": 100
+    },
+    "fields": [],
+    "templates": {
+        "app": "business_app",
+        "module": "crud_module",
+        "view": "table_view"
+    },
+    "safety": {
+        "output_root": "apps/Generated",
+        "temp_root": "apps/Generated/tmp",
+        "raw_php_injection_allowed": false,
+        "db_schema_execution_allowed": false
+    },
+    "runtime": {
+        "renderer": "generated.runtime.v1",
+        "view_definition": {
+            "layout": {
+                "type": "grid",
+                "columns": 12,
+                "rows": "auto",
+                "items": [
+                    {
+                        "id": "text_intro",
+                        "component": "text",
+                        "x": 0,
+                        "y": 0,
+                        "w": 7,
+                        "h": 2,
+                        "group": "intro",
+                        "props": {
+                            "title": "stock_entries",
+                            "body": "stock_entries"
+                        },
+                        "data_binding": "module.description"
+                    },
+                    {
+                        "id": "kpi_total",
+                        "component": "kpi_card",
+                        "x": 7,
+                        "y": 0,
+                        "w": 5,
+                        "h": 2,
+                        "group": "summary",
+                        "props": {
+                            "label": "Total Records",
+                            "value": "0",
+                            "delta": ""
+                        },
+                        "data_binding": "module.metrics.total"
+                    },
+                    {
+                        "id": "table_main",
+                        "component": "table",
+                        "x": 0,
+                        "y": 2,
+                        "w": 8,
+                        "h": 7,
+                        "group": "data",
+                        "props": {
+                            "title": "stock_entries",
+                            "sample_rows": 10,
+                            "density": "comfortable"
+                        },
+                        "data_binding": "module.rows"
+                    },
+                    {
+                        "id": "form_main",
+                        "component": "form",
+                        "x": 8,
+                        "y": 2,
+                        "w": 4,
+                        "h": 7,
+                        "group": "actions",
+                        "props": {
+                            "title": "Create Record",
+                            "submit_label": "Save",
+                            "show_required": true
+                        },
+                        "data_binding": "module.fields"
+                    }
+                ],
+                "relations": []
+            },
+            "component_registry": {
+                "version": "runtime.generated.v1",
+                "components": [
+                    "kpi_card",
+                    "table",
+                    "form",
+                    "text"
+                ]
+            },
+            "studio_views": {
+                "active_view_id": "view_main",
+                "views": [
+                    {
+                        "id": "view_main",
+                        "name": "stock_entries",
+                        "route_path": "/apps/inventory-app/stock-entries",
+                        "view_kind": "dashboard",
+                        "layout": {
+                            "type": "grid",
+                            "columns": 12,
+                            "rows": "auto",
+                            "items": [
+                                {
+                                    "id": "text_intro",
+                                    "component": "text",
+                                    "x": 0,
+                                    "y": 0,
+                                    "w": 7,
+                                    "h": 2,
+                                    "group": "intro",
+                                    "props": {
+                                        "title": "stock_entries",
+                                        "body": "stock_entries"
+                                    },
+                                    "data_binding": "module.description"
+                                },
+                                {
+                                    "id": "kpi_total",
+                                    "component": "kpi_card",
+                                    "x": 7,
+                                    "y": 0,
+                                    "w": 5,
+                                    "h": 2,
+                                    "group": "summary",
+                                    "props": {
+                                        "label": "Total Records",
+                                        "value": "0",
+                                        "delta": ""
+                                    },
+                                    "data_binding": "module.metrics.total"
+                                },
+                                {
+                                    "id": "table_main",
+                                    "component": "table",
+                                    "x": 0,
+                                    "y": 2,
+                                    "w": 8,
+                                    "h": 7,
+                                    "group": "data",
+                                    "props": {
+                                        "title": "stock_entries",
+                                        "sample_rows": 10,
+                                        "density": "comfortable"
+                                    },
+                                    "data_binding": "module.rows"
+                                },
+                                {
+                                    "id": "form_main",
+                                    "component": "form",
+                                    "x": 8,
+                                    "y": 2,
+                                    "w": 4,
+                                    "h": 7,
+                                    "group": "actions",
+                                    "props": {
+                                        "title": "Create Record",
+                                        "submit_label": "Save",
+                                        "show_required": true
+                                    },
+                                    "data_binding": "module.fields"
+                                }
+                            ],
+                            "relations": []
+                        },
+                        "links": []
+                    }
+                ]
+            }
+        }
+    },
+    "view_definition": {
+        "layout": {
+            "type": "grid",
+            "columns": 12,
+            "rows": "auto",
+            "items": [
+                {
+                    "id": "text_intro",
+                    "component": "text",
+                    "x": 0,
+                    "y": 0,
+                    "w": 7,
+                    "h": 2,
+                    "group": "intro",
+                    "props": {
+                        "title": "stock_entries",
+                        "body": "stock_entries"
+                    },
+                    "data_binding": "module.description"
+                },
+                {
+                    "id": "kpi_total",
+                    "component": "kpi_card",
+                    "x": 7,
+                    "y": 0,
+                    "w": 5,
+                    "h": 2,
+                    "group": "summary",
+                    "props": {
+                        "label": "Total Records",
+                        "value": "0",
+                        "delta": ""
+                    },
+                    "data_binding": "module.metrics.total"
+                },
+                {
+                    "id": "table_main",
+                    "component": "table",
+                    "x": 0,
+                    "y": 2,
+                    "w": 8,
+                    "h": 7,
+                    "group": "data",
+                    "props": {
+                        "title": "stock_entries",
+                        "sample_rows": 10,
+                        "density": "comfortable"
+                    },
+                    "data_binding": "module.rows"
+                },
+                {
+                    "id": "form_main",
+                    "component": "form",
+                    "x": 8,
+                    "y": 2,
+                    "w": 4,
+                    "h": 7,
+                    "group": "actions",
+                    "props": {
+                        "title": "Create Record",
+                        "submit_label": "Save",
+                        "show_required": true
+                    },
+                    "data_binding": "module.fields"
+                }
+            ],
+            "relations": []
+        },
+        "studio_views": {
+            "active_view_id": "view_main",
+            "views": [
+                {
+                    "id": "view_main",
+                    "name": "stock_entries",
+                    "route_path": "/apps/inventory-app/stock-entries",
+                    "view_kind": "dashboard",
+                    "layout": {
+                        "type": "grid",
+                        "columns": 12,
+                        "rows": "auto",
+                        "items": [
+                            {
+                                "id": "text_intro",
+                                "component": "text",
+                                "x": 0,
+                                "y": 0,
+                                "w": 7,
+                                "h": 2,
+                                "group": "intro",
+                                "props": {
+                                    "title": "stock_entries",
+                                    "body": "stock_entries"
+                                },
+                                "data_binding": "module.description"
+                            },
+                            {
+                                "id": "kpi_total",
+                                "component": "kpi_card",
+                                "x": 7,
+                                "y": 0,
+                                "w": 5,
+                                "h": 2,
+                                "group": "summary",
+                                "props": {
+                                    "label": "Total Records",
+                                    "value": "0",
+                                    "delta": ""
+                                },
+                                "data_binding": "module.metrics.total"
+                            },
+                            {
+                                "id": "table_main",
+                                "component": "table",
+                                "x": 0,
+                                "y": 2,
+                                "w": 8,
+                                "h": 7,
+                                "group": "data",
+                                "props": {
+                                    "title": "stock_entries",
+                                    "sample_rows": 10,
+                                    "density": "comfortable"
+                                },
+                                "data_binding": "module.rows"
+                            },
+                            {
+                                "id": "form_main",
+                                "component": "form",
+                                "x": 8,
+                                "y": 2,
+                                "w": 4,
+                                "h": 7,
+                                "group": "actions",
+                                "props": {
+                                    "title": "Create Record",
+                                    "submit_label": "Save",
+                                    "show_required": true
+                                },
+                                "data_binding": "module.fields"
+                            }
+                        ],
+                        "relations": []
+                    },
+                    "links": []
+                }
+            ]
+        }
+    },
+    "styles": [
+        {
+            "key": "generated.inventory_app.stock_entries",
+            "path": "styles.css",
+            "scope": "module",
+            "module": "stock_entries",
+            "surfaces": [
+                "admin",
+                "operator"
+            ],
+            "order": 300
+        }
+    ]
+}

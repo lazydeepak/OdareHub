@@ -1,0 +1,50 @@
+-- Studio Visual Customizer: approval requests (replaces file-based storage)
+CREATE TABLE IF NOT EXISTS studio_visual_customizer_requests (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    request_id VARCHAR(64) NOT NULL,
+    draft_id VARCHAR(64) NULL,
+    requested_by_user_id BIGINT UNSIGNED NOT NULL,
+    requested_by_handle VARCHAR(190) NOT NULL,
+    selected_socket_id VARCHAR(100) NOT NULL DEFAULT 'radius.scale',
+    default_value VARCHAR(50) NOT NULL,
+    current_value VARCHAR(50) NULL,
+    proposed_value VARCHAR(50) NOT NULL,
+    diff_summary TEXT NULL,
+    validation_status JSON NULL,
+    status VARCHAR(40) NOT NULL DEFAULT 'pending_review',
+    status_updated_at VARCHAR(40) NULL,
+    decision JSON NULL,
+    non_runtime_flags JSON NULL,
+    applied_at VARCHAR(40) NULL,
+    applied_by_handle VARCHAR(190) NULL,
+    applied_by_user_id BIGINT UNSIGNED NULL,
+    registry_target JSON NULL,
+    created_at VARCHAR(40) NOT NULL,
+    created_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY uniq_vc_req_request_id (request_id),
+    KEY idx_vc_req_user_status (requested_by_user_id, status),
+    KEY idx_vc_req_status (status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Studio Visual Customizer: snapshots (replaces file-based storage)
+CREATE TABLE IF NOT EXISTS studio_visual_customizer_snapshots (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    snapshot_id VARCHAR(64) NOT NULL,
+    request_id VARCHAR(64) NOT NULL,
+    socket_id VARCHAR(100) NOT NULL,
+    previous_value VARCHAR(50) NOT NULL,
+    proposed_value VARCHAR(50) NOT NULL,
+    status VARCHAR(40) NOT NULL DEFAULT 'snapshot_taken',
+    created_by_user_id BIGINT UNSIGNED NOT NULL,
+    created_by_handle VARCHAR(190) NOT NULL,
+    created_at VARCHAR(40) NOT NULL,
+    applied_at VARCHAR(40) NULL,
+    notes TEXT NULL,
+    snapshot_data JSON NULL,
+    created_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY uniq_vc_snap_snapshot_id (snapshot_id),
+    KEY idx_vc_snap_request_id (request_id),
+    KEY idx_vc_snap_status (status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

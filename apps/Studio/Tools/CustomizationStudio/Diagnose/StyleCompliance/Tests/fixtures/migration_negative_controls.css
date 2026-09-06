@@ -1,0 +1,32 @@
+/* Negative controls: These should NOT become domain_migration.
+   Owner-local business selectors must not be classified as Shell/Foundation. */
+.product-card {
+    background: var(--surface);
+    color: #333;
+    border: 1px solid #e0e0e0;
+}
+
+.report-chart {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.coverage-kpi {
+    background-color: #f0f0f0;
+    color: #222;
+}
+
+.app-quicklink-card {
+    border: 1px solid #e0e0e0;
+    background: #fff;
+}
+
+.form-input {
+    border: 1px solid #ccc;
+    opacity: 0.8;
+}
+
+.button-primary {
+    background-color: #3366cc;
+    color: white;
+    border: none;
+}

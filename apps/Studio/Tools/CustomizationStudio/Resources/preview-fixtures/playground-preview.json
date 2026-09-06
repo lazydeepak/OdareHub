@@ -1,0 +1,21 @@
+{
+  "fixture": "playground-preview",
+  "owner": "studio",
+  "tool_area": "customization-studio",
+  "purpose": "Describes a broad playground preview for exploring Shell style socket effects.",
+  "runtime_status": "fixture_catalog_only_not_rendered",
+  "renders_ui": false,
+  "connects_to_shell": false,
+  "reads_studio_drafts": false,
+  "uses_active_registry_truth": false,
+  "examples": [
+    {
+      "example": "mixed-surface-playground",
+      "label": "Style Playground",
+      "description": "A mixed preview canvas containing representative chrome, cards, forms, tables, feedback, and charts.",
+      "socket_catalogs": ["root-mode", "core-tokens", "shell-chrome", "layout", "primitives", "data-display", "feedback", "visualization"],
+      "preview_modes": ["simple", "advanced"],
+      "notes": "Catalog only. No renderer or runtime consumption exists yet."
+    }
+  ]
+}

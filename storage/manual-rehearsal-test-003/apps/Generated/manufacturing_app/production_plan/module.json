@@ -1,0 +1,11 @@
+{
+    "schema_version": "studio.generated-module-contract.v1",
+    "app_key": "manufacturing_app",
+    "module_key": "production_plan",
+    "display_name": "production_plan",
+    "route_path": "/apps/manufacturing-app/production-plan",
+    "template": "crud_module",
+    "compile_id": "compile:generated:446fd8ce18a2e751",
+    "snapshot_id": "5fa5da03-0bdb-5739-9378-6b47c1fa82ec",
+    "fields": []
+}

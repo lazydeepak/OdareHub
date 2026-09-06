@@ -1,0 +1,10 @@
+<?php
+return [
+    'host' => '127.0.0.1',
+    'name' => 'erp_live',
+    'user' => 'erp_user',
+    'pass' => 'change-me',
+    'port' => 3306,
+    'charset' => 'utf8mb4',
+    'timezone' => 'Asia/Tokyo',
+];

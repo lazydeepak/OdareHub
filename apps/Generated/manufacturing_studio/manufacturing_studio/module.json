@@ -1,0 +1,76 @@
+{
+    "schema_version": "studio.generated-module-contract.v1",
+    "app_key": "manufacturing_studio",
+    "module_key": "manufacturing_studio",
+    "display_name": "Manufacturing Studio",
+    "route_path": "/apps/manufacturing-studio/manufacturing-studio",
+    "template": "dashboard_module",
+    "compile_id": "compile:generated:6b5ea785231d834b",
+    "snapshot_id": "cef52021-2020-5e73-ad52-e2640c0f1594",
+    "fields": [
+        {
+            "key": "qty",
+            "label": "qty",
+            "type": "string",
+            "required": true,
+            "default": "",
+            "options": []
+        },
+        {
+            "key": "coverage_pct",
+            "label": "coverage pct",
+            "type": "string",
+            "required": false,
+            "default": "",
+            "options": []
+        },
+        {
+            "key": "shortage_qty",
+            "label": "shortage qty",
+            "type": "string",
+            "required": false,
+            "default": "",
+            "options": []
+        },
+        {
+            "key": "order_date",
+            "label": "order date",
+            "type": "string",
+            "required": false,
+            "default": "",
+            "options": []
+        },
+        {
+            "key": "required_date",
+            "label": "required date",
+            "type": "string",
+            "required": false,
+            "default": "",
+            "options": []
+        },
+        {
+            "key": "customer_name",
+            "label": "customer name",
+            "type": "string",
+            "required": false,
+            "default": "",
+            "options": []
+        },
+        {
+            "key": "product_id",
+            "label": "product id",
+            "type": "string",
+            "required": false,
+            "default": "",
+            "options": []
+        },
+        {
+            "key": "parts_name",
+            "label": "parts name",
+            "type": "string",
+            "required": false,
+            "default": "",
+            "options": []
+        }
+    ]
+}

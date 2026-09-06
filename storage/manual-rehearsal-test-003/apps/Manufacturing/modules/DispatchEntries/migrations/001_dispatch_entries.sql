@@ -1,0 +1,21 @@
+CREATE TABLE IF NOT EXISTS dispatch_entries (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    dispatch_date DATE NOT NULL,
+    daily_order_id INT NULL,
+    production_plan_id INT NULL,
+    production_entry_id INT NULL,
+    qc_entry_id INT NULL,
+    product_id INT NOT NULL,
+    dispatchable_qty DECIMAL(14,2) NOT NULL DEFAULT 0,
+    destination VARCHAR(190) NULL,
+    dispatch_type VARCHAR(50) NOT NULL DEFAULT 'Regular',
+    dispatch_status VARCHAR(30) NOT NULL DEFAULT 'Ready',
+    remarks TEXT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    KEY idx_dispatch_entries_date (dispatch_date),
+    KEY idx_dispatch_entries_status (dispatch_status),
+    KEY idx_dispatch_entries_product (product_id),
+    KEY idx_dispatch_entries_daily_order (daily_order_id),
+    KEY idx_dispatch_entries_qc_entry (qc_entry_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

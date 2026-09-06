@@ -1,0 +1,46 @@
+{
+    "a93c6f196754debbc067106fe54b53e97937b3fb": {
+        "signature": "a93c6f196754debbc067106fe54b53e97937b3fb",
+        "action": "manifest_contract_warning",
+        "app_key": "manufacturing",
+        "context": {
+            "warnings": [
+                "navigation item `app.mfg.materials` uses hardcoded label; add label_key for EN/JA readiness",
+                "navigation item `app.mfg.materials_orders` uses hardcoded label; add label_key for EN/JA readiness",
+                "navigation item `app.mfg.materials_receipt` uses hardcoded label; add label_key for EN/JA readiness",
+                "navigation item `app.mfg.materials_stock` uses hardcoded label; add label_key for EN/JA readiness",
+                "navigation item `app.mfg.materials_supply` uses hardcoded label; add label_key for EN/JA readiness",
+                "navigation item `app.mfg.processing_operation` uses hardcoded label; add label_key for EN/JA readiness",
+                "navigation item `app.mfg.production_operation` uses hardcoded label; add label_key for EN/JA readiness",
+                "search_entries entry `material_management` uses hardcoded label; add label_key for EN/JA readiness",
+                "search_entries entry `material_orders` uses hardcoded label; add label_key for EN/JA readiness",
+                "search_entries entry `material_receipt` uses hardcoded label; add label_key for EN/JA readiness",
+                "search_entries entry `material_stock` uses hardcoded label; add label_key for EN/JA readiness"
+            ]
+        },
+        "count": 116,
+        "first_seen": "2026-08-25T22:36:49+09:00",
+        "last_seen": "2026-08-26T21:06:33+09:00"
+    },
+    "46669a5609562438850207ceca0b963f2cf325f8": {
+        "signature": "46669a5609562438850207ceca0b963f2cf325f8",
+        "action": "manifest_contract_warning",
+        "app_key": "procurement",
+        "context": {
+            "warnings": [
+                "navigation item `app.procurement.orders` uses hardcoded label; add label_key for EN/JA readiness",
+                "navigation item `app.procurement.receipts` uses hardcoded label; add label_key for EN/JA readiness",
+                "navigation item `app.procurement.requests` uses hardcoded label; add label_key for EN/JA readiness",
+                "navigation item `app.procurement.root` uses hardcoded label; add label_key for EN/JA readiness",
+                "widgets entry `procurement.widget.dashboard` uses hardcoded label; add label_key for EN/JA readiness",
+                "search_entries entry `procurement_dashboard` uses hardcoded label; add label_key for EN/JA readiness",
+                "search_entries entry `procurement_orders` uses hardcoded label; add label_key for EN/JA readiness",
+                "search_entries entry `procurement_receipts` uses hardcoded label; add label_key for EN/JA readiness",
+                "search_entries entry `procurement_requests` uses hardcoded label; add label_key for EN/JA readiness"
+            ]
+        },
+        "count": 116,
+        "first_seen": "2026-08-25T22:36:49+09:00",
+        "last_seen": "2026-08-26T21:06:33+09:00"
+    }
+}

@@ -1,0 +1,59 @@
+{
+    "name": "AssemblyEntries",
+    "display_name": "Assembly Entries",
+    "suite": "manufacturing",
+    "group": "ipm",
+    "category": "business",
+    "display_order": 75,
+    "type": "business",
+    "version": "1.0.0",
+    "description": "Assembly execution entries completed before QC release.",
+    "requires": [
+        "Base>=3.0.0",
+        "Products>=1.0.0",
+        "AssemblyPlans>=1.0.0"
+    ],
+    "entry": "routes.php",
+    "package_type": "module",
+    "owner_app": "manufacturing",
+    "module_key": "AssemblyEntries",
+    "module_type": "process_execution",
+    "target_maturity_level": "L3",
+    "declared_capabilities": [
+        "routes",
+        "views",
+        "forms",
+        "schema",
+        "migrations",
+        "controllers",
+        "services",
+        "permissions",
+        "menus",
+        "widgets",
+        "reports",
+        "exports",
+        "lifecycle_hooks",
+        "localization"
+    ],
+    "lifecycle_contract": {
+        "routes": "active_only",
+        "menus": "active_only",
+        "widgets": "active_only",
+        "reports": "active_only",
+        "dashboards": "active_only",
+        "schema": "installed_or_active"
+    },
+    "activation_contract_enforced": true,
+    "reports": [
+        {
+            "report_key": "manufacturing.assembly_entries.execution",
+            "title": "Assembly Execution",
+            "view": "Views/report.php",
+            "export_view": "Views/export.php",
+            "owner": "module",
+            "scope": "assembly_entries",
+            "permission": "manufacturing.assembly_entries.view",
+            "lifecycle": "active_only"
+        }
+    ]
+}

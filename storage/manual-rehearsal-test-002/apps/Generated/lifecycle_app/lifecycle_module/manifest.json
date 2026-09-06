@@ -1,0 +1,381 @@
+{
+    "schema_version": "studio.generated-module.v1",
+    "generated_by": "studio",
+    "generator_id": "erp_app_studio.first_apply.v1",
+    "compile_id": "compile:generated:826bf401cc344c75",
+    "app_key": "lifecycle_app",
+    "module_key": "lifecycle_module",
+    "display_name": "Lifecycle Module",
+    "app_display_name": "Lifecycle App",
+    "route_path": "/apps/lifecycle-app/lifecycle-module",
+    "view_file": "index.php",
+    "snapshot_id": "d55be3e3-1d08-50a7-adc3-141a0c45d8cf",
+    "snapshot_hash": "snapshot:b56100169f8fd9587568be6e594e88508d8b99c5d16b3d5f066ba72ddfb6b1de",
+    "created_at": "2026-05-09T05:59:04+00:00",
+    "live_path": "apps/Generated/lifecycle_app/lifecycle_module",
+    "navigation": {
+        "label": "Lifecycle Module",
+        "section": "Lifecycle App",
+        "key": "lifecycle_app_lifecycle_module",
+        "order": 10,
+        "priority": 100
+    },
+    "provider": {
+        "namespace": "Generated\\LifecycleApp\\Providers",
+        "class": "LifecycleModuleProvider",
+        "file": "Providers/LifecycleModuleProvider.php"
+    },
+    "fields": [
+        {
+            "key": "name",
+            "label": "Name",
+            "type": "string",
+            "required": true,
+            "default": "",
+            "options": []
+        },
+        {
+            "key": "status",
+            "label": "Status",
+            "type": "select",
+            "required": false,
+            "default": "active",
+            "options": [
+                "active",
+                "inactive"
+            ]
+        }
+    ],
+    "templates": {
+        "app": "business_app",
+        "module": "crud_module",
+        "view": "table_view"
+    },
+    "safety": {
+        "output_root": "apps/Generated",
+        "temp_root": "apps/Generated/tmp",
+        "raw_php_injection_allowed": false,
+        "db_schema_execution_allowed": false
+    },
+    "runtime": {
+        "renderer": "generated.runtime.v1",
+        "view_definition": {
+            "layout": {
+                "type": "grid",
+                "columns": 12,
+                "rows": "auto",
+                "items": [
+                    {
+                        "id": "text_intro",
+                        "component": "text",
+                        "x": 0,
+                        "y": 0,
+                        "w": 7,
+                        "h": 2,
+                        "group": "intro",
+                        "props": {
+                            "title": "Lifecycle Module",
+                            "body": "Lifecycle Module"
+                        },
+                        "data_binding": "module.description"
+                    },
+                    {
+                        "id": "kpi_total",
+                        "component": "kpi_card",
+                        "x": 7,
+                        "y": 0,
+                        "w": 5,
+                        "h": 2,
+                        "group": "summary",
+                        "props": {
+                            "label": "Total Records",
+                            "value": "0",
+                            "delta": ""
+                        },
+                        "data_binding": "module.metrics.total"
+                    },
+                    {
+                        "id": "table_main",
+                        "component": "table",
+                        "x": 0,
+                        "y": 2,
+                        "w": 8,
+                        "h": 7,
+                        "group": "data",
+                        "props": {
+                            "title": "Lifecycle Module",
+                            "sample_rows": 10,
+                            "density": "comfortable"
+                        },
+                        "data_binding": "module.rows"
+                    },
+                    {
+                        "id": "form_main",
+                        "component": "form",
+                        "x": 8,
+                        "y": 2,
+                        "w": 4,
+                        "h": 7,
+                        "group": "actions",
+                        "props": {
+                            "title": "Create Record",
+                            "submit_label": "Save",
+                            "show_required": true
+                        },
+                        "data_binding": "module.fields"
+                    }
+                ],
+                "relations": []
+            },
+            "component_registry": {
+                "version": "runtime.generated.v1",
+                "components": [
+                    "kpi_card",
+                    "table",
+                    "form",
+                    "text"
+                ]
+            },
+            "studio_views": {
+                "active_view_id": "view_main",
+                "views": [
+                    {
+                        "id": "view_main",
+                        "name": "Lifecycle Module",
+                        "route_path": "/apps/lifecycle-app/lifecycle-module",
+                        "view_kind": "dashboard",
+                        "layout": {
+                            "type": "grid",
+                            "columns": 12,
+                            "rows": "auto",
+                            "items": [
+                                {
+                                    "id": "text_intro",
+                                    "component": "text",
+                                    "x": 0,
+                                    "y": 0,
+                                    "w": 7,
+                                    "h": 2,
+                                    "group": "intro",
+                                    "props": {
+                                        "title": "Lifecycle Module",
+                                        "body": "Lifecycle Module"
+                                    },
+                                    "data_binding": "module.description"
+                                },
+                                {
+                                    "id": "kpi_total",
+                                    "component": "kpi_card",
+                                    "x": 7,
+                                    "y": 0,
+                                    "w": 5,
+                                    "h": 2,
+                                    "group": "summary",
+                                    "props": {
+                                        "label": "Total Records",
+                                        "value": "0",
+                                        "delta": ""
+                                    },
+                                    "data_binding": "module.metrics.total"
+                                },
+                                {
+                                    "id": "table_main",
+                                    "component": "table",
+                                    "x": 0,
+                                    "y": 2,
+                                    "w": 8,
+                                    "h": 7,
+                                    "group": "data",
+                                    "props": {
+                                        "title": "Lifecycle Module",
+                                        "sample_rows": 10,
+                                        "density": "comfortable"
+                                    },
+                                    "data_binding": "module.rows"
+                                },
+                                {
+                                    "id": "form_main",
+                                    "component": "form",
+                                    "x": 8,
+                                    "y": 2,
+                                    "w": 4,
+                                    "h": 7,
+                                    "group": "actions",
+                                    "props": {
+                                        "title": "Create Record",
+                                        "submit_label": "Save",
+                                        "show_required": true
+                                    },
+                                    "data_binding": "module.fields"
+                                }
+                            ],
+                            "relations": []
+                        },
+                        "links": []
+                    }
+                ]
+            }
+        }
+    },
+    "view_definition": {
+        "layout": {
+            "type": "grid",
+            "columns": 12,
+            "rows": "auto",
+            "items": [
+                {
+                    "id": "text_intro",
+                    "component": "text",
+                    "x": 0,
+                    "y": 0,
+                    "w": 7,
+                    "h": 2,
+                    "group": "intro",
+                    "props": {
+                        "title": "Lifecycle Module",
+                        "body": "Lifecycle Module"
+                    },
+                    "data_binding": "module.description"
+                },
+                {
+                    "id": "kpi_total",
+                    "component": "kpi_card",
+                    "x": 7,
+                    "y": 0,
+                    "w": 5,
+                    "h": 2,
+                    "group": "summary",
+                    "props": {
+                        "label": "Total Records",
+                        "value": "0",
+                        "delta": ""
+                    },
+                    "data_binding": "module.metrics.total"
+                },
+                {
+                    "id": "table_main",
+                    "component": "table",
+                    "x": 0,
+                    "y": 2,
+                    "w": 8,
+                    "h": 7,
+                    "group": "data",
+                    "props": {
+                        "title": "Lifecycle Module",
+                        "sample_rows": 10,
+                        "density": "comfortable"
+                    },
+                    "data_binding": "module.rows"
+                },
+                {
+                    "id": "form_main",
+                    "component": "form",
+                    "x": 8,
+                    "y": 2,
+                    "w": 4,
+                    "h": 7,
+                    "group": "actions",
+                    "props": {
+                        "title": "Create Record",
+                        "submit_label": "Save",
+                        "show_required": true
+                    },
+                    "data_binding": "module.fields"
+                }
+            ],
+            "relations": []
+        },
+        "studio_views": {
+            "active_view_id": "view_main",
+            "views": [
+                {
+                    "id": "view_main",
+                    "name": "Lifecycle Module",
+                    "route_path": "/apps/lifecycle-app/lifecycle-module",
+                    "view_kind": "dashboard",
+                    "layout": {
+                        "type": "grid",
+                        "columns": 12,
+                        "rows": "auto",
+                        "items": [
+                            {
+                                "id": "text_intro",
+                                "component": "text",
+                                "x": 0,
+                                "y": 0,
+                                "w": 7,
+                                "h": 2,
+                                "group": "intro",
+                                "props": {
+                                    "title": "Lifecycle Module",
+                                    "body": "Lifecycle Module"
+                                },
+                                "data_binding": "module.description"
+                            },
+                            {
+                                "id": "kpi_total",
+                                "component": "kpi_card",
+                                "x": 7,
+                                "y": 0,
+                                "w": 5,
+                                "h": 2,
+                                "group": "summary",
+                                "props": {
+                                    "label": "Total Records",
+                                    "value": "0",
+                                    "delta": ""
+                                },
+                                "data_binding": "module.metrics.total"
+                            },
+                            {
+                                "id": "table_main",
+                                "component": "table",
+                                "x": 0,
+                                "y": 2,
+                                "w": 8,
+                                "h": 7,
+                                "group": "data",
+                                "props": {
+                                    "title": "Lifecycle Module",
+                                    "sample_rows": 10,
+                                    "density": "comfortable"
+                                },
+                                "data_binding": "module.rows"
+                            },
+                            {
+                                "id": "form_main",
+                                "component": "form",
+                                "x": 8,
+                                "y": 2,
+                                "w": 4,
+                                "h": 7,
+                                "group": "actions",
+                                "props": {
+                                    "title": "Create Record",
+                                    "submit_label": "Save",
+                                    "show_required": true
+                                },
+                                "data_binding": "module.fields"
+                            }
+                        ],
+                        "relations": []
+                    },
+                    "links": []
+                }
+            ]
+        }
+    },
+    "styles": [
+        {
+            "key": "generated.lifecycle_app.lifecycle_module",
+            "path": "styles.css",
+            "scope": "module",
+            "module": "lifecycle_module",
+            "surfaces": [
+                "admin",
+                "operator"
+            ],
+            "order": 300
+        }
+    ]
+}

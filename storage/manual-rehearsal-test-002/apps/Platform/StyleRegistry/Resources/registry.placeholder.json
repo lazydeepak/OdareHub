@@ -1,0 +1,11 @@
+{
+  "status": "contract_defined_write_ready_not_connected",
+  "owner": "platform_system",
+  "scope": "approved_active_default_style_registry",
+  "runtime_connection": "disconnected",
+  "shell_consumption": "disabled",
+  "studio_apply": "not_called_yet",
+  "allowlist": ["radius.scale"],
+  "contract": "ApprovedStyleRegistryContract",
+  "implementation": "ApprovedStyleRegistry"
+}

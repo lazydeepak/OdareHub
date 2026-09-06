@@ -1,0 +1,6 @@
+/* Theme source scaffold: custom theme example
+ * Status: scaffold only, not wired to runtime in this phase.
+ */
+[data-theme="custom"][data-color-style="my-theme"] {
+  /* Custom theme overrides can be authored here in future slices. */
+}

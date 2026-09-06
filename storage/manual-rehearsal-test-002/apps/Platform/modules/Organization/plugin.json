@@ -1,0 +1,60 @@
+{
+    "name": "Organization",
+    "display_name": "Organization",
+    "suite": "core",
+    "group": "platform",
+    "category": "system",
+    "display_order": 24,
+    "type": "engine",
+    "version": "1.0.0",
+    "description": "Canonical organization and company master data for shared platform identity, fiscal defaults, branding, and branches.",
+    "requires": [
+        "Base>=3.0.0"
+    ],
+    "optional": [
+        "ACL>=1.0.0"
+    ],
+    "entry": "routes.php",
+    "package_type": "module",
+    "owner_app": "platform",
+    "module_key": "organization",
+    "required_tables": [
+        "org_companies",
+        "org_branches",
+        "org_fiscal_settings",
+        "branding_assets"
+    ],
+    "module_type": "governance",
+    "target_maturity_level": "L2",
+    "declared_capabilities": [
+        "routes",
+        "views",
+        "schema",
+        "controllers",
+        "services",
+        "permissions",
+        "menus",
+        "lifecycle_hooks",
+        "localization"
+    ],
+    "lifecycle_contract": {
+        "routes": "active_only",
+        "menus": "active_only",
+        "widgets": "active_only",
+        "reports": "active_only",
+        "dashboards": "active_only",
+        "schema": "installed_or_active"
+    },
+    "reports": [
+        {
+            "report_key": "platform.organization.overview",
+            "title": "Organization Report",
+            "view": "Views/report.php",
+            "export_view": "Views/export.php",
+            "owner": "module",
+            "scope": "organization",
+            "permission": "app.platform.access",
+            "lifecycle": "active_only"
+        }
+    ]
+}

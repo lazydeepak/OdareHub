@@ -1,0 +1,48 @@
+{
+    "schema_version": "susankhya.release.v1",
+    "product_id": "susankhya-os",
+    "product_name": "Susankhya ERP",
+    "release_version": "0.5.0",
+    "build_id": "git:f3971b30788cbfdd4c3296043acc26b927265b02",
+    "channel": "local",
+    "lane": "app",
+    "created_at": "2026-08-18T17:25:30Z",
+    "package": {
+        "filename": "susankhya-os-0.5.0-git-f3971b30788cbfdd4c3296043acc26b927265b02.zip",
+        "sha256": "6302c3d3dcc3cb19d38b4b5b972b4f4923c19ef4f96887c0064656956ec237dd",
+        "size_bytes": 26429322
+    },
+    "compatibility": {
+        "minimum_product_version": "0.5.0",
+        "maximum_product_version": null,
+        "php": {
+            "minimum": "8.1.0"
+        },
+        "php_extensions": [
+            "mysqli",
+            "json",
+            "zip"
+        ]
+    },
+    "readiness": {
+        "status": "passed",
+        "evidence": []
+    },
+    "migration": {
+        "warnings": [],
+        "requires_backup": true
+    },
+    "assets": {
+        "regeneration_required": false
+    },
+    "release_notes": "",
+    "apply_eligibility": {
+        "requires_preview": true,
+        "requires_operator_approval": true
+    },
+    "build_manifest": {
+        "included_count": 5022,
+        "skipped": [],
+        "included_sha256": "92ec5b76be935163def5373d9be7219c364639d5c11a1401fb1a67dc5625823b"
+    }
+}

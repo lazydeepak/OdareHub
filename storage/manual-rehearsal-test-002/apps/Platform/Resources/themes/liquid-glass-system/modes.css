@@ -1,0 +1,6 @@
+@layer theme {
+  :root {
+    --theme-id: liquid-glass-system;
+    --theme-mode: system;
+  }
+}

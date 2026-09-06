@@ -1,0 +1,24 @@
+{
+    "schema_version": "susankhya.local-channel.v1",
+    "channel": "local",
+    "product_id": "susankhya-os",
+    "generated_at": "2026-08-18T17:25:30Z",
+    "lanes": {
+        "app": {
+            "current": {
+                "release_version": "0.5.0",
+                "build_id": "git:f3971b30788cbfdd4c3296043acc26b927265b02",
+                "metadata": "releases/susankhya-os-0.5.0-git-f3971b30788cbfdd4c3296043acc26b927265b02.json",
+                "package": "releases/susankhya-os-0.5.0-git-f3971b30788cbfdd4c3296043acc26b927265b02.zip",
+                "sha256": "6302c3d3dcc3cb19d38b4b5b972b4f4923c19ef4f96887c0064656956ec237dd",
+                "size_bytes": 26429322
+            }
+        },
+        "runtime": {
+            "current": null
+        },
+        "support": {
+            "current": null
+        }
+    }
+}

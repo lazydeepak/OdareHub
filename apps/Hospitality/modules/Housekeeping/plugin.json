@@ -1,0 +1,38 @@
+{
+    "name": "Housekeeping",
+    "display_name": "Housekeeping",
+    "group": "hospitality",
+    "category": "business",
+    "display_order": 50,
+    "type": "business",
+    "version": "0.1.0",
+    "description": "Current housekeeping status per room for the Hospitality app.",
+    "requires": [],
+    "optional": [],
+    "package_type": "module",
+    "owner_app": "hospitality",
+    "module_key": "Housekeeping",
+    "required_tables": [
+        "hosp_housekeeping_status"
+    ],
+    "module_type": "service_only",
+    "target_maturity_level": "L2",
+    "declared_capabilities": [
+        "routes",
+        "views",
+        "schema",
+        "migrations",
+        "controllers",
+        "forms",
+        "permissions",
+        "localization"
+    ],
+    "lifecycle_contract": {
+        "routes": "active_only",
+        "menus": "active_only",
+        "widgets": "active_only",
+        "reports": "active_only",
+        "dashboards": "active_only",
+        "schema": "installed_or_active"
+    }
+}

@@ -1,0 +1,3 @@
+/* DEPRECATED: Admin surface CSS has been consolidated into apps/Shell/styles/shell.css
+   This file is kept as a shim for backwards compatibility and will be removed in phase 10. */
+@import url(/assets/apps/shell/styles/shell.css);

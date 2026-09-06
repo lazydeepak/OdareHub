@@ -1,0 +1,21 @@
+{
+  "fixture": "app-module-preview",
+  "owner": "studio",
+  "tool_area": "customization-studio",
+  "purpose": "Describes generic app/module preview examples without depending on a business app runtime.",
+  "runtime_status": "fixture_catalog_only_not_rendered",
+  "renders_ui": false,
+  "connects_to_shell": false,
+  "reads_studio_drafts": false,
+  "uses_active_registry_truth": false,
+  "examples": [
+    {
+      "example": "module-list-detail",
+      "label": "App/module page",
+      "description": "A representative module page with list-detail layout, summary cards, table rows, filter bar, and action toolbar.",
+      "socket_catalogs": ["layout", "navigation", "data-display", "tables-grids", "forms-editors", "states"],
+      "preview_modes": ["simple", "advanced"],
+      "notes": "Catalog only. No Manufacturing, SBAIO, or other app runtime dependency."
+    }
+  ]
+}

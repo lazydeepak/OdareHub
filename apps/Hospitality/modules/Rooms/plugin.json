@@ -1,0 +1,38 @@
+{
+    "name": "Rooms",
+    "display_name": "Rooms",
+    "group": "hospitality",
+    "category": "business",
+    "display_order": 10,
+    "type": "business",
+    "version": "0.1.0",
+    "description": "Room inventory and room attributes for the Hospitality app.",
+    "requires": [],
+    "optional": [],
+    "package_type": "module",
+    "owner_app": "hospitality",
+    "module_key": "Rooms",
+    "required_tables": [
+        "hosp_rooms"
+    ],
+    "module_type": "business_entity",
+    "target_maturity_level": "L2",
+    "declared_capabilities": [
+        "routes",
+        "views",
+        "forms",
+        "schema",
+        "migrations",
+        "controllers",
+        "permissions",
+        "localization"
+    ],
+    "lifecycle_contract": {
+        "routes": "active_only",
+        "menus": "active_only",
+        "widgets": "active_only",
+        "reports": "active_only",
+        "dashboards": "active_only",
+        "schema": "installed_or_active"
+    }
+}

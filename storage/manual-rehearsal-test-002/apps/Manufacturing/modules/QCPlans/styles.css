@@ -1,0 +1,56 @@
+/* QC Plans styles */
+.qc-add-form input,
+.qc-add-form select,
+.qc-add-form textarea,
+.qc-edit-form input,
+.qc-edit-form select,
+.qc-edit-form textarea{width:100%;max-width:100%}
+
+.qc-add-form input[type="date"],
+.qc-add-form input[type="number"],
+.qc-add-form input[type="text"],
+.qc-add-form select,
+.qc-edit-form input[type="date"],
+.qc-edit-form input[type="number"],
+.qc-edit-form input[type="text"],
+.qc-edit-form select{min-height:var(--control-height)}
+
+.qc-add-form textarea,
+.qc-edit-form textarea{min-height:90px}
+
+.qc-date-field{flex:0 0 auto;min-width:160px}
+.qc-qty-field{flex:0 0 auto;min-width:120px}
+.qc-text-field{flex:0 0 auto;min-width:145px}
+.qc-select-field{flex:0 0 auto;min-width:180px}
+.qc-notes-field{flex:1 1 100%}
+.qc-print-form{margin:0}
+.qc-print-form-field{flex:1 1 140px;min-width:min(140px,100%)}
+.qc-filter-date{flex:1 1 155px;min-width:min(155px,100%)}
+.qc-filter-priority{flex:1 1 135px;min-width:min(135px,100%)}
+.qc-filter-status{flex:1 1 200px;min-width:min(200px,100%)}
+.qc-form-actions{display:flex;gap:var(--control-gap-tight);flex-wrap:wrap;align-items:center}
+.qc-plans-table{min-width:980px}
+
+@media (max-width:720px){
+  .qc-date-field,
+  .qc-qty-field,
+  .qc-text-field,
+  .qc-select-field,
+  .qc-notes-field{flex:1 1 100%;min-width:100%}
+
+  .qc-print-form,
+  .qc-filter-actions,
+  .qc-table-actions,
+  .qc-form-actions{width:100%}
+
+  .qc-print-form .btn,
+  .qc-filter-actions .btn,
+  .qc-table-actions .btn,
+  .qc-form-actions .btn{
+    flex:1 1 100%;
+    text-align:center
+  }
+
+  .qc-print-form-field{min-width:0;flex:1 1 100%}
+  .qc-table-actions form{flex:1 1 100%}
+}

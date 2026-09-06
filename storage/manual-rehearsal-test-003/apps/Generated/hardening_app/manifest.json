@@ -1,0 +1,19 @@
+{
+    "schema_version": "studio.generated-app.v1",
+    "generated_by": "studio",
+    "app_key": "hardening_app",
+    "display_name": "Hardening app",
+    "created_at": "2026-05-17T12:44:56+00:00",
+    "styles": [
+        {
+            "key": "generated.hardening_app.app",
+            "path": "styles.css",
+            "scope": "app",
+            "surfaces": [
+                "admin",
+                "operator"
+            ],
+            "order": 200
+        }
+    ]
+}

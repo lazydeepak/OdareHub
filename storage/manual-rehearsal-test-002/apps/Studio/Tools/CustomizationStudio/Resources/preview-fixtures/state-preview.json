@@ -1,0 +1,21 @@
+{
+  "fixture": "state-preview",
+  "owner": "studio",
+  "tool_area": "customization-studio",
+  "purpose": "Describes future state preview examples for common interaction and status states.",
+  "runtime_status": "fixture_catalog_only_not_rendered",
+  "renders_ui": false,
+  "connects_to_shell": false,
+  "reads_studio_drafts": false,
+  "uses_active_registry_truth": false,
+  "examples": [
+    {
+      "example": "interaction-and-status-states",
+      "label": "State preview",
+      "description": "Default, hover, active, focus, selected, disabled, readonly, loading, success, warning, danger, info, pending, and overdue examples.",
+      "socket_catalogs": ["states", "feedback", "primitives", "workflow-operations", "accessibility"],
+      "preview_modes": ["simple", "advanced"],
+      "notes": "Catalog only. No runtime state machine is introduced."
+    }
+  ]
+}

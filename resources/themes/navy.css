@@ -1,0 +1,7 @@
+/* Navy style placeholder
+ * Intentionally disabled in theme-manifest for compatibility only.
+ */
+[data-theme="dark"][data-color-style="navy"],
+[data-theme="light"][data-color-style="navy"] {
+  /* Disabled legacy style placeholder. */
+}

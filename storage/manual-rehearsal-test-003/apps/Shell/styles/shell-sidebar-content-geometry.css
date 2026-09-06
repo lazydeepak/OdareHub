@@ -1,0 +1,253 @@
+/* ── Sidebar + Content geometry ──────────────────────────────
+   Canonical width, padding, position/placement, grid columns,
+   height, and safe-area for sidebars and content areas across
+   Admin, Operator, and App-shell surfaces.
+
+   Appearance (border, background, backdrop-filter, box-shadow,
+   transition) and interactive behavior (transform open/close)
+   remain in surface-specific files.
+   ──────────────────────────────────────────────────────── */
+
+/* ── .layout-sidebar (mobile drawer) ──────────────────────── */
+.layout-sidebar {
+  width: min(320px, calc(100vw - 58px));
+  padding: var(--sys-sidebar-padding-block, 8px)
+           calc(var(--sys-sidebar-padding-inline, 12px) - 2px + var(--sys-safe-area-right, 0px))
+           calc(var(--sys-sidebar-padding-block, 12px) + var(--sys-safe-area-bottom, 0px))
+           calc(var(--sys-sidebar-padding-inline, 12px) - 2px + var(--sys-safe-area-left, 0px));
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── .app-shell grid (Gmail/AppRail pattern) ──────────────── */
+.app-shell {
+  display: grid;
+  grid-template-columns: var(--sys-sidebar-width, 280px) minmax(0, 1fr);
+  grid-template-rows: 1fr;
+  height: 100%;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  transition: grid-template-columns 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.app-shell.sidebar-collapsed {
+  grid-template-columns: var(--sys-sidebar-collapsed-width, 72px) minmax(0, 1fr);
+}
+
+.app-shell.sidebar-collapsed.sidebar-peek {
+  grid-template-columns: var(--sys-sidebar-width, 280px) minmax(0, 1fr);
+}
+
+/* ── .app-sidebar ──────────────────────────────────────────── */
+.app-sidebar {
+  padding: var(--sys-sidebar-padding-block, 12px) var(--sys-sidebar-padding-inline, 12px);
+  height: 100%;
+  min-height: 0;
+  min-width: 0;
+  grid-row: 1;
+  grid-column: 1;
+  position: relative;
+}
+
+.app-shell.sidebar-collapsed:not(.sidebar-peek) .app-sidebar {
+  width: var(--sys-sidebar-collapsed-width, 72px);
+}
+
+/* ── .u-sidebar (Operator) ────────────────────────────────── */
+.u-sidebar {
+  padding: var(--sys-sidebar-padding-block, 12px) var(--sys-sidebar-padding-inline, 12px);
+}
+
+/* ── Admin layout-shell (mobile-first) ─────────────────── */
+.layout-shell {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  height: 100vh;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.layout-shell:not(.operator-shell-page) .topbar {
+  width: 100%;
+  height: auto;
+  min-height: calc(var(--sys-header-block-size, 58px) + var(--sys-safe-area-top, 0px));
+  flex: 0 0 auto;
+}
+
+/* ── Admin layout-shell grid (desktop) ────────────────────── */
+@media (min-width: 901px) {
+.layout-shell:not(.operator-shell-page) {
+    display: grid;
+    grid-template-columns: var(--sys-sidebar-width, 280px) minmax(0, 1fr);
+    grid-template-rows: auto 1fr;
+    transition: grid-template-columns .28s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+.layout-shell:not(.operator-shell-page).sidebar-collapsed {
+    grid-template-columns: var(--sys-sidebar-collapsed-width, 72px) minmax(0, 1fr);
+  }
+.layout-shell:not(.operator-shell-page).sidebar-collapsed.sidebar-peek {
+    grid-template-columns: var(--sys-sidebar-width, 280px) minmax(0, 1fr);
+  }
+.layout-shell:not(.operator-shell-page) .topbar {
+    grid-column: 1 / -1;
+    grid-row: 1;
+  }
+.layout-shell:not(.operator-shell-page) .layout-sidebar {
+    position: relative;
+    top: auto;
+    left: auto;
+    bottom: auto;
+    width: auto;
+    min-width: 0;
+    height: 100%;
+    grid-row: 2;
+    transform: none;
+  }
+.layout-shell:not(.operator-shell-page) .sidebar-backdrop {
+    display: none !important;
+  }
+}
+
+/* ── Admin sidebar collapsed inline padding ───────────────── */
+@media (min-width: 901px) {
+.layout-shell:not(.operator-shell-page).sidebar-collapsed:not(.sidebar-peek) .layout-sidebar {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+}
+
+/* ── .layout-main (admin content column) ──────────────────── */
+.layout-main {
+  width: 100%;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  height: auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+@media (min-width: 901px) {
+.layout-shell:not(.operator-shell-page) .layout-main {
+    grid-column: 2;
+    grid-row: 2;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+.layout-shell:not(.operator-shell-page) .layout-main > main.container,
+  .layout-shell:not(.operator-shell-page) .layout-main > .container {
+    max-width: none;
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+  }
+}
+
+/* ── .content (centered admin layout) ─────────────────────── */
+.content {
+  padding: var(--sys-content-padding-block, 20px)
+           calc(var(--sys-content-padding-inline, 24px) - 6px + var(--sys-safe-area-right, 0px))
+           calc(var(--sys-content-padding-block, 20px) - 2px + var(--sys-safe-area-bottom, 0px))
+           calc(var(--sys-content-padding-inline, 24px) - 6px + var(--sys-safe-area-left, 0px));
+  max-width: var(--sys-content-max-width, 1220px);
+  width: 100%;
+  margin: 0 auto;
+}
+
+@media (max-width: 860px) {
+.content { padding: var(--sys-content-padding-block, 20px); }
+}
+
+@media (max-width: 720px) {
+.content { padding: 10px; }
+}
+
+.content { flex: 1; overflow-y: auto; }
+
+/* ── .container (centered admin container) ────────────────── */
+.container {
+  padding: 22px
+           calc(20px + var(--sys-safe-area-right, 0px))
+           24px
+           calc(20px + var(--sys-safe-area-left, 0px));
+  max-width: var(--sys-content-max-width, 1220px);
+  margin: 0 auto;
+  width: 100%;
+}
+
+@media (min-width: 1440px) {
+.container {
+    max-width: none;
+    padding: 24px
+             calc(28px + var(--sys-safe-area-right, 0px))
+             26px
+             calc(28px + var(--sys-safe-area-left, 0px));
+  }
+}
+
+@media (min-width: 1920px) {
+.container {
+    padding: 24px
+             calc(36px + var(--sys-safe-area-right, 0px))
+             26px
+             calc(36px + var(--sys-safe-area-left, 0px));
+  }
+}
+
+@media (max-width: 860px) {
+.container { padding: 12px; }
+}
+
+@media (max-width: 720px) {
+.container {
+    padding: 10px
+             calc(2px + var(--sys-safe-area-right, 0px))
+             10px
+             calc(2px + var(--sys-safe-area-left, 0px));
+  }
+}
+
+/* ── .main-content (app-shell content panel) ──────────────── */
+.main-content {
+  padding: var(--sys-content-padding-block, 20px)
+           var(--sys-content-padding-inline, 24px)
+           var(--sys-content-padding-block, 20px)
+           calc(var(--sys-content-padding-inline, 24px) - 4px);
+  height: 100%;
+  min-height: 0;
+  overflow-y: auto;
+  grid-row: 1;
+  grid-column: 2;
+  min-width: 0;
+  position: relative;
+}
+
+@media (max-width: 820px) {
+.main-content {
+    grid-column: 1;
+    padding: 12px calc(2px + var(--sys-safe-area-right, 0px)) 88px calc(2px + var(--sys-safe-area-left, 0px));
+  }
+}
+
+/* ── .u-main (operator content) ───────────────────────────── */
+.u-main {
+  padding: 14px;
+  overflow-y: auto;
+}
+
+@media (max-width: 900px) {
+.u-main { padding: 10px; }
+}

@@ -1,0 +1,78 @@
+{
+  "schema_version": "studio.template-registry.v1",
+  "status": "placeholder_only",
+  "templates": [
+    {
+      "template_key": "business_app",
+      "display_name": "Business App",
+      "category": "app",
+      "description": "Draft a business app manifest, app route intent, and governance checklist.",
+      "outputs": ["app_manifest", "navigation_manifest", "artifact_manifest"],
+      "guardrails": ["apps_route_prefix", "business_domain_owned_by_app", "publish_locked"]
+    },
+    {
+      "template_key": "system_app",
+      "display_name": "System App",
+      "category": "app",
+      "description": "Draft a platform or governance app manifest without business-domain workflow.",
+      "outputs": ["app_manifest", "navigation_manifest", "artifact_manifest"],
+      "guardrails": ["platform_governance_scope", "server_authorization_required", "publish_locked"]
+    },
+    {
+      "template_key": "crud_module",
+      "display_name": "CRUD Module",
+      "category": "module",
+      "description": "Draft a module contract for list, create, update, and detail surfaces.",
+      "outputs": ["module_manifest", "view_manifest", "artifact_manifest"],
+      "guardrails": ["csrf_for_mutations", "permission_contract_required", "no_db_migration_execution"]
+    },
+    {
+      "template_key": "dashboard_module",
+      "display_name": "Dashboard Module",
+      "category": "module",
+      "description": "Draft a metric-first module with readonly summary widgets.",
+      "outputs": ["module_manifest", "view_manifest", "artifact_manifest"],
+      "guardrails": ["readonly_default", "adapter_required", "no_inline_business_ui_in_shell"]
+    },
+    {
+      "template_key": "queue_workflow_module",
+      "display_name": "Queue/Workflow Module",
+      "category": "module",
+      "description": "Draft a queue-oriented module with workflow states and approval intent.",
+      "outputs": ["module_manifest", "view_manifest", "artifact_manifest"],
+      "guardrails": ["workflow_policy_required", "audit_required", "publish_locked"]
+    },
+    {
+      "template_key": "table_view",
+      "display_name": "Table View",
+      "category": "view",
+      "description": "Draft a tabular view contract with filters, row actions, and empty state keys.",
+      "outputs": ["view_manifest", "artifact_manifest"],
+      "guardrails": ["localized_labels", "route_confinement", "no_arbitrary_php"]
+    },
+    {
+      "template_key": "form_view",
+      "display_name": "Form View",
+      "category": "view",
+      "description": "Draft a form view contract with validation, CSRF, and role gates.",
+      "outputs": ["view_manifest", "artifact_manifest"],
+      "guardrails": ["csrf_for_mutations", "localized_validation", "no_direct_db_mutation"]
+    },
+    {
+      "template_key": "detail_view",
+      "display_name": "Detail View",
+      "category": "view",
+      "description": "Draft a record detail view contract with readonly sections and action intent.",
+      "outputs": ["view_manifest", "artifact_manifest"],
+      "guardrails": ["permission_check_required", "localized_empty_state", "route_confinement"]
+    },
+    {
+      "template_key": "navigation_entry",
+      "display_name": "Navigation Entry",
+      "category": "navigation",
+      "description": "Draft a navigation contribution with visibility and active pattern intent.",
+      "outputs": ["navigation_manifest", "artifact_manifest"],
+      "guardrails": ["label_key_required", "wrapper_confinement", "no_cross_layer_escape"]
+    }
+  ]
+}

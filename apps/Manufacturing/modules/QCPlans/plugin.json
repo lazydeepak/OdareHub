@@ -1,0 +1,59 @@
+{
+    "name": "QCPlans",
+    "display_name": "QC Plans",
+    "suite": "manufacturing",
+    "group": "ipm",
+    "category": "business",
+    "display_order": 80,
+    "type": "business",
+    "version": "1.0.0",
+    "description": "QC planning based on production and demand.",
+    "requires": [
+        "Base>=3.0.0",
+        "Products>=1.0.0",
+        "DailyOrders>=1.0.0",
+        "ProductionEntries>=1.0.0"
+    ],
+    "entry": "routes.php",
+    "package_type": "module",
+    "owner_app": "manufacturing",
+    "module_key": "QCPlans",
+    "module_type": "planning",
+    "target_maturity_level": "L3",
+    "declared_capabilities": [
+        "routes",
+        "views",
+        "forms",
+        "schema",
+        "migrations",
+        "controllers",
+        "services",
+        "permissions",
+        "menus",
+        "widgets",
+        "reports",
+        "exports",
+        "lifecycle_hooks",
+        "localization"
+    ],
+    "lifecycle_contract": {
+        "routes": "active_only",
+        "menus": "active_only",
+        "widgets": "active_only",
+        "reports": "active_only",
+        "dashboards": "active_only",
+        "schema": "installed_or_active"
+    },
+    "reports": [
+        {
+            "report_key": "manufacturing.qc_plans.range",
+            "title": "QC Plan Range",
+            "view": "Views/report.php",
+            "export_view": "Views/export.php",
+            "owner": "module",
+            "scope": "qc_plans",
+            "permission": "workflow.qc_plan.approve",
+            "lifecycle": "active_only"
+        }
+    ]
+}

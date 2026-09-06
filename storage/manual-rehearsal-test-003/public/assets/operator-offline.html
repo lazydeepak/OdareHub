@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Offline — Operator Workspace</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:system-ui,-apple-system,sans-serif;background: var(--style-subtle-bg);color: var(--text);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    min-height:100vh;padding:24px;text-align:center}
+  .offline-icon{font-size:3rem;margin-bottom:16px;opacity:.7}
+  h1{font-size:1.4rem;font-weight:700;margin-bottom:8px}
+  p{font-size:.9rem;color: var(--text);max-width:360px;line-height:1.6;margin-bottom:24px}
+  .retry-btn{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;
+    background: var(--style-subtle-bg);color: var(--text);border:none;border-radius:8px;
+    font-size:.9rem;font-weight:600;cursor:pointer;text-decoration:none}
+  .retry-btn:hover{background: var(--style-subtle-bg)}
+  .note{margin-top:24px;font-size:.78rem;color: var(--text)}
+</style>
+</head>
+<body>
+  <div class="offline-icon">📡</div>
+  <h1>You&rsquo;re offline</h1>
+  <p>
+    The operator workspace could not load because your device appears to be offline.
+    Previously visited pages may be available from cache — try going back.
+  </p>
+  <a href="javascript:location.reload()" class="retry-btn">
+    ↺ Retry
+  </a>
+  <div class="note">Changes made while offline will not be saved.</div>
+</body>
+</html>

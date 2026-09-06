@@ -1,0 +1,14 @@
+{
+  "name": "Base",
+  "display_name": "Base",
+  "suite": "core",
+  "group": "platform",
+  "category": "system",
+  "display_order": 10,
+  "type": "engine",
+  "version": "3.0.0",
+  "description": "Base services: menus, apps manager, settings.",
+  "requires": [],
+  "package_type": "plugin",
+  "entry": "routes.php"
+}

@@ -1,0 +1,30 @@
+{
+  "schema_version": "gui.app-manifest.v1",
+  "status": "draft",
+  "app": {
+    "app_key": "",
+    "display_name": "",
+    "owner": "",
+    "description": "",
+    "route_prefix": "",
+    "default_landing_page": "/",
+    "is_active": true
+  },
+  "governance": {
+    "created_from": "gui-studio",
+    "requires_platform_admin_approval": true,
+    "requires_i18n_keys": true,
+    "requires_schema_check": true
+  },
+  "i18n": {
+    "title_key": "",
+    "display_name_key": "",
+    "description_key": "",
+    "supported_locales": ["en", "ja", "ne"]
+  },
+  "audit": {
+    "draft_id": "",
+    "created_by": "",
+    "created_at": ""
+  }
+}

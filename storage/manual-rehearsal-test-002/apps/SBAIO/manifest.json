@@ -1,0 +1,410 @@
+{
+  "id": "sbaio",
+  "app_key": "sbaio",
+  "package_type": "bundle",
+  "directory_name": "SBAIO",
+  "name": "SBAIO",
+  "version": "1.0.0",
+  "type": "business",
+  "min_core_version": "3.0.0",
+  "dependencies": [],
+  "entry": "routes.php",
+  "native_modules": [
+    "staff",
+    "attendance",
+    "timecards",
+    "payroll",
+    "schedules",
+    "leave",
+    "customers",
+    "tasks",
+    "sales",
+    "expenses",
+    "notices"
+  ],
+  "legacy_bridge_plugins": [
+    "Staff",
+    "Attendance",
+    "Timecards",
+    "Payroll",
+    "Schedules",
+    "Leave",
+    "Customers",
+    "Tasks",
+    "Sales",
+    "Expenses",
+    "Notices"
+  ],
+  "migrations_path": "migrations",
+  "permissions": [
+    "sbaio.view",
+    "sbaio.manage"
+  ],
+  "modules": [
+    {
+      "key": "staff",
+      "name": "Staff"
+    },
+    {
+      "key": "attendance",
+      "name": "Attendance"
+    },
+    {
+      "key": "timecards",
+      "name": "Timecards"
+    },
+    {
+      "key": "payroll",
+      "name": "Payroll"
+    },
+    {
+      "key": "schedules",
+      "name": "Schedules"
+    },
+    {
+      "key": "leave",
+      "name": "Leave"
+    },
+    {
+      "key": "customers",
+      "name": "Customers"
+    },
+    {
+      "key": "tasks",
+      "name": "Tasks"
+    },
+    {
+      "key": "sales",
+      "name": "Sales"
+    },
+    {
+      "key": "expenses",
+      "name": "Expenses"
+    },
+    {
+      "key": "notices",
+      "name": "Notices"
+    }
+  ],
+  "hooks": [
+    {
+      "type": "boot",
+      "key": "sbaio.bootstrap",
+      "handler_file": "bootstrap.php"
+    },
+    {
+      "type": "host_surface",
+      "key": "sbaio.me.header_actions",
+      "surface": "me",
+      "region": "header_actions",
+      "provider": "Apps\\SBAIO\\Services\\HostSurfaceContributionService::contribute",
+      "provider_file": "Services/HostSurfaceContributionService.php",
+      "order": 50
+    },
+    {
+      "type": "host_surface",
+      "key": "sbaio.me.summary_cards",
+      "surface": "me",
+      "region": "summary_cards",
+      "provider": "Apps\\SBAIO\\Services\\HostSurfaceContributionService::contribute",
+      "provider_file": "Services/HostSurfaceContributionService.php",
+      "order": 60
+    },
+    {
+      "type": "host_surface",
+      "key": "sbaio.me.quick_links",
+      "surface": "me",
+      "region": "quick_links",
+      "provider": "Apps\\SBAIO\\Services\\HostSurfaceContributionService::contribute",
+      "provider_file": "Services/HostSurfaceContributionService.php",
+      "order": 70
+    },
+    {
+      "type": "host_surface",
+      "key": "sbaio.me.monitoring_sections",
+      "surface": "me",
+      "region": "monitoring_sections",
+      "provider": "Apps\\SBAIO\\Services\\HostSurfaceContributionService::contribute",
+      "provider_file": "Services/HostSurfaceContributionService.php",
+      "order": 80
+    },
+    {
+      "type": "operator_surface",
+      "key": "sbaio.operator.sidebar",
+      "surface": "operator",
+      "region": "sidebar",
+      "provider": "Apps\\SBAIO\\Services\\OperatorSurfaceContributionService::contribute",
+      "provider_file": "Services/OperatorSurfaceContributionService.php",
+      "order": 90
+    },
+    {
+      "type": "operator_surface",
+      "key": "sbaio.operator.focus_views",
+      "surface": "operator",
+      "region": "focus_views",
+      "provider": "Apps\\SBAIO\\Services\\OperatorSurfaceContributionService::contribute",
+      "provider_file": "Services/OperatorSurfaceContributionService.php",
+      "order": 100
+    },
+    {
+      "type": "operator_surface",
+      "key": "sbaio.operator.data_exchange",
+      "surface": "operator",
+      "region": "data_exchange",
+      "provider": "Apps\\SBAIO\\Services\\OperatorSurfaceContributionService::contribute",
+      "provider_file": "Services/OperatorSurfaceContributionService.php",
+      "order": 105
+    }
+  ],
+  "routes": [
+    {
+      "path": "/apps/sbaio"
+    },
+    {
+      "path": "/apps/sbaio/reports"
+    },
+    {
+      "path": "/apps/sbaio/staff"
+    },
+    {
+      "path": "/apps/sbaio/attendance"
+    },
+    {
+      "path": "/apps/sbaio/timecards"
+    },
+    {
+      "path": "/apps/sbaio/payroll"
+    },
+    {
+      "path": "/apps/sbaio/schedules"
+    },
+    {
+      "path": "/apps/sbaio/leave"
+    },
+    {
+      "path": "/apps/sbaio/customers"
+    },
+    {
+      "path": "/apps/sbaio/tasks"
+    },
+    {
+      "path": "/apps/sbaio/sales"
+    },
+    {
+      "path": "/apps/sbaio/expenses"
+    },
+    {
+      "path": "/apps/sbaio/notices"
+    }
+  ],
+  "menus": [
+    {
+      "key": "app.sbaio.root",
+      "label_key": "nav.sbaio_dashboard",
+      "label": "SBAIO Workspace",
+      "url": "/apps/sbaio",
+      "parent": "apps.root",
+      "order": 50
+    },
+    {
+      "key": "app.sbaio.reports",
+      "label_key": "nav.sbaio_reports",
+      "label": "Analytics",
+      "url": "/apps/sbaio/reports",
+      "parent": "app.sbaio.root",
+      "order": 50,
+      "perm": "sbaio.view"
+    },
+    {
+      "key": "app.sbaio.staff",
+      "label_key": "nav.sbaio_staff",
+      "label": "Staff",
+      "url": "/apps/sbaio/staff",
+      "parent": "app.sbaio.root",
+      "order": 51,
+      "perm": "sbaio.view"
+    },
+    {
+      "key": "app.sbaio.attendance",
+      "label_key": "nav.sbaio_attendance",
+      "label": "Attendance",
+      "url": "/apps/sbaio/attendance",
+      "parent": "app.sbaio.root",
+      "order": 52,
+      "perm": "sbaio.view"
+    },
+    {
+      "key": "app.sbaio.timecards",
+      "label_key": "nav.sbaio_timecards",
+      "label": "Timecards",
+      "url": "/apps/sbaio/timecards",
+      "parent": "app.sbaio.root",
+      "order": 53,
+      "perm": "sbaio.view"
+    },
+    {
+      "key": "app.sbaio.payroll",
+      "label_key": "nav.sbaio_payroll",
+      "label": "Payroll",
+      "url": "/apps/sbaio/payroll",
+      "parent": "app.sbaio.root",
+      "order": 54,
+      "perm": "sbaio.view"
+    },
+    {
+      "key": "app.sbaio.payroll_parity",
+      "label_key": "nav.sbaio_payroll_parity",
+      "label": "Payroll Parity",
+      "url": "/apps/sbaio/payroll/parity",
+      "parent": "app.sbaio.root",
+      "order": 54,
+      "perm": "sbaio.view"
+    },
+    {
+      "key": "app.sbaio.schedules",
+      "label_key": "nav.sbaio_schedules",
+      "label": "Schedules",
+      "url": "/apps/sbaio/schedules",
+      "parent": "app.sbaio.root",
+      "order": 55,
+      "perm": "sbaio.view"
+    },
+    {
+      "key": "app.sbaio.leave",
+      "label_key": "nav.sbaio_leave",
+      "label": "Leave & Holidays",
+      "url": "/apps/sbaio/leave",
+      "parent": "app.sbaio.root",
+      "order": 56,
+      "perm": "sbaio.view"
+    },
+    {
+      "key": "app.sbaio.customers",
+      "label_key": "nav.sbaio_customers",
+      "label": "Customers",
+      "url": "/apps/sbaio/customers",
+      "parent": "app.sbaio.root",
+      "order": 57,
+      "perm": "sbaio.view"
+    },
+    {
+      "key": "app.sbaio.tasks",
+      "label_key": "nav.sbaio_tasks",
+      "label": "Tasks",
+      "url": "/apps/sbaio/tasks",
+      "parent": "app.sbaio.root",
+      "order": 58,
+      "perm": "sbaio.view"
+    },
+    {
+      "key": "app.sbaio.sales",
+      "label_key": "nav.sbaio_sales",
+      "label": "Sales",
+      "url": "/apps/sbaio/sales",
+      "parent": "app.sbaio.root",
+      "order": 59,
+      "perm": "sbaio.view"
+    },
+    {
+      "key": "app.sbaio.expenses",
+      "label_key": "nav.sbaio_expenses",
+      "label": "Expenses",
+      "url": "/apps/sbaio/expenses",
+      "parent": "app.sbaio.root",
+      "order": 60,
+      "perm": "sbaio.view"
+    },
+    {
+      "key": "app.sbaio.notices",
+      "label_key": "nav.sbaio_notices",
+      "label": "Notices",
+      "url": "/apps/sbaio/notices",
+      "parent": "app.sbaio.root",
+      "order": 61,
+      "perm": "sbaio.view"
+    }
+  ],
+  "widgets": [
+    {
+      "key": "sbaio.widget.dashboard",
+      "title_key": "nav.sbaio_dashboard",
+      "title": "SBAIO Workspace",
+      "url": "/apps/sbaio",
+      "order": 20,
+      "domain": "sbaio",
+      "zone": "sbaio"
+    }
+  ],
+  "search_entries": [
+    {
+      "key": "sbaio_dashboard",
+      "label_key": "nav.sbaio_dashboard",
+      "url": "/apps/sbaio"
+    },
+    {
+      "key": "sbaio_reports",
+      "label_key": "nav.sbaio_reports",
+      "url": "/apps/sbaio/reports"
+    },
+    {
+      "key": "sbaio_attendance",
+      "label_key": "nav.sbaio_attendance",
+      "url": "/apps/sbaio/attendance"
+    },
+    {
+      "key": "sbaio_timecards",
+      "label_key": "nav.sbaio_timecards",
+      "url": "/apps/sbaio/timecards"
+    },
+    {
+      "key": "sbaio_payroll",
+      "label_key": "nav.sbaio_payroll",
+      "url": "/apps/sbaio/payroll"
+    },
+    {
+      "key": "sbaio_payroll_parity",
+      "label_key": "nav.sbaio_payroll_parity",
+      "url": "/apps/sbaio/payroll/parity"
+    },
+    {
+      "key": "sbaio_customers",
+      "label_key": "nav.sbaio_customers",
+      "url": "/apps/sbaio/customers"
+    }
+  ],
+  "notifications": [
+    {
+      "key": "sbaio_notices",
+      "feature_key": "notices",
+      "target_table": "sbaio_notices",
+      "lifecycle_bound": true
+    },
+    {
+      "key": "sbaio_attendance",
+      "feature_key": "attendance",
+      "target_table": "sbaio_attendance_daily",
+      "lifecycle_bound": true
+    },
+    {
+      "key": "sbaio_payroll",
+      "feature_key": "payroll",
+      "target_table": "sbaio_payroll_runs",
+      "lifecycle_bound": true
+    }
+  ],
+  "can_disable": true,
+  "can_uninstall": true,
+  "can_export": true,
+  "styles": [
+    {
+      "key": "sbaio.app",
+      "path": "styles/sbaio.css",
+      "scope": "app",
+      "surfaces": [
+        "admin",
+        "operator"
+      ],
+      "order": 200
+    }
+  ]
+}

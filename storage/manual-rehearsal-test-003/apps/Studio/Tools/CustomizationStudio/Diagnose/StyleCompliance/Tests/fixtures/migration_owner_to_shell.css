@@ -1,0 +1,15 @@
+/* Calibration: Owner file with shared Shell chrome selector.
+   Expected: current_domain=owner_surface, required_domain=shell_foundation,
+   migration_state=domain_migration, target_owner=Shell, target_tool=style_compliance,
+   migration_confidence=high. */
+.app-shell {
+    background: #ffffff;
+}
+
+.layout-sidebar {
+    border-right: 1px solid #e0e0e0;
+}
+
+.topbar {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}

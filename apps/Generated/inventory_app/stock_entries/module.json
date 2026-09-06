@@ -1,0 +1,11 @@
+{
+    "schema_version": "studio.generated-module-contract.v1",
+    "app_key": "inventory_app",
+    "module_key": "stock_entries",
+    "display_name": "stock_entries",
+    "route_path": "/apps/inventory-app/stock-entries",
+    "template": "crud_module",
+    "compile_id": "compile:generated:c2120c70c86f3bbd",
+    "snapshot_id": "587648ea-be92-5f39-b390-8c819d098f8c",
+    "fields": []
+}

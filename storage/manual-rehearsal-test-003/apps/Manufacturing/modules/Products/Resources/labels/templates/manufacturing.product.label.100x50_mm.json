@@ -1,0 +1,59 @@
+{
+    "schema": "susankhya.label.template.v1",
+    "write_status": "created",
+    "template_key": "manufacturing.product.label.100x50_mm",
+    "context_ref": {
+        "context_key": "manufacturing.product.label",
+        "context_file": "apps/Manufacturing/modules/Products/Resources/labels/contexts/product-label.label-context.json",
+        "owner_key": "Manufacturing/Products",
+        "owner_type": "module"
+    },
+    "layout": {
+        "label_size": "100x50_mm",
+        "orientation": "landscape",
+        "blocks": [
+            {
+                "block_key": "header",
+                "role": "title_and_identity"
+            },
+            {
+                "block_key": "details",
+                "role": "field_rows"
+            },
+            {
+                "block_key": "footer",
+                "role": "owner_signoff_qr_placeholder"
+            }
+        ]
+    },
+    "fields": [
+        {
+            "field_key": "product_name",
+            "label": "Product Name",
+            "source_column": "product_name"
+        },
+        {
+            "field_key": "product_code",
+            "label": "Product Code",
+            "source_column": "product_code"
+        },
+        {
+            "field_key": "batch_number",
+            "label": "Batch Number",
+            "source_column": "batch_number"
+        },
+        {
+            "field_key": "manufacturing_date",
+            "label": "Manufacturing Date",
+            "source_column": "manufacturing_date"
+        }
+    ],
+    "notes": [
+        "created_via_studio_label_designer",
+        "resource_canonical"
+    ],
+    "owner_key": "Manufacturing/Products",
+    "owner_type": "module",
+    "owner_root": "apps/Manufacturing/modules/Products",
+    "resource_type": "template"
+}

@@ -1,0 +1,39 @@
+{
+    "name": "FrontDesk",
+    "display_name": "Front Desk",
+    "group": "hospitality",
+    "category": "business",
+    "display_order": 40,
+    "type": "business",
+    "version": "0.1.0",
+    "description": "Check-in/check-out stay operations and the v1 local folio/charges records (inside FrontDesk by foundation brief decision).",
+    "requires": [],
+    "optional": [],
+    "package_type": "module",
+    "owner_app": "hospitality",
+    "module_key": "FrontDesk",
+    "required_tables": [
+        "hosp_folios",
+        "hosp_folio_charges"
+    ],
+    "module_type": "process_execution",
+    "target_maturity_level": "L3",
+    "declared_capabilities": [
+        "routes",
+        "views",
+        "forms",
+        "schema",
+        "migrations",
+        "controllers",
+        "permissions",
+        "localization"
+    ],
+    "lifecycle_contract": {
+        "routes": "active_only",
+        "menus": "active_only",
+        "widgets": "active_only",
+        "reports": "active_only",
+        "dashboards": "active_only",
+        "schema": "installed_or_active"
+    }
+}

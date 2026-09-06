@@ -1,0 +1,10 @@
+{
+    "schema_version": "studio.generated-module-contract.v1",
+    "app_key": "hardening_app",
+    "module_key": "hardening_module",
+    "display_name": "Hardening Module",
+    "route_path": "/apps/hardening-app/hardening-module",
+    "template": "crud_module",
+    "compile_id": "compile:generated:8b83f9095e4f3d37",
+    "snapshot_id": "dd62883a-5ed8-5f0e-919c-f895d2c7022d"
+}

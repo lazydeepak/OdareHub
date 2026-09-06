@@ -1,0 +1,20 @@
+CREATE TABLE IF NOT EXISTS qc_entries (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    qc_plan_id INT NULL,
+    daily_order_id INT NULL,
+    production_plan_id INT NULL,
+    product_id INT NOT NULL,
+    qc_type VARCHAR(40) NOT NULL DEFAULT 'Final',
+    checked_qty DECIMAL(14,2) NOT NULL DEFAULT 0,
+    pass_qty DECIMAL(14,2) NOT NULL DEFAULT 0,
+    fail_qty DECIMAL(14,2) NOT NULL DEFAULT 0,
+    status VARCHAR(30) NOT NULL DEFAULT 'Open',
+    remarks TEXT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    KEY idx_qc_entries_status (status),
+    KEY idx_qc_entries_product (product_id),
+    KEY idx_qc_entries_qc_plan (qc_plan_id),
+    KEY idx_qc_entries_daily_order (daily_order_id),
+    KEY idx_qc_entries_production_plan (production_plan_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

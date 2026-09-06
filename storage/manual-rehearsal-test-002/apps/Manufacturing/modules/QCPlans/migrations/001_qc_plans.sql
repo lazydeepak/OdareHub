@@ -1,0 +1,21 @@
+CREATE TABLE IF NOT EXISTS qc_plans (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    plan_date DATE NOT NULL,
+    required_date DATE NULL,
+    product_id INT NOT NULL,
+    daily_order_id INT NULL,
+    production_entry_id INT NULL,
+    planned_qty DECIMAL(14,2) NOT NULL DEFAULT 0,
+    estimated_time_minutes INT NOT NULL DEFAULT 0,
+    priority VARCHAR(30) NOT NULL DEFAULT 'Normal',
+    status VARCHAR(30) NOT NULL DEFAULT 'Open',
+    notes TEXT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    KEY idx_qc_plans_dates (plan_date, required_date),
+    KEY idx_qc_plans_priority (priority),
+    KEY idx_qc_plans_status (status),
+    KEY idx_qc_plans_product (product_id),
+    KEY idx_qc_plans_daily_order (daily_order_id),
+    KEY idx_qc_plans_production_entry (production_entry_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

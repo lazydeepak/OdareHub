@@ -1,0 +1,21 @@
+/* Effect declarations — all should be is_effect_candidate */
+.effects-panel {
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+    backdrop-filter: blur(8px);
+}
+
+.modal-overlay {
+    backdrop-filter: blur(4px);
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+.blend-example {
+    mix-blend-mode: multiply;
+    background-blend-mode: overlay;
+}
+
+.isolate {
+    isolation: isolate;
+    color: #333;
+    background-color: #fff;
+}

@@ -1,0 +1,27 @@
+-- Platform no-code widget builder persistence
+CREATE TABLE IF NOT EXISTS platform_widget_blueprints (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    app_key VARCHAR(80) NOT NULL,
+    module_key VARCHAR(120) NOT NULL,
+    widget_key VARCHAR(140) NOT NULL,
+    title_key VARCHAR(190) NOT NULL,
+    description_key VARCHAR(190) NULL,
+    template_type VARCHAR(40) NOT NULL,
+    dataset_key VARCHAR(120) NOT NULL,
+    placement_zone VARCHAR(80) NOT NULL,
+    config_json JSON NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'draft',
+    created_by_user_id BIGINT UNSIGNED NULL,
+    created_by_email VARCHAR(190) NULL,
+    updated_by_user_id BIGINT UNSIGNED NULL,
+    updated_by_email VARCHAR(190) NULL,
+    published_by_user_id BIGINT UNSIGNED NULL,
+    published_by_email VARCHAR(190) NULL,
+    published_at DATETIME NULL,
+    archived_at DATETIME NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY uniq_platform_widget_blueprint_widget (widget_key),
+    KEY idx_platform_widget_blueprint_status (status),
+    KEY idx_platform_widget_blueprint_app_module (app_key, module_key)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

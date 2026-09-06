@@ -1,0 +1,16 @@
+{
+  "name": "ACL",
+  "display_name": "ACL",
+  "suite": "core",
+  "group": "platform",
+  "category": "system",
+  "display_order": 20,
+  "type": "engine",
+  "version": "1.0.0",
+  "description": "RBAC / Permissions engine with centralized policy checks.",
+  "requires": [
+    "Base>=3.0.0"
+  ],
+  "package_type": "plugin",
+  "entry": "routes.php"
+}

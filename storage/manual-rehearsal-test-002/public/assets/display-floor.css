@@ -1,0 +1,4 @@
+/* DEPRECATED: Display floor CSS has been moved to apps/Manufacturing/styles/display-floor.css
+   This file is kept as a shim for backwards compatibility and will be removed in phase 10. */
+@import url(/assets/apps/manufacturing/styles/display-floor.css);
+

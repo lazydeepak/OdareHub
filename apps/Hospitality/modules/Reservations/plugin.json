@@ -1,0 +1,38 @@
+{
+    "name": "Reservations",
+    "display_name": "Reservations",
+    "group": "hospitality",
+    "category": "business",
+    "display_order": 30,
+    "type": "business",
+    "version": "0.1.0",
+    "description": "Booking lifecycle and reservation status transitions for the Hospitality app.",
+    "requires": [],
+    "optional": [],
+    "package_type": "module",
+    "owner_app": "hospitality",
+    "module_key": "Reservations",
+    "required_tables": [
+        "hosp_reservations"
+    ],
+    "module_type": "planning",
+    "target_maturity_level": "L2",
+    "declared_capabilities": [
+        "routes",
+        "views",
+        "forms",
+        "schema",
+        "migrations",
+        "controllers",
+        "permissions",
+        "localization"
+    ],
+    "lifecycle_contract": {
+        "routes": "active_only",
+        "menus": "active_only",
+        "widgets": "active_only",
+        "reports": "active_only",
+        "dashboards": "active_only",
+        "schema": "installed_or_active"
+    }
+}

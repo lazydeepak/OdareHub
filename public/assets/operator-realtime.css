@@ -1,0 +1,287 @@
+/**
+ * Operator Realtime Updates CSS
+ * 
+ * Styles for WebSocket KPI updates and animations.
+ * Applies to operator dashboard and production views.
+ */
+
+/* KPI Value Animation */
+.kpi-updated {
+  animation: kpi-flash 300ms ease-out;
+}
+
+@keyframes kpi-flash {
+  0% {
+    background-color: #fff3cd;
+    color: #ff6b6b;
+    font-weight: bold;
+  }
+  50% {
+    background-color: #ffe082;
+  }
+  100% {
+    background-color: transparent;
+    color: inherit;
+    font-weight: normal;
+  }
+}
+
+/* Realtime Connection Status */
+.realtime-status {
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  z-index: 100;
+  background: #f5f5f5;
+  border: 1px solid #ddd;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.realtime-status::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ccc;
+  display: inline-block;
+}
+
+.realtime-status.connected {
+  background: #e8f5e9;
+  border-color: #66bb6a;
+  color: #2e7d32;
+}
+
+.realtime-status.connected::before {
+  background: #66bb6a;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.realtime-status.disconnected {
+  background: #ffebee;
+  border-color: #ef5350;
+  color: #c62828;
+}
+
+.realtime-status.disconnected::before {
+  background: #ef5350;
+  animation: none;
+}
+
+.realtime-status.reconnecting {
+  background: #fff3e0;
+  border-color: #ffa726;
+  color: #e65100;
+}
+
+.realtime-status.reconnecting::before {
+  background: #ffa726;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Critical Orders Table */
+#critical-orders-tbody {
+  transition: opacity 150ms ease-out;
+}
+
+.critical-order-row {
+  animation: row-highlight 300ms ease-out;
+}
+
+@keyframes row-highlight {
+  0% {
+    background-color: #fff3cd;
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+/* Status Badge */
+.status-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-badge.status-critical {
+  background-color: #ffebee;
+  color: #c62828;
+  border: 1px solid #ef5350;
+}
+
+.status-badge.status-warning {
+  background-color: #fff3e0;
+  color: #e65100;
+  border: 1px solid #ffa726;
+}
+
+.status-badge.status-ok {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  border: 1px solid #66bb6a;
+}
+
+/* KPI Container Update Animation */
+.kpi-container {
+  transition: all 150ms ease-out;
+}
+
+.kpi-container.updating {
+  background-color: #f5f5f5;
+}
+
+/* Fade transition for content updates */
+.content-fade-update {
+  animation: fade-in-out 300ms ease-out;
+}
+
+@keyframes fade-in-out {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Loading indicator for KPI fetch */
+.kpi-loading {
+  position: relative;
+  display: inline-block;
+}
+
+.kpi-loading::after {
+  content: '';
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: currentColor;
+  border-radius: 50%;
+  top: -6px;
+  right: -6px;
+  animation: dot-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes dot-pulse {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+/* Preference Controls (optional) */
+.realtime-preferences {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  background: #fafafa;
+}
+
+.realtime-preferences label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.realtime-preferences input[type="number"] {
+  width: 60px;
+  padding: 4px 6px;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+  font-size: 12px;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .realtime-status {
+    background: #424242;
+    border-color: #616161;
+    color: #fff;
+  }
+
+  .realtime-status.connected {
+    background: #1b5e20;
+    border-color: #81c784;
+    color: #c8e6c9;
+  }
+
+  .realtime-status.disconnected {
+    background: #b71c1c;
+    border-color: #ef5350;
+    color: #ffcdd2;
+  }
+
+  .realtime-status.reconnecting {
+    background: #e65100;
+    border-color: #ffb74d;
+    color: #ffe0b2;
+  }
+
+  .realtime-preferences {
+    background: #333;
+    border-color: #555;
+    color: #fff;
+  }
+
+  .realtime-preferences input[type="number"] {
+    background: #424242;
+    color: #fff;
+    border-color: #616161;
+  }
+
+  .status-badge.status-critical {
+    background-color: #5d1f1a;
+    border-color: #c62828;
+  }
+
+  .status-badge.status-warning {
+    background-color: #663d00;
+    border-color: #f57c00;
+  }
+
+  .status-badge.status-ok {
+    background-color: #1b5e20;
+    border-color: #2e7d32;
+  }
+}

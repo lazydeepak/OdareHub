@@ -1,0 +1,25 @@
+{
+  "brand_key": "susankhya-os",
+  "platform_name": "Susankhya OS",
+  "asset_contract": "platform-branding.v1",
+  "variants": {
+    "light": {
+      "svg": "/assets/branding/platform/susankhya-os/light/mark.svg",
+      "usage": "Light backgrounds and printable surfaces"
+    },
+    "dark": {
+      "svg": "/assets/branding/platform/susankhya-os/dark/mark.svg",
+      "usage": "Dark chrome, display surfaces, and operator headers"
+    },
+    "monochrome": {
+      "svg": "/assets/branding/platform/susankhya-os/monochrome/mark.svg",
+      "usage": "Single-color export, watermark, and restricted-color surfaces"
+    }
+  },
+  "runtime_instance_support": {
+    "platform_name": "Global product name",
+    "instance_name": "Customer or deployment display name",
+    "app_name": "Current app or workspace display name",
+    "version_label": "Presentation-safe release or channel label"
+  }
+}

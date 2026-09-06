@@ -1,0 +1,27 @@
+{
+  "id": "parties",
+  "app_key": "parties",
+  "package_type": "bundle",
+  "name": "Parties",
+  "version": "0.1.0",
+  "type": "business",
+  "min_core_version": "3.0.0",
+  "dependencies": [],
+  "entry": "routes.php",
+  "migrations_path": "migrations",
+  "permissions": [
+    "parties.view",
+    "parties.manage"
+  ],
+  "shared_contract": {
+    "kind": "shared_app",
+    "consumers": [
+      "hospitality",
+      "sbaio",
+      "procurement"
+    ]
+  },
+  "can_disable": true,
+  "can_uninstall": true,
+  "can_export": true
+}

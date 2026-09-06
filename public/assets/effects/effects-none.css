@@ -1,0 +1,17 @@
+/* GENERATED FILE: public/assets/effects/effects-none.css */
+/* Source manifest: scripts/assets/first_boot_css_manifest.json */
+
+/* source: apps/Platform/Resources/effects/effects-none.css */
+@layer effects {
+  :root {
+    --fx-glass-blur: none;
+    --fx-glass-blur-shell: none;
+    --fx-glass-blur-card: none;
+    --fx-glass-blur-popover: none;
+    --fx-glass-blur-control: none;
+    --fx-glass-opacity: 1;
+    --fx-glass-saturation: 1;
+    --fx-edge-highlight-opacity: 0;
+  }
+}
+

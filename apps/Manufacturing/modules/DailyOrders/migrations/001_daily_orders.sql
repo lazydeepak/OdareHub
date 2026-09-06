@@ -1,0 +1,21 @@
+CREATE TABLE IF NOT EXISTS daily_orders (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    order_date DATE NOT NULL,
+    required_date DATE NULL,
+    customer_name VARCHAR(190) NOT NULL,
+    product_id INT NOT NULL,
+    qty DECIMAL(14,2) NOT NULL DEFAULT 0,
+    dispatch_deadline DATETIME NULL,
+    coverage_pct DECIMAL(8,2) NOT NULL DEFAULT 0,
+    coverage_status VARCHAR(30) NOT NULL DEFAULT 'Low',
+    shortage_qty DECIMAL(14,2) NOT NULL DEFAULT 0,
+    planned_supply_qty DECIMAL(14,2) NOT NULL DEFAULT 0,
+    status VARCHAR(30) NOT NULL DEFAULT 'Open',
+    notes TEXT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    KEY idx_daily_orders_product (product_id),
+    KEY idx_daily_orders_dates (order_date, required_date),
+    KEY idx_daily_orders_status (status),
+    KEY idx_daily_orders_customer (customer_name)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

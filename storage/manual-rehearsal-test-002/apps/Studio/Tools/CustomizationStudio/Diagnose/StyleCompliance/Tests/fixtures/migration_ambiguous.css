@@ -1,0 +1,20 @@
+/* Calibration: Ambiguous tokens that need human classification review.
+   These use named CSS keywords (transparent, currentColor) that the
+   literal classifier does not recognize as stable literals (not hex,
+   not rgb/hsl). This triggers classification_review with low confidence
+   because the scanner cannot determine the correct semantic domain.
+
+   Expected: migration_state=classification_review, migration_confidence=low,
+   current_domain=owner_surface, required_domain=owner_surface. */
+
+/* Named keyword value — visual_literal, is_literal=false,
+   not theme-aware, no shell selector match.
+   → classification_review with low confidence */
+.custom-workspace-panel {
+    background: transparent;
+}
+
+/* Another CSS keyword — same classification path */
+.dashboard-highlight {
+    border-color: currentColor;
+}

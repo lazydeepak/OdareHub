@@ -1,0 +1,21 @@
+{
+  "fixture": "diagram-preview",
+  "owner": "studio",
+  "tool_area": "customization-studio",
+  "purpose": "Describes future diagram and graph preview examples.",
+  "runtime_status": "fixture_catalog_only_not_rendered",
+  "renders_ui": false,
+  "connects_to_shell": false,
+  "reads_studio_drafts": false,
+  "uses_active_registry_truth": false,
+  "examples": [
+    {
+      "example": "process-and-dependency-diagram",
+      "label": "Diagram preview",
+      "description": "Nodes, groups, connectors, arrows, edges, swimlanes, flow steps, decision nodes, timeline nodes, dependency lines, and selected/hover states.",
+      "socket_catalogs": ["diagrams-graphs", "workflow-operations", "states", "motion-transform"],
+      "preview_modes": ["simple", "advanced"],
+      "notes": "Catalog only. No diagram renderer is invoked."
+    }
+  ]
+}

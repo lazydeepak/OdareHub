@@ -1,0 +1,77 @@
+/* GENERATED FILE: public/assets/themes/liquid-glass-system.css */
+/* Source manifest: scripts/assets/first_boot_css_manifest.json */
+
+/* source: apps/Platform/Resources/themes/liquid-glass-system/colors.css */
+@layer theme {
+  :root {
+    --color-page: #eef5ff;
+    --color-panel: #f7fbff;
+    --color-card: #ffffff;
+    --color-control: #f7fbff;
+    --color-text: #16243d;
+    --color-text-muted: #516887;
+    --color-border: rgba(74, 118, 182, .28);
+    --color-border-strong: rgba(31, 94, 207, .42);
+    --color-accent: #1f5ecf;
+    --color-accent-focus: #2c72f0;
+    --color-success-bg: #edf9f1;
+    --color-success-text: #166534;
+    --color-success-border: rgba(22, 101, 52, .42);
+    --color-info-bg: #edf5ff;
+    --color-info-text: #1f56b0;
+    --color-info-border: rgba(31, 86, 176, .32);
+    --color-warning-bg: #fff7e5;
+    --color-warning-text: #7a4f00;
+    --color-warning-border: rgba(143, 93, 0, .42);
+    --color-danger-bg: #fff0ef;
+    --color-danger-text: #a3271d;
+    --color-danger-border: rgba(180, 35, 24, .34);
+    --color-page-gradient: radial-gradient(68rem 38rem at -8% -12%, rgba(111, 190, 255, .24), transparent 52%), linear-gradient(180deg, #f7fbff 0%, #edf5ff 52%, #e7f0ff 100%);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --color-page: #07101f;
+      --color-panel: #0c182e;
+      --color-card: #0f1c36;
+      --color-control: #10213d;
+      --color-text: #edf4ff;
+      --color-text-muted: #a4badb;
+      --color-border: rgba(176, 214, 255, .2);
+      --color-border-strong: rgba(143, 193, 255, .38);
+      --color-accent: #8fc1ff;
+      --color-accent-focus: #9ac8ff;
+      --color-success-bg: #102d20;
+      --color-success-text: #b9f4d0;
+      --color-success-border: rgba(109, 242, 166, .35);
+      --color-info-bg: #112642;
+      --color-info-text: #d7e8ff;
+      --color-info-border: rgba(142, 193, 255, .35);
+      --color-warning-bg: #302710;
+      --color-warning-text: #ffe5ab;
+      --color-warning-border: rgba(255, 210, 125, .35);
+      --color-danger-bg: #35191c;
+      --color-danger-text: #ffcbc7;
+      --color-danger-border: rgba(255, 155, 155, .35);
+      --color-page-gradient: radial-gradient(72rem 40rem at -8% -14%, rgba(90, 175, 255, .2), transparent 52%), linear-gradient(180deg, #06101d 0%, #091628 54%, #07101f 100%);
+    }
+  }
+}
+
+/* source: apps/Platform/Resources/themes/liquid-glass-system/typography.css */
+@layer theme {
+  :root {
+    --theme-font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --theme-body-size: 14px;
+    --theme-control-size: 16px;
+  }
+}
+
+/* source: apps/Platform/Resources/themes/liquid-glass-system/modes.css */
+@layer theme {
+  :root {
+    --theme-id: liquid-glass-system;
+    --theme-mode: system;
+  }
+}
+

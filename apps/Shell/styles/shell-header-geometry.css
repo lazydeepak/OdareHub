@@ -1,0 +1,100 @@
+/* ── Header geometry ────────────────────────────────────────
+   Canonical sticky positioning, block-size, padding, gap, and
+   safe-area.  This file is the single authority for header
+   geometry across Admin (.topbar / .topbar-inner), Operator
+   (.u-header), and Work-entry (inherits .u-header).
+
+   Appearance (border, background, backdrop-filter, box-shadow,
+   transition) remains in surface-specific files.
+   ──────────────────────────────────────────────────────── */
+
+/* ── Sticky positioning (shared) ─────────────────────────── */
+.topbar,
+.u-header {
+  position: sticky;
+  top: 0;
+  z-index: var(--shell-z-topbar, 100);
+}
+
+/* Admin safe-area top – kept separate so Operator (.u-header)
+   is not affected (current Operator has no safe-area handling). */
+.topbar {
+  padding-block-start: var(--sys-safe-area-top, 0px);
+}
+
+/* ── .topbar-inner (Admin two‑layer model) ───────────────────
+   Desktop flex order: brand(1) → spacer(2) → search(3) → actions(4).
+   Spacer fills the gap so search + actions sit on the right.
+   ──────────────────────────────────────────────────────── */
+.topbar-inner {
+  display: flex;
+  align-items: center;
+  gap: var(--sys-header-gap, 12px);
+  flex-wrap: nowrap;
+  block-size: var(--sys-header-block-size, 58px);
+  padding-block: var(--sys-header-padding-block, 12px);
+  padding-inline-start: calc(
+    var(--sys-header-padding-inline, 16px) + var(--sys-safe-area-left, 0px)
+  );
+  padding-inline-end: calc(
+    var(--sys-header-padding-inline, 16px) + var(--sys-safe-area-right, 0px)
+  );
+}
+
+/* Admin topbar flex ordering — search pulled right, narrow */
+.topbar-brand   { order: 1; }
+.topbar-spacer  { order: 2; flex: 1 1 auto; }
+.topbar-search  { order: 3; max-width: 400px; flex: 0 1 auto; min-width: 200px; }
+.topbar-actions { order: 4; }
+
+/* ── .wrapper-header (shared flex header for admin/operator wrappers) ── */
+.wrapper-header {
+  display: flex;
+  align-items: center;
+  gap: var(--sys-header-gap, 12px);
+  block-size: var(--sys-header-block-size, 58px);
+  padding-block: var(--sys-header-padding-block, 12px);
+  padding-inline-start: calc(
+    var(--sys-header-padding-inline, 16px) + var(--sys-safe-area-left, 0px)
+  );
+  padding-inline-end: calc(
+    var(--sys-header-padding-inline, 16px) + var(--sys-safe-area-right, 0px)
+  );
+}
+.wrapper-header-logo    { flex-shrink: 0; }
+.wrapper-header-company { flex-shrink: 0; }
+.wrapper-header-search  { margin-left: auto; max-width: 400px; flex: 0 1 auto; min-width: 200px; }
+.wrapper-header-avatar  { flex-shrink: 0; }
+.wrapper-header-badge   { flex-shrink: 0; }
+
+/* ── .u-header (Operator / Work-entry single‑layer model) ── */
+.u-header {
+  display: flex;
+  align-items: center;
+  gap: var(--sys-header-gap, 12px);
+  block-size: var(--sys-header-block-size, 58px);
+  padding-block: var(--sys-header-padding-block, 12px);
+  padding-inline-start: calc(
+    var(--sys-header-padding-inline, 16px) + var(--sys-safe-area-left, 0px)
+  );
+  padding-inline-end: calc(
+    var(--sys-header-padding-inline, 16px) + var(--sys-safe-area-right, 0px)
+  );
+}
+
+/* ── Responsive compaction ───────────────────────────────── */
+@media (max-width: 720px) {
+  :root {
+    --sys-header-padding-inline: 12px;
+    --sys-header-gap: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --sys-header-block-size: 52px;
+    --sys-header-padding-block: 10px;
+    --sys-header-padding-inline: 10px;
+    --sys-header-gap: 6px;
+  }
+}

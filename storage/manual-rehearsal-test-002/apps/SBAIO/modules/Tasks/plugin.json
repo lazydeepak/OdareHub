@@ -1,0 +1,63 @@
+{
+    "name": "Tasks",
+    "display_name": "Tasks",
+    "suite": "sbaio",
+    "group": "operations",
+    "category": "business",
+    "display_order": 30,
+    "type": "business",
+    "version": "1.0.0",
+    "description": "Task tracking for the SBAIO business suite.",
+    "requires": [
+        "Base>=3.0.0"
+    ],
+    "optional": [
+        "ACL>=1.0.0",
+        "Audit>=1.0.0"
+    ],
+    "entry": "routes.php",
+    "package_type": "module",
+    "owner_app": "sbaio",
+    "module_key": "Tasks",
+    "required_tables": [
+        "sbaio_tasks"
+    ],
+    "module_type": "process_execution",
+    "target_maturity_level": "L2",
+    "declared_capabilities": [
+        "routes",
+        "views",
+        "forms",
+        "schema",
+        "migrations",
+        "controllers",
+        "services",
+        "permissions",
+        "menus",
+        "widgets",
+        "reports",
+        "exports",
+        "lifecycle_hooks",
+        "localization"
+    ],
+    "lifecycle_contract": {
+        "routes": "active_only",
+        "menus": "active_only",
+        "widgets": "active_only",
+        "reports": "active_only",
+        "dashboards": "active_only",
+        "schema": "installed_or_active"
+    },
+    "reports": [
+        {
+            "report_key": "sbaio.tasks.overview",
+            "title": "Tasks Report",
+            "view": "Views/report.php",
+            "export_view": "Views/export.php",
+            "owner": "module",
+            "scope": "tasks",
+            "permission": "app.sbaio.access",
+            "lifecycle": "active_only"
+        }
+    ]
+}

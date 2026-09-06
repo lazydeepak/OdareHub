@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="ipm-logo" viewBox="0 0 820 860" role="img" aria-label="Susankhya OS">
+  <defs>
+    <linearGradient id="sqBlue" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1f6fe5"/>
+      <stop offset="1" stop-color="#1450b8"/>
+    </linearGradient>
+    <linearGradient id="sqGreen" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#56be20"/>
+      <stop offset="1" stop-color="#379f13"/>
+    </linearGradient>
+  </defs>
+
+  <g transform="translate(120 40)">
+    <g fill="none" stroke="#072d62" stroke-width="13" stroke-linecap="round">
+      <path d="M138 8a220 220 0 0 1 184 0"/>
+      <path d="M322 472a220 220 0 0 1-184 0"/>
+      <path d="M18 145a220 220 0 0 0 0 190"/>
+      <path d="M442 335a220 220 0 0 0 0-190"/>
+    </g>
+
+    <rect x="22" y="22" width="66" height="66" rx="16" fill="none" stroke="url(#sqGreen)" stroke-width="13"/>
+    <rect x="372" y="22" width="66" height="66" rx="16" fill="none" stroke="url(#sqBlue)" stroke-width="13"/>
+    <rect x="22" y="392" width="66" height="66" rx="16" fill="none" stroke="url(#sqBlue)" stroke-width="13"/>
+    <rect x="372" y="392" width="66" height="66" rx="16" fill="none" stroke="url(#sqGreen)" stroke-width="13"/>
+
+    <circle cx="44" cy="239" r="26" fill="none" stroke="#072d62" stroke-width="13"/>
+    <circle cx="416" cy="239" r="26" fill="none" stroke="#072d62" stroke-width="13"/>
+    <path d="M70 239h33" fill="none" stroke="#072d62" stroke-width="13" stroke-linecap="round"/>
+    <path d="M357 239h33" fill="none" stroke="#072d62" stroke-width="13" stroke-linecap="round"/>
+
+    <path d="M130 122h196c40 0 60 46 31 74-11 11-24 16-42 16h-71c-15 0-25 17-15 29 6 8 15 12 27 12h122c40 0 60 45 31 73-12 11-26 17-44 17H130"
+          fill="none" stroke="url(#sqBlue)" stroke-width="29" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M248 212h122c40 0 60 45 31 73-12 11-26 17-44 17H130"
+          fill="none" stroke="url(#sqGreen)" stroke-width="29" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <g transform="translate(108 612)">
+    <text x="0" y="88" fill="#072d62" font-family="Segoe UI, Arial, sans-serif" font-size="84" font-weight="700" letter-spacing="4">SUSANKHYA</text>
+    <rect x="0" y="136" width="246" height="6" rx="3" fill="#1f6fe5"/>
+    <text x="274" y="156" fill="#46af1d" font-family="Segoe UI, Arial, sans-serif" font-size="54" font-weight="700" letter-spacing="12">OS</text>
+    <rect x="392" y="136" width="246" height="6" rx="3" fill="#46af1d"/>
+  </g>
+</svg>

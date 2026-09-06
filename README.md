@@ -1,73 +1,230 @@
-# Getting Started with Create React App
+# Susankhya
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+**Susankhya** is a modular business operations platform designed as a core engine with installable business applications.
 
-## Available Scripts
+It follows a **Core -> Apps -> Modules architecture**, with plugins used only as extension/provider mechanisms.
 
-In the project directory, you can run:
+---
 
-### `npm start`
+## 🚀 Vision
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+To provide a **workflow-first, role-driven business platform** where:
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+- Operations are driven by **real-time demand and execution**
+- Users interact through **role-based dashboards**
+- Business logic is modular and **installable as apps**
+- The system evolves without monolithic constraints
 
-### `npm test`
+---
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## 🧱 Architecture
 
-### `npm run build`
+### Core Platform
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+The core engine provides:
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+- Authentication & Identity
+- Access Control & Assignment
+- Audit Logging
+- App/Plugin Manager
+- Routing & Navigation System
+- Dashboard & Widget Framework (in progress)
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Terminology is frozen in [ARCHITECTURE.md](ARCHITECTURE.md).
 
-### `npm run eject`
+---
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+### Business Applications
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+Installed on top of the core:
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+#### Manufacturing (IPM)
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+A demand-driven manufacturing system with:
 
-## Learn More
+- Pre Orders + Daily Orders → Demand Engine
+- Production Planning & Execution
+- QC & Assembly workflows
+- Dispatch operations & tracking
+- Coverage & shortage analytics
+- SLA / Handoff / Escalation tracking
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+#### SBAIO (Small Business All-in-One)
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+A business operations suite including:
 
-### Code Splitting
+- Staff & Attendance
+- Timecards & Payroll
+- Scheduling & Leave
+- Sales & Expenses
+- Task management
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+---
 
-### Analyzing the Bundle Size
+## 🧩 Key Concepts
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+### 1. App-Based System
 
-### Making a Progressive Web App
+- Apps can be:
+  - Installed
+  - Enabled / Disabled
+  - Upgraded
+  - Exported as packages
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+Apps own modules. Modules are not top-level apps.
 
-### Advanced Configuration
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+### 2. Workflow-First Design
 
-### Deployment
+Operations are modeled as:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+- Demand → Plan → Execute → QC → Dispatch
 
-### `npm run build` fails to minify
+Each stage:
+- generates workload
+- triggers handoffs
+- tracks SLA and ownership
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
-# susankhya
-# susankhya
-# susankhya
+---
+
+### 3. Role-Based Dashboards
+
+Users do not navigate menus.
+
+They operate through:
+
+- **My Work (`/me`)**
+- Assigned dashboards
+- Context-aware widgets
+
+---
+
+### 4. Assignment-Driven Access
+
+Instead of static roles:
+
+- Users are assigned:
+  - dashboard types
+  - operational scope (machine, part, task, etc.)
+  - app/module visibility
+
+---
+
+## 📊 Current Status
+
+- Core platform: ✅ functional
+- Manufacturing app: ✅ active (IPM system)
+- SBAIO app: ✅ active
+- Dashboard system: ⚠️ in transition (widget-based assignment)
+- App packaging system: ⚠️ in progress
+
+---
+
+## 🛠️ Tech Stack
+
+- PHP (custom framework)
+- Modular plugin architecture
+- MySQL / MariaDB
+- Lightweight frontend (server-rendered views)
+
+## 🚚 Deployment Notes
+
+- Clone the repo into `public_html`.
+- Point the web root to `public_html/public`.
+- If the live server cannot run Composer, commit and sync `vendor/` with the repo.
+- Configure the database by either:
+  - creating `storage/db_config.php` from `storage/db_config.php.example`, or
+  - setting `ERP_DB_HOST`, `ERP_DB_NAME`, `ERP_DB_USER`, `ERP_DB_PASS` and optional `ERP_DB_PORT`, `ERP_DB_CHARSET`, `ERP_DB_TIMEZONE`.
+- Make sure the web server can write to `storage/` and `packages/`.
+- Required PHP extensions: `mysqli`, `json`, `zip`, and `gd`.
+
+---
+
+## 📂 Project Structure
+
+```
+/app
+/Core                # Core engine (Auth, ACL, routing, system services)
+
+/apps
+/Manufacturing       # Manufacturing business app
+/SBAIO               # Small Business All-in-One
+
+/plugins
+/Base
+/ACL
+/...                 # Extension/provider plugins only
+
+/public
+/views
+/assets
+
+/tools
+
+# scripts, utilities, migrations
+
+```
+
+Architecture rules and ownership model: [ARCHITECTURE.md](ARCHITECTURE.md)
+
+---
+
+## 🔑 Entry Points
+
+- `/me` → Personal Work Dashboard
+- `/apps/manufacturing` → Manufacturing Portal
+- `/ops/platform-admin-dashboard` → Platform Admin Control
+
+---
+
+## ⚙️ Development Philosophy
+
+- Modular over monolithic
+- Workflow over static data entry
+- Assignment over rigid roles
+- Dashboards over navigation trees
+
+---
+
+## 📌 Roadmap
+
+### Short Term
+
+- Finalize widget-based dashboard system
+- Remove cockpit-style pages
+- Normalize routing (`/manufacturing` vs `/apps/manufacturing`)
+- Clean `/me` into a true command center
+- Next pending phase: worker-perspective UI creation
+  - worker-focused `/me` composition with current work first and queue next
+  - role-shaped execution surfaces (worker, leader, admin, read-only, TV/display)
+  - computed-scope aware worker UI (machines, parts, work/process area)
+  - display-safe read-only surfaces and dynamic worker navigation from effective access
+
+### Mid Term
+
+- App packaging (ZIP install/export)
+- Migration runner & schema sync improvements
+- Plugin widget registry
+- API layer for integrations
+
+### Long Term
+
+- Marketplace for apps/plugins
+- Multi-tenant deployment support
+- Advanced analytics & forecasting
+- Mobile-first dashboards
+
+---
+
+## 🤝 Contribution
+
+Currently under active development.
+
+Structure and architecture are evolving toward a stable v1 platform baseline.
+
+---
+
+## 📜 License
+
+(To be defined)

@@ -1,0 +1,23 @@
+CREATE TABLE IF NOT EXISTS production_plans (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    plan_date DATE NOT NULL,
+    machine_id INT NOT NULL,
+    product_id INT NOT NULL,
+    planned_qty DECIMAL(14,2) NOT NULL DEFAULT 0,
+    sequence_no INT NOT NULL DEFAULT 1,
+    runtime DECIMAL(12,2) NULL,
+    status VARCHAR(30) NOT NULL DEFAULT 'Planned',
+    plan_type VARCHAR(40) NOT NULL DEFAULT 'Manual',
+    reference_doctype VARCHAR(80) NULL,
+    reference_name VARCHAR(120) NULL,
+    coverage_pct DECIMAL(8,2) NOT NULL DEFAULT 0,
+    shortage_qty DECIMAL(14,2) NOT NULL DEFAULT 0,
+    auto_created TINYINT(1) NOT NULL DEFAULT 0,
+    notes TEXT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    KEY idx_pp_machine_date (machine_id, plan_date),
+    KEY idx_pp_product (product_id),
+    KEY idx_pp_status (status),
+    KEY idx_pp_sequence (sequence_no)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

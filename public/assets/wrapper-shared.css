@@ -1,0 +1,376 @@
+/* ────────────────────────────────────────────────────────────────────────────
+   wrapper-shared.css — Shared Wrapper Chrome — All Layers (/u, /admin, /displays)
+   Consumed by operator-surface.css, admin-surface.css, and display surface.
+   ──────────────────────────────────────────────────────────────────────────── */
+
+/* ── Theme-safe form controls baseline ──────────────────────────────────── */
+button:not([class]),
+input:not([class]),
+textarea:not([class]),
+select:not([class]) {
+    all: unset;
+    box-sizing: border-box;
+    padding: 6px 10px;
+    border-radius: 6px;
+    background: var(--style-subtle-bg);
+    border: 1px solid var(--style-border-soft);
+    color: var(--text);
+    cursor: pointer;
+}
+
+button:not([class]) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+input:not([class]),
+textarea:not([class]),
+select:not([class]) {
+    cursor: text;
+}
+
+/* ── Breadcrumbs ─────────────────────────────────────────────────────────── */
+.wrapper-breadcrumbs {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border-soft);
+    padding: 7px 16px 7px 20px;
+    font-size: 12px;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-shrink: 0;
+    border-left: 3px solid var(--accent);
+}
+
+.wrapper-breadcrumbs-trail {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    overflow-x: auto;
+    white-space: nowrap;
+    min-width: 0;
+}
+
+.wrapper-breadcrumbs-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    overflow-x: auto;
+    white-space: nowrap;
+    scrollbar-width: thin;
+}
+
+.wrapper-breadcrumbs-action {
+    flex: 0 0 auto;
+    padding: 7px 12px;
+    border: 1px solid var(--style-border-soft);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--text);
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1;
+    transition: color 0.15s, border-color 0.15s, background 0.15s, box-shadow 0.15s;
+}
+
+.wrapper-breadcrumbs-action:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+    background: var(--style-subtle-bg);
+}
+
+.wrapper-breadcrumbs-action.is-active {
+    color: var(--accent);
+    border-color: var(--style-active-border);
+    background: var(--style-active-bg);
+    box-shadow: inset 0 0 0 1px var(--style-active-border);
+}
+
+.wrapper-breadcrumbs-item {
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.15s;
+}
+
+.wrapper-breadcrumbs-item:hover {
+    color: var(--accent);
+}
+
+.wrapper-breadcrumbs-item.active {
+    color: var(--text);
+    font-weight: 600;
+}
+
+.wrapper-breadcrumbs-separator {
+    margin: 0 2px;
+    color: var(--border-soft);
+    user-select: none;
+}
+
+/* ── Footer ──────────────────────────────────────────────────────────────── */
+.wrapper-footer {
+    background: var(--surface);
+    border-top: 1px solid var(--border-soft);
+    padding: 8px 16px;
+    font-size: 12px;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    flex-shrink: 0;
+}
+
+.wrapper-footer-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--muted);
+}
+
+.wrapper-footer-links {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.wrapper-footer-link {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 12px;
+    padding: 3px 10px;
+    border: 1px solid var(--border-soft);
+    border-radius: 999px;
+    transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+
+.wrapper-footer-link:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+    background: var(--style-subtle-bg);
+    text-decoration: none;
+}
+
+/* ── Sidebar items (shared token set) ────────────────────────────────────── */
+.wrapper-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 8px;
+    background: var(--surface);
+}
+
+.wrapper-sidebar-item {
+    width: 100%;
+    border: 0;
+    border-radius: var(--card-radius);
+    background: transparent;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    font-size: 13px;
+    font-weight: 500;
+    text-align: left;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.wrapper-sidebar-item:hover {
+    background: var(--style-subtle-bg);
+}
+
+.wrapper-sidebar-item.active {
+    background: var(--style-active-bg);
+    color: var(--accent);
+    font-weight: 600;
+}
+
+.wrapper-sidebar-item-icon {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+}
+
+.wrapper-sidebar-item-label {
+    flex-grow: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+}
+
+/* ── Admin horizontal governance nav ─────────────────────────────────────── */
+.wrapper-sidebar-horizontal {
+    flex-direction: row;
+    flex-wrap: wrap;
+    padding: 8px 16px;
+    gap: 4px;
+    border-bottom: 1px solid var(--border-soft);
+}
+
+.wrapper-sidebar-horizontal .wrapper-sidebar-item {
+    width: auto;
+    flex-shrink: 0;
+    padding: 4px 12px;
+    font-size: 12px;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--border-soft);
+}
+
+.wrapper-sidebar-horizontal .wrapper-sidebar-item.active {
+    background: var(--style-subtle-bg);
+    border-color: var(--style-border-soft);
+    color: var(--accent);
+    font-weight: 600;
+}
+
+.wrapper-sidebar-horizontal .wrapper-sidebar-item:hover {
+    background: var(--style-subtle-bg);
+    border-color: var(--accent);
+}
+
+.wrapper-sidebar-horizontal .wrapper-sidebar-item-label {
+    /* Always show labels in horizontal mode */
+    display: block;
+    overflow: initial;
+    text-overflow: initial;
+}
+
+/* ── Admin header badge ("- Admin") ─────────────────────────────────────── */
+.wrapper-header-badge {
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 400;
+    margin-left: 4px;
+}
+
+/* ── Footer separator ────────────────────────────────────────────────────── */
+.wrapper-footer-separator {
+    margin: 0 4px;
+    color: var(--muted);
+    user-select: none;
+}
+
+/* ── Header search form row ──────────────────────────────────────────────── */
+.wrapper-header-search-form {
+    display: flex;
+    gap: 6px;
+    width: 100%;
+}
+
+/* ── Display layer header ────────────────────────────────────────────────── */
+.wrapper-header-display {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    height: 80px;
+    padding: 12px 24px;
+    /* Override grid layout from base .wrapper-header */
+    grid-template-columns: unset;
+}
+
+.wrapper-header-display .wrapper-header-company {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+}
+
+.wrapper-header-display .wrapper-header-company-name {
+    font-size: 16px;
+}
+
+.wrapper-header-company-logo-display {
+    height: 48px;
+    width: auto;
+    max-width: 120px;
+    object-fit: contain;
+    border-radius: 4px;
+    flex-shrink: 0;
+}
+
+.wrapper-header-display-icon {
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--text);
+    flex-shrink: 0;
+}
+
+.wrapper-header-right {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.wrapper-header-clock {
+    font-size: 14px;
+    color: var(--text);
+    font-weight: 600;
+}
+
+.wrapper-header-live-badge {
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 500;
+}
+
+/* ── Display layer footer ────────────────────────────────────────────────── */
+.wrapper-footer-display {
+    justify-content: center;
+    text-align: center;
+    padding: 16px;
+}
+
+.wrapper-footer-display .wrapper-footer-info {
+    flex-direction: column;
+    gap: 4px;
+}
+
+.wrapper-footer-info-label {
+    font-size: 11px;
+    color: var(--muted);
+}
+
+.wrapper-footer-info-meta {
+    font-size: 10px;
+    color: var(--muted);
+}
+
+/* ── Responsive ─────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+    .wrapper-breadcrumbs {
+        padding: 6px 12px;
+        font-size: 11px;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+
+    .wrapper-breadcrumbs-actions {
+        width: 100%;
+    }
+
+    .wrapper-footer {
+        padding: 8px 12px;
+        font-size: 11px;
+    }
+}

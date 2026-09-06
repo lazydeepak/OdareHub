@@ -1,0 +1,40 @@
+{
+  "schema_version": "studio.app-manifest.v1",
+  "status": "draft",
+  "app": {
+    "app_key": "sample_app",
+    "display_name": "Sample App",
+    "app_taxonomy": "business_app",
+    "owner": "platform",
+    "description": "Non-writing sample app draft.",
+    "route_prefix": "/apps/sample-app",
+    "default_landing_page": "/apps/sample-app",
+    "is_active": false
+  },
+  "governance": {
+    "created_from": "erp-app-studio",
+    "requires_platform_admin_approval": true,
+    "requires_i18n_keys": true,
+    "requires_schema_check": true,
+    "publish_locked": true
+  },
+  "i18n": {
+    "title_key": "studio.sample_app.title",
+    "description_key": "studio.sample_app.description",
+    "supported_locales": ["en", "ja", "ne"]
+  },
+  "styles": [
+    {
+      "key": "generated.sample_app.app",
+      "path": "styles.css",
+      "scope": "app",
+      "surfaces": ["admin", "operator"],
+      "order": 200
+    }
+  ],
+  "audit": {
+    "draft_id": "",
+    "created_by": "",
+    "created_at": ""
+  }
+}

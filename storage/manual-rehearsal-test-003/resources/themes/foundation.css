@@ -1,0 +1,41 @@
+/* Shared theme foundation primitives — context-neutral design values */
+:root {
+  --glass-blur: blur(24px);
+  --glass-blur-shell: blur(20px);
+  --glass-blur-card: blur(16px);
+  --glass-blur-popover: blur(24px);
+  --glass-blur-control: blur(14px);
+  --glass-specular-top: rgba(255, 255, 255, 0.34);
+  --glass-specular-bottom: rgba(255, 255, 255, 0.08);
+  --transition: color 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94), background-color 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94), border-color 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94), backdrop-filter 0.2s ease;
+  --depth: 0 4px 12px rgba(0, 0, 0, 0.14), 0 1px 3px rgba(0, 0, 0, 0.08);
+  --depth-lg: 0 12px 28px rgba(0, 0, 0, 0.2), 0 2px 6px rgba(0, 0, 0, 0.12);
+  --topbar-height: 58px;
+  --select-scheme: dark;
+  --space-1: 6px;
+  --space-2: 10px;
+  --space-3: 14px;
+  --space-4: 18px;
+  --space-5: 24px;
+  --safe-area-top: 0px;
+  --safe-area-right: 0px;
+  --safe-area-bottom: 0px;
+  --safe-area-left: 0px;
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 18px;
+  --radius-pill: 999px;
+  --focus-ring: 0 0 0 3px rgba(119, 167, 255, 0.17);
+  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --type-body-size: 14px;
+  --type-control-size: var(--control-font-size);
+}
+
+@supports (padding: max(0px)) {
+  :root {
+    --safe-area-top: env(safe-area-inset-top);
+    --safe-area-right: env(safe-area-inset-right);
+    --safe-area-bottom: env(safe-area-inset-bottom);
+    --safe-area-left: env(safe-area-inset-left);
+  }
+}

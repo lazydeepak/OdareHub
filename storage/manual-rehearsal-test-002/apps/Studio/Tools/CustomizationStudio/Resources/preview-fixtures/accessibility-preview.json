@@ -1,0 +1,21 @@
+{
+  "fixture": "accessibility-preview",
+  "owner": "studio",
+  "tool_area": "customization-studio",
+  "purpose": "Describes future accessibility preview examples.",
+  "runtime_status": "fixture_catalog_only_not_rendered",
+  "renders_ui": false,
+  "connects_to_shell": false,
+  "reads_studio_drafts": false,
+  "uses_active_registry_truth": false,
+  "examples": [
+    {
+      "example": "accessibility-check-preview",
+      "label": "Accessibility preview",
+      "description": "Focus ring, contrast level, reduced motion, readable font size, keyboard highlight, error visibility, and screen-reader-only pattern examples.",
+      "socket_catalogs": ["accessibility", "states", "feedback", "core-tokens", "motion-transform"],
+      "preview_modes": ["simple", "advanced"],
+      "notes": "Catalog only. No accessibility scanner or runtime renderer is invoked."
+    }
+  ]
+}

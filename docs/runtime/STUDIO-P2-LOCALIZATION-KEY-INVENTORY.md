@@ -1,0 +1,1197 @@
+# STUDIO P2.2 Localization Key Inventory (Docs-Only)
+
+Date: 2026-05-23
+Status: Inventory complete (no runtime implementation)
+Scope: Documentation only. No code, loader, route, DB, permission, or behavior changes.
+
+## Purpose
+
+This document is the next safe Studio P2.2 slice: inventory and mapping only.
+It maps inline Studio localization labels to proposed global keys under `ops.gui_studio.*`.
+
+## Source Evidence
+
+Inline dictionaries were extracted from:
+
+- `apps/Studio/Views/gui_studio.php`
+- `apps/Studio/Views/gui_studio_history.php`
+
+Extraction method used a read-only parser pass over each file's first `$dict = [` block.
+Language bucket keys (`en`, `ja`, `ne`) are excluded from label inventory.
+
+## Inventory Summary
+
+- `gui_studio.php` inline label keys: 994
+- `gui_studio_history.php` inline label keys: 80
+- Shared keys across both views: 45
+- Total unique inline label keys (union): 1029
+
+## Proposed Global Mapping Contract (Draft)
+
+Draft mapping rules for this docs-only checkpoint:
+
+1. Main Studio view keys map to `ops.gui_studio.<inline_key>`.
+2. History keys that are shared with main view reuse `ops.gui_studio.<inline_key>`.
+3. History-only keys map to `ops.gui_studio.history.<inline_key>`.
+4. This is a proposal only; runtime code and locale files are intentionally unchanged in this slice.
+
+## Shared Keys (Reuse `ops.gui_studio.<inline_key>`)
+
+- apply_id
+- bool.false
+- bool.true
+- compile_id
+- snapshot_id
+- status
+- studio_tool_app_builder
+- studio_tool_approval_apply_center
+- studio_tool_change_history_snapshots
+- studio_tool_data_model_schema
+- studio_tool_module_builder
+- studio_tool_navigation_menu
+- studio_tool_purpose_app_builder
+- studio_tool_purpose_approval_apply_center
+- studio_tool_purpose_change_history_snapshots
+- studio_tool_purpose_data_model_schema
+- studio_tool_purpose_module_builder
+- studio_tool_purpose_navigation_menu
+- studio_tool_purpose_report_builder
+- studio_tool_purpose_resource_explorer
+- studio_tool_purpose_validation_preview_center
+- studio_tool_purpose_view_layout_builder
+- studio_tool_purpose_widget_card_builder
+- studio_tool_report_builder
+- studio_tool_resource_explorer
+- studio_tool_validation_preview_center
+- studio_tool_view_layout_builder
+- studio_tool_widget_card_builder
+- studio_tools_boundary_no_runtime_without_apply
+- studio_tools_boundary_not_owner
+- studio_tools_boundary_owner_resources
+- studio_tools_group_build
+- studio_tools_group_explore
+- studio_tools_group_govern
+- studio_tools_group_history
+- studio_tools_group_validate
+- studio_tools_helper
+- studio_tools_open_history
+- studio_tools_open_library
+- studio_tools_status_available
+- studio_tools_status_planned
+- studio_tools_status_read_only
+- studio_tools_status_requires_governed
+- studio_tools_title
+- title
+
+## Mapping: `apps/Studio/Views/gui_studio.php`
+
+Each inline key maps to proposed global key:
+
+- action -> ops.gui_studio.action
+- add_field -> ops.gui_studio.add_field
+- additions -> ops.gui_studio.additions
+- advanced_debug_help -> ops.gui_studio.advanced_debug_help
+- advanced_debug_title -> ops.gui_studio.advanced_debug_title
+- affected -> ops.gui_studio.affected
+- after_hash -> ops.gui_studio.after_hash
+- analyze_show_technical_details -> ops.gui_studio.analyze_show_technical_details
+- analyze_summary_bindings_ok -> ops.gui_studio.analyze_summary_bindings_ok
+- analyze_summary_blockers -> ops.gui_studio.analyze_summary_blockers
+- analyze_summary_missing_bindings -> ops.gui_studio.analyze_summary_missing_bindings
+- analyze_summary_structure_ok -> ops.gui_studio.analyze_summary_structure_ok
+- analyze_summary_structure_pending -> ops.gui_studio.analyze_summary_structure_pending
+- analyze_summary_title -> ops.gui_studio.analyze_summary_title
+- app_display_name_label -> ops.gui_studio.app_display_name_label
+- app_key_label -> ops.gui_studio.app_key_label
+- app_lifecycle_manager -> ops.gui_studio.app_lifecycle_manager
+- app_manifest -> ops.gui_studio.app_manifest
+- app_registry_empty -> ops.gui_studio.app_registry_empty
+- app_settings -> ops.gui_studio.app_settings
+- app_type_label -> ops.gui_studio.app_type_label
+- app_version_label -> ops.gui_studio.app_version_label
+- apply_applied -> ops.gui_studio.apply_applied
+- apply_blocked -> ops.gui_studio.apply_blocked
+- apply_btn -> ops.gui_studio.apply_btn
+- apply_changes_btn -> ops.gui_studio.apply_changes_btn
+- apply_confirmation_label -> ops.gui_studio.apply_confirmation_label
+- apply_disabled_label -> ops.gui_studio.apply_disabled_label
+- apply_failed -> ops.gui_studio.apply_failed
+- apply_gate_error_analyze -> ops.gui_studio.apply_gate_error_analyze
+- apply_gate_error_confirm -> ops.gui_studio.apply_gate_error_confirm
+- apply_gate_error_reason -> ops.gui_studio.apply_gate_error_reason
+- apply_gate_failed_title -> ops.gui_studio.apply_gate_failed_title
+- apply_gate_requirements_analyze -> ops.gui_studio.apply_gate_requirements_analyze
+- apply_gate_requirements_confirm -> ops.gui_studio.apply_gate_requirements_confirm
+- apply_gate_requirements_reason -> ops.gui_studio.apply_gate_requirements_reason
+- apply_gate_requirements_title -> ops.gui_studio.apply_gate_requirements_title
+- apply_gate_runtime_errors -> ops.gui_studio.apply_gate_runtime_errors
+- apply_id -> ops.gui_studio.apply_id
+- apply_metadata_title -> ops.gui_studio.apply_metadata_title
+- apply_mode_disabled -> ops.gui_studio.apply_mode_disabled
+- apply_mode_first_apply -> ops.gui_studio.apply_mode_first_apply
+- apply_mode_gate -> ops.gui_studio.apply_mode_gate
+- apply_mode_label -> ops.gui_studio.apply_mode_label
+- apply_mode_real -> ops.gui_studio.apply_mode_real
+- apply_mode_simulation -> ops.gui_studio.apply_mode_simulation
+- apply_next_step_message -> ops.gui_studio.apply_next_step_message
+- apply_next_step_ready_message -> ops.gui_studio.apply_next_step_ready_message
+- apply_no_data -> ops.gui_studio.apply_no_data
+- apply_pipeline_analyze -> ops.gui_studio.apply_pipeline_analyze
+- apply_pipeline_compile -> ops.gui_studio.apply_pipeline_compile
+- apply_pipeline_impact -> ops.gui_studio.apply_pipeline_impact
+- apply_pipeline_ok -> ops.gui_studio.apply_pipeline_ok
+- apply_pipeline_pending -> ops.gui_studio.apply_pipeline_pending
+- apply_pipeline_risk_level -> ops.gui_studio.apply_pipeline_risk_level
+- apply_pipeline_title -> ops.gui_studio.apply_pipeline_title
+- apply_results -> ops.gui_studio.apply_results
+- apply_snapshot -> ops.gui_studio.apply_snapshot
+- apply_snapshot_title -> ops.gui_studio.apply_snapshot_title
+- apply_status -> ops.gui_studio.apply_status
+- apply_step_1_edit -> ops.gui_studio.apply_step_1_edit
+- apply_step_2_analyze -> ops.gui_studio.apply_step_2_analyze
+- apply_step_3_changes -> ops.gui_studio.apply_step_3_changes
+- apply_step_4_apply -> ops.gui_studio.apply_step_4_apply
+- apply_tab_subtitle -> ops.gui_studio.apply_tab_subtitle
+- apply_tab_title -> ops.gui_studio.apply_tab_title
+- apply_unavailable -> ops.gui_studio.apply_unavailable
+- approval.error.blocked_present -> ops.gui_studio.approval.error.blocked_present
+- approval.error.invalid_decision -> ops.gui_studio.approval.error.invalid_decision
+- approval.error.reason_required -> ops.gui_studio.approval.error.reason_required
+- approval.error.risk_ack_required -> ops.gui_studio.approval.error.risk_ack_required
+- approval_ack_required -> ops.gui_studio.approval_ack_required
+- approval_disabled -> ops.gui_studio.approval_disabled
+- approval_gate -> ops.gui_studio.approval_gate
+- approval_id -> ops.gui_studio.approval_id
+- approval_ready -> ops.gui_studio.approval_ready
+- approval_result -> ops.gui_studio.approval_result
+- approval_summary -> ops.gui_studio.approval_summary
+- approve -> ops.gui_studio.approve
+- approved -> ops.gui_studio.approved
+- approved_at -> ops.gui_studio.approved_at
+- approved_by -> ops.gui_studio.approved_by
+- artifact_count -> ops.gui_studio.artifact_count
+- artifact_id -> ops.gui_studio.artifact_id
+- artifact_name -> ops.gui_studio.artifact_name
+- artifact_type -> ops.gui_studio.artifact_type
+- artifact_types -> ops.gui_studio.artifact_types
+- artifacts -> ops.gui_studio.artifacts
+- audit_failed -> ops.gui_studio.audit_failed
+- audit_ok -> ops.gui_studio.audit_ok
+- audit_written -> ops.gui_studio.audit_written
+- before_hash -> ops.gui_studio.before_hash
+- bindings -> ops.gui_studio.bindings
+- blocked -> ops.gui_studio.blocked
+- blocked_items -> ops.gui_studio.blocked_items
+- bool.false -> ops.gui_studio.bool.false
+- bool.true -> ops.gui_studio.bool.true
+- breaking_changes_blocked -> ops.gui_studio.breaking_changes_blocked
+- breaking_changes_warning -> ops.gui_studio.breaking_changes_warning
+- builder_item_move -> ops.gui_studio.builder_item_move
+- builder_item_remove -> ops.gui_studio.builder_item_remove
+- bundle_hash -> ops.gui_studio.bundle_hash
+- can_execute -> ops.gui_studio.can_execute
+- cap.apps -> ops.gui_studio.cap.apps
+- cap.modules -> ops.gui_studio.cap.modules
+- cap.nav -> ops.gui_studio.cap.nav
+- cap.packages -> ops.gui_studio.cap.packages
+- cap.templates -> ops.gui_studio.cap.templates
+- cap.validate -> ops.gui_studio.cap.validate
+- cap.views -> ops.gui_studio.cap.views
+- capabilities -> ops.gui_studio.capabilities
+- category -> ops.gui_studio.category
+- change_requires_ack -> ops.gui_studio.change_requires_ack
+- change_severity_additive -> ops.gui_studio.change_severity_additive
+- change_severity_breaking -> ops.gui_studio.change_severity_breaking
+- change_severity_safe -> ops.gui_studio.change_severity_safe
+- change_summary_empty -> ops.gui_studio.change_summary_empty
+- change_summary_title -> ops.gui_studio.change_summary_title
+- change_type -> ops.gui_studio.change_type
+- changes_artifacts_title -> ops.gui_studio.changes_artifacts_title
+- changes_diff_summary -> ops.gui_studio.changes_diff_summary
+- changes_modified_files -> ops.gui_studio.changes_modified_files
+- changes_new_files -> ops.gui_studio.changes_new_files
+- changes_no_data -> ops.gui_studio.changes_no_data
+- changes_no_preview -> ops.gui_studio.changes_no_preview
+- changes_preview_subtitle -> ops.gui_studio.changes_preview_subtitle
+- changes_preview_title -> ops.gui_studio.changes_preview_title
+- changes_routes_affected -> ops.gui_studio.changes_routes_affected
+- changes_summary_title -> ops.gui_studio.changes_summary_title
+- changes_total_artifacts -> ops.gui_studio.changes_total_artifacts
+- changes_views_affected -> ops.gui_studio.changes_views_affected
+- check -> ops.gui_studio.check
+- check.no_php.invalid -> ops.gui_studio.check.no_php.invalid
+- check.no_php.ok -> ops.gui_studio.check.no_php.ok
+- checkpoint_gates -> ops.gui_studio.checkpoint_gates
+- checkpoint_label -> ops.gui_studio.checkpoint_label
+- checkpoint_stage -> ops.gui_studio.checkpoint_stage
+- checkpoints_title -> ops.gui_studio.checkpoints_title
+- clear_loaded_context_action -> ops.gui_studio.clear_loaded_context_action
+- clear_loaded_context_helper -> ops.gui_studio.clear_loaded_context_helper
+- compat -> ops.gui_studio.compat
+- compile -> ops.gui_studio.compile
+- compile_graph -> ops.gui_studio.compile_graph
+- compile_id -> ops.gui_studio.compile_id
+- compile_lineage -> ops.gui_studio.compile_lineage
+- compile_plan -> ops.gui_studio.compile_plan
+- compile_snapshot_identity -> ops.gui_studio.compile_snapshot_identity
+- component.delete -> ops.gui_studio.component.delete
+- component.duplicate -> ops.gui_studio.component.duplicate
+- component.filter -> ops.gui_studio.component.filter
+- component.form -> ops.gui_studio.component.form
+- component.kpi_card -> ops.gui_studio.component.kpi_card
+- component.table -> ops.gui_studio.component.table
+- component.text_block -> ops.gui_studio.component.text_block
+- component.type.filter -> ops.gui_studio.component.type.filter
+- component.type.form -> ops.gui_studio.component.type.form
+- component.type.kpi_card -> ops.gui_studio.component.type.kpi_card
+- component.type.table -> ops.gui_studio.component.type.table
+- component.type.text_block -> ops.gui_studio.component.type.text_block
+- component_config.default_submit -> ops.gui_studio.component_config.default_submit
+- component_config.filter_field -> ops.gui_studio.component_config.filter_field
+- component_config.filter_label -> ops.gui_studio.component_config.filter_label
+- component_config.filter_placeholder -> ops.gui_studio.component_config.filter_placeholder
+- component_config.form_show_required -> ops.gui_studio.component_config.form_show_required
+- component_config.form_submit_label -> ops.gui_studio.component_config.form_submit_label
+- component_config.form_title -> ops.gui_studio.component_config.form_title
+- component_config.item_id -> ops.gui_studio.component_config.item_id
+- component_config.kpi_delta -> ops.gui_studio.component_config.kpi_delta
+- component_config.kpi_label -> ops.gui_studio.component_config.kpi_label
+- component_config.kpi_value -> ops.gui_studio.component_config.kpi_value
+- component_config.open_view -> ops.gui_studio.component_config.open_view
+- component_config.open_view_none -> ops.gui_studio.component_config.open_view_none
+- component_config.option.center -> ops.gui_studio.component_config.option.center
+- component_config.option.comfortable -> ops.gui_studio.component_config.option.comfortable
+- component_config.option.compact -> ops.gui_studio.component_config.option.compact
+- component_config.option.left -> ops.gui_studio.component_config.option.left
+- component_config.option.right -> ops.gui_studio.component_config.option.right
+- component_config.table_density -> ops.gui_studio.component_config.table_density
+- component_config.table_rows -> ops.gui_studio.component_config.table_rows
+- component_config.table_title -> ops.gui_studio.component_config.table_title
+- component_config.text_align -> ops.gui_studio.component_config.text_align
+- component_config.text_body -> ops.gui_studio.component_config.text_body
+- component_config.text_title -> ops.gui_studio.component_config.text_title
+- component_config.width -> ops.gui_studio.component_config.width
+- component_config.width_narrower -> ops.gui_studio.component_config.width_narrower
+- component_config.width_wider -> ops.gui_studio.component_config.width_wider
+- component_settings_title -> ops.gui_studio.component_settings_title
+- conflict_check_count -> ops.gui_studio.conflict_check_count
+- conflict_checks -> ops.gui_studio.conflict_checks
+- content_hash -> ops.gui_studio.content_hash
+- content_outline_back -> ops.gui_studio.content_outline_back
+- content_outline_change_summary -> ops.gui_studio.content_outline_change_summary
+- content_outline_components -> ops.gui_studio.content_outline_components
+- content_outline_empty -> ops.gui_studio.content_outline_empty
+- content_outline_fields -> ops.gui_studio.content_outline_fields
+- content_outline_governance -> ops.gui_studio.content_outline_governance
+- content_outline_impact_analysis -> ops.gui_studio.content_outline_impact_analysis
+- content_outline_layout -> ops.gui_studio.content_outline_layout
+- content_outline_migration_plan -> ops.gui_studio.content_outline_migration_plan
+- content_outline_module_settings -> ops.gui_studio.content_outline_module_settings
+- content_outline_selected_component -> ops.gui_studio.content_outline_selected_component
+- content_outline_simulation_preview -> ops.gui_studio.content_outline_simulation_preview
+- content_outline_summary -> ops.gui_studio.content_outline_summary
+- content_outline_table_mode -> ops.gui_studio.content_outline_table_mode
+- content_outline_table_mode_direct_db -> ops.gui_studio.content_outline_table_mode_direct_db
+- content_outline_table_mode_view_only -> ops.gui_studio.content_outline_table_mode_view_only
+- content_outline_title -> ops.gui_studio.content_outline_title
+- content_outline_toggle_direct_db -> ops.gui_studio.content_outline_toggle_direct_db
+- content_outline_toggle_view_only -> ops.gui_studio.content_outline_toggle_view_only
+- create_flow_action_add_form -> ops.gui_studio.create_flow_action_add_form
+- create_flow_action_add_kpi -> ops.gui_studio.create_flow_action_add_kpi
+- create_flow_action_add_table -> ops.gui_studio.create_flow_action_add_table
+- create_flow_action_add_text -> ops.gui_studio.create_flow_action_add_text
+- create_flow_action_configure_navigation -> ops.gui_studio.create_flow_action_configure_navigation
+- create_flow_action_direct_db -> ops.gui_studio.create_flow_action_direct_db
+- create_flow_action_set_dashboard -> ops.gui_studio.create_flow_action_set_dashboard
+- create_flow_action_view_mode -> ops.gui_studio.create_flow_action_view_mode
+- create_flow_actions -> ops.gui_studio.create_flow_actions
+- create_flow_empty -> ops.gui_studio.create_flow_empty
+- create_flow_intent_label -> ops.gui_studio.create_flow_intent_label
+- create_flow_step_fields -> ops.gui_studio.create_flow_step_fields
+- create_flow_step_governance -> ops.gui_studio.create_flow_step_governance
+- create_flow_step_intent -> ops.gui_studio.create_flow_step_intent
+- create_flow_step_layout -> ops.gui_studio.create_flow_step_layout
+- create_flow_step_module -> ops.gui_studio.create_flow_step_module
+- create_flow_step_table_mode -> ops.gui_studio.create_flow_step_table_mode
+- create_flow_step_view -> ops.gui_studio.create_flow_step_view
+- create_flow_steps -> ops.gui_studio.create_flow_steps
+- create_flow_title -> ops.gui_studio.create_flow_title
+- create_intent_app -> ops.gui_studio.create_intent_app
+- create_intent_dashboard -> ops.gui_studio.create_intent_dashboard
+- create_intent_label -> ops.gui_studio.create_intent_label
+- create_intent_module -> ops.gui_studio.create_intent_module
+- create_intent_navigation -> ops.gui_studio.create_intent_navigation
+- create_intent_view -> ops.gui_studio.create_intent_view
+- created -> ops.gui_studio.created
+- current_version -> ops.gui_studio.current_version
+- customization_zone -> ops.gui_studio.customization_zone
+- data_contract_bindings -> ops.gui_studio.data_contract_bindings
+- data_contract_check.bindings_extracted -> ops.gui_studio.data_contract_check.bindings_extracted
+- data_contract_check.bindings_known -> ops.gui_studio.data_contract_check.bindings_known
+- data_contract_check.data_sources_declared -> ops.gui_studio.data_contract_check.data_sources_declared
+- data_contract_check.required_fields_resolved -> ops.gui_studio.data_contract_check.required_fields_resolved
+- data_contract_check_detail -> ops.gui_studio.data_contract_check_detail
+- data_contract_check_status -> ops.gui_studio.data_contract_check_status
+- data_contract_checks -> ops.gui_studio.data_contract_checks
+- data_contract_confidence -> ops.gui_studio.data_contract_confidence
+- data_contract_confidence.full -> ops.gui_studio.data_contract_confidence.full
+- data_contract_confidence.none -> ops.gui_studio.data_contract_confidence.none
+- data_contract_confidence.partial -> ops.gui_studio.data_contract_confidence.partial
+- data_contract_empty -> ops.gui_studio.data_contract_empty
+- data_contract_fields -> ops.gui_studio.data_contract_fields
+- data_contract_required_fields -> ops.gui_studio.data_contract_required_fields
+- data_contract_sources -> ops.gui_studio.data_contract_sources
+- data_contract_status.fail -> ops.gui_studio.data_contract_status.fail
+- data_contract_status.pass -> ops.gui_studio.data_contract_status.pass
+- data_contract_subtitle -> ops.gui_studio.data_contract_subtitle
+- data_contract_title -> ops.gui_studio.data_contract_title
+- db_editor_add_row -> ops.gui_studio.db_editor_add_row
+- db_editor_cancel -> ops.gui_studio.db_editor_cancel
+- db_editor_confirm_delete -> ops.gui_studio.db_editor_confirm_delete
+- db_editor_delete_row -> ops.gui_studio.db_editor_delete_row
+- db_editor_empty -> ops.gui_studio.db_editor_empty
+- db_editor_field_col -> ops.gui_studio.db_editor_field_col
+- db_editor_load_failed -> ops.gui_studio.db_editor_load_failed
+- db_editor_loading -> ops.gui_studio.db_editor_loading
+- db_editor_no_app -> ops.gui_studio.db_editor_no_app
+- db_editor_note -> ops.gui_studio.db_editor_note
+- db_editor_nullable_col -> ops.gui_studio.db_editor_nullable_col
+- db_editor_orders_table -> ops.gui_studio.db_editor_orders_table
+- db_editor_parts_table -> ops.gui_studio.db_editor_parts_table
+- db_editor_rows_title -> ops.gui_studio.db_editor_rows_title
+- db_editor_save_row -> ops.gui_studio.db_editor_save_row
+- db_editor_schema_title -> ops.gui_studio.db_editor_schema_title
+- db_editor_table_type_label -> ops.gui_studio.db_editor_table_type_label
+- db_editor_title -> ops.gui_studio.db_editor_title
+- db_editor_type_col -> ops.gui_studio.db_editor_type_col
+- decision -> ops.gui_studio.decision
+- deletions -> ops.gui_studio.deletions
+- dependencies -> ops.gui_studio.dependencies
+- dependency_check_count -> ops.gui_studio.dependency_check_count
+- dependency_checks -> ops.gui_studio.dependency_checks
+- dependency_graph_affects -> ops.gui_studio.dependency_graph_affects
+- dependency_graph_depends_on -> ops.gui_studio.dependency_graph_depends_on
+- dependency_graph_edge_table -> ops.gui_studio.dependency_graph_edge_table
+- dependency_graph_edges -> ops.gui_studio.dependency_graph_edges
+- dependency_graph_from -> ops.gui_studio.dependency_graph_from
+- dependency_graph_issues -> ops.gui_studio.dependency_graph_issues
+- dependency_graph_nodes -> ops.gui_studio.dependency_graph_nodes
+- dependency_graph_none -> ops.gui_studio.dependency_graph_none
+- dependency_graph_relation -> ops.gui_studio.dependency_graph_relation
+- dependency_graph_subtitle -> ops.gui_studio.dependency_graph_subtitle
+- dependency_graph_title -> ops.gui_studio.dependency_graph_title
+- dependency_graph_to -> ops.gui_studio.dependency_graph_to
+- detail -> ops.gui_studio.detail
+- diff_preview -> ops.gui_studio.diff_preview
+- diff_readiness -> ops.gui_studio.diff_readiness
+- diff_status -> ops.gui_studio.diff_status
+- diff_summary -> ops.gui_studio.diff_summary
+- disable -> ops.gui_studio.disable
+- dominant_reason -> ops.gui_studio.dominant_reason
+- downstream_tabs_helper -> ops.gui_studio.downstream_tabs_helper
+- drafts -> ops.gui_studio.drafts
+- drift_check_count -> ops.gui_studio.drift_check_count
+- drift_filter -> ops.gui_studio.drift_filter
+- drift_status -> ops.gui_studio.drift_status
+- editor_creating -> ops.gui_studio.editor_creating
+- editor_editing -> ops.gui_studio.editor_editing
+- editor_note_create -> ops.gui_studio.editor_note_create
+- editor_note_upgrade -> ops.gui_studio.editor_note_upgrade
+- editor_note_upgrade_app -> ops.gui_studio.editor_note_upgrade_app
+- editor_note_upgrade_db_table -> ops.gui_studio.editor_note_upgrade_db_table
+- editor_note_upgrade_module -> ops.gui_studio.editor_note_upgrade_module
+- editor_note_upgrade_navigation -> ops.gui_studio.editor_note_upgrade_navigation
+- editor_note_upgrade_unknown -> ops.gui_studio.editor_note_upgrade_unknown
+- editor_note_upgrade_view -> ops.gui_studio.editor_note_upgrade_view
+- editor_role_helper -> ops.gui_studio.editor_role_helper
+- editor_safe_mode -> ops.gui_studio.editor_safe_mode
+- editor_title_create -> ops.gui_studio.editor_title_create
+- editor_title_upgrade -> ops.gui_studio.editor_title_upgrade
+- enable -> ops.gui_studio.enable
+- error.layout_binding_type_filter -> ops.gui_studio.error.layout_binding_type_filter
+- error.layout_binding_type_form -> ops.gui_studio.error.layout_binding_type_form
+- error.layout_binding_type_kpi -> ops.gui_studio.error.layout_binding_type_kpi
+- error.layout_binding_type_table -> ops.gui_studio.error.layout_binding_type_table
+- error.layout_binding_type_text -> ops.gui_studio.error.layout_binding_type_text
+- error.layout_invalid_columns -> ops.gui_studio.error.layout_invalid_columns
+- error.layout_invalid_component -> ops.gui_studio.error.layout_invalid_component
+- error.layout_invalid_data_binding -> ops.gui_studio.error.layout_invalid_data_binding
+- error.layout_invalid_group -> ops.gui_studio.error.layout_invalid_group
+- error.layout_invalid_item -> ops.gui_studio.error.layout_invalid_item
+- error.layout_invalid_relation -> ops.gui_studio.error.layout_invalid_relation
+- error.layout_invalid_rows -> ops.gui_studio.error.layout_invalid_rows
+- error.layout_invalid_type -> ops.gui_studio.error.layout_invalid_type
+- error.layout_item_duplicate_id -> ops.gui_studio.error.layout_item_duplicate_id
+- error.layout_item_id_required -> ops.gui_studio.error.layout_item_id_required
+- error.layout_missing_component_props -> ops.gui_studio.error.layout_missing_component_props
+- error.layout_missing_data_binding -> ops.gui_studio.error.layout_missing_data_binding
+- error.layout_missing_items -> ops.gui_studio.error.layout_missing_items
+- error.layout_out_of_bounds -> ops.gui_studio.error.layout_out_of_bounds
+- error.layout_overlap -> ops.gui_studio.error.layout_overlap
+- error.no_php -> ops.gui_studio.error.no_php
+- error.upgrade_baseline_required -> ops.gui_studio.error.upgrade_baseline_required
+- errors -> ops.gui_studio.errors
+- execution_blocked -> ops.gui_studio.execution_blocked
+- execution_id -> ops.gui_studio.execution_id
+- execution_preview -> ops.gui_studio.execution_preview
+- execution_ready -> ops.gui_studio.execution_ready
+- execution_results -> ops.gui_studio.execution_results
+- execution_simulated -> ops.gui_studio.execution_simulated
+- execution_summary -> ops.gui_studio.execution_summary
+- execution_unavailable -> ops.gui_studio.execution_unavailable
+- fail -> ops.gui_studio.fail
+- feedback.add -> ops.gui_studio.feedback.add
+- feedback.move -> ops.gui_studio.feedback.move
+- feedback.resize -> ops.gui_studio.feedback.resize
+- feedback.template -> ops.gui_studio.feedback.template
+- field_default -> ops.gui_studio.field_default
+- field_editor -> ops.gui_studio.field_editor
+- field_name -> ops.gui_studio.field_name
+- field_required -> ops.gui_studio.field_required
+- field_type -> ops.gui_studio.field_type
+- fields -> ops.gui_studio.fields
+- files_changed -> ops.gui_studio.files_changed
+- files_present -> ops.gui_studio.files_present
+- filter_all -> ops.gui_studio.filter_all
+- filters -> ops.gui_studio.filters
+- flash.apply.applied -> ops.gui_studio.flash.apply.applied
+- flash.apply.failed -> ops.gui_studio.flash.apply.failed
+- flash.approval.ready -> ops.gui_studio.flash.approval.ready
+- flash.compile.blocked -> ops.gui_studio.flash.compile.blocked
+- flash.compile.ready -> ops.gui_studio.flash.compile.ready
+- flash.execution.ready -> ops.gui_studio.flash.execution.ready
+- flash.import_loaded -> ops.gui_studio.flash.import_loaded
+- flash.import_missing -> ops.gui_studio.flash.import_missing
+- flash.import_partial -> ops.gui_studio.flash.import_partial
+- flash.library_bundle_loaded -> ops.gui_studio.flash.library_bundle_loaded
+- flash.library_bundle_missing -> ops.gui_studio.flash.library_bundle_missing
+- flash.lifecycle.failed -> ops.gui_studio.flash.lifecycle.failed
+- flash.lifecycle.updated -> ops.gui_studio.flash.lifecycle.updated
+- flash.preflight.failed -> ops.gui_studio.flash.preflight.failed
+- flash.preflight.ok -> ops.gui_studio.flash.preflight.ok
+- flash.publish_gate.failed -> ops.gui_studio.flash.publish_gate.failed
+- flash.publish_gate.ok -> ops.gui_studio.flash.publish_gate.ok
+- flash.rollback.blocked -> ops.gui_studio.flash.rollback.blocked
+- flash.rollback.execute_failed -> ops.gui_studio.flash.rollback.execute_failed
+- flash.rollback.executed -> ops.gui_studio.flash.rollback.executed
+- flash.rollback.ready -> ops.gui_studio.flash.rollback.ready
+- flash.snapshot.ready -> ops.gui_studio.flash.snapshot.ready
+- focused_plan_gate -> ops.gui_studio.focused_plan_gate
+- focused_plan_step -> ops.gui_studio.focused_plan_step
+- focused_plan_title -> ops.gui_studio.focused_plan_title
+- form_title -> ops.gui_studio.form_title
+- future -> ops.gui_studio.future
+- generated_at -> ops.gui_studio.generated_at
+- generated_by -> ops.gui_studio.generated_by
+- generated_library_title -> ops.gui_studio.generated_library_title
+- global_count_apps -> ops.gui_studio.global_count_apps
+- global_count_dashboards -> ops.gui_studio.global_count_dashboards
+- global_count_modules -> ops.gui_studio.global_count_modules
+- global_count_navs -> ops.gui_studio.global_count_navs
+- global_count_plugins -> ops.gui_studio.global_count_plugins
+- global_count_routes -> ops.gui_studio.global_count_routes
+- global_count_views -> ops.gui_studio.global_count_views
+- global_library_counts -> ops.gui_studio.global_library_counts
+- global_library_detail -> ops.gui_studio.global_library_detail
+- global_library_empty -> ops.gui_studio.global_library_empty
+- global_library_load_into_studio -> ops.gui_studio.global_library_load_into_studio
+- global_library_no_selection -> ops.gui_studio.global_library_no_selection
+- global_library_subtitle -> ops.gui_studio.global_library_subtitle
+- global_library_title -> ops.gui_studio.global_library_title
+- global_library_tree -> ops.gui_studio.global_library_tree
+- governance_mode -> ops.gui_studio.governance_mode
+- governance_policy -> ops.gui_studio.governance_policy
+- governance_title -> ops.gui_studio.governance_title
+- guardrails -> ops.gui_studio.guardrails
+- hash_verified -> ops.gui_studio.hash_verified
+- high_risk_items -> ops.gui_studio.high_risk_items
+- history_link -> ops.gui_studio.history_link
+- human_diff_summary -> ops.gui_studio.human_diff_summary
+- impact.error.ack_required -> ops.gui_studio.impact.error.ack_required
+- impact.error.confirmation_required -> ops.gui_studio.impact.error.confirmation_required
+- impact_ack_label -> ops.gui_studio.impact_ack_label
+- impact_affected_components -> ops.gui_studio.impact_affected_components
+- impact_analysis_pending -> ops.gui_studio.impact_analysis_pending
+- impact_analysis_subtitle -> ops.gui_studio.impact_analysis_subtitle
+- impact_analysis_title -> ops.gui_studio.impact_analysis_title
+- impact_change -> ops.gui_studio.impact_change
+- impact_confirmation_label -> ops.gui_studio.impact_confirmation_label
+- impact_empty -> ops.gui_studio.impact_empty
+- impact_high -> ops.gui_studio.impact_high
+- impact_low -> ops.gui_studio.impact_low
+- impact_medium -> ops.gui_studio.impact_medium
+- impact_severity -> ops.gui_studio.impact_severity
+- impact_warning_high -> ops.gui_studio.impact_warning_high
+- implemented -> ops.gui_studio.implemented
+- import_existing_view -> ops.gui_studio.import_existing_view
+- inspect -> ops.gui_studio.inspect
+- integrity_verified -> ops.gui_studio.integrity_verified
+- invalid -> ops.gui_studio.invalid
+- layer -> ops.gui_studio.layer
+- layout_compact -> ops.gui_studio.layout_compact
+- library_advanced_registry_title -> ops.gui_studio.library_advanced_registry_title
+- library_affordance_legend_inspect_only -> ops.gui_studio.library_affordance_legend_inspect_only
+- library_affordance_legend_inspect_only_kinds -> ops.gui_studio.library_affordance_legend_inspect_only_kinds
+- library_affordance_legend_label -> ops.gui_studio.library_affordance_legend_label
+- library_affordance_legend_loadable -> ops.gui_studio.library_affordance_legend_loadable
+- library_affordance_legend_loadable_kinds -> ops.gui_studio.library_affordance_legend_loadable_kinds
+- library_all_modules_title -> ops.gui_studio.library_all_modules_title
+- library_all_views_title -> ops.gui_studio.library_all_views_title
+- library_app -> ops.gui_studio.library_app
+- library_detail_close -> ops.gui_studio.library_detail_close
+- library_detail_inspect_only_note -> ops.gui_studio.library_detail_inspect_only_note
+- library_detail_title -> ops.gui_studio.library_detail_title
+- library_empty -> ops.gui_studio.library_empty
+- library_filter_apps -> ops.gui_studio.library_filter_apps
+- library_filter_group_label -> ops.gui_studio.library_filter_group_label
+- library_filter_modules -> ops.gui_studio.library_filter_modules
+- library_filter_recent -> ops.gui_studio.library_filter_recent
+- library_filter_routes -> ops.gui_studio.library_filter_routes
+- library_filter_views -> ops.gui_studio.library_filter_views
+- library_import_complete -> ops.gui_studio.library_import_complete
+- library_import_partial -> ops.gui_studio.library_import_partial
+- library_last_updated -> ops.gui_studio.library_last_updated
+- library_load_app -> ops.gui_studio.library_load_app
+- library_load_failed -> ops.gui_studio.library_load_failed
+- library_load_failed_with_reason -> ops.gui_studio.library_load_failed_with_reason
+- library_load_form_only -> ops.gui_studio.library_load_form_only
+- library_load_invalid_response -> ops.gui_studio.library_load_invalid_response
+- library_load_table_only -> ops.gui_studio.library_load_table_only
+- library_load_unsupported_kind -> ops.gui_studio.library_load_unsupported_kind
+- library_loading -> ops.gui_studio.library_loading
+- library_module -> ops.gui_studio.library_module
+- library_publish_approved -> ops.gui_studio.library_publish_approved
+- library_publish_pending -> ops.gui_studio.library_publish_pending
+- library_publish_state -> ops.gui_studio.library_publish_state
+- library_quick_last_edited_views -> ops.gui_studio.library_quick_last_edited_views
+- library_quick_load_title -> ops.gui_studio.library_quick_load_title
+- library_quick_most_used_views -> ops.gui_studio.library_quick_most_used_views
+- library_quick_recent_views -> ops.gui_studio.library_quick_recent_views
+- library_recent_title -> ops.gui_studio.library_recent_title
+- library_role_helper -> ops.gui_studio.library_role_helper
+- library_route -> ops.gui_studio.library_route
+- library_search_placeholder -> ops.gui_studio.library_search_placeholder
+- library_search_placeholder_full -> ops.gui_studio.library_search_placeholder_full
+- library_search_results_empty -> ops.gui_studio.library_search_results_empty
+- library_search_results_title -> ops.gui_studio.library_search_results_title
+- library_snapshot -> ops.gui_studio.library_snapshot
+- library_system_registry_title -> ops.gui_studio.library_system_registry_title
+- library_version -> ops.gui_studio.library_version
+- lifecycle.error.app_not_found -> ops.gui_studio.lifecycle.error.app_not_found
+- lifecycle.error.invalid_lifecycle_request -> ops.gui_studio.lifecycle.error.invalid_lifecycle_request
+- lifecycle.error.module_files_missing -> ops.gui_studio.lifecycle.error.module_files_missing
+- lifecycle.error.registry_write_failed -> ops.gui_studio.lifecycle.error.registry_write_failed
+- lifecycle.error.rollback_in_progress -> ops.gui_studio.lifecycle.error.rollback_in_progress
+- lifecycle.error.uninstall_blocked -> ops.gui_studio.lifecycle.error.uninstall_blocked
+- lifecycle_result -> ops.gui_studio.lifecycle_result
+- lifecycle_status_disabled -> ops.gui_studio.lifecycle_status_disabled
+- lifecycle_status_enabled -> ops.gui_studio.lifecycle_status_enabled
+- lifecycle_status_installed -> ops.gui_studio.lifecycle_status_installed
+- lifecycle_status_removed -> ops.gui_studio.lifecycle_status_removed
+- lint_failed -> ops.gui_studio.lint_failed
+- lint_ok -> ops.gui_studio.lint_ok
+- lint_title -> ops.gui_studio.lint_title
+- load_into_studio -> ops.gui_studio.load_into_studio
+- loaded_context_label -> ops.gui_studio.loaded_context_label
+- loaded_context_source -> ops.gui_studio.loaded_context_source
+- loaded_context_source_import -> ops.gui_studio.loaded_context_source_import
+- loaded_context_source_library -> ops.gui_studio.loaded_context_source_library
+- loaded_context_unknown -> ops.gui_studio.loaded_context_unknown
+- loaded_identity_helper -> ops.gui_studio.loaded_identity_helper
+- loaded_identity_title -> ops.gui_studio.loaded_identity_title
+- loaded_mode_create -> ops.gui_studio.loaded_mode_create
+- loaded_mode_edit -> ops.gui_studio.loaded_mode_edit
+- loaded_mode_label -> ops.gui_studio.loaded_mode_label
+- loaded_mode_read_only -> ops.gui_studio.loaded_mode_read_only
+- loaded_mode_upgrade -> ops.gui_studio.loaded_mode_upgrade
+- loaded_module_label -> ops.gui_studio.loaded_module_label
+- loaded_owner_app_label -> ops.gui_studio.loaded_owner_app_label
+- loaded_resource_key_label -> ops.gui_studio.loaded_resource_key_label
+- loaded_resource_type_label -> ops.gui_studio.loaded_resource_type_label
+- loaded_source_path_label -> ops.gui_studio.loaded_source_path_label
+- loaded_type_app -> ops.gui_studio.loaded_type_app
+- loaded_type_dashboard -> ops.gui_studio.loaded_type_dashboard
+- loaded_type_db_table -> ops.gui_studio.loaded_type_db_table
+- loaded_type_label -> ops.gui_studio.loaded_type_label
+- loaded_type_module -> ops.gui_studio.loaded_type_module
+- loaded_type_navigation -> ops.gui_studio.loaded_type_navigation
+- loaded_type_unknown -> ops.gui_studio.loaded_type_unknown
+- loaded_type_view -> ops.gui_studio.loaded_type_view
+- locked_future -> ops.gui_studio.locked_future
+- migration.error.override_reason_required -> ops.gui_studio.migration.error.override_reason_required
+- migration.error.override_required -> ops.gui_studio.migration.error.override_required
+- migration.strategy.destructive -> ops.gui_studio.migration.strategy.destructive
+- migration.strategy.requires_migration -> ops.gui_studio.migration.strategy.requires_migration
+- migration.strategy.safe -> ops.gui_studio.migration.strategy.safe
+- migration_action -> ops.gui_studio.migration_action
+- migration_empty -> ops.gui_studio.migration_empty
+- migration_override_label -> ops.gui_studio.migration_override_label
+- migration_override_reason -> ops.gui_studio.migration_override_reason
+- migration_plan_title -> ops.gui_studio.migration_plan_title
+- migration_strategy -> ops.gui_studio.migration_strategy
+- migration_warning_destructive -> ops.gui_studio.migration_warning_destructive
+- mobile_mode_editor -> ops.gui_studio.mobile_mode_editor
+- mobile_mode_library -> ops.gui_studio.mobile_mode_library
+- mobile_mode_run -> ops.gui_studio.mobile_mode_run
+- mode_create -> ops.gui_studio.mode_create
+- mode_edit -> ops.gui_studio.mode_edit
+- mode_panel_helper -> ops.gui_studio.mode_panel_helper
+- mode_panel_title -> ops.gui_studio.mode_panel_title
+- mode_read_only -> ops.gui_studio.mode_read_only
+- mode_state_active -> ops.gui_studio.mode_state_active
+- mode_state_context_available -> ops.gui_studio.mode_state_context_available
+- mode_state_not_active -> ops.gui_studio.mode_state_not_active
+- mode_state_planned -> ops.gui_studio.mode_state_planned
+- mode_state_requires_governance -> ops.gui_studio.mode_state_requires_governance
+- mode_upgrade -> ops.gui_studio.mode_upgrade
+- modified -> ops.gui_studio.modified
+- module_description -> ops.gui_studio.module_description
+- module_display_name -> ops.gui_studio.module_display_name
+- module_key -> ops.gui_studio.module_key
+- module_manifest -> ops.gui_studio.module_manifest
+- module_settings -> ops.gui_studio.module_settings
+- module_type -> ops.gui_studio.module_type
+- modules -> ops.gui_studio.modules
+- nav_link_analyze_btn -> ops.gui_studio.nav_link_analyze_btn
+- nav_link_analyzing -> ops.gui_studio.nav_link_analyzing
+- nav_link_apply_btn -> ops.gui_studio.nav_link_apply_btn
+- nav_link_applying -> ops.gui_studio.nav_link_applying
+- nav_link_cancel_btn -> ops.gui_studio.nav_link_cancel_btn
+- nav_link_changes_after -> ops.gui_studio.nav_link_changes_after
+- nav_link_changes_before -> ops.gui_studio.nav_link_changes_before
+- nav_link_changes_field -> ops.gui_studio.nav_link_changes_field
+- nav_link_changes_file -> ops.gui_studio.nav_link_changes_file
+- nav_link_changes_none -> ops.gui_studio.nav_link_changes_none
+- nav_link_changes_title -> ops.gui_studio.nav_link_changes_title
+- nav_link_error_blocked -> ops.gui_studio.nav_link_error_blocked
+- nav_link_error_failed -> ops.gui_studio.nav_link_error_failed
+- nav_link_gate_blocked -> ops.gui_studio.nav_link_gate_blocked
+- nav_link_gate_ready -> ops.gui_studio.nav_link_gate_ready
+- nav_link_label_label -> ops.gui_studio.nav_link_label_label
+- nav_link_label_placeholder -> ops.gui_studio.nav_link_label_placeholder
+- nav_link_open_btn -> ops.gui_studio.nav_link_open_btn
+- nav_link_placeholder -> ops.gui_studio.nav_link_placeholder
+- nav_link_subtitle -> ops.gui_studio.nav_link_subtitle
+- nav_link_success -> ops.gui_studio.nav_link_success
+- nav_link_title -> ops.gui_studio.nav_link_title
+- nav_link_update_btn -> ops.gui_studio.nav_link_update_btn
+- nav_link_upgrade_acknowledge -> ops.gui_studio.nav_link_upgrade_acknowledge
+- nav_link_upgrade_subtitle -> ops.gui_studio.nav_link_upgrade_subtitle
+- nav_link_url_label -> ops.gui_studio.nav_link_url_label
+- navigation_editor -> ops.gui_studio.navigation_editor
+- navigation_group -> ops.gui_studio.navigation_group
+- navigation_icon -> ops.gui_studio.navigation_icon
+- navigation_label -> ops.gui_studio.navigation_label
+- navigation_manifest -> ops.gui_studio.navigation_manifest
+- navigation_order -> ops.gui_studio.navigation_order
+- navigation_section -> ops.gui_studio.navigation_section
+- navigation_section_admin_system -> ops.gui_studio.navigation_section_admin_system
+- navigation_section_apps -> ops.gui_studio.navigation_section_apps
+- navigation_section_operations -> ops.gui_studio.navigation_section_operations
+- navigation_target -> ops.gui_studio.navigation_target
+- navigation_visibility -> ops.gui_studio.navigation_visibility
+- no_changes_staged_badge -> ops.gui_studio.no_changes_staged_badge
+- nodes -> ops.gui_studio.nodes
+- non_reversible_label -> ops.gui_studio.non_reversible_label
+- not_loaded -> ops.gui_studio.not_loaded
+- ok -> ops.gui_studio.ok
+- operation -> ops.gui_studio.operation
+- operation.create -> ops.gui_studio.operation.create
+- operation.delete -> ops.gui_studio.operation.delete
+- operation.modify -> ops.gui_studio.operation.modify
+- outputs -> ops.gui_studio.outputs
+- owner -> ops.gui_studio.owner
+- ownership_filter -> ops.gui_studio.ownership_filter
+- ownership_governance -> ops.gui_studio.ownership_governance
+- ownership_scope -> ops.gui_studio.ownership_scope
+- parent_compile_id -> ops.gui_studio.parent_compile_id
+- pass -> ops.gui_studio.pass
+- payload_preview -> ops.gui_studio.payload_preview
+- pending -> ops.gui_studio.pending
+- pipeline_risk_medium -> ops.gui_studio.pipeline_risk_medium
+- planned_action -> ops.gui_studio.planned_action
+- post_publish_verification -> ops.gui_studio.post_publish_verification
+- precond.concurrent_apply_in_progress -> ops.gui_studio.precond.concurrent_apply_in_progress
+- precond.generator_mismatch -> ops.gui_studio.precond.generator_mismatch
+- precond.invalid_snapshot_context -> ops.gui_studio.precond.invalid_snapshot_context
+- precond.no_compile_id -> ops.gui_studio.precond.no_compile_id
+- precond.snapshot_already_applied -> ops.gui_studio.precond.snapshot_already_applied
+- precond.snapshot_not_found -> ops.gui_studio.precond.snapshot_not_found
+- precond.unsafe_live_path -> ops.gui_studio.precond.unsafe_live_path
+- precond.unsafe_route_path -> ops.gui_studio.precond.unsafe_route_path
+- precondition_failures -> ops.gui_studio.precondition_failures
+- preflight_btn -> ops.gui_studio.preflight_btn
+- preflight_failed -> ops.gui_studio.preflight_failed
+- preflight_ok -> ops.gui_studio.preflight_ok
+- preflight_title -> ops.gui_studio.preflight_title
+- preview_approval -> ops.gui_studio.preview_approval
+- preview_execution -> ops.gui_studio.preview_execution
+- preview_snapshot -> ops.gui_studio.preview_snapshot
+- primary.analyze_review_changes -> ops.gui_studio.primary.analyze_review_changes
+- primary.apply_apply_changes -> ops.gui_studio.primary.apply_apply_changes
+- primary.changes_proceed_apply -> ops.gui_studio.primary.changes_proceed_apply
+- primary.edit_analyze -> ops.gui_studio.primary.edit_analyze
+- project.note -> ops.gui_studio.project.note
+- projects -> ops.gui_studio.projects
+- publish_decision_allowed -> ops.gui_studio.publish_decision_allowed
+- publish_decision_at -> ops.gui_studio.publish_decision_at
+- publish_decision_by -> ops.gui_studio.publish_decision_by
+- publish_decision_record_write_failed -> ops.gui_studio.publish_decision_record_write_failed
+- publish_decision_title -> ops.gui_studio.publish_decision_title
+- publish_gate_btn -> ops.gui_studio.publish_gate_btn
+- publish_gate_failed -> ops.gui_studio.publish_gate_failed
+- publish_gate_ok -> ops.gui_studio.publish_gate_ok
+- publish_gate_title -> ops.gui_studio.publish_gate_title
+- publish_gate_token_mismatch -> ops.gui_studio.publish_gate_token_mismatch
+- publish_gate_token_missing -> ops.gui_studio.publish_gate_token_missing
+- publish_governance -> ops.gui_studio.publish_governance
+- read_only_analysis_badge -> ops.gui_studio.read_only_analysis_badge
+- ready -> ops.gui_studio.ready
+- reason -> ops.gui_studio.reason
+- reason_label -> ops.gui_studio.reason_label
+- reject -> ops.gui_studio.reject
+- relations -> ops.gui_studio.relations
+- remove_field -> ops.gui_studio.remove_field
+- required -> ops.gui_studio.required
+- results -> ops.gui_studio.results
+- reversible -> ops.gui_studio.reversible
+- risk_ack_label -> ops.gui_studio.risk_ack_label
+- risk_acknowledged -> ops.gui_studio.risk_acknowledged
+- risk_escalation -> ops.gui_studio.risk_escalation
+- risk_filter -> ops.gui_studio.risk_filter
+- risk_level -> ops.gui_studio.risk_level
+- risk_score -> ops.gui_studio.risk_score
+- rollback -> ops.gui_studio.rollback
+- rollback_action -> ops.gui_studio.rollback_action
+- rollback_binding -> ops.gui_studio.rollback_binding
+- rollback_binding_status -> ops.gui_studio.rollback_binding_status
+- rollback_bound -> ops.gui_studio.rollback_bound
+- rollback_execute_all_non_reversible -> ops.gui_studio.rollback_execute_all_non_reversible
+- rollback_execute_apply_id_label -> ops.gui_studio.rollback_execute_apply_id_label
+- rollback_execute_btn -> ops.gui_studio.rollback_execute_btn
+- rollback_execute_compile_id_label -> ops.gui_studio.rollback_execute_compile_id_label
+- rollback_execute_completed -> ops.gui_studio.rollback_execute_completed
+- rollback_execute_failed -> ops.gui_studio.rollback_execute_failed
+- rollback_execute_message -> ops.gui_studio.rollback_execute_message
+- rollback_execute_no_binding -> ops.gui_studio.rollback_execute_no_binding
+- rollback_execute_non_reversible_warning -> ops.gui_studio.rollback_execute_non_reversible_warning
+- rollback_execute_result -> ops.gui_studio.rollback_execute_result
+- rollback_execute_status -> ops.gui_studio.rollback_execute_status
+- rollback_execute_steps -> ops.gui_studio.rollback_execute_steps
+- rollback_execute_title -> ops.gui_studio.rollback_execute_title
+- rollback_plan_artifacts -> ops.gui_studio.rollback_plan_artifacts
+- rollback_plan_title -> ops.gui_studio.rollback_plan_title
+- rollback_preview -> ops.gui_studio.rollback_preview
+- rollback_reversible -> ops.gui_studio.rollback_reversible
+- rollback_snapshot_notice -> ops.gui_studio.rollback_snapshot_notice
+- rollback_summary -> ops.gui_studio.rollback_summary
+- rollback_unavailable -> ops.gui_studio.rollback_unavailable
+- route_link_analyze_btn -> ops.gui_studio.route_link_analyze_btn
+- route_link_analyzing -> ops.gui_studio.route_link_analyzing
+- route_link_apply_btn -> ops.gui_studio.route_link_apply_btn
+- route_link_applying -> ops.gui_studio.route_link_applying
+- route_link_cancel_btn -> ops.gui_studio.route_link_cancel_btn
+- route_link_change_btn -> ops.gui_studio.route_link_change_btn
+- route_link_changes_after -> ops.gui_studio.route_link_changes_after
+- route_link_changes_before -> ops.gui_studio.route_link_changes_before
+- route_link_changes_field -> ops.gui_studio.route_link_changes_field
+- route_link_changes_file -> ops.gui_studio.route_link_changes_file
+- route_link_changes_none -> ops.gui_studio.route_link_changes_none
+- route_link_changes_title -> ops.gui_studio.route_link_changes_title
+- route_link_error_blocked -> ops.gui_studio.route_link_error_blocked
+- route_link_error_failed -> ops.gui_studio.route_link_error_failed
+- route_link_gate_blocked -> ops.gui_studio.route_link_gate_blocked
+- route_link_gate_ready -> ops.gui_studio.route_link_gate_ready
+- route_link_label -> ops.gui_studio.route_link_label
+- route_link_open_btn -> ops.gui_studio.route_link_open_btn
+- route_link_placeholder -> ops.gui_studio.route_link_placeholder
+- route_link_subtitle -> ops.gui_studio.route_link_subtitle
+- route_link_success -> ops.gui_studio.route_link_success
+- route_link_title -> ops.gui_studio.route_link_title
+- route_link_upgrade_acknowledge -> ops.gui_studio.route_link_upgrade_acknowledge
+- route_link_upgrade_subtitle -> ops.gui_studio.route_link_upgrade_subtitle
+- route_path -> ops.gui_studio.route_path
+- routes -> ops.gui_studio.routes
+- safe_pipeline_analyze_required -> ops.gui_studio.safe_pipeline_analyze_required
+- safe_pipeline_confirm_required -> ops.gui_studio.safe_pipeline_confirm_required
+- safe_pipeline_context_mismatch -> ops.gui_studio.safe_pipeline_context_mismatch
+- schema_version -> ops.gui_studio.schema_version
+- simulation.error.override_required -> ops.gui_studio.simulation.error.override_required
+- simulation.error.reason_required -> ops.gui_studio.simulation.error.reason_required
+- simulation_broken_views -> ops.gui_studio.simulation_broken_views
+- simulation_empty -> ops.gui_studio.simulation_empty
+- simulation_new_fields -> ops.gui_studio.simulation_new_fields
+- simulation_override_label -> ops.gui_studio.simulation_override_label
+- simulation_override_reason -> ops.gui_studio.simulation_override_reason
+- simulation_preview_title -> ops.gui_studio.simulation_preview_title
+- simulation_reason_filter_references_removed_field -> ops.gui_studio.simulation_reason_filter_references_removed_field
+- simulation_reason_missing_required_field -> ops.gui_studio.simulation_reason_missing_required_field
+- simulation_reason_navigation_invalid_route -> ops.gui_studio.simulation_reason_navigation_invalid_route
+- simulation_removed_fields -> ops.gui_studio.simulation_removed_fields
+- simulation_views_after -> ops.gui_studio.simulation_views_after
+- simulation_warning -> ops.gui_studio.simulation_warning
+- skipped -> ops.gui_studio.skipped
+- snapshot_artifacts -> ops.gui_studio.snapshot_artifacts
+- snapshot_disabled -> ops.gui_studio.snapshot_disabled
+- snapshot_hash -> ops.gui_studio.snapshot_hash
+- snapshot_id -> ops.gui_studio.snapshot_id
+- snapshot_integrity -> ops.gui_studio.snapshot_integrity
+- snapshot_persisted -> ops.gui_studio.snapshot_persisted
+- snapshot_preview -> ops.gui_studio.snapshot_preview
+- snapshot_ready -> ops.gui_studio.snapshot_ready
+- snapshot_unavailable -> ops.gui_studio.snapshot_unavailable
+- source_template -> ops.gui_studio.source_template
+- sources -> ops.gui_studio.sources
+- status -> ops.gui_studio.status
+- status.pending -> ops.gui_studio.status.pending
+- status.ready -> ops.gui_studio.status.ready
+- step_result -> ops.gui_studio.step_result
+- structured_editor_note -> ops.gui_studio.structured_editor_note
+- structured_editor_title -> ops.gui_studio.structured_editor_title
+- structured_mapping_ok -> ops.gui_studio.structured_mapping_ok
+- studio_draft_id -> ops.gui_studio.studio_draft_id
+- studio_mode_create_new -> ops.gui_studio.studio_mode_create_new
+- studio_mode_edit_existing -> ops.gui_studio.studio_mode_edit_existing
+- studio_mode_label -> ops.gui_studio.studio_mode_label
+- studio_mode_switch_create -> ops.gui_studio.studio_mode_switch_create
+- studio_mode_switch_upgrade -> ops.gui_studio.studio_mode_switch_upgrade
+- studio_project_id -> ops.gui_studio.studio_project_id
+- studio_root_label -> ops.gui_studio.studio_root_label
+- studio_tool_app_builder -> ops.gui_studio.studio_tool_app_builder
+- studio_tool_approval_apply_center -> ops.gui_studio.studio_tool_approval_apply_center
+- studio_tool_change_history_snapshots -> ops.gui_studio.studio_tool_change_history_snapshots
+- studio_tool_data_model_schema -> ops.gui_studio.studio_tool_data_model_schema
+- studio_tool_module_builder -> ops.gui_studio.studio_tool_module_builder
+- studio_tool_navigation_menu -> ops.gui_studio.studio_tool_navigation_menu
+- studio_tool_purpose_app_builder -> ops.gui_studio.studio_tool_purpose_app_builder
+- studio_tool_purpose_approval_apply_center -> ops.gui_studio.studio_tool_purpose_approval_apply_center
+- studio_tool_purpose_change_history_snapshots -> ops.gui_studio.studio_tool_purpose_change_history_snapshots
+- studio_tool_purpose_data_model_schema -> ops.gui_studio.studio_tool_purpose_data_model_schema
+- studio_tool_purpose_module_builder -> ops.gui_studio.studio_tool_purpose_module_builder
+- studio_tool_purpose_navigation_menu -> ops.gui_studio.studio_tool_purpose_navigation_menu
+- studio_tool_purpose_report_builder -> ops.gui_studio.studio_tool_purpose_report_builder
+- studio_tool_purpose_resource_explorer -> ops.gui_studio.studio_tool_purpose_resource_explorer
+- studio_tool_purpose_validation_preview_center -> ops.gui_studio.studio_tool_purpose_validation_preview_center
+- studio_tool_purpose_view_layout_builder -> ops.gui_studio.studio_tool_purpose_view_layout_builder
+- studio_tool_purpose_widget_card_builder -> ops.gui_studio.studio_tool_purpose_widget_card_builder
+- studio_tool_report_builder -> ops.gui_studio.studio_tool_report_builder
+- studio_tool_resource_explorer -> ops.gui_studio.studio_tool_resource_explorer
+- studio_tool_validation_preview_center -> ops.gui_studio.studio_tool_validation_preview_center
+- studio_tool_view_layout_builder -> ops.gui_studio.studio_tool_view_layout_builder
+- studio_tool_widget_card_builder -> ops.gui_studio.studio_tool_widget_card_builder
+- studio_tools_boundary_no_runtime_without_apply -> ops.gui_studio.studio_tools_boundary_no_runtime_without_apply
+- studio_tools_boundary_not_owner -> ops.gui_studio.studio_tools_boundary_not_owner
+- studio_tools_boundary_owner_resources -> ops.gui_studio.studio_tools_boundary_owner_resources
+- studio_tools_group_build -> ops.gui_studio.studio_tools_group_build
+- studio_tools_group_explore -> ops.gui_studio.studio_tools_group_explore
+- studio_tools_group_govern -> ops.gui_studio.studio_tools_group_govern
+- studio_tools_group_history -> ops.gui_studio.studio_tools_group_history
+- studio_tools_group_validate -> ops.gui_studio.studio_tools_group_validate
+- studio_tools_helper -> ops.gui_studio.studio_tools_helper
+- studio_tools_open_history -> ops.gui_studio.studio_tools_open_history
+- studio_tools_open_library -> ops.gui_studio.studio_tools_open_library
+- studio_tools_preview_backend_linked -> ops.gui_studio.studio_tools_preview_backend_linked
+- studio_tools_preview_backend_unwired -> ops.gui_studio.studio_tools_preview_backend_unwired
+- studio_tools_preview_default -> ops.gui_studio.studio_tools_preview_default
+- studio_tools_preview_field_backend -> ops.gui_studio.studio_tools_preview_field_backend
+- studio_tools_preview_field_first_safe -> ops.gui_studio.studio_tools_preview_field_first_safe
+- studio_tools_preview_field_group -> ops.gui_studio.studio_tools_preview_field_group
+- studio_tools_preview_field_must_not_own -> ops.gui_studio.studio_tools_preview_field_must_not_own
+- studio_tools_preview_field_name -> ops.gui_studio.studio_tools_preview_field_name
+- studio_tools_preview_field_purpose -> ops.gui_studio.studio_tools_preview_field_purpose
+- studio_tools_preview_field_status -> ops.gui_studio.studio_tools_preview_field_status
+- studio_tools_preview_field_works_on -> ops.gui_studio.studio_tools_preview_field_works_on
+- studio_tools_preview_first_safe_governed -> ops.gui_studio.studio_tools_preview_first_safe_governed
+- studio_tools_preview_first_safe_linked -> ops.gui_studio.studio_tools_preview_first_safe_linked
+- studio_tools_preview_first_safe_readonly -> ops.gui_studio.studio_tools_preview_first_safe_readonly
+- studio_tools_preview_helper -> ops.gui_studio.studio_tools_preview_helper
+- studio_tools_preview_title -> ops.gui_studio.studio_tools_preview_title
+- studio_tools_status_available -> ops.gui_studio.studio_tools_status_available
+- studio_tools_status_planned -> ops.gui_studio.studio_tools_status_planned
+- studio_tools_status_read_only -> ops.gui_studio.studio_tools_status_read_only
+- studio_tools_status_requires_governed -> ops.gui_studio.studio_tools_status_requires_governed
+- studio_tools_title -> ops.gui_studio.studio_tools_title
+- studio_workbench_context_action_no_apply -> ops.gui_studio.studio_workbench_context_action_no_apply
+- studio_workbench_context_action_preview_only -> ops.gui_studio.studio_workbench_context_action_preview_only
+- studio_workbench_context_action_readonly_analysis -> ops.gui_studio.studio_workbench_context_action_readonly_analysis
+- studio_workbench_context_backend_linked -> ops.gui_studio.studio_workbench_context_backend_linked
+- studio_workbench_context_backend_planned -> ops.gui_studio.studio_workbench_context_backend_planned
+- studio_workbench_context_boundary_text -> ops.gui_studio.studio_workbench_context_boundary_text
+- studio_workbench_context_field_action_state -> ops.gui_studio.studio_workbench_context_field_action_state
+- studio_workbench_context_field_module -> ops.gui_studio.studio_workbench_context_field_module
+- studio_workbench_context_field_owner_app -> ops.gui_studio.studio_workbench_context_field_owner_app
+- studio_workbench_context_field_ownership_boundary -> ops.gui_studio.studio_workbench_context_field_ownership_boundary
+- studio_workbench_context_field_resource_type -> ops.gui_studio.studio_workbench_context_field_resource_type
+- studio_workbench_context_field_selected_resource -> ops.gui_studio.studio_workbench_context_field_selected_resource
+- studio_workbench_context_field_selected_tool -> ops.gui_studio.studio_workbench_context_field_selected_tool
+- studio_workbench_context_no_execution -> ops.gui_studio.studio_workbench_context_no_execution
+- studio_workbench_context_no_resource -> ops.gui_studio.studio_workbench_context_no_resource
+- studio_workbench_context_no_tool -> ops.gui_studio.studio_workbench_context_no_tool
+- studio_workbench_context_title -> ops.gui_studio.studio_workbench_context_title
+- subtitle -> ops.gui_studio.subtitle
+- summary -> ops.gui_studio.summary
+- summary_group -> ops.gui_studio.summary_group
+- surface_exposure_aspect -> ops.gui_studio.surface_exposure_aspect
+- surface_exposure_aspect_navigation -> ops.gui_studio.surface_exposure_aspect_navigation
+- surface_exposure_aspect_policy -> ops.gui_studio.surface_exposure_aspect_policy
+- surface_exposure_aspect_route -> ops.gui_studio.surface_exposure_aspect_route
+- surface_exposure_aspect_view -> ops.gui_studio.surface_exposure_aspect_view
+- surface_exposure_diag_ambiguous_conflicting -> ops.gui_studio.surface_exposure_diag_ambiguous_conflicting
+- surface_exposure_diag_connected -> ops.gui_studio.surface_exposure_diag_connected
+- surface_exposure_diag_missing_nav -> ops.gui_studio.surface_exposure_diag_missing_nav
+- surface_exposure_diag_missing_route -> ops.gui_studio.surface_exposure_diag_missing_route
+- surface_exposure_diag_nav_unknown_route -> ops.gui_studio.surface_exposure_diag_nav_unknown_route
+- surface_exposure_policy_inspect_only -> ops.gui_studio.surface_exposure_policy_inspect_only
+- surface_exposure_policy_route_linkable -> ops.gui_studio.surface_exposure_policy_route_linkable
+- surface_exposure_state -> ops.gui_studio.surface_exposure_state
+- surface_exposure_state_ambiguous_conflicting -> ops.gui_studio.surface_exposure_state_ambiguous_conflicting
+- surface_exposure_state_connected -> ops.gui_studio.surface_exposure_state_connected
+- surface_exposure_state_inspect_only -> ops.gui_studio.surface_exposure_state_inspect_only
+- surface_exposure_state_missing_nav -> ops.gui_studio.surface_exposure_state_missing_nav
+- surface_exposure_state_missing_route -> ops.gui_studio.surface_exposure_state_missing_route
+- surface_exposure_state_nav_unknown_route -> ops.gui_studio.surface_exposure_state_nav_unknown_route
+- surface_exposure_subtitle -> ops.gui_studio.surface_exposure_subtitle
+- surface_exposure_summary_label -> ops.gui_studio.surface_exposure_summary_label
+- surface_exposure_title -> ops.gui_studio.surface_exposure_title
+- surface_exposure_value -> ops.gui_studio.surface_exposure_value
+- surface_exposure_value_none -> ops.gui_studio.surface_exposure_value_none
+- tab.analyze -> ops.gui_studio.tab.analyze
+- tab.apply -> ops.gui_studio.tab.apply
+- tab.changes -> ops.gui_studio.tab.changes
+- tab.edit -> ops.gui_studio.tab.edit
+- table_edit_mode_direct_db -> ops.gui_studio.table_edit_mode_direct_db
+- table_edit_mode_label -> ops.gui_studio.table_edit_mode_label
+- table_edit_mode_note_direct_db -> ops.gui_studio.table_edit_mode_note_direct_db
+- table_edit_mode_note_view_only -> ops.gui_studio.table_edit_mode_note_view_only
+- table_edit_mode_view_only -> ops.gui_studio.table_edit_mode_view_only
+- target_exists -> ops.gui_studio.target_exists
+- target_path -> ops.gui_studio.target_path
+- template_library -> ops.gui_studio.template_library
+- tier_advanced -> ops.gui_studio.tier_advanced
+- tier_guided -> ops.gui_studio.tier_guided
+- tier_label -> ops.gui_studio.tier_label
+- tier_simple -> ops.gui_studio.tier_simple
+- title -> ops.gui_studio.title
+- todo_title -> ops.gui_studio.todo_title
+- total_conflict_instances -> ops.gui_studio.total_conflict_instances
+- transaction_steps -> ops.gui_studio.transaction_steps
+- uninstall -> ops.gui_studio.uninstall
+- unique_conflicts -> ops.gui_studio.unique_conflicts
+- upgrade_safe -> ops.gui_studio.upgrade_safe
+- valid -> ops.gui_studio.valid
+- validate -> ops.gui_studio.validate
+- validation -> ops.gui_studio.validation
+- validation_errors -> ops.gui_studio.validation_errors
+- verification_status -> ops.gui_studio.verification_status
+- view_config_editor -> ops.gui_studio.view_config_editor
+- view_manifest -> ops.gui_studio.view_manifest
+- view_type -> ops.gui_studio.view_type
+- view_type_dashboard -> ops.gui_studio.view_type_dashboard
+- view_type_form -> ops.gui_studio.view_type_form
+- view_type_table -> ops.gui_studio.view_type_table
+- views -> ops.gui_studio.views
+- visible_columns -> ops.gui_studio.visible_columns
+- visual_builder_add_component -> ops.gui_studio.visual_builder_add_component
+- visual_builder_add_component_inline -> ops.gui_studio.visual_builder_add_component_inline
+- visual_builder_add_relation -> ops.gui_studio.visual_builder_add_relation
+- visual_builder_add_view -> ops.gui_studio.visual_builder_add_view
+- visual_builder_all_templates_title -> ops.gui_studio.visual_builder_all_templates_title
+- visual_builder_binding_error.form -> ops.gui_studio.visual_builder_binding_error.form
+- visual_builder_binding_error.invalid_path -> ops.gui_studio.visual_builder_binding_error.invalid_path
+- visual_builder_binding_error.kpi -> ops.gui_studio.visual_builder_binding_error.kpi
+- visual_builder_binding_error.table -> ops.gui_studio.visual_builder_binding_error.table
+- visual_builder_binding_error.text -> ops.gui_studio.visual_builder_binding_error.text
+- visual_builder_binding_picker -> ops.gui_studio.visual_builder_binding_picker
+- visual_builder_binding_placeholder -> ops.gui_studio.visual_builder_binding_placeholder
+- visual_builder_binding_schema -> ops.gui_studio.visual_builder_binding_schema
+- visual_builder_binding_source -> ops.gui_studio.visual_builder_binding_source
+- visual_builder_canvas -> ops.gui_studio.visual_builder_canvas
+- visual_builder_component_config -> ops.gui_studio.visual_builder_component_config
+- visual_builder_default_form -> ops.gui_studio.visual_builder_default_form
+- visual_builder_default_kpi -> ops.gui_studio.visual_builder_default_kpi
+- visual_builder_default_table -> ops.gui_studio.visual_builder_default_table
+- visual_builder_default_text -> ops.gui_studio.visual_builder_default_text
+- visual_builder_empty -> ops.gui_studio.visual_builder_empty
+- visual_builder_export_app -> ops.gui_studio.visual_builder_export_app
+- visual_builder_export_filename -> ops.gui_studio.visual_builder_export_filename
+- visual_builder_export_missing -> ops.gui_studio.visual_builder_export_missing
+- visual_builder_group -> ops.gui_studio.visual_builder_group
+- visual_builder_import_app -> ops.gui_studio.visual_builder_import_app
+- visual_builder_import_failed -> ops.gui_studio.visual_builder_import_failed
+- visual_builder_import_invalid -> ops.gui_studio.visual_builder_import_invalid
+- visual_builder_import_success -> ops.gui_studio.visual_builder_import_success
+- visual_builder_items -> ops.gui_studio.visual_builder_items
+- visual_builder_my_templates_title -> ops.gui_studio.visual_builder_my_templates_title
+- visual_builder_note -> ops.gui_studio.visual_builder_note
+- visual_builder_palette -> ops.gui_studio.visual_builder_palette
+- visual_builder_phase1_note -> ops.gui_studio.visual_builder_phase1_note
+- visual_builder_preview -> ops.gui_studio.visual_builder_preview
+- visual_builder_preview_toggle -> ops.gui_studio.visual_builder_preview_toggle
+- visual_builder_recommended_templates_title -> ops.gui_studio.visual_builder_recommended_templates_title
+- visual_builder_relation_affects_table -> ops.gui_studio.visual_builder_relation_affects_table
+- visual_builder_relation_empty -> ops.gui_studio.visual_builder_relation_empty
+- visual_builder_relation_filter_to_kpi -> ops.gui_studio.visual_builder_relation_filter_to_kpi
+- visual_builder_relation_filter_to_table -> ops.gui_studio.visual_builder_relation_filter_to_table
+- visual_builder_relation_form_refresh_table -> ops.gui_studio.visual_builder_relation_form_refresh_table
+- visual_builder_relation_source -> ops.gui_studio.visual_builder_relation_source
+- visual_builder_relation_table_to_kpi_derived -> ops.gui_studio.visual_builder_relation_table_to_kpi_derived
+- visual_builder_relation_target -> ops.gui_studio.visual_builder_relation_target
+- visual_builder_relation_type -> ops.gui_studio.visual_builder_relation_type
+- visual_builder_relations -> ops.gui_studio.visual_builder_relations
+- visual_builder_reorder_down -> ops.gui_studio.visual_builder_reorder_down
+- visual_builder_reorder_up -> ops.gui_studio.visual_builder_reorder_up
+- visual_builder_save_template -> ops.gui_studio.visual_builder_save_template
+- visual_builder_select_component_hint -> ops.gui_studio.visual_builder_select_component_hint
+- visual_builder_suggestion_add_form -> ops.gui_studio.visual_builder_suggestion_add_form
+- visual_builder_suggestion_add_kpi -> ops.gui_studio.visual_builder_suggestion_add_kpi
+- visual_builder_suggestion_add_table -> ops.gui_studio.visual_builder_suggestion_add_table
+- visual_builder_suggestion_none -> ops.gui_studio.visual_builder_suggestion_none
+- visual_builder_suggestion_use_template -> ops.gui_studio.visual_builder_suggestion_use_template
+- visual_builder_suggestions_title -> ops.gui_studio.visual_builder_suggestions_title
+- visual_builder_template_form_entry -> ops.gui_studio.visual_builder_template_form_entry
+- visual_builder_template_kpi_grid -> ops.gui_studio.visual_builder_template_kpi_grid
+- visual_builder_template_metric_1 -> ops.gui_studio.visual_builder_template_metric_1
+- visual_builder_template_metric_2 -> ops.gui_studio.visual_builder_template_metric_2
+- visual_builder_template_metric_3 -> ops.gui_studio.visual_builder_template_metric_3
+- visual_builder_template_metric_4 -> ops.gui_studio.visual_builder_template_metric_4
+- visual_builder_template_name_prompt -> ops.gui_studio.visual_builder_template_name_prompt
+- visual_builder_template_replace_confirm -> ops.gui_studio.visual_builder_template_replace_confirm
+- visual_builder_template_table_view -> ops.gui_studio.visual_builder_template_table_view
+- visual_builder_templates_title -> ops.gui_studio.visual_builder_templates_title
+- visual_builder_title -> ops.gui_studio.visual_builder_title
+- visual_builder_view_default_name -> ops.gui_studio.visual_builder_view_default_name
+- visual_builder_view_name_prompt -> ops.gui_studio.visual_builder_view_name_prompt
+- visual_builder_view_none -> ops.gui_studio.visual_builder_view_none
+- visual_builder_views_title -> ops.gui_studio.visual_builder_views_title
+- visual_builder_warning_binding_invalid -> ops.gui_studio.visual_builder_warning_binding_invalid
+- visual_builder_warning_bounds -> ops.gui_studio.visual_builder_warning_bounds
+- visual_builder_warning_overlap -> ops.gui_studio.visual_builder_warning_overlap
+- workflow_stage_analyze -> ops.gui_studio.workflow_stage_analyze
+- workflow_stage_apply -> ops.gui_studio.workflow_stage_apply
+- workflow_stage_approval -> ops.gui_studio.workflow_stage_approval
+- workflow_stage_changes -> ops.gui_studio.workflow_stage_changes
+- workflow_stage_preview -> ops.gui_studio.workflow_stage_preview
+- workflow_state_apply_inactive -> ops.gui_studio.workflow_state_apply_inactive
+- workflow_state_load_before_analysis -> ops.gui_studio.workflow_state_load_before_analysis
+- workflow_state_no_apply -> ops.gui_studio.workflow_state_no_apply
+- workflow_state_no_approval -> ops.gui_studio.workflow_state_no_approval
+- workflow_state_no_changes_staged -> ops.gui_studio.workflow_state_no_changes_staged
+- workflow_state_no_diff -> ops.gui_studio.workflow_state_no_diff
+- workflow_state_no_preview -> ops.gui_studio.workflow_state_no_preview
+- workflow_state_ready_readonly -> ops.gui_studio.workflow_state_ready_readonly
+- workflow_status_helper -> ops.gui_studio.workflow_status_helper
+- workflow_status_title -> ops.gui_studio.workflow_status_title
+
+## Mapping: `apps/Studio/Views/gui_studio_history.php`
+
+Shared keys (listed above) reuse `ops.gui_studio.<inline_key>`.
+History-only keys map to `ops.gui_studio.history.<inline_key>`.
+
+- apply_history -> ops.gui_studio.history.apply_history
+- apply_id -> ops.gui_studio.apply_id
+- approval_valid -> ops.gui_studio.history.approval_valid
+- back -> ops.gui_studio.history.back
+- bool.false -> ops.gui_studio.bool.false
+- bool.true -> ops.gui_studio.bool.true
+- compile_id -> ops.gui_studio.compile_id
+- completed_at -> ops.gui_studio.history.completed_at
+- created_at -> ops.gui_studio.history.created_at
+- empty -> ops.gui_studio.history.empty
+- event -> ops.gui_studio.history.event
+- event_history -> ops.gui_studio.history.event_history
+- export_btn -> ops.gui_studio.history.export_btn
+- export_form_title -> ops.gui_studio.history.export_form_title
+- export_snapshot_id_label -> ops.gui_studio.history.export_snapshot_id_label
+- export_success -> ops.gui_studio.history.export_success
+- has_rollback -> ops.gui_studio.history.has_rollback
+- hash -> ops.gui_studio.history.hash
+- occurred_at -> ops.gui_studio.history.occurred_at
+- package_filename -> ops.gui_studio.history.package_filename
+- package_history -> ops.gui_studio.history.package_history
+- package_modified -> ops.gui_studio.history.package_modified
+- package_signature -> ops.gui_studio.history.package_signature
+- package_signed_at -> ops.gui_studio.history.package_signed_at
+- package_size -> ops.gui_studio.history.package_size
+- registry_approval -> ops.gui_studio.history.registry_approval
+- registry_artifact_count -> ops.gui_studio.history.registry_artifact_count
+- registry_disable_btn -> ops.gui_studio.history.registry_disable_btn
+- registry_enable_btn -> ops.gui_studio.history.registry_enable_btn
+- registry_install_btn -> ops.gui_studio.history.registry_install_btn
+- registry_install_form_title -> ops.gui_studio.history.registry_install_form_title
+- registry_install_success -> ops.gui_studio.history.registry_install_success
+- registry_installed_at -> ops.gui_studio.history.registry_installed_at
+- registry_package_id -> ops.gui_studio.history.registry_package_id
+- registry_status -> ops.gui_studio.history.registry_status
+- registry_title -> ops.gui_studio.history.registry_title
+- snapshot_history -> ops.gui_studio.history.snapshot_history
+- snapshot_id -> ops.gui_studio.snapshot_id
+- started_at -> ops.gui_studio.history.started_at
+- status -> ops.gui_studio.status
+- studio_tool_app_builder -> ops.gui_studio.studio_tool_app_builder
+- studio_tool_approval_apply_center -> ops.gui_studio.studio_tool_approval_apply_center
+- studio_tool_change_history_snapshots -> ops.gui_studio.studio_tool_change_history_snapshots
+- studio_tool_data_model_schema -> ops.gui_studio.studio_tool_data_model_schema
+- studio_tool_module_builder -> ops.gui_studio.studio_tool_module_builder
+- studio_tool_navigation_menu -> ops.gui_studio.studio_tool_navigation_menu
+- studio_tool_purpose_app_builder -> ops.gui_studio.studio_tool_purpose_app_builder
+- studio_tool_purpose_approval_apply_center -> ops.gui_studio.studio_tool_purpose_approval_apply_center
+- studio_tool_purpose_change_history_snapshots -> ops.gui_studio.studio_tool_purpose_change_history_snapshots
+- studio_tool_purpose_data_model_schema -> ops.gui_studio.studio_tool_purpose_data_model_schema
+- studio_tool_purpose_module_builder -> ops.gui_studio.studio_tool_purpose_module_builder
+- studio_tool_purpose_navigation_menu -> ops.gui_studio.studio_tool_purpose_navigation_menu
+- studio_tool_purpose_report_builder -> ops.gui_studio.studio_tool_purpose_report_builder
+- studio_tool_purpose_resource_explorer -> ops.gui_studio.studio_tool_purpose_resource_explorer
+- studio_tool_purpose_validation_preview_center -> ops.gui_studio.studio_tool_purpose_validation_preview_center
+- studio_tool_purpose_view_layout_builder -> ops.gui_studio.studio_tool_purpose_view_layout_builder
+- studio_tool_purpose_widget_card_builder -> ops.gui_studio.studio_tool_purpose_widget_card_builder
+- studio_tool_report_builder -> ops.gui_studio.studio_tool_report_builder
+- studio_tool_resource_explorer -> ops.gui_studio.studio_tool_resource_explorer
+- studio_tool_validation_preview_center -> ops.gui_studio.studio_tool_validation_preview_center
+- studio_tool_view_layout_builder -> ops.gui_studio.studio_tool_view_layout_builder
+- studio_tool_widget_card_builder -> ops.gui_studio.studio_tool_widget_card_builder
+- studio_tools_boundary_no_runtime_without_apply -> ops.gui_studio.studio_tools_boundary_no_runtime_without_apply
+- studio_tools_boundary_not_owner -> ops.gui_studio.studio_tools_boundary_not_owner
+- studio_tools_boundary_owner_resources -> ops.gui_studio.studio_tools_boundary_owner_resources
+- studio_tools_group_build -> ops.gui_studio.studio_tools_group_build
+- studio_tools_group_explore -> ops.gui_studio.studio_tools_group_explore
+- studio_tools_group_govern -> ops.gui_studio.studio_tools_group_govern
+- studio_tools_group_history -> ops.gui_studio.studio_tools_group_history
+- studio_tools_group_validate -> ops.gui_studio.studio_tools_group_validate
+- studio_tools_helper -> ops.gui_studio.studio_tools_helper
+- studio_tools_open_history -> ops.gui_studio.studio_tools_open_history
+- studio_tools_open_library -> ops.gui_studio.studio_tools_open_library
+- studio_tools_status_available -> ops.gui_studio.studio_tools_status_available
+- studio_tools_status_planned -> ops.gui_studio.studio_tools_status_planned
+- studio_tools_status_read_only -> ops.gui_studio.studio_tools_status_read_only
+- studio_tools_status_requires_governed -> ops.gui_studio.studio_tools_status_requires_governed
+- studio_tools_title -> ops.gui_studio.studio_tools_title
+- title -> ops.gui_studio.title
+- verification -> ops.gui_studio.history.verification
+
+## Notes And Guardrails
+
+- This inventory does not change runtime behavior.
+- No app-scoped language loader is introduced.
+- No Core/helper changes are included.
+- No partial migration is proposed without fallback rules and validation gates.
+
+## Future Implementation Sequence (After Approval)
+
+1. Add missing target keys in global locale dictionaries using this inventory.
+2. Replace inline key reads in small batches with global key reads.
+3. Keep explicit fallback behavior per batch.
+4. Validate each batch with architecture and deployment readiness gates.
+5. Re-evaluate app-scoped Studio lang support only after loader contract approval.
+
+## Validation Commands For Future Implementation Batches
+
+```bash
+/opt/homebrew/bin/php -l apps/Studio/Views/gui_studio.php
+/opt/homebrew/bin/php -l apps/Studio/Views/gui_studio_history.php
+/opt/homebrew/bin/php -l apps/Studio/Controllers/StudioController.php
+/opt/homebrew/bin/php -l apps/Studio/Routes/gui_studio_routes.php
+bash scripts/architecture/run_architecture_gates.sh
+bash scripts/system/check_deployment_readiness.sh
+git diff --check
+git status --short
+```

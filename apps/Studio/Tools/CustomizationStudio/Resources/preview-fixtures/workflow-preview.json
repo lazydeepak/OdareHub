@@ -1,0 +1,21 @@
+{
+  "fixture": "workflow-preview",
+  "owner": "studio",
+  "tool_area": "customization-studio",
+  "purpose": "Describes future operational workflow preview examples.",
+  "runtime_status": "fixture_catalog_only_not_rendered",
+  "renders_ui": false,
+  "connects_to_shell": false,
+  "reads_studio_drafts": false,
+  "uses_active_registry_truth": false,
+  "examples": [
+    {
+      "example": "operations-board",
+      "label": "Workflow preview",
+      "description": "Task cards, approval cards, handoff cards, SLA and risk indicators, queue status, production/QC/dispatch states, blocked state, and completed state.",
+      "socket_catalogs": ["workflow-operations", "data-display", "states", "feedback", "tables-grids"],
+      "preview_modes": ["simple", "advanced"],
+      "notes": "Catalog only. No business workflow or app module is executed."
+    }
+  ]
+}

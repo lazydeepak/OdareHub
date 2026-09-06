@@ -1,0 +1,57 @@
+{
+    "name": "QRCode",
+    "display_name": "QR Code",
+    "suite": "core",
+    "group": "platform",
+    "category": "system",
+    "display_order": 65,
+    "type": "engine",
+    "version": "1.0.0",
+    "description": "Shared QR generation, scan workflows, and stock update utilities.",
+    "requires": [
+        "Base>=3.0.0"
+    ],
+    "optional": [
+        "Products>=1.0.0",
+        "ProductionEntries>=1.0.0",
+        "QCPlans>=1.0.0",
+        "Ledger>=1.0.0"
+    ],
+    "entry": "routes.php",
+    "package_type": "module",
+    "owner_app": "platform",
+    "module_key": "QRCode",
+    "module_type": "integration",
+    "target_maturity_level": "L2",
+    "declared_capabilities": [
+        "routes",
+        "views",
+        "schema",
+        "controllers",
+        "services",
+        "permissions",
+        "menus",
+        "lifecycle_hooks",
+        "localization"
+    ],
+    "lifecycle_contract": {
+        "routes": "active_only",
+        "menus": "active_only",
+        "widgets": "active_only",
+        "reports": "active_only",
+        "dashboards": "active_only",
+        "schema": "installed_or_active"
+    },
+    "reports": [
+        {
+            "report_key": "platform.qrcode.overview",
+            "title": "QR Code Report",
+            "view": "Views/report.php",
+            "export_view": "Views/export.php",
+            "owner": "module",
+            "scope": "qrcode",
+            "permission": "app.platform.access",
+            "lifecycle": "active_only"
+        }
+    ]
+}

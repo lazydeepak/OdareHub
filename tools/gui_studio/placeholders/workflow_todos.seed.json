@@ -1,0 +1,47 @@
+{
+  "schema_version": "gui.workflow-todos.v1",
+  "pipeline": [
+    {
+      "id": 1,
+      "title": "Define business intent",
+      "status": "not-started",
+      "checks": ["scope_locked", "owner_confirmed"]
+    },
+    {
+      "id": 2,
+      "title": "Draft app/module contract in GUI",
+      "status": "not-started",
+      "checks": ["manifest_valid", "route_prefix_valid"]
+    },
+    {
+      "id": 3,
+      "title": "Design views and nav in GUI",
+      "status": "not-started",
+      "checks": ["wrapper_valid", "no_cross_layer_links"]
+    },
+    {
+      "id": 4,
+      "title": "Apply role and security gates",
+      "status": "not-started",
+      "checks": ["role_matrix_complete", "csrf_complete"]
+    },
+    {
+      "id": 5,
+      "title": "Complete localization",
+      "status": "not-started",
+      "checks": ["en_complete", "ja_complete", "ne_complete"]
+    },
+    {
+      "id": 6,
+      "title": "Preview, diff, and dry-run",
+      "status": "not-started",
+      "checks": ["preview_ok", "diff_reviewed", "syntax_clean"]
+    },
+    {
+      "id": 7,
+      "title": "Approve and publish",
+      "status": "not-started",
+      "checks": ["platform_admin_approved", "audit_recorded"]
+    }
+  ]
+}

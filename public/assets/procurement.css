@@ -1,0 +1,3 @@
+/* DEPRECATED: Procurement CSS has been moved to apps/Procurement/styles/procurement.css
+   This file is kept as a shim for backwards compatibility and will be removed in phase 10. */
+@import url(/assets/apps/procurement/styles/procurement.css);

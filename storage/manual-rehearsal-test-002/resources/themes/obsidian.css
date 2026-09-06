@@ -1,0 +1,7 @@
+/* Obsidian style placeholder
+ * Intentionally disabled in theme-manifest for compatibility only.
+ */
+[data-theme="dark"][data-color-style="obsidian"],
+[data-theme="light"][data-color-style="obsidian"] {
+  /* Disabled legacy style placeholder. */
+}

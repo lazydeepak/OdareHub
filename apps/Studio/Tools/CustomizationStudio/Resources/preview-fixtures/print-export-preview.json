@@ -1,0 +1,21 @@
+{
+  "fixture": "print-export-preview",
+  "owner": "studio",
+  "tool_area": "customization-studio",
+  "purpose": "Describes future print and export preview examples.",
+  "runtime_status": "fixture_catalog_only_not_rendered",
+  "renders_ui": false,
+  "connects_to_shell": false,
+  "reads_studio_drafts": false,
+  "uses_active_registry_truth": false,
+  "examples": [
+    {
+      "example": "report-and-label-export",
+      "label": "Print/export preview",
+      "description": "Print page, PDF header, PDF table, report title, report section, invoice layout, label layout, and barcode label examples.",
+      "socket_catalogs": ["print-export", "tables-grids", "media-assets", "core-tokens"],
+      "preview_modes": ["simple", "advanced"],
+      "notes": "Catalog only. No PDF, print, or asset output is generated."
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "schema_version": "gui.navigation-definition.v1",
+  "status": "draft",
+  "navigation": {
+    "scope": "admin",
+    "owner_app": "",
+    "key": "",
+    "label_key": "",
+    "url": "",
+    "section": "",
+    "order": 10,
+    "priority": 100,
+    "visible_if": "role_platform_admin_or_sysadmin"
+  },
+  "active_patterns": {
+    "exact": [],
+    "prefix": []
+  },
+  "governance": {
+    "wrapper_confinement_valid": true,
+    "no_cross_layer_escape": true
+  },
+  "audit": {
+    "draft_id": "",
+    "created_by": "",
+    "created_at": ""
+  }
+}

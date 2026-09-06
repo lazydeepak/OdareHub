@@ -1,0 +1,198 @@
+{
+  "id": "shell",
+  "app_key": "shell",
+  "package_type": "bundle",
+  "name": "Shell",
+  "version": "1.0.0",
+  "type": "framework",
+  "min_core_version": "3.0.0",
+  "dependencies": [],
+  "entry": "routes.php",
+  "migrations_path": "migrations",
+  "permissions": [],
+  "can_disable": true,
+  "can_uninstall": true,
+  "can_export": true,
+  "system_app_contract": {
+    "version": "system-app-contract.v1",
+    "owner_layer": "Shell",
+    "runtime_role": "generic_runtime_shell",
+    "lifecycle_policy": {
+      "disable": "restricted_contract_only",
+      "uninstall": "restricted_contract_only",
+      "export": "metadata_and_assets_only",
+      "notes": "Current can_disable/can_uninstall/can_export flags are runtime compatibility flags until lifecycle enforcement is updated."
+    },
+    "route_policy": {
+      "canonical_prefixes": [
+        "/u/{username}",
+        "/admin/{username}",
+        "/displays"
+      ],
+      "compatibility_surfaces": [
+        "/me",
+        "/me2"
+      ],
+      "must_not_reinterpret_routes": true
+    },
+    "source_of_truth_policy": "compose_resolved_contracts_only"
+  },
+  "ownership_contract": {
+    "owns": [
+      "runtime frame and wrapper composition",
+      "admin/operator/display wrapper chrome",
+      "shared layout primitives",
+      "generic Shell CSS and theme-token usage",
+      "contribution normalization before rendering",
+      "rendering of already-resolved admin/operator/display experience data"
+    ],
+    "must_not_own": [
+      "Core primitives",
+      "business logic or business workflow meaning",
+      "app/module capability catalogs",
+      "ACL authorization policy",
+      "Workspace Profile policy",
+      "Studio drafts, previews, or runtime truth",
+      "app/module page-specific CSS",
+      "new primary links to compatibility aliases"
+    ],
+    "contributes_to": [
+      "resolved runtime surfaces",
+      "system app diagnostics"
+    ],
+    "depends_on": [
+      "Core routing/auth/view primitives",
+      "resolved experience contracts",
+      "app/module contribution contracts"
+    ]
+  },
+  "modules": [],
+  "hooks": [
+    {
+      "type": "boot",
+      "key": "shell.bootstrap",
+      "handler_file": "bootstrap.php"
+    }
+  ],
+  "routes": [
+    {
+      "path": "/apps/shell",
+      "kind": "canonical",
+      "feature_key": "shell_app_entry"
+    },
+    {
+      "path": "/me",
+      "kind": "canonical",
+      "feature_key": "shell_workspace_entry"
+    },
+    {
+      "path": "/me2",
+      "kind": "alias",
+      "canonical_target": "/me",
+      "compatibility": true,
+      "feature_key": "shell_workspace_entry_legacy"
+    }
+  ],
+  "menus": [],
+  "widgets": [],
+  "styles": [
+    {
+      "key": "shell.app",
+      "path": "styles/shell.css",
+      "scope": "app",
+      "surfaces": [
+        "admin",
+        "operator",
+        "work-entry",
+        "display",
+        "auth"
+      ],
+      "runtime": false,
+      "order": 200
+    },
+    {
+      "key": "shell.tokens",
+      "path": "styles/shell-tokens.css",
+      "scope": "app",
+      "surfaces": ["admin", "operator", "work-entry", "display", "auth"],
+      "order": 201
+    },
+    {
+      "key": "shell.header-geometry",
+      "path": "styles/shell-header-geometry.css",
+      "scope": "app",
+      "surfaces": ["admin", "operator", "work-entry", "display", "auth"],
+      "order": 202
+    },
+    {
+      "key": "shell.sidebar-content-geometry",
+      "path": "styles/shell-sidebar-content-geometry.css",
+      "scope": "app",
+      "surfaces": ["admin", "operator", "work-entry", "display", "auth"],
+      "order": 203
+    },
+    {
+      "key": "shell.layout",
+      "path": "styles/shell-layout.css",
+      "scope": "app",
+      "surfaces": ["admin", "operator", "work-entry", "display", "auth"],
+      "order": 204
+    },
+    {
+      "key": "shell.surfaces",
+      "path": "styles/shell-surfaces.css",
+      "scope": "app",
+      "surfaces": ["admin", "operator", "work-entry", "display", "auth"],
+      "order": 205
+    },
+    {
+      "key": "shell.navigation",
+      "path": "styles/shell-navigation.css",
+      "scope": "app",
+      "surfaces": ["admin", "operator", "work-entry", "display", "auth"],
+      "order": 206
+    },
+    {
+      "key": "shell.forms",
+      "path": "styles/shell-forms.css",
+      "scope": "app",
+      "surfaces": ["admin", "operator", "work-entry", "display", "auth"],
+      "order": 207
+    },
+    {
+      "key": "shell.components",
+      "path": "styles/shell-components.css",
+      "scope": "app",
+      "surfaces": ["admin", "operator", "work-entry", "display", "auth"],
+      "order": 208
+    },
+    {
+      "key": "shell.admin",
+      "path": "styles/shell-admin.css",
+      "scope": "app",
+      "surfaces": ["admin"],
+      "order": 209
+    },
+    {
+      "key": "shell.operator",
+      "path": "styles/shell-operator.css",
+      "scope": "app",
+      "surfaces": ["operator"],
+      "order": 210
+    },
+    {
+      "key": "shell.auth",
+      "path": "styles/shell-auth.css",
+      "scope": "app",
+      "surfaces": ["auth"],
+      "order": 211
+    },
+    {
+      "key": "shell.setup",
+      "path": "styles/shell-setup.css",
+      "scope": "app",
+      "surfaces": ["auth"],
+      "order": 212
+    }
+  ]
+}

@@ -1,0 +1,55 @@
+{
+    "schema": "susankhya.label.context.v1",
+    "context_key": "manufacturing.product.label",
+    "purpose": "Product identification label for manufactured items",
+    "allowed_fields": [
+        {
+            "field_key": "product_name",
+            "label": "Product Name",
+            "source_column": "product_name"
+        },
+        {
+            "field_key": "product_code",
+            "label": "Product Code",
+            "source_column": "product_code"
+        },
+        {
+            "field_key": "batch_number",
+            "label": "Batch Number",
+            "source_column": "batch_number"
+        },
+        {
+            "field_key": "manufacturing_date",
+            "label": "Manufacturing Date",
+            "source_column": "manufacturing_date"
+        },
+        {
+            "field_key": "expiry_date",
+            "label": "Expiry Date",
+            "source_column": "expiry_date"
+        },
+        {
+            "field_key": "quantity",
+            "label": "Quantity",
+            "source_column": "quantity"
+        },
+        {
+            "field_key": "barcode",
+            "label": "Barcode",
+            "source_column": "barcode"
+        }
+    ],
+    "data_source_boundary": {
+        "source_name": "manufacturing_products",
+        "source_type": "manual_setup",
+        "status": "owner_scoped_candidate_selected"
+    },
+    "print_locations": {
+        "status": "owner_defined_later"
+    },
+    "template_ref": {
+        "status": "owner_template_selected_later"
+    },
+    "rules_refs": [],
+    "permissions": []
+}

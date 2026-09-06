@@ -1,0 +1,160 @@
+{
+  "id": "hospitality",
+  "app_key": "hospitality",
+  "package_type": "bundle",
+  "name": "Hospitality",
+  "version": "0.1.0",
+  "type": "business",
+  "min_core_version": "3.0.0",
+  "dependencies": [],
+  "entry": "routes.php",
+  "migrations_path": "migrations",
+  "permissions": [
+    "hospitality.view",
+    "hospitality.manage"
+  ],
+  "hooks": [
+    {
+      "type": "operator_surface",
+      "key": "hospitality.operator.sidebar",
+      "surface": "operator",
+      "region": "sidebar",
+      "provider": "Apps\\Hospitality\\Services\\OperatorContributionService::contribute",
+      "provider_file": "Services/OperatorContributionService.php",
+      "order": 110
+    },
+    {
+      "type": "operator_surface",
+      "key": "hospitality.operator.focus_views",
+      "surface": "operator",
+      "region": "focus_views",
+      "provider": "Apps\\Hospitality\\Services\\OperatorContributionService::contribute",
+      "provider_file": "Services/OperatorContributionService.php",
+      "order": 120,
+      "focus_tokens": [
+        "hospitality"
+      ]
+    }
+  ],
+  "can_disable": true,
+  "can_uninstall": true,
+  "can_export": true,
+  "styles": [
+    {
+      "key": "hospitality.app",
+      "path": "styles/hospitality.css",
+      "scope": "app",
+      "surfaces": [
+        "admin",
+        "operator"
+      ],
+      "order": 200
+    }
+  ],
+  "modules": [
+    {
+      "key": "rooms",
+      "name": "Rooms"
+    },
+    {
+      "key": "guests",
+      "name": "Guests"
+    },
+    {
+      "key": "reservations",
+      "name": "Reservations"
+    },
+    {
+      "key": "front_desk",
+      "name": "Front Desk"
+    },
+    {
+      "key": "housekeeping",
+      "name": "Housekeeping"
+    }
+  ],
+  "routes": [
+    {
+      "path": "/apps/hospitality",
+      "kind": "canonical",
+      "feature_key": "hospitality_home"
+    },
+    {
+      "path": "/apps/hospitality/rooms",
+      "kind": "canonical",
+      "feature_key": "rooms_index"
+    },
+    {
+      "path": "/apps/hospitality/guests",
+      "kind": "canonical",
+      "feature_key": "guests_index"
+    },
+    {
+      "path": "/apps/hospitality/reservations",
+      "kind": "canonical",
+      "feature_key": "reservations_index"
+    },
+    {
+      "path": "/apps/hospitality/front-desk",
+      "kind": "canonical",
+      "feature_key": "front_desk_index"
+    },
+    {
+      "path": "/apps/hospitality/housekeeping",
+      "kind": "canonical",
+      "feature_key": "housekeeping_index"
+    }
+  ],
+  "runtime_contract": {
+    "routes": [
+      {
+        "path": "/apps/hospitality",
+        "feature_key": "hospitality_home",
+        "kind": "canonical",
+        "nav_visible": true,
+        "search_visible": true,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/apps/hospitality/rooms",
+        "feature_key": "rooms_index",
+        "kind": "canonical",
+        "nav_visible": true,
+        "search_visible": true,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/apps/hospitality/guests",
+        "feature_key": "guests_index",
+        "kind": "canonical",
+        "nav_visible": true,
+        "search_visible": true,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/apps/hospitality/reservations",
+        "feature_key": "reservations_index",
+        "kind": "canonical",
+        "nav_visible": true,
+        "search_visible": true,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/apps/hospitality/front-desk",
+        "feature_key": "front_desk_index",
+        "kind": "canonical",
+        "nav_visible": true,
+        "search_visible": true,
+        "lifecycle_bound": true
+      },
+      {
+        "path": "/apps/hospitality/housekeeping",
+        "feature_key": "housekeeping_index",
+        "kind": "canonical",
+        "nav_visible": true,
+        "search_visible": true,
+        "lifecycle_bound": true
+      }
+    ]
+  }
+}

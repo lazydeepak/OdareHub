@@ -1,0 +1,41 @@
+/* Hospitality presentation polish (token-based, loaded only on
+   Hospitality admin/operator surfaces via manifest styles[]).
+   All rules are owner-prefixed (.hosp-*); shared platform primitives
+   are consumed in markup, not redefined here. */
+
+.hosp-chip {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  border: 1px solid var(--style-border-soft);
+}
+
+.hosp-chip--ok {
+  background: var(--color-success-bg);
+  color: var(--color-success-text);
+  border-color: var(--color-success-border);
+}
+
+.hosp-chip--warning {
+  background: var(--color-warning-bg);
+  color: var(--color-warning-text);
+  border-color: var(--color-warning-border);
+}
+
+.hosp-chip--danger {
+  background: var(--color-danger-bg);
+  color: var(--color-danger-text);
+  border-color: var(--color-danger-border);
+}
+
+.hosp-chip--neutral {
+  background: var(--style-subtle-bg);
+  color: var(--text);
+}
+
+.hosp-inline-form {
+  display: inline;
+  margin: 0;
+}
