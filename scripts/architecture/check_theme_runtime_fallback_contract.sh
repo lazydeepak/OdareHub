@@ -206,6 +206,18 @@ $previousHandler = set_error_handler(static function (): bool {
   return true;
 });
 
+// The admin layout unconditionally requires the self-contained developer_strip
+// partial. Provide a faithful copy in the smoke stub root so the render completes.
+$stubPartialDir = APP_ROOT . '/apps/Shell/Views/partials';
+$stubPartial = $stubPartialDir . '/developer_strip.php';
+if (!is_dir($stubPartialDir)) {
+  mkdir($stubPartialDir, 0777, true);
+}
+if (is_file($stubPartial)) {
+  unlink($stubPartial);
+}
+copy($realRoot . '/apps/Shell/Views/partials/developer_strip.php', $stubPartial);
+
 ob_start();
 require $realRoot . '/public/views/layouts/header.php';
 $html = (string)ob_get_clean();

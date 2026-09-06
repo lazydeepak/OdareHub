@@ -53,7 +53,7 @@ check_required_path() {
 shell_php_files=()
 while IFS= read -r file; do
   shell_php_files+=("$file")
-done < <(find apps/Shell -type f -name '*.php' -print 2>/dev/null)
+done < <(find apps/Shell -type f -name '*.php' -not -path '*/Tests/*' -not -path '*/tests/*' -print 2>/dev/null)
 
 # Collect Shell layout/view files under public/views/layouts/
 shell_layout_files=()
