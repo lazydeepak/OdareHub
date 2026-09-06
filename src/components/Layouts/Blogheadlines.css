@@ -1,0 +1,27 @@
+#p{
+    font-size: 10px;
+    text-align: justify;
+}
+.forheader{
+    text-align: center;
+    margin-top: 20px;
+    margin-bottom: 15px;
+    font-family: 'Times New Roman', Times, serif;
+}
+.row{
+    justify-content: center;
+    margin-left: 0;
+    margin-bottom: 10px;
+
+}
+.card-text{
+    justify-content: center;
+    text-align: justify;
+    font-family: 'Times New Roman', Times, serif;
+}
+.text-muted{
+    font-size: 15px;
+}
+.card{
+    margin-right: 25px;
+}

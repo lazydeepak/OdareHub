@@ -1,0 +1,28 @@
+.about{
+    background-color: rgb(239, 241, 241);
+}
+.item{
+    font-size: 23px;
+}
+.container{
+    margin-right: 0;
+}
+.social{
+    font-size: 30px;
+    justify-content: space-between;
+    align-content: center;
+    flex-wrap: wrap;
+}
+.subscribe{
+    text-align: center;
+    align-content: center;
+    margin: 5px 350px;
+}
+.social{
+    margin:0px 100px;
+}
+.info{
+    text-align: center;
+    background-color: rgb(239, 241, 241);
+    margin-top: 10px;
+}
