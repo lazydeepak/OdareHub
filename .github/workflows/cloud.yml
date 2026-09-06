@@ -1,0 +1,104 @@
+name: Cloud application CI and manual deployment
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      deploy:
+        description: Deploy this main commit to cloud.odarehub.com
+        type: boolean
+        default: false
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: shivammathur/setup-php@b604ade2a87db23f8871b7182e69ec5e75effb45 # v2
+        with:
+          php-version: '8.5'
+          extensions: mysqli, mbstring, dom, xml, xmlwriter, zip, gd, curl, fileinfo
+          tools: composer:v2
+          coverage: none
+      - name: Validate locked dependencies
+        run: |
+          composer validate --strict --no-check-publish
+          # vendor is tracked in this repository; never trust the checked-in copy.
+          rm -rf vendor
+          composer install --no-interaction --prefer-dist --no-progress --no-scripts --no-plugins
+          composer check-platform-reqs
+      - name: Lint application PHP
+        run: |
+          find app apps platform plugins public resources scripts bin -type f -name '*.php' -print0 | xargs -0 -n1 php -l > "$RUNNER_TEMP/php-lint.log"
+      - name: Repository deployment readiness (blocking)
+        run: bash scripts/system/check_deployment_readiness.sh
+      - name: Build production payload
+        run: bash .github/cloud/build.sh "$RUNNER_TEMP/cloud-release"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: cloud-${{ github.sha }}
+          path: ${{ runner.temp }}/cloud-release/
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 7
+  deploy:
+    needs: validate
+    if: github.event_name == 'workflow_dispatch' && inputs.deploy && github.ref == 'refs/heads/main' && vars.CLOUD_DEPLOY_ENABLED == 'true'
+    environment:
+      name: cloud.odarehub.com
+      url: https://cloud.odarehub.com
+    concurrency:
+      group: cloud-odarehub-deploy
+      cancel-in-progress: false
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      CLOUD_HOST: ${{ secrets.CLOUD_HOST }}
+      CLOUD_PORT: ${{ secrets.CLOUD_PORT }}
+      CLOUD_SSH_KEY: ${{ secrets.CLOUD_SSH_KEY }}
+      CLOUD_KNOWN_HOSTS: ${{ secrets.CLOUD_KNOWN_HOSTS }}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: cloud-${{ github.sha }}
+          path: payload
+      - name: Transfer and activate isolated release
+        shell: bash
+        run: |
+          set -euo pipefail
+          : "${CLOUD_HOST:?Missing CLOUD_HOST}" "${CLOUD_PORT:?Missing CLOUD_PORT}"
+          : "${CLOUD_SSH_KEY:?Missing CLOUD_SSH_KEY}" "${CLOUD_KNOWN_HOSTS:?Missing CLOUD_KNOWN_HOSTS}"
+          [[ "$CLOUD_HOST" =~ ^[a-zA-Z0-9][a-zA-Z0-9.-]+$ ]]
+          [[ "$CLOUD_PORT" =~ ^[0-9]{1,5}$ ]]
+          (( 10#$CLOUD_PORT > 0 && 10#$CLOUD_PORT < 65536 ))
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "$CLOUD_SSH_KEY" > ~/.ssh/cloud_key
+          printf '%s\n' "$CLOUD_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/cloud_key ~/.ssh/known_hosts
+          trap 'rm -f ~/.ssh/cloud_key' EXIT
+          # Hestia panel user owns the docroot; PHP-FPM for this domain runs as lazy.
+          # Username and destination are fixed so the key cannot target the marketing site.
+          ssh_args=(-i ~/.ssh/cloud_key -p "$CLOUD_PORT" -o BatchMode=yes -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes)
+          base='/home/lazy/web/cloud.odarehub.com/private/odarehub'
+          release="${GITHUB_SHA}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          mkdir_cmd="mkdir -m 711 '$base/incoming' 2>/dev/null || true; mkdir -m 711 '$base/incoming/$release'"
+          # shellcheck disable=SC2029
+          ssh "${ssh_args[@]}" "lazy@$CLOUD_HOST" "$mkdir_cmd"
+          rsync -rltz --chmod=D750,F640 \
+            -e "ssh -i $HOME/.ssh/cloud_key -p $CLOUD_PORT -o BatchMode=yes -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes" \
+            payload/ "lazy@$CLOUD_HOST:$base/incoming/$release/"
+          # shellcheck disable=SC2029
+          ssh "${ssh_args[@]}" "lazy@$CLOUD_HOST" \
+            "bash -s -- '$release' '$GITHUB_SHA'" < .github/cloud/activate.sh
+      - name: Remove deployment key
+        if: always()
+        run: rm -f ~/.ssh/cloud_key
