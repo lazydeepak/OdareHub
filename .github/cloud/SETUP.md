@@ -1,8 +1,27 @@
 # cloud.odarehub.com — Hestia VPS preparation and operations
 
-Prepared 2026-09-06. Nothing has been deployed, pushed, or changed on the VPS beyond
-the approved layout scaffold. The commands below are operator instructions for a
-future approved deployment.
+Prepared 2026-09-06 as the first-boot plan; superseded by the operation status
+below. Sections 1-5 are one-time Hestia/panel steps (historical provenance; do not
+rerun them for future deployments). Section 6 is the ongoing release/rollback
+procedure and remains current.
+
+## Operational status (post-setup baseline)
+
+- First deployment completed and activated on `cloud.odarehub.com`.
+- Baseline release: `a19843956311cf04c5b0a5a59c854dd896a71d0d-34133999734-1`
+  (commit `a19843956311cf04c5b0a5a59c854dd896a71d0d`), verified by `cloud-release.txt`.
+- Setup completed; first admin account created and login verified. Do not run the
+  first-boot `/setup` preparation again for future deployments.
+- The temporary `operator` Apache Basic-Auth gate is intentionally retained during
+  stabilization (`KEEP_OPERATOR_GATE_DURING_STABILIZATION`). Do not remove or weaken
+  it without explicit approval. It lives in Hestia user-conf Apache config outside the
+  release tree, so routine deployments never touch it.
+- Future deployments use the established release pipeline: CI on `main`, then a
+  manually authorized `deploy=true` dispatch that activates the exact verified SHA.
+  `CLOUD_DEPLOY_ENABLED` stays `false` (or absent) except during an authorized
+  deployment and is restored to `false` afterwards.
+- Docroot placeholder backup `public_html.placeholder-backup` is retained; do not
+  delete it.
 
 ## Findings and scope
 
