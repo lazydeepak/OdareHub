@@ -184,19 +184,31 @@ done < <(find app -type f \( -name '*.php' -o -name '*.js' -o -name '*.css' -o -
 
 echo ""
 echo "== Customization Studio source home =="
+# Owner-home invariant: CustomizationStudio implementation/source paths must be
+# confined to the canonical owner home under apps/Studio/Tools/CustomizationStudio.
+# We scan ONLY the canonical source-bearing roots (app/, apps/, platform/,
+# packages/, plugins/, resources/) because those are the only locations where a
+# competing source implementation could legitimately live per the architecture
+# model (Core -> Shell+Platform -> Apps, Packages/Plugins extension). Non-source
+# roots (storage/, engineering/, docs/, scripts/, etc.) are runtime storage /
+# workspaces / documentation, not source implementation homes, so they are
+# intentionally excluded from this scan.
+source_roots=(app apps platform packages plugins resources)
 unexpected_paths="$(mktemp /tmp/customization-studio-paths-XXXXXX)"
-find . \
-  \( -path "./.git" -o -path "./storage/manual-rehearsal-test-*" -o -path "./engineering/*" -o -path "./docs/*" -o -name "*.md" \) -prune -o \
-  -type f \( -name '*.php' -o -name '*.js' -o -name '*.css' -o -name '*.json' \) -path "*/CustomizationStudio*" -print \
-  | while IFS= read -r path; do
-      case "$path" in
-        "./$customization_root"|"./$customization_root"/*)
-          ;;
-        *)
-          printf '%s\n' "$path"
-          ;;
-      esac
-    done > "$unexpected_paths"
+: > "$unexpected_paths"
+for source_root in "${source_roots[@]}"; do
+  [[ -d "$source_root" ]] || continue
+  find "$source_root" -path "*/CustomizationStudio*" -print \
+    | while IFS= read -r path; do
+        case "$path" in
+          "$customization_root"|"$customization_root"/*)
+            ;;
+          *)
+            printf '%s\n' "$path"
+            ;;
+        esac
+      done >> "$unexpected_paths"
+done
 
 if [[ -s "$unexpected_paths" ]]; then
   echo "  fail: CustomizationStudio implementation paths must stay under $customization_root" >&2
