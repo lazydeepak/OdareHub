@@ -10,7 +10,7 @@ $ht = static function (string $key): string {
     $dict = [
         'en' => [
             'title' => 'Repository Scanner',
-            'subtitle' => 'Read-only repository discovery and inspection for Susankhya OS.',
+            'subtitle' => 'Read-only repository discovery and inspection for OdareHub.',
             'scan_btn' => 'Scan Repository',
             'scan_desc' => 'Scans from APP_ROOT and renders folders/files with aggregate byte sizes.',
             'root_label' => 'Root',
@@ -124,7 +124,7 @@ $ht = static function (string $key): string {
         ],
         'ja' => [
             'title' => 'Repository Scanner',
-            'subtitle' => 'Susankhya OS の読み取り専用リポジトリ探索・点検ツール。',
+            'subtitle' => 'OdareHub の読み取り専用リポジトリ探索・点検ツール。',
             'scan_btn' => 'リポジトリをスキャン',
             'scan_desc' => 'APP_ROOT から走査し、フォルダ・ファイルを合計サイズ付きで表示します。',
             'root_label' => 'ルート',
@@ -238,7 +238,7 @@ $ht = static function (string $key): string {
         ],
         'ne' => [
             'title' => 'Repository Scanner',
-            'subtitle' => 'Susankhya OS को लागि पढ्न-मात्र रिपोजिटरी खोज र निरीक्षण।',
+            'subtitle' => 'OdareHub को लागि पढ्न-मात्र रिपोजिटरी खोज र निरीक्षण।',
             'scan_btn' => 'रिपोजिटरी स्क्यान गर्नुहोस्',
             'scan_desc' => 'APP_ROOT बाट स्क्यान गरी फोल्डर/फाइल संरचना आकारसहित देखाउँछ।',
             'root_label' => 'रुट',

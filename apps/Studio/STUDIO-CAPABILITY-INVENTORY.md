@@ -17,7 +17,7 @@ This is a read-only architecture inventory. It does not authorize mutation, chan
 
 ## Governing Direction
 
-Studio exists to diagnose and repair Susankhya OS and to create, inspect, edit, migrate, and delete owners and owner-owned components through governed workflows.
+Studio exists to diagnose and repair OdareHub and to create, inspect, edit, migrate, and delete owners and owner-owned components through governed workflows.
 
 The target architecture is:
 

@@ -1,8 +1,8 @@
-# Susankhya Studio Charter
+# OdareHub Studio Charter
 
 ## Purpose
 
-Susankhya Studio is the governed engineering environment for changing Susankhya OS without bypassing ownership, lifecycle, validation, or runtime contracts.
+OdareHub Studio is the governed engineering environment for changing OdareHub without bypassing ownership, lifecycle, validation, or runtime contracts.
 
 Studio exists to:
 
@@ -196,7 +196,7 @@ Studio must not become:
 - a shortcut around app, module, platform, schema, routing, ACL, or lifecycle contracts;
 - an automatic mutation engine without preview, approval, evidence, and recovery;
 - a replacement for target-owner runtime services; or
-- a generic visual builder detached from valid Susankhya owner artifacts.
+- a generic visual builder detached from valid OdareHub owner artifacts.
 
 ---
 

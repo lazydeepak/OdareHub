@@ -1,6 +1,6 @@
 # /apps/Studio/AGENTS.md
 
-> Susankhya Studio is the optional System App for governed system engineering and no-code composition.
+> OdareHub Studio is the optional System App for governed system engineering and no-code composition.
 > Studio diagnoses and repairs the system, and creates, edits, migrates, and deletes owners and owner-owned components through governed workflows.
 > Studio owns builder/editor workflows; other apps must not depend on Studio at runtime.
 
