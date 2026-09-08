@@ -101,7 +101,7 @@ final class OperatorLayerSidebarService
 
     /**
      * Get primary app rail items (major zones)
-     * Shows only: My Work, Manufacturing, SBAIO, Susankhya OS governance (if admin), Platform Admin (if admin)
+     * Shows only: My Work, Manufacturing, SBAIO, OdareHub governance (if admin), Platform Admin (if admin)
      * 
      * @return array<int, array{
      *   id: string,

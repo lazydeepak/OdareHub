@@ -947,7 +947,7 @@ a.ewh-doc:hover { border-color: #1d4ed8; color: #1d4ed8; }
         </div>
 
         <div style="margin-top:12px;padding:10px 14px;border:1px solid #e5e7eb;border-radius:8px;background:#f9fafb;font-size:12px;color:#6b7280;">
-          <strong>Limitation:</strong> Susankhya OS does not contain a built-in coding agent runtime. This surface prepares a structured context packet for an external agent but does not dispatch or execute external agents.
+          <strong>Limitation:</strong> OdareHub does not contain a built-in coding agent runtime. This surface prepares a structured context packet for an external agent but does not dispatch or execute external agents.
         </div>
       <?php elseif ($agentContextRequest !== null && $agentContextResult === null): ?>
         <div class="ewh-provision-plan" style="background:#fef2f2;border-color:#fecaca;">

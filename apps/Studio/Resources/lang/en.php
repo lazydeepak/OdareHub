@@ -171,7 +171,7 @@ return [
     'studio.home_description' => 'Studio edits owner resources through explicit tools and governed workflow stages. Runtime truth stays with the owning app or module.',
     'studio.host.open_studio' => 'Open Studio',
     'studio.host.open_studio_description' => 'Open the governed app and resource workbench.',
-    'studio.host.workspace' => 'Susankhya Studio',
+    'studio.host.workspace' => 'OdareHub Studio',
     'studio.host.workspace_description' => 'Governed workbench for apps, modules, resources, tools, diffs, approvals, and rollback.',
     'studio.impact_explorer_description' => 'Search tokens...',
     'studio.impact_explorer_empty_state' => 'No tokens found matching your search.',
