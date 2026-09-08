@@ -2,7 +2,7 @@
 
 Status: Placeholder direction only
 
-ERP App Studio is the governed authoring layer for Susankhya OS apps and modules. It replaces user-facing GUI Studio language while preserving current technical route and key names during this phase.
+ERP App Studio is the governed authoring layer for OdareHub apps and modules. It replaces user-facing GUI Studio language while preserving current technical route and key names during this phase.
 
 ## Future Registry Areas
 

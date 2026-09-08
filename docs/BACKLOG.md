@@ -1,4 +1,4 @@
-# Susankhya OS Backlog
+# OdareHub Backlog
 
 This file tracks confirmed future work that is not the current active task. Keep speculative ideas out unless they have a clear owner or reason.
 
