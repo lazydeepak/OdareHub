@@ -8,7 +8,7 @@
 
 ## 1. Decision Summary
 
-Susankhya OS should separate authorization from experience composition.
+OdareHub should separate authorization from experience composition.
 
 The intended model is:
 

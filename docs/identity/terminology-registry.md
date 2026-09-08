@@ -1,14 +1,14 @@
-# Susankhya OS Terminology Registry
+# OdareHub Terminology Registry
 
 Status: Identity Stabilization baseline
 
-This registry controls user-facing platform language after the ERP Engine to Susankhya OS migration. It does not rename technical routes, folders, namespaces, database keys, or compatibility aliases.
+This registry controls user-facing platform language after the ERP Engine to OdareHub migration. It does not rename technical routes, folders, namespaces, database keys, or compatibility aliases.
 
 ## Canonical Terms
 
 | Term | Use For | Avoid |
 |---|---|---|
-| Susankhya OS | Platform product name and platform-wide runtime identity | ERP Engine |
+| OdareHub | Platform product name and platform-wide runtime identity | ERP Engine |
 | ERP App Studio | Governed app authoring, templates, manifests, artifacts, and publish preparation | GUI Studio |
 | Manufacturing | Business app for production, QC, materials, assembly, and dispatch | Manufacturing portal as a product name |
 | SBAIO | Business app for small-business workforce and operational records | Expanded ad hoc names in navigation |

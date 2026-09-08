@@ -2,7 +2,7 @@
 
 Status: Architecture checkpoint. Vocabulary and ownership only; no runtime behavior changes.
 
-Appearance is the future canonical umbrella domain for the visual state of Susankhya OS. This contract names the dimensions that future persistence, tooling, publishing, and runtime contracts will use. It does not replace any current setting, selector, compiler input, browser-storage key, or runtime value.
+Appearance is the future canonical umbrella domain for the visual state of OdareHub. This contract names the dimensions that future persistence, tooling, publishing, and runtime contracts will use. It does not replace any current setting, selector, compiler input, browser-storage key, or runtime value.
 
 ## Canonical vocabulary
 
