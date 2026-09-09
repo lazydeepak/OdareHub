@@ -1,5 +1,5 @@
 {
-  "schema": "susankhya.system_tools_registry.v1",
+  "schema": "odarehub.system_tools_registry.v1",
   "owner": "System Tools",
   "source_of_truth": "scripts/system/tools.registry.json",
   "tools": [

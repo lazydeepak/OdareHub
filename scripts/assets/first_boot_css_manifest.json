@@ -1,5 +1,5 @@
 {
-  "schema": "susankhya.first_boot_css_manifest.v1",
+  "schema": "odarehub.first_boot_css_manifest.v1",
   "assets": [
     {
       "target": "public/assets/system/shell-essential.css",

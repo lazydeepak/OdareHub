@@ -1,5 +1,5 @@
 {
-    "schema": "susankhya.label.template.v1",
+    "schema": "odarehub.label.template.v1",
     "write_status": "created",
     "template_key": "manufacturing.product.label.100x50_mm",
     "context_ref": {

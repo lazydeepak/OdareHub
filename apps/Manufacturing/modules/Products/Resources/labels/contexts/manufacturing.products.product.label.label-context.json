@@ -1,5 +1,5 @@
 {
-    "schema": "susankhya.label.context.v1",
+    "schema": "odarehub.label.context.v1",
     "context_key": "manufacturing.products.product.label",
     "owner": {
         "owner_key": "manufacturing/products",

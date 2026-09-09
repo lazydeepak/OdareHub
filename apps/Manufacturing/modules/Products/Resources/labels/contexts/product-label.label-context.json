@@ -1,5 +1,5 @@
 {
-    "schema": "susankhya.label.context.v1",
+    "schema": "odarehub.label.context.v1",
     "context_key": "manufacturing.product.label",
     "purpose": "Product identification label for manufactured items",
     "allowed_fields": [

@@ -334,6 +334,7 @@ final class ShellOverlayFramework
       }
     }
   };
+  window['SusankhyaOS.ShellOverlay'] = window[NS];
   applyVisual();
 })();
 JS;

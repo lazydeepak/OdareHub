@@ -1,5 +1,5 @@
 {
-  "schema": "susankhya.admin_upgrade_candidates.v1",
+  "schema": "odarehub.admin_upgrade_candidates.v1",
   "generated_on": "2026-07-13",
   "source_policy": "code_reality_first",
   "statuses": ["discovered", "analyzed", "target_designed", "implementing", "parity_review", "owner_approved", "promoted", "compatibility", "cleanup_approved"],

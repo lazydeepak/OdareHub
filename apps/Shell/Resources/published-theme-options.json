@@ -1,5 +1,5 @@
 {
-    "schema": "susankhya.shell.published-theme-options.v1",
+    "schema": "odarehub.shell.published-theme-options.v1",
     "generated_from": "resources/themes/theme-manifest.json",
     "styles": {
         "liquid-glass": "Liquid Glass",
