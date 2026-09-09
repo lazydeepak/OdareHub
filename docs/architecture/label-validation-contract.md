@@ -6,13 +6,13 @@ Status: Architecture contract baseline. This contract defines what makes a Label
 
 ## 1. Context Schema Rules
 
-Every Label Context Resource must conform to schema `susankhya.label.context.v1`. This section defines mandatory and optional fields, their types, and the value constraints that produce a valid context.
+Every Label Context Resource must conform to schema `odarehub.label.context.v1`. This section defines mandatory and optional fields, their types, and the value constraints that produce a valid context.
 
 ### 1.1 Required Fields
 
 | Field | Type | Constraint |
 |---|---|---|
-| `schema` | string | Must equal `susankhya.label.context.v1` exactly. |
+| `schema` | string | Must equal `odarehub.label.context.v1` exactly. |
 | `context_key` | string | Must be non-empty. Must match `[a-z0-9._-]+`. Must be unique per owner. |
 | `purpose` | string | Must be non-empty, plain-text business description. |
 | `allowed_fields` | array of objects | Must contain at least one field entry. Each entry must have a unique `field_key`. |
@@ -61,19 +61,19 @@ Context files must be named `{context_key}.label-context.json` and reside under 
 
 ### 1.7 Schema Versioning
 
-`susankhya.label.context.v1` is the initial and only version. Future versions (`v2`, etc.) must be additive-only — no field may be removed or changed in meaning. A context file that declares an unrecognized schema version is invalid for all purposes.
+`odarehub.label.context.v1` is the initial and only version. Future versions (`v2`, etc.) must be additive-only — no field may be removed or changed in meaning. A context file that declares an unrecognized schema version is invalid for all purposes.
 
 ---
 
 ## 2. Template Schema Rules
 
-Every Label Template Resource must conform to schema `susankhya.label.template.v1`.
+Every Label Template Resource must conform to schema `odarehub.label.template.v1`.
 
 ### 2.1 Required Fields
 
 | Field | Type | Constraint |
 |---|---|---|
-| `schema` | string | Must equal `susankhya.label.template.v1` exactly. |
+| `schema` | string | Must equal `odarehub.label.template.v1` exactly. |
 | `template_key` | string | Must be non-empty. Must match `[a-z0-9._-]+`. Must be unique per owner. |
 | `context_ref` | object | Must reference an existing, valid owner-owned context. |
 | `layout` | object | Must declare a valid `label_size` and at least one `block`. |
@@ -133,7 +133,7 @@ Template files must be named `{template_key}.json` and reside under `{OwnerRoot}
 
 ### 2.7 Schema Versioning
 
-`susankhya.label.template.v1` is the initial version. Same additive-only rule as contexts.
+`odarehub.label.template.v1` is the initial version. Same additive-only rule as contexts.
 
 ### 2.8 Write Status Contract
 
@@ -262,7 +262,7 @@ Files outside these subdirectories are not recognized as label resources. Empty 
 
 ### 6.5 No Orphan Files
 
-Every `.json` file in `Resources/labels/templates/` must have a corresponding context (per Section 4.2). Every `.label-context.json` file in `Resources/labels/contexts/` must be parseable as `susankhya.label.context.v1`. Files that fail parse or schema validation must be reported as invalid and must not participate in template binding resolution.
+Every `.json` file in `Resources/labels/templates/` must have a corresponding context (per Section 4.2). Every `.label-context.json` file in `Resources/labels/contexts/` must be parseable as `odarehub.label.context.v1`. Files that fail parse or schema validation must be reported as invalid and must not participate in template binding resolution.
 
 ---
 

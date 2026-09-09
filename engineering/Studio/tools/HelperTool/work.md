@@ -2,7 +2,7 @@
 
 ## Current Focus
 
-Transform the current repository tree scanner into the canonical Repository Scanner for Susankhya OS.
+Transform the current repository tree scanner into the canonical Repository Scanner for OdareHub.
 
 The immediate goal is to build a trustworthy read-only repository inspection platform that becomes the engineering foundation for Repository Doctor, App/Module Upgrade workflows, and future engineering agents.
 

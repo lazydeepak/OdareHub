@@ -7,7 +7,7 @@ return [
             'version' => '0.4.0',
             'release_date' => '2026-04-09',
             'scope' => 'core',
-            'summary' => 'Introduced layered setup, environment portability, restore/import-back, and release workflow foundations for Susankhya OS.',
+            'summary' => 'Introduced layered setup, environment portability, restore/import-back, and release workflow foundations for OdareHub.',
             'breaking_changes' => [],
             'migration_notes' => [
                 'Re-run Core verification after upgrade so runtime hooks, schema tables, and writable path checks are refreshed.',

@@ -20,7 +20,7 @@ Plugins may provide:
 - Do NOT create app-owned business routes in plugin scope.
 - Enforce server-side authorization and input validation on plugin routes.
 - Keep plugin behavior removable without orphan surfaces.
-- Do NOT add new Susankhya Studio builder/editor logic to plugins. Studio belongs to the optional `/apps/Studio` System App; plugin-hosted GUI Studio code is legacy or temporary bridge code only.
+- Do NOT add new OdareHub Studio builder/editor logic to plugins. Studio belongs to the optional `/apps/Studio` System App; plugin-hosted GUI Studio code is legacy or temporary bridge code only.
 - Do NOT add new independent ACL experience-shaping catalogs in plugins. Follow `../docs/experience-composition-architecture-plan.md` for ACL, Workspace Profile, Studio, and runtime experience composition work.
 
 ---

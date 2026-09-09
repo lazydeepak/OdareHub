@@ -40,7 +40,7 @@ function builder_rm_tree(string $path): void
     @rmdir($path);
 }
 
-$tmp = sys_get_temp_dir() . '/susankhya-local-channel-builder-probe-' . bin2hex(random_bytes(6));
+$tmp = sys_get_temp_dir() . '/odarehub-local-channel-builder-probe-' . bin2hex(random_bytes(6));
 mkdir($tmp . '/source/app', 0700, true);
 mkdir($tmp . '/source/storage', 0700, true);
 file_put_contents($tmp . '/source/app/runtime.php', '<?php return true;');

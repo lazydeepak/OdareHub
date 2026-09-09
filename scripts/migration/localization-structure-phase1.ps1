@@ -2,7 +2,7 @@
 # Migrates locale files from legacy lang/ to canonical Resources/lang/
 # Preserves legacy lang/ files for backward compatibility
 
-$ProjectRoot = "C:\Projects\Susankhya"
+$ProjectRoot = "C:\Projects\OdareHub"
 $Locales = @("en", "ja", "ne")
 
 # Owners with their locale file status

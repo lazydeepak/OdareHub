@@ -4619,7 +4619,7 @@ return [
 
     // Entity Runtime Inspector
     'admin.entity_runtime.title'                             => 'Entity Runtime Inspector',
-    'admin.entity_runtime.subtitle'                          => 'Susankhya OS entity definitions, workflows, hooks, र policies को debug surface।',
+    'admin.entity_runtime.subtitle'                          => 'OdareHub entity definitions, workflows, hooks, र policies को debug surface।',
     'admin.entity_runtime.dry_run.heading'                   => 'Transition Dry-Run (Read-Only)',
     'admin.entity_runtime.dry_run.entity_key'                => 'Entity Key',
     'admin.entity_runtime.dry_run.select_entity'             => '-- Entity छान्नुहोस् --',

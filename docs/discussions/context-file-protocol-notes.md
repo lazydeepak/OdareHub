@@ -15,11 +15,11 @@ A referenced coding-preparation pattern suggested creating six files before star
 - `design.md`
 - `memory.md`
 
-The useful principle is to prepare structured context before coding. The risk for Susankhya OS is duplication and drift across many agents, owners, and long-running milestones.
+The useful principle is to prepare structured context before coding. The risk for OdareHub is duplication and drift across many agents, owners, and long-running milestones.
 
 ## Confirmed Direction
 
-Susankhya OS should keep a leaner context system:
+OdareHub should keep a leaner context system:
 
 - `AGENTS.md` for startup rules and routing
 - `docs/CURRENT.md` for current project state and context routing

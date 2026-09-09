@@ -152,7 +152,7 @@ Rules are **declarative presentation resources only**.
 
 ```json
 {
-  "schema": "susankhya.label.rule.v1",
+  "schema": "odarehub.label.rule.v1",
   "rule_key": "product_qty_highlight",
   "owner_key": "manufacturing.products",
   "label": "Highlight large quantities",
@@ -188,7 +188,7 @@ Rules are **declarative presentation resources only**.
 
 | Field | Type | Description |
 |---|---|---|
-| `schema` | string | Must be `"susankhya.label.rule.v1"` |
+| `schema` | string | Must be `"odarehub.label.rule.v1"` |
 | `rule_key` | string | Unique key within the owner's rule namespace. Pattern: `[a-z0-9._-]+` |
 | `owner_key` | string | The owner key that declares this rule. Must match the owning app/module/plugin key |
 | `conditions` | array | Array of condition objects. At least one condition required |
@@ -209,8 +209,8 @@ Rules are **declarative presentation resources only**.
 
 ### Versioning
 
-- Schema version is pinned to `"susankhya.label.rule.v1"`.
-- Future schema versions must update the version string (e.g., `"susankhya.label.rule.v2"`).
+- Schema version is pinned to `"odarehub.label.rule.v1"`.
+- Future schema versions must update the version string (e.g., `"odarehub.label.rule.v2"`).
 - The renderer must reject unknown schema versions with a clear diagnostic failure.
 - Backward-incompatible changes require a new schema version.
 
@@ -360,7 +360,7 @@ Aligned with the Label Validation Contract:
 
 | ID | Check | Severity | Description |
 |---|---|---|---|
-| R001 | Schema version | FAIL | Rule schema must be `"susankhya.label.rule.v1"` |
+| R001 | Schema version | FAIL | Rule schema must be `"odarehub.label.rule.v1"` |
 | R002 | Rule key present | FAIL | `rule_key` must be a non-empty string matching `[a-z0-9._-]+` |
 | R003 | Rule key unique | FAIL | No duplicate `rule_key` within the same owner |
 | R004 | Owner key present | FAIL | `owner_key` must match the owning app/module/plugin key |

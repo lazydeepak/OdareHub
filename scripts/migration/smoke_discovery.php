@@ -1,5 +1,5 @@
 <?php
-define('APP_ROOT', 'C:\Projects\Susankhya');
+define('APP_ROOT', 'C:\Projects\OdareHub');
 
 // Load the discovery service directly
 require_once APP_ROOT . '/apps/Studio/Tools/LocalizationStudio/Services/LocalizationStudioDiscoveryService.php';

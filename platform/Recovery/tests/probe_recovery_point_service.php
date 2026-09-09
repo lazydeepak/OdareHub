@@ -42,7 +42,7 @@ function point_rm_tree(string $path): void
     @rmdir($path);
 }
 
-$tmp = sys_get_temp_dir() . '/susankhya-recovery-point-service-probe-' . bin2hex(random_bytes(6));
+$tmp = sys_get_temp_dir() . '/odarehub-recovery-point-service-probe-' . bin2hex(random_bytes(6));
 mkdir($tmp, 0700, true);
 
 try {

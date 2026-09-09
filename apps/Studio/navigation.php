@@ -13,7 +13,7 @@ return [
             'owner' => 'studio',
             'key' => 'studio_workspace',
             'feature_key' => 'studio_workspace',
-            'label' => 'Susankhya Studio',
+            'label' => 'OdareHub Studio',
             'url' => '/apps/studio',
             'visible_if' => 'role_platform_admin_or_sysadmin',
             'nav_visible' => true,

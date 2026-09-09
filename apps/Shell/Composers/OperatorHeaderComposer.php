@@ -56,7 +56,7 @@ final class OperatorHeaderComposer
                     <?php elseif ($companyLogo !== ''): ?>
                         <img src="<?php echo htmlspecialchars($companyLogo); ?>" alt="<?php echo htmlspecialchars((string)($data['company_name'] ?? '')); ?>" class="header-company-logo">
                     <?php else: ?>
-                        <span class="header-company-logo-fallback header-company-logo-fallback--desktop"><?php echo htmlspecialchars($companyFallbackText ?: 'Susankhya OS'); ?></span>
+                        <span class="header-company-logo-fallback header-company-logo-fallback--desktop"><?php echo htmlspecialchars($companyFallbackText ?: 'OdareHub'); ?></span>
                         <span class="header-company-logo-fallback header-company-logo-fallback--mobile"><?php echo htmlspecialchars($companyFallbackTextCompact ?: 'S'); ?></span>
                     <?php endif; ?>
                     <?php if ($hasLogo): ?>

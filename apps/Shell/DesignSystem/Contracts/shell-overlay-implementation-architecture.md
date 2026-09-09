@@ -2,7 +2,7 @@
 
 ## Decision
 
-Shell owns one browser controller: `SusankhyaOS.ShellOverlay`.
+Shell owns one browser controller: `OdareHubOS.ShellOverlay`.
 
 Candidates do not implement generic overlay policy. They supply an ID, a Shell-owned preset, DOM bindings, and content-specific callbacks only where required.
 

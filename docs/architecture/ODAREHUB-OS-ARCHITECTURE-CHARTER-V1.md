@@ -1,4 +1,4 @@
-# Susankhya OS Architecture Charter v1
+# OdareHub Architecture Charter v1
 
 Status: Active architecture guidance for all platform and agent work.
 
@@ -41,7 +41,7 @@ Core changes are exceptional and require explicit approval.
 
 ## 3. Current Project Focus
 
-1. Susankhya OS is the product.
+1. OdareHub is the product.
 2. ERP/Manufacturing/SBAIO/Payroll are sample/reference apps.
 3. Do not polish sample apps unless the issue exposes a platform architecture problem.
 4. Current priority is architecture perfection.

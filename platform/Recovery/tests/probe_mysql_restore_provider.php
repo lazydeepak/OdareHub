@@ -39,7 +39,7 @@ function mysql_restore_rm_tree(string $path): void
     @rmdir($path);
 }
 
-$tmp = sys_get_temp_dir() . '/susankhya-mysql-restore-provider-probe-' . bin2hex(random_bytes(6));
+$tmp = sys_get_temp_dir() . '/odarehub-mysql-restore-provider-probe-' . bin2hex(random_bytes(6));
 mkdir($tmp, 0700, true);
 
 try {

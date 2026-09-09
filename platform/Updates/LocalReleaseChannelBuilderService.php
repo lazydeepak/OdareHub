@@ -9,7 +9,7 @@ use ZipArchive;
 
 final class LocalReleaseChannelBuilderService
 {
-    private const SCHEMA_VERSION = 'susankhya.release.v1';
+    private const SCHEMA_VERSION = 'odarehub.release.v1';
 
     /**
      * @param array<int,string> $includeRoots
@@ -32,7 +32,7 @@ final class LocalReleaseChannelBuilderService
         }
 
         $safeBuildId = preg_replace('/[^A-Za-z0-9._-]+/', '-', $buildId) ?: 'build';
-        $packageName = 'susankhya-os-' . $releaseVersion . '-' . $safeBuildId . '.zip';
+        $packageName = 'odarehub-' . $releaseVersion . '-' . $safeBuildId . '.zip';
         $packagePath = $releasesDirectory . '/' . $packageName;
         $zip = new ZipArchive();
         if ($zip->open($packagePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
@@ -49,14 +49,14 @@ final class LocalReleaseChannelBuilderService
         $sha = hash_file('sha256', $packagePath) ?: '';
         $size = filesize($packagePath) ?: 0;
         $metadata = $this->metadata($releaseVersion, $buildId, $packageName, $sha, $size, $included, $skipped);
-        $metadataName = 'susankhya-os-' . $releaseVersion . '-' . $safeBuildId . '.json';
+        $metadataName = 'odarehub-' . $releaseVersion . '-' . $safeBuildId . '.json';
         $metadataPath = $releasesDirectory . '/' . $metadataName;
         file_put_contents($metadataPath, json_encode($metadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n");
 
         $channel = [
-            'schema_version' => 'susankhya.local-channel.v1',
+            'schema_version' => 'odarehub.local-channel.v1',
             'channel' => 'local',
-            'product_id' => 'susankhya-os',
+            'product_id' => 'odarehub',
             'generated_at' => gmdate('Y-m-d\TH:i:s\Z'),
             'lanes' => [
                 'app' => [
@@ -147,8 +147,8 @@ final class LocalReleaseChannelBuilderService
     {
         return [
             'schema_version' => self::SCHEMA_VERSION,
-            'product_id' => 'susankhya-os',
-            'product_name' => 'Susankhya ERP',
+            'product_id' => 'odarehub',
+            'product_name' => 'OdareHub ERP',
             'release_version' => $releaseVersion,
             'build_id' => $buildId,
             'channel' => 'local',

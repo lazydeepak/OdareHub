@@ -1,6 +1,6 @@
-# Susankhya
+# OdareHub
 
-**Susankhya** is a modular business operations platform designed as a core engine with installable business applications.
+**OdareHub** is a modular business operations platform designed as a core engine with installable business applications.
 
 It follows a **Core -> Apps -> Modules architecture**, with plugins used only as extension/provider mechanisms.
 

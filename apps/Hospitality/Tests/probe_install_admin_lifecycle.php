@@ -4,7 +4,7 @@ declare(strict_types=1);
 /**
  * Hospitality Installation / Admin Lifecycle Probe (self-restoring)
  *
- * Proves that Hospitality behaves correctly as an installable Susankhya app
+ * Proves that Hospitality behaves correctly as an installable OdareHub app
  * through the platform's EXISTING generic lifecycle machinery only, and that
  * running this probe leaves local runtime state semantically identical to its
  * pre-run state.

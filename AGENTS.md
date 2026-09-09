@@ -2159,11 +2159,11 @@ This gate is part of the aggregate runner. All invariants must pass.
 
 ---
 
-## Susankhya OS Architecture Charter v1 (Mandatory)
+## OdareHub Architecture Charter v1 (Mandatory)
 
 Canonical charter document:
 
-- [docs/architecture/SUSANKHYA-OS-ARCHITECTURE-CHARTER-V1.md](docs/architecture/SUSANKHYA-OS-ARCHITECTURE-CHARTER-V1.md)
+- [docs/architecture/ODAREHUB-OS-ARCHITECTURE-CHARTER-V1.md](docs/architecture/ODAREHUB-OS-ARCHITECTURE-CHARTER-V1.md)
 
 All agent work must align with Charter v1:
 
@@ -2207,9 +2207,9 @@ Rules:
 
 ---
 
-## Susankhya Studio Ownership (Mandatory)
+## OdareHub Studio Ownership (Mandatory)
 
-Susankhya Studio is a separate optional System App.
+OdareHub Studio is a separate optional System App.
 
 - Target ownership path: `/apps/Studio`
 - Canonical route family: `/apps/studio/...`
@@ -4255,7 +4255,7 @@ Read-only Label Preview Renderer — a server-side or client-side preview that a
 ## Session Summary (2026-06-09) — Label Rule Resource Contract + Template Auto-Selection
 
 ### What was done
-1. **Created `docs/architecture/label-rule-resource-contract.md`** — 18-section contract defining rule resource architecture, ownership model (owner/Platform/Studio/Core), canonical resource location at `{OwnerRoot}/Resources/labels/rules/`, allowed capabilities (visibility, styling, highlighting, badges, warnings, conditional sections, placeholder substitution, layout variants), explicitly forbidden behaviors (no DB access, no side effects, no code execution, no output generation, no business logic), canonical schema (`susankhya.label.rule.v1`), 6 target scope categories, 12 condition operators, 8 effect types, 19 validation checks (R001-R019) with severity, runtime placement in the chain (rules evaluated after template resolution and before data injection), Studio boundary (9 may / 11 must not), and non-goals.
+1. **Created `docs/architecture/label-rule-resource-contract.md`** — 18-section contract defining rule resource architecture, ownership model (owner/Platform/Studio/Core), canonical resource location at `{OwnerRoot}/Resources/labels/rules/`, allowed capabilities (visibility, styling, highlighting, badges, warnings, conditional sections, placeholder substitution, layout variants), explicitly forbidden behaviors (no DB access, no side effects, no code execution, no output generation, no business logic), canonical schema (`odarehub.label.rule.v1`), 6 target scope categories, 12 condition operators, 8 effect types, 19 validation checks (R001-R019) with severity, runtime placement in the chain (rules evaluated after template resolution and before data injection), Studio boundary (9 may / 11 must not), and non-goals.
 
 2. **Updated cross-references in 6 existing contracts**:
    - `label-designer-operating-contract.md` — Section 14 (Next Contract Sequence) now includes rule contract
@@ -5679,7 +5679,7 @@ Active Rendered Proof Planning Contract
 
 ### What was done
 
-1. Reframed overlay runtime ownership around one minimal `SusankhyaOS.ShellOverlay` browser controller.
+1. Reframed overlay runtime ownership around one minimal `OdareHubOS.ShellOverlay` browser controller.
 2. Added one active-instance map, ordered stack, idempotent open/close, and `toggle`/`closeTop`/`isOpen` operations.
 3. Added four Shell-owned candidate definitions (`dropdown`, `drawer`, `sidebar`, `viewport`) and four visual presets (`none`, `local`, `page`, `viewport`).
 4. Converted all ten adapters to select a definition instead of repeating visual effect, scope, and strength literals.
@@ -5705,7 +5705,7 @@ Active Rendered Proof Planning Contract
 
 ### What was done
 
-1. Folded the separate overlay visual-effects runtime into `SusankhyaOS.ShellOverlay`.
+1. Folded the separate overlay visual-effects runtime into `OdareHubOS.ShellOverlay`.
 2. Reused the controller's single active-instance map for visual-policy selection.
 3. Kept strength control under `ShellOverlay.visualEffects` and updated public/operator callers.
 4. Removed the separate visual-effects service, namespace, event listeners, and state map.

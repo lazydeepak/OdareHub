@@ -900,7 +900,7 @@ final class LabelDesignerRuleCreateService
         $valueType = is_numeric($conditionValue) ? 'number' : 'string';
 
         return [
-            'schema' => 'susankhya.label.rule.v1',
+            'schema' => 'odarehub.label.rule.v1',
             'rule_key' => $ruleKey,
             'owner_key' => $ownerKey,
             'owner_type' => $ownerType,

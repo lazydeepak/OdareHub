@@ -6,11 +6,11 @@ Date: 2026-08-19
 
 ## 1. Purpose
 
-Define the full database and filesystem recovery point required before any Susankhya OS local update apply, repair upgrade, Windows installer upgrade, or private online update can be authorized.
+Define the full database and filesystem recovery point required before any OdareHub local update apply, repair upgrade, Windows installer upgrade, or private online update can be authorized.
 
 ## 2. Scope
 
-This contract protects one compatible Susankhya OS modular-monolith installation: runtime code, vendor dependencies, database, configuration, customer files, customer-generated state, and necessary recovery evidence.
+This contract protects one compatible OdareHub modular-monolith installation: runtime code, vendor dependencies, database, configuration, customer files, customer-generated state, and necessary recovery evidence.
 
 It does not redefine app/module ownership or replace app/module export/import features. It is a product-update recovery contract, not a generic data-export feature.
 
@@ -232,4 +232,4 @@ This contract does not authorize:
 - `docs/architecture/local-release-channel-contract.md`
 - `docs/architecture/deployment-update-foundation-audit.md`
 - `docs/architecture/local-deployment-update-channel-plan.md`
-- `docs/architecture/susankhya-productization-roadmap.md`
+- `docs/architecture/odarehub-productization-roadmap.md`

@@ -34,7 +34,7 @@ final class ShellOverlayFramework
         // No automatic activation; no event handlers that would close existing overlays.
         return <<<'JS'
 (function(){
-  const NS = 'SusankhyaOS.ShellOverlay';
+  const NS = 'OdareHubOS.ShellOverlay';
   if (window[NS]) {
     return;
   }

@@ -38,14 +38,14 @@ Approximately **550 project-owned markdown files**:
 - `docs/CURRENT.md` — current-state router
 - `docs/BACKLOG.md`
 - `README.md`, `ARCHITECTURE.md`, `NAMING_CONVENTION.md`
-- `docs/architecture/SUSANKHYA-OS-ARCHITECTURE-CHARTER-V1.md`
+- `docs/architecture/ODAREHUB-OS-ARCHITECTURE-CHARTER-V1.md`
 - `docs/architecture/CORE-LOCK-POLICY.md`, `APP-CONTRACT.md`, `MODULE-CONTRACT.md`, `CLEANUP-AND-LIFECYCLE.md`, `ROUTING-STANDARD.md`, `SECURITY-POLICY.md`
 - `docs/active/README.md`, `docs/discussions/README.md` — folder protocol definitions
 
 **Risks:**
 
 - Root `AGENTS.md` mixes ~200 lines of durable rules with ~5,700 lines / 168 dated session summaries. A new agent cannot distinguish law from history without reading everything. Already acknowledged as backlog debt.
-- `ARCHITECTURE.md` still leads with "IPM ERP" product framing while `docs/identity/` establishes Susankhya OS terminology; terminology drift between startup docs.
+- `ARCHITECTURE.md` still leads with "IPM ERP" product framing while `docs/identity/` establishes OdareHub terminology; terminology drift between startup docs.
 
 **Next action:** Keep authoritative. Split the session-history block out of `AGENTS.md` only as part of the already-queued reviewed archive task (Bucket 9). No other changes needed.
 

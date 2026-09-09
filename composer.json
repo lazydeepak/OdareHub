@@ -1,6 +1,6 @@
 {
   "name": "lazydeepak/erp-engine-v3",
-  "description": "Susankhya modular ERP runtime and app platform.",
+  "description": "OdareHub modular ERP runtime and app platform.",
   "type": "project",
   "license": "proprietary",
   "autoload": {

@@ -94,7 +94,7 @@ function buildCssPublishPlan(string $root, string $mode): array
     }
 
     return [
-        'schema' => 'susankhya.css_publish_plan.v1',
+        'schema' => 'odarehub.css_publish_plan.v1',
         'mode' => $mode,
         'note' => $mode === 'apply'
             ? 'Apply mode copies owner CSS files only into public/assets/apps/... delivery targets.'

@@ -15,9 +15,9 @@ namespace Apps\Studio\Tools\LabelDesigner\Services;
  */
 final class LabelDesignerResourceMetadataService
 {
-    private const SCHEMA_CONTEXT = 'susankhya.label.context.v1';
-    private const SCHEMA_TEMPLATE = 'susankhya.label.template.v1';
-    private const SCHEMA_RULE = 'susankhya.label.rule.v1';
+    private const SCHEMA_CONTEXT = 'odarehub.label.context.v1';
+    private const SCHEMA_TEMPLATE = 'odarehub.label.template.v1';
+    private const SCHEMA_RULE = 'odarehub.label.rule.v1';
 
     private const SEVERITY_RANK = [
         'PASS' => 0,

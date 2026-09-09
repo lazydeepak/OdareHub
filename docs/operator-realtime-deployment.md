@@ -414,4 +414,4 @@ When updating the server code:
 For issues or feature requests, see:
 - [docs/operator-layer-phase8-realtime-updates.md](operator-layer-phase8-realtime-updates.md) - Technical specification
 - [docs/runtime/operator/operator-workspace-user-guide.md](runtime/operator/operator-workspace-user-guide.md) - Operator usage
-- GitHub Issues: https://github.com/lazydeepak/Susankhya/issues
+- GitHub Issues: https://github.com/lazydeepak/OdareHub/issues

@@ -12,14 +12,14 @@ final class OperatorAvatarPanelAdapter
 (function () {
   'use strict';
 
-  window.SusankhyaOS = window.SusankhyaOS || {};
-  window.SusankhyaOS.ShellOverlayAdapters = window.SusankhyaOS.ShellOverlayAdapters || {};
+  window.OdareHubOS = window.OdareHubOS || {};
+  window.OdareHubOS.ShellOverlayAdapters = window.OdareHubOS.ShellOverlayAdapters || {};
 
   function framework() {
-    return window['SusankhyaOS.ShellOverlay'] || null;
+    return window['OdareHubOS.ShellOverlay'] || null;
   }
 
-  window.SusankhyaOS.ShellOverlayAdapters.createOperatorAvatarPanelAdapter = function (options) {
+  window.OdareHubOS.ShellOverlayAdapters.createOperatorAvatarPanelAdapter = function (options) {
     var config = options && typeof options === 'object' ? options : {};
     var overlayType = 'operator_avatar_panel';
     var instance = null;

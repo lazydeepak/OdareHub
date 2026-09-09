@@ -73,7 +73,7 @@ Continue safely decomposing `OperatorSurfaceComposer.php` toward orchestration-o
 - Added selector-based trigger resolution to the controller so candidates without trigger IDs retain outside-click exclusion and focus restoration.
 - Migrated the public account-overflow dropdown to controller-owned Escape/outside-click routing and focus restoration using small `onOpen`/`onClose` DOM hooks.
 - Removed account-overflow handling from the public page-wide Escape and outside-click branches while keeping trigger, ARIA, hidden/class, peer-close, and fallback rendering behavior intact.
-- Folded visual instance selection, strength override, CSS-variable application, and cleanup into the single `SusankhyaOS.ShellOverlay` controller and removed the separate `ShellOverlayVisualEffects` runtime/service.
+- Folded visual instance selection, strength override, CSS-variable application, and cleanup into the single `OdareHubOS.ShellOverlay` controller and removed the separate `ShellOverlayVisualEffects` runtime/service.
 - Updated public and operator strength controls to use `ShellOverlay.visualEffects` without changing stored preference keys, slider behavior, or rendered CSS effects.
 - Simplified the Shell overlay architecture to one browser controller with Shell-owned `dropdown`, `drawer`, `sidebar`, and `viewport` definitions.
 - Replaced repeated adapter visual effect/scope/strength literals with one preset selection per candidate and added executable runtime coverage for idempotent open/close/toggle/closeTop behavior.

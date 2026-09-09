@@ -8,7 +8,7 @@ Started: 2026-08-23
 
 ## Objective
 
-Prepare Susankhya OS for a future Hospitality Suite implementation by settling ownership language, runtime boundaries, first usable scope, and readiness checks before any `apps/Hospitality` code is created.
+Prepare OdareHub for a future Hospitality Suite implementation by settling ownership language, runtime boundaries, first usable scope, and readiness checks before any `apps/Hospitality` code is created.
 
 This task exists because Hospitality should not repeat older terminology drift between app, suite, plugin, module, bundle, and shared capability.
 
@@ -28,7 +28,7 @@ Primary planning sources:
 - `docs/architecture/app-ownership-classification-and-hospitality-readiness.md`
 - `docs/discussions/hospitality-suite-preimplementation-notes.md`
 - `ARCHITECTURE.md`
-- `docs/architecture/SUSANKHYA-OS-ARCHITECTURE-CHARTER-V1.md`
+- `docs/architecture/ODAREHUB-OS-ARCHITECTURE-CHARTER-V1.md`
 - `docs/architecture/APP-CONTRACT.md`
 - `docs/architecture/MODULE-CONTRACT.md`
 

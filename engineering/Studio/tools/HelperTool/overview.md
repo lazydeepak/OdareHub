@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Repository Scanner is the authoritative read-only repository discovery and inspection tool for Susankhya OS.
+Repository Scanner is the authoritative read-only repository discovery and inspection tool for OdareHub.
 
 Its responsibility is to discover, inventory, classify, and expose repository truth across the entire platform. It provides a structured understanding of the repository without modifying source code, configuration, or runtime state.
 

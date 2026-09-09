@@ -23,7 +23,7 @@ Platform governance may assign roles, permissions, profiles, and diagnostic entr
 - Do NOT implement platform governance logic in core without explicit approval.
 - Do NOT hardcode platform UI into shell/core.
 - Keep server-side authorization on all governance surfaces.
-- Do NOT add new Susankhya Studio editor/builder services, views, routes, or composition logic to Platform.
+- Do NOT add new OdareHub Studio editor/builder services, views, routes, or composition logic to Platform.
 - Platform may conditionally link to `/apps/studio/...` or show Studio diagnostics only when the Studio System App is installed/enabled.
 - Existing Platform Studio/GUI Studio code is migration debt during extraction; treat it as legacy/current implementation to move or bridge into `/apps/Studio`, not as the desired ownership model.
 - Follow `../../docs/experience-composition-architecture-plan.md` before changing ACL, Workspace Profile, experience layout, Studio diagnostics links, or `ResolvedExperience` diagnostics.

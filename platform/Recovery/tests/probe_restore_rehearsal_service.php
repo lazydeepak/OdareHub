@@ -46,13 +46,13 @@ function rehearsal_metadata(string $dbPayload, string $fsPayload): array
     $hash = str_repeat('a', 64);
 
     return [
-        'schema_version' => 'susankhya.recovery-point.v1',
+        'schema_version' => 'odarehub.recovery-point.v1',
         'recovery_point_id' => 'rp-rehearsal-probe',
         'created_at' => '2026-08-19T00:00:00Z',
         'created_by' => 'probe',
         'reason' => 'manual',
         'installation' => [
-            'product_id' => 'susankhya-os',
+            'product_id' => 'odarehub',
             'release_version' => '1.0.0',
             'build_id' => 'git:probe',
             'app_manifest_checksums' => [],
@@ -82,7 +82,7 @@ function rehearsal_metadata(string $dbPayload, string $fsPayload): array
     ];
 }
 
-$tmp = sys_get_temp_dir() . '/susankhya-restore-rehearsal-probe-' . bin2hex(random_bytes(6));
+$tmp = sys_get_temp_dir() . '/odarehub-restore-rehearsal-probe-' . bin2hex(random_bytes(6));
 mkdir($tmp, 0700, true);
 
 try {

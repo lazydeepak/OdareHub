@@ -6,7 +6,7 @@
 **Supersedes**: Ad-hoc shell layout patterns in operator.css, components.css, admin.css
 **References**:
 - `docs/architecture/shell-behavior-rendering-audit.md` — Prompt 1/4 audit findings
-- `docs/architecture/SUSANKHYA-OS-ARCHITECTURE-CHARTER-V1.md` — Charter laws
+- `docs/architecture/ODAREHUB-OS-ARCHITECTURE-CHARTER-V1.md` — Charter laws
 - `docs/architecture/theme-source-compilation-migration.md` — Theme boundary
 - `docs/architecture/surface-contribution-contract.md` — Composition safety
 

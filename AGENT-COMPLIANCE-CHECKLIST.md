@@ -4577,7 +4577,7 @@ Blank token inputs reported by user were traced to **stale browser context snaps
 
 ### What was done
 
-1. Moved active visual-policy selection, strength clamping/override, CSS data attributes, CSS variables, and cleanup into `SusankhyaOS.ShellOverlay`.
+1. Moved active visual-policy selection, strength clamping/override, CSS data attributes, CSS variables, and cleanup into `OdareHubOS.ShellOverlay`.
 2. Added `ShellOverlay.visualEffects` as the controller-owned strength/state surface.
 3. Updated public and operator preference sliders to call the unified controller.
 4. Removed `ShellOverlayVisualEffects.php` and its separate namespace, event listeners, and duplicate active-instance map.

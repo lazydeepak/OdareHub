@@ -52,9 +52,9 @@ final class OperatorInteractionScriptComposer
         let operatorSearchActiveIndex = -1;
         let operatorSearchDebounceTimer = null;
         let operatorSearchResultRows = [];
-        const operatorSearchResultsAdapterFactory = window.SusankhyaOS
-            && window.SusankhyaOS.ShellOverlayAdapters
-            && window.SusankhyaOS.ShellOverlayAdapters.createOperatorSearchResultsAdapter;
+        const operatorSearchResultsAdapterFactory = window.OdareHubOS
+            && window.OdareHubOS.ShellOverlayAdapters
+            && window.OdareHubOS.ShellOverlayAdapters.createOperatorSearchResultsAdapter;
         const operatorSearchResultsAdapter = typeof operatorSearchResultsAdapterFactory === 'function'
             ? operatorSearchResultsAdapterFactory({
                 triggerId: 'headerRouteSearch',
@@ -63,9 +63,9 @@ final class OperatorInteractionScriptComposer
             })
             : null;
 
-        const operatorHamburgerDrawerAdapterFactory = window.SusankhyaOS
-            && window.SusankhyaOS.ShellOverlayAdapters
-            && window.SusankhyaOS.ShellOverlayAdapters.createOperatorHamburgerDrawerAdapter;
+        const operatorHamburgerDrawerAdapterFactory = window.OdareHubOS
+            && window.OdareHubOS.ShellOverlayAdapters
+            && window.OdareHubOS.ShellOverlayAdapters.createOperatorHamburgerDrawerAdapter;
         const operatorHamburgerDrawerAdapter = typeof operatorHamburgerDrawerAdapterFactory === 'function'
             ? operatorHamburgerDrawerAdapterFactory({
                 triggerId: 'hamburgerToggle',
@@ -76,9 +76,9 @@ final class OperatorInteractionScriptComposer
             })
             : null;
 
-        const operatorAvatarPanelAdapterFactory = window.SusankhyaOS
-            && window.SusankhyaOS.ShellOverlayAdapters
-            && window.SusankhyaOS.ShellOverlayAdapters.createOperatorAvatarPanelAdapter;
+        const operatorAvatarPanelAdapterFactory = window.OdareHubOS
+            && window.OdareHubOS.ShellOverlayAdapters
+            && window.OdareHubOS.ShellOverlayAdapters.createOperatorAvatarPanelAdapter;
         const operatorAvatarPanelAdapter = typeof operatorAvatarPanelAdapterFactory === 'function'
             ? operatorAvatarPanelAdapterFactory({
                 triggerId: 'headerAvatarButton',
@@ -273,7 +273,7 @@ final class OperatorInteractionScriptComposer
 
         function applyOverlayEffectStrength(value) {
             const strength = clampOverlayEffectStrength(value);
-            const shellOverlay = window['SusankhyaOS.ShellOverlay'];
+            const shellOverlay = window['OdareHubOS.ShellOverlay'];
             const controller = shellOverlay && shellOverlay.visualEffects;
             if (controller && typeof controller.setStrength === 'function') {
                 controller.setStrength(strength);
@@ -417,9 +417,9 @@ final class OperatorInteractionScriptComposer
                     return;
                 }
 
-                const cameraScanAdapterFactory = window.SusankhyaOS
-                    && window.SusankhyaOS.ShellOverlayAdapters
-                    && window.SusankhyaOS.ShellOverlayAdapters.createCameraScanOverlayAdapter;
+                const cameraScanAdapterFactory = window.OdareHubOS
+                    && window.OdareHubOS.ShellOverlayAdapters
+                    && window.OdareHubOS.ShellOverlayAdapters.createCameraScanOverlayAdapter;
                 const cameraScanAdapter = typeof cameraScanAdapterFactory === 'function'
                     ? cameraScanAdapterFactory({
                         sourceSurface: 'operator',
@@ -1115,11 +1115,11 @@ final class OperatorInteractionScriptComposer
                 if (mobilePanel) mobilePanel.classList.remove('open');
                 if (mobileBackdrop) mobileBackdrop.classList.remove('open');
                 if (mobileBtn) mobileBtn.setAttribute('aria-expanded', 'false');
-                if (window.SusankhyaOS
-                    && window.SusankhyaOS.ShellOverlayAdapters
-                    && window.SusankhyaOS.ShellOverlayAdapters.operatorMobileActionSheetAdapter
-                    && typeof window.SusankhyaOS.ShellOverlayAdapters.operatorMobileActionSheetAdapter.syncState === 'function') {
-                    window.SusankhyaOS.ShellOverlayAdapters.operatorMobileActionSheetAdapter.syncState(false, 'peer-opened');
+                if (window.OdareHubOS
+                    && window.OdareHubOS.ShellOverlayAdapters
+                    && window.OdareHubOS.ShellOverlayAdapters.operatorMobileActionSheetAdapter
+                    && typeof window.OdareHubOS.ShellOverlayAdapters.operatorMobileActionSheetAdapter.syncState === 'function') {
+                    window.OdareHubOS.ShellOverlayAdapters.operatorMobileActionSheetAdapter.syncState(false, 'peer-opened');
                 }
             }
         }
@@ -1171,11 +1171,11 @@ final class OperatorInteractionScriptComposer
                 if (apEl) apEl.classList.remove('open');
                 if (apBackdrop) apBackdrop.classList.remove('open');
                 if (apBtn) apBtn.setAttribute('aria-expanded', 'false');
-                if (window.SusankhyaOS
-                    && window.SusankhyaOS.ShellOverlayAdapters
-                    && window.SusankhyaOS.ShellOverlayAdapters.operatorMobileActionSheetAdapter
-                    && typeof window.SusankhyaOS.ShellOverlayAdapters.operatorMobileActionSheetAdapter.syncState === 'function') {
-                    window.SusankhyaOS.ShellOverlayAdapters.operatorMobileActionSheetAdapter.syncState(false, 'peer-opened');
+                if (window.OdareHubOS
+                    && window.OdareHubOS.ShellOverlayAdapters
+                    && window.OdareHubOS.ShellOverlayAdapters.operatorMobileActionSheetAdapter
+                    && typeof window.OdareHubOS.ShellOverlayAdapters.operatorMobileActionSheetAdapter.syncState === 'function') {
+                    window.OdareHubOS.ShellOverlayAdapters.operatorMobileActionSheetAdapter.syncState(false, 'peer-opened');
                 }
                 toggleAvatarPanel();
             });

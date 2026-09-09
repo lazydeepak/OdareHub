@@ -12,7 +12,7 @@ warnings=0
 
 contract_doc="docs/architecture/business-app-module-ownership-contract.md"
 readiness_doc="docs/architecture/shared-app-extension-readiness.md"
-roadmap_doc="docs/architecture/susankhya-productization-roadmap.md"
+roadmap_doc="docs/architecture/odarehub-productization-roadmap.md"
 
 check_file() {
   local path="$1"; local label="$2"

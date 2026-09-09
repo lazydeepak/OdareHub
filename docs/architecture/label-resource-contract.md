@@ -2,7 +2,7 @@
 
 Status: Architecture contract baseline. Guarded owner-owned Label Context create is authorized in Label Designer for this slice. Template/rule create-edit-apply, runtime behavior changes, renderer/export/print behavior, migrations, SQL builders, and Core edits remain unauthorized.
 
-This contract defines the owner-owned resource shapes that future Susankhya OS Label Designer work must target. Label Designer may discover and design these resources, but it must not become their source of truth. Source truth remains under the owning app, module, or plugin.
+This contract defines the owner-owned resource shapes that future OdareHub Label Designer work must target. Label Designer may discover and design these resources, but it must not become their source of truth. Source truth remains under the owning app, module, or plugin.
 
 ## 1. Owner Resource Family
 
@@ -35,7 +35,7 @@ Canonical fields:
 
 | Field | Required | Meaning |
 |---|---:|---|
-| `schema` | Yes | Resource schema identifier, e.g. `susankhya.label.context.v1` |
+| `schema` | Yes | Resource schema identifier, e.g. `odarehub.label.context.v1` |
 | `context_key` | Yes | Stable unique key, e.g. `manufacturing.pallet` |
 | `owner` | Yes | Owner metadata: app/module/plugin and owner root |
 | `purpose` | Yes | Business purpose of the label |
@@ -72,7 +72,7 @@ Canonical fields:
 
 | Field | Required | Meaning |
 |---|---:|---|
-| `schema` | Yes | Resource schema identifier, e.g. `susankhya.label.template.v1` |
+| `schema` | Yes | Resource schema identifier, e.g. `odarehub.label.template.v1` |
 | `template_key` | Yes | Stable template key |
 | `context_key` | Yes | Label context this template is bound to |
 | `owner` | Yes | Owner metadata matching or delegating from the context owner |
@@ -109,7 +109,7 @@ Canonical fields:
 
 | Field | Required | Meaning |
 |---|---:|---|
-| `schema` | Yes | Resource schema identifier, e.g. `susankhya.label.rules.v1` |
+| `schema` | Yes | Resource schema identifier, e.g. `odarehub.label.rules.v1` |
 | `rules_key` | Yes | Stable rule set key |
 | `owner` | Yes | Owner metadata |
 | `applies_to` | Yes | Contexts/templates this rule set may attach to |

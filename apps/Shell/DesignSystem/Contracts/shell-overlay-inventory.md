@@ -13,4 +13,4 @@
 | Operator action sheet | drawer | Escape, outside, focus, scroll, visual | actions/DOM |
 | Shared camera scan | viewport | root/backdrop outside, focus, visual | camera lifecycle/results/DOM |
 
-All ten candidates use `SusankhyaOS.ShellOverlay`; no candidate policy registry remains.
+All ten candidates use `OdareHubOS.ShellOverlay`; no candidate policy registry remains.

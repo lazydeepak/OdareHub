@@ -79,7 +79,7 @@ Create and verify operations require an explicit operator-provided target direct
 ```bash
 php scripts/system/recovery_point.php create --target-dir=/path/to/recovery-point --reason=manual
 php scripts/system/recovery_point.php verify --target-dir=/path/to/recovery-point
-php scripts/system/recovery_point.php rehearse --target-dir=/path/to/recovery-point --isolated-dir=/path/to/empty-rehearsal-dir --rehearsal-db=susankhya_rehearsal
+php scripts/system/recovery_point.php rehearse --target-dir=/path/to/recovery-point --isolated-dir=/path/to/empty-rehearsal-dir --rehearsal-db=odarehub_rehearsal
 php scripts/system/recovery_point.php build-channel --channel-dir=storage/update-channels/local
 php scripts/system/recovery_point.php preview-channel --channel-dir=storage/update-channels/local --recovery-dir=/path/to/recovery-point
 php scripts/system/recovery_point.php prepare-apply --channel-dir=storage/update-channels/local --recovery-dir=/path/to/recovery-point --staging-dir=/path/to/empty-apply-staging-dir

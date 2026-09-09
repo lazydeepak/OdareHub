@@ -103,7 +103,7 @@ $brandingLogoCssVersion = is_file($brandingLogoCssPath) ? (string)filemtime($bra
         <?php elseif ($companyLogo !== ''): ?>
             <img src="<?php echo htmlspecialchars($companyLogo); ?>" alt="<?php echo htmlspecialchars($companyName); ?>" class="d-logo">
         <?php else: ?>
-            <div class="d-logo-wrap"><span class="d-logo-fallback"><?php echo htmlspecialchars($companyFallbackText ?: 'Susankhya OS'); ?></span></div>
+            <div class="d-logo-wrap"><span class="d-logo-fallback"><?php echo htmlspecialchars($companyFallbackText ?: 'OdareHub'); ?></span></div>
         <?php endif; ?>
         <div class="ui-block">
             <div class="d-company"><?php echo htmlspecialchars($companyName); ?></div>

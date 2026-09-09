@@ -38,7 +38,7 @@ $testRecipient = (string)($testRecipient ?? '');
   </div>
 
   <div class="acb-help u-style-c5a49e8178">
-    <?= t('admin.email_settings.email.config_priority') ?> Environment variables (ERP_MAIL_*) override database settings. See <a href="https://github.com/lazydeepak/Susankhya/blob/main/docs/MAIL-SERVICE-GUIDE.md" target="_blank">Mail Service Guide</a> for setup details.
+    <?= t('admin.email_settings.email.config_priority') ?> Environment variables (ERP_MAIL_*) override database settings. See <a href="https://github.com/lazydeepak/OdareHub/blob/main/docs/MAIL-SERVICE-GUIDE.md" target="_blank">Mail Service Guide</a> for setup details.
   </div>
 
   <form method="post" action="/admin/system-tools/email-settings" class="admin-form-grid admin-form-grid-compact">

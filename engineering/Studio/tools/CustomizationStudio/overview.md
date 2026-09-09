@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Customization Studio is Studio's governed workspace for discovering, diagnosing, previewing, authoring, and eventually migrating Susankhya OS styling and Appearance resources.
+Customization Studio is Studio's governed workspace for discovering, diagnosing, previewing, authoring, and eventually migrating OdareHub styling and Appearance resources.
 
 It consolidates existing theme, CSS token, socket, selector, effect, and visual-customization capabilities without creating competing sources of truth. Its capabilities must be reusable by larger Studio workflows rather than being confined to individual tool pages.
 

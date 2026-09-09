@@ -43,15 +43,15 @@ function preview_rm_tree(string $path): void
 function write_preview_channel(string $root, array $overrides = []): array
 {
     mkdir($root . '/releases', 0700, true);
-    $package = $root . '/releases/susankhya-os-1.0.0-build.zip';
+    $package = $root . '/releases/odarehub-1.0.0-build.zip';
     file_put_contents($package, 'disposable package bytes');
     $sha = hash_file('sha256', $package) ?: '';
     $size = filesize($package) ?: 0;
 
     $metadata = array_replace_recursive([
-        'schema_version' => 'susankhya.release.v1',
-        'product_id' => 'susankhya-os',
-        'product_name' => 'Susankhya ERP',
+        'schema_version' => 'odarehub.release.v1',
+        'product_id' => 'odarehub',
+        'product_name' => 'OdareHub ERP',
         'release_version' => '1.0.0',
         'build_id' => 'git:preview',
         'channel' => 'local',
@@ -71,20 +71,20 @@ function write_preview_channel(string $root, array $overrides = []): array
         'migration' => ['warnings' => [], 'requires_backup' => true],
         'apply_eligibility' => ['requires_preview' => true, 'requires_operator_approval' => true],
     ], $overrides['metadata'] ?? []);
-    file_put_contents($root . '/releases/susankhya-os-1.0.0-build.json', json_encode($metadata, JSON_PRETTY_PRINT));
+    file_put_contents($root . '/releases/odarehub-1.0.0-build.json', json_encode($metadata, JSON_PRETTY_PRINT));
 
     $channel = array_replace_recursive([
-        'schema_version' => 'susankhya.local-channel.v1',
+        'schema_version' => 'odarehub.local-channel.v1',
         'channel' => 'local',
-        'product_id' => 'susankhya-os',
+        'product_id' => 'odarehub',
         'generated_at' => '2026-08-19T00:00:00Z',
         'lanes' => [
             'app' => [
                 'current' => [
                     'release_version' => '1.0.0',
                     'build_id' => 'git:preview',
-                    'metadata' => 'releases/susankhya-os-1.0.0-build.json',
-                    'package' => 'releases/susankhya-os-1.0.0-build.zip',
+                    'metadata' => 'releases/odarehub-1.0.0-build.json',
+                    'package' => 'releases/odarehub-1.0.0-build.zip',
                     'sha256' => $sha,
                     'size_bytes' => $size,
                 ],
@@ -98,7 +98,7 @@ function write_preview_channel(string $root, array $overrides = []): array
     return ['package' => $package, 'sha' => $sha, 'size' => $size];
 }
 
-$tmp = sys_get_temp_dir() . '/susankhya-local-channel-preview-probe-' . bin2hex(random_bytes(6));
+$tmp = sys_get_temp_dir() . '/odarehub-local-channel-preview-probe-' . bin2hex(random_bytes(6));
 mkdir($tmp, 0700, true);
 $productionChannelExistsBefore = file_exists(APP_ROOT . '/storage/update-channels');
 

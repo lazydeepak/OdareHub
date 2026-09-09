@@ -2,7 +2,7 @@
 
 Status: Landed v1 skeleton. No consumer migration. No domain-role migration. No UI.
 
-Builds on: `business-app-module-ownership-contract.md` (Shared App contract), `susankhya-productization-roadmap.md`, Slice 2 tenant/company distinction, Slice 3 identity investigation.
+Builds on: `business-app-module-ownership-contract.md` (Shared App contract), `odarehub-productization-roadmap.md`, Slice 2 tenant/company distinction, Slice 3 identity investigation.
 
 ## Canonical Parties Owns
 

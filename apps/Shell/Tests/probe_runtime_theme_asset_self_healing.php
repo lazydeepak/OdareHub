@@ -34,7 +34,7 @@ function theme_healing_remove_tree(string $path): void
     @rmdir($path);
 }
 
-$root = sys_get_temp_dir() . '/susankhya-theme-self-heal-' . bin2hex(random_bytes(6));
+$root = sys_get_temp_dir() . '/odarehub-theme-self-heal-' . bin2hex(random_bytes(6));
 $paths = [
     $root . '/resources/themes',
     $root . '/scripts/assets',
@@ -67,11 +67,11 @@ theme_healing_assert((string)file_get_contents($target) === $staleBefore, 'dry-r
 
 $applyStale = compileThemeCssIfAvailable($root, true);
 $firstCompiled = (string)file_get_contents($target);
-$firstFingerprint = susankhyaCompiledThemeFingerprint($target);
+$firstFingerprint = odarehubCompiledThemeFingerprint($target);
 theme_healing_assert(($applyStale['ok'] ?? false) === true, 'apply repairs a stale theme asset');
 theme_healing_assert($firstFingerprint !== null, 'compiled theme records its deterministic source fingerprint');
 theme_healing_assert(str_contains($firstCompiled, '--probe-theme-value:#123456'), 'compiled theme contains current source content');
-theme_healing_assert($firstFingerprint === susankhyaThemeSourceFingerprint($root), 'target fingerprint matches current sources');
+theme_healing_assert($firstFingerprint === odarehubThemeSourceFingerprint($root), 'target fingerprint matches current sources');
 
 $targetMtime = (int)filemtime($target);
 file_put_contents($root . '/resources/themes/foundation.css', ":root{--probe-theme-value:#abcdef;}\n");
@@ -87,7 +87,7 @@ $secondCompiled = (string)file_get_contents($target);
 theme_healing_assert(($applyOlderSource['ok'] ?? false) === true, 'apply repairs timestamp-preserved deployment content');
 theme_healing_assert(str_contains($secondCompiled, '--probe-theme-value:#abcdef'), 'recompiled target contains changed older-timestamp source');
 theme_healing_assert(
-    susankhyaCompiledThemeFingerprint($target) === susankhyaThemeSourceFingerprint($root),
+    odarehubCompiledThemeFingerprint($target) === odarehubThemeSourceFingerprint($root),
     'recompiled target records the new source fingerprint'
 );
 

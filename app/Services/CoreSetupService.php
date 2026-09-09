@@ -232,7 +232,7 @@ final class CoreSetupService
         $createDatabase = !empty($input['db_create_if_missing']);
         $adminEmail = strtolower(trim((string)($input['admin_email'] ?? '')));
         $adminPassword = (string)($input['admin_password'] ?? '');
-        $systemName = trim((string)($input['system_name'] ?? 'Susankhya OS'));
+        $systemName = trim((string)($input['system_name'] ?? 'OdareHub'));
         $currency = trim((string)($input['currency'] ?? 'JPY'));
         $locale = trim((string)($input['locale'] ?? 'en'));
         $theme = trim((string)($input['theme'] ?? default_theme_preference()));

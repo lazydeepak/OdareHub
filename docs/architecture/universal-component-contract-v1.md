@@ -9,7 +9,7 @@
 - `docs/architecture/universal-component-contract-readiness-audit.md`
 - `docs/architecture/shell-behavior-rendering-contract-v1.md`
 - `docs/architecture/theme-source-compilation-migration.md`
-- `docs/architecture/SUSANKHYA-OS-ARCHITECTURE-CHARTER-V1.md`
+- `docs/architecture/ODAREHUB-OS-ARCHITECTURE-CHARTER-V1.md`
 - `docs/architecture/surface-contribution-contract.md`
 - `docs/architecture/studio-operating-contract.md`
 

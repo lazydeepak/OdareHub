@@ -201,12 +201,12 @@ function parse_options(array $args): array
 
 function print_help(): void
 {
-    echo "Susankhya recovery point tool\n\n";
+    echo "OdareHub recovery point tool\n\n";
     echo "Usage:\n";
     echo "  php scripts/system/recovery_point.php preflight\n";
     echo "  php scripts/system/recovery_point.php create --target-dir=/explicit/writable/dir [--reason=manual] [--created-by=name]\n";
     echo "  php scripts/system/recovery_point.php verify --target-dir=/existing/recovery-point/dir\n";
-    echo "  php scripts/system/recovery_point.php rehearse --target-dir=/existing/recovery-point/dir --isolated-dir=/empty/dir --rehearsal-db=susankhya_rehearsal\n";
+    echo "  php scripts/system/recovery_point.php rehearse --target-dir=/existing/recovery-point/dir --isolated-dir=/empty/dir --rehearsal-db=odarehub_rehearsal\n";
     echo "  php scripts/system/recovery_point.php build-channel [--channel-dir=storage/update-channels/local] [--release-version=0.5.0]\n";
     echo "  php scripts/system/recovery_point.php preview-channel [--channel-dir=storage/update-channels/local] [--recovery-dir=/path/to/recovery-point]\n";
     echo "  php scripts/system/recovery_point.php prepare-apply --channel-dir=storage/update-channels/local --recovery-dir=/path/to/recovery-point --staging-dir=/empty/staging/dir\n";
@@ -256,7 +256,7 @@ function git_head(): string
 function rehearsal_evidence(array $result, array $metadata, string $target, string $isolatedDir, string $rehearsalDb): array
 {
     return [
-        'schema_version' => 'susankhya.rehearsal.v1',
+        'schema_version' => 'odarehub.rehearsal.v1',
         'created_at' => gmdate('Y-m-d\TH:i:s\Z'),
         'recovery_point_id' => (string)($metadata['recovery_point_id'] ?? ''),
         'recovery_point_dir' => $target,

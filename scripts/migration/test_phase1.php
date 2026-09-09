@@ -1,5 +1,5 @@
 <?php
-define('APP_ROOT', 'C:\Projects\Susankhya');
+define('APP_ROOT', 'C:\Projects\OdareHub');
 
 // Simulate the helpers we need to test
 require_once APP_ROOT . '/app/Core/helpers.php';

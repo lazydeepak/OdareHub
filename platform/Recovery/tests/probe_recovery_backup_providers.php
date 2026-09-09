@@ -42,7 +42,7 @@ function backup_rm_tree(string $path): void
     @rmdir($path);
 }
 
-$tmp = sys_get_temp_dir() . '/susankhya-recovery-provider-probe-' . bin2hex(random_bytes(6));
+$tmp = sys_get_temp_dir() . '/odarehub-recovery-provider-probe-' . bin2hex(random_bytes(6));
 mkdir($tmp, 0700, true);
 
 try {

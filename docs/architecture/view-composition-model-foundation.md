@@ -9,7 +9,7 @@
 - `docs/architecture/surface-contribution-contract.md`
 - `docs/architecture/universal-component-contract-v1.md`
 - `docs/architecture/shell-behavior-rendering-contract-v1.md`
-- `docs/architecture/SUSANKHYA-OS-ARCHITECTURE-CHARTER-V1.md`
+- `docs/architecture/ODAREHUB-OS-ARCHITECTURE-CHARTER-V1.md`
 
 ## 1. Purpose
 

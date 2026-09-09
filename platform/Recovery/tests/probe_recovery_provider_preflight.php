@@ -28,13 +28,13 @@ function recovery_metadata(): array
     $hash = str_repeat('a', 64);
 
     return [
-        'schema_version' => 'susankhya.recovery-point.v1',
+        'schema_version' => 'odarehub.recovery-point.v1',
         'recovery_point_id' => 'rp-probe-001',
         'created_at' => '2026-08-19T00:00:00Z',
         'created_by' => 'probe',
         'reason' => 'update_apply',
         'installation' => [
-            'product_id' => 'susankhya-os',
+            'product_id' => 'odarehub',
             'release_version' => '1.0.0',
             'build_id' => 'git:probe',
             'app_manifest_checksums' => [],

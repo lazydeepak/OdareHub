@@ -13,9 +13,9 @@ namespace Apps\Studio\Tools\LabelDesigner\Services;
  */
 final class LabelDesignerPreviewRendererService
 {
-    private const SCHEMA_CONTEXT = 'susankhya.label.context.v1';
-    private const SCHEMA_TEMPLATE = 'susankhya.label.template.v1';
-    private const SCHEMA_RULE = 'susankhya.label.rule.v1';
+    private const SCHEMA_CONTEXT = 'odarehub.label.context.v1';
+    private const SCHEMA_TEMPLATE = 'odarehub.label.template.v1';
+    private const SCHEMA_RULE = 'odarehub.label.rule.v1';
 
     private const ALLOWED_OPERATORS = [
         'equals',
@@ -211,7 +211,7 @@ final class LabelDesignerPreviewRendererService
     {
         $checks = [];
 
-        $checks[] = self::makeCheck('C001', 'context_schema', 'Context schema', 'susankhya.label.context.v1');
+        $checks[] = self::makeCheck('C001', 'context_schema', 'Context schema', 'odarehub.label.context.v1');
         $contextSchema = (string)($context['schema'] ?? '');
         if ($contextSchema === '') {
             $checks[] = self::makeCheck('C001.1', 'context_schema_present', 'Context schema field present', 'ERROR', 'Missing schema field.');

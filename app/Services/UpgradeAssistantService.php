@@ -37,7 +37,7 @@ final class UpgradeAssistantService
     public function scopeOptions(): array
     {
         return [
-            'core' => 'Core Susankhya OS',
+            'core' => 'Core OdareHub',
             'suite' => 'Suite / Bundle',
             'module' => 'Child Module',
         ];
@@ -132,9 +132,9 @@ final class UpgradeAssistantService
 
         return [
             'scope' => 'core',
-            'scope_label' => 'Core Susankhya OS',
+            'scope_label' => 'Core OdareHub',
             'target_key' => 'core',
-            'target_label' => 'Core Susankhya OS',
+            'target_label' => 'Core OdareHub',
             'current_version' => (string)($versioning['current_version'] ?? APP_VERSION),
             'target_version' => (string)($versioning['target_version'] ?? APP_VERSION),
             'ready' => $blocking === [],

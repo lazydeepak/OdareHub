@@ -41,7 +41,7 @@ final class LocalReleaseApplyPreparationService
             return $inspection;
         }
 
-        $payloadDirectory = sys_get_temp_dir() . '/susankhya-local-apply-payload-' . bin2hex(random_bytes(8));
+        $payloadDirectory = sys_get_temp_dir() . '/odarehub-local-apply-payload-' . bin2hex(random_bytes(8));
         if (!mkdir($payloadDirectory, 0775, true)) {
             return $this->failure('Unable to create apply payload staging directory.');
         }
@@ -57,7 +57,7 @@ final class LocalReleaseApplyPreparationService
         $zip->close();
 
         $plan = [
-            'schema_version' => 'susankhya.local-apply-plan.v1',
+            'schema_version' => 'odarehub.local-apply-plan.v1',
             'created_at' => gmdate('Y-m-d\TH:i:s\Z'),
             'final_state' => 'prepared_without_live_mutation',
             'channel_dir' => $channelDirectory,

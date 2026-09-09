@@ -6,7 +6,7 @@ declare(strict_types=1);
  *
  * @return array<int,string>|null Absolute paths, sorted by repository-relative path
  */
-function susankhyaThemeFingerprintFiles(string $root): ?array
+function odarehubThemeFingerprintFiles(string $root): ?array
 {
     $root = rtrim(str_replace('\\', '/', $root), '/');
     $manifestPath = $root . '/resources/themes/theme-manifest.json';
@@ -28,8 +28,8 @@ function susankhyaThemeFingerprintFiles(string $root): ?array
         if (!is_array($entry)) {
             continue;
         }
-        $path = susankhyaNormalizeThemeRelativePath((string)($entry['path'] ?? ''));
-        if (!susankhyaIsSafeThemeRelativePath($path)) {
+        $path = odarehubNormalizeThemeRelativePath((string)($entry['path'] ?? ''));
+        if (!odarehubIsSafeThemeRelativePath($path)) {
             continue;
         }
 
@@ -59,7 +59,7 @@ function susankhyaThemeFingerprintFiles(string $root): ?array
                 continue;
             }
             $absolute = str_replace('\\', '/', (string)$fileInfo->getPathname());
-            $relative = susankhyaNormalizeThemeRelativePath((string)substr($absolute, strlen($themeRoot) + 1));
+            $relative = odarehubNormalizeThemeRelativePath((string)substr($absolute, strlen($themeRoot) + 1));
             if ($relative === '' || isset($excludedBase[$relative]) || isset($includedPaths[$relative]) || isset($disabledPaths[$relative])) {
                 continue;
             }
@@ -69,8 +69,8 @@ function susankhyaThemeFingerprintFiles(string $root): ?array
 
     $legacy = $manifest['legacy_base'] ?? null;
     if (is_array($legacy) && (!array_key_exists('enabled', $legacy) || !empty($legacy['enabled']))) {
-        $legacyPath = susankhyaNormalizeThemeRelativePath((string)($legacy['path'] ?? 'public/assets/theme.legacy.css'));
-        if (susankhyaIsSafeThemeRelativePath($legacyPath)) {
+        $legacyPath = odarehubNormalizeThemeRelativePath((string)($legacy['path'] ?? 'public/assets/theme.legacy.css'));
+        if (odarehubIsSafeThemeRelativePath($legacyPath)) {
             $files[] = $root . '/' . $legacyPath;
         }
     }
@@ -85,10 +85,10 @@ function susankhyaThemeFingerprintFiles(string $root): ?array
     return $files;
 }
 
-function susankhyaThemeSourceFingerprint(string $root): ?string
+function odarehubThemeSourceFingerprint(string $root): ?string
 {
     $root = rtrim(str_replace('\\', '/', $root), '/');
-    $files = susankhyaThemeFingerprintFiles($root);
+    $files = odarehubThemeFingerprintFiles($root);
     if ($files === null || $files === []) {
         return null;
     }
@@ -105,7 +105,7 @@ function susankhyaThemeSourceFingerprint(string $root): ?string
     return hash_final($hash);
 }
 
-function susankhyaCompiledThemeFingerprint(string $targetPath): ?string
+function odarehubCompiledThemeFingerprint(string $targetPath): ?string
 {
     $head = @file_get_contents($targetPath, false, null, 0, 512);
     if (!is_string($head) || !preg_match('/Source fingerprint:\s*([a-f0-9]{64})/i', $head, $matches)) {
@@ -114,12 +114,12 @@ function susankhyaCompiledThemeFingerprint(string $targetPath): ?string
     return strtolower((string)$matches[1]);
 }
 
-function susankhyaNormalizeThemeRelativePath(string $path): string
+function odarehubNormalizeThemeRelativePath(string $path): string
 {
     return ltrim(str_replace('\\', '/', trim($path)), '/');
 }
 
-function susankhyaIsSafeThemeRelativePath(string $path): bool
+function odarehubIsSafeThemeRelativePath(string $path): bool
 {
     return $path !== ''
         && !str_contains($path, "\0")

@@ -6,11 +6,11 @@ Date: 2026-08-19
 
 ## 1. Purpose
 
-Define the release-package identity, filesystem-backed local channel, compatibility, checksum, preview, backup, and apply gates required before Susankhya ERP can implement controlled local delivery.
+Define the release-package identity, filesystem-backed local channel, compatibility, checksum, preview, backup, and apply gates required before OdareHub ERP can implement controlled local delivery.
 
 ## 2. Scope
 
-V1 distributes one Susankhya OS modular-monolith runtime package through a local filesystem channel. It does not create separate deployable suites, shared-app packages, plugin-store packages, or Hospitality artifacts.
+V1 distributes one OdareHub modular-monolith runtime package through a local filesystem channel. It does not create separate deployable suites, shared-app packages, plugin-store packages, or Hospitality artifacts.
 
 V1 begins with the conceptual `app` lane only. `runtime` and `support` lanes are reserved for future compatible expansion and must not be implemented by assuming their behavior now.
 
@@ -34,8 +34,8 @@ Each release identity must contain:
 
 | Field | V1 rule |
 | --- | --- |
-| `product_id` | Literal `susankhya-os`, consistent with the existing local-channel planning baseline. |
-| `product_name` | Human display name, initially `Susankhya ERP`. |
+| `product_id` | Literal `odarehub`, consistent with the existing local-channel planning baseline. |
+| `product_name` | Human display name, initially `OdareHub ERP`. |
 | `release_version` | Immutable product release version. |
 | `build_id` | Immutable build identifier; a source commit identifier is preferred when available. |
 | `channel` | Local channel name, initially `local`. |
@@ -110,16 +110,16 @@ Each package has a sidecar `<package>.json` metadata document. The ZIP may conta
 
 ```json
 {
-  "schema_version": "susankhya.release.v1",
-  "product_id": "susankhya-os",
-  "product_name": "Susankhya ERP",
+  "schema_version": "odarehub.release.v1",
+  "product_id": "odarehub",
+  "product_name": "OdareHub ERP",
   "release_version": "1.0.0",
   "build_id": "git:<immutable-commit-or-build-id>",
   "channel": "local",
   "lane": "app",
   "created_at": "2026-08-19T00:00:00Z",
   "package": {
-    "filename": "susankhya-os-1.0.0.zip",
+    "filename": "odarehub-1.0.0.zip",
     "size_bytes": 0,
     "sha256": "<64-lowercase-hex>"
   },
@@ -151,8 +151,8 @@ Do not create this path in this slice. The future shape is:
 storage/update-channels/local/
   channel.json
   releases/
-    susankhya-os-<release-version>-<build-id>.zip
-    susankhya-os-<release-version>-<build-id>.json
+    odarehub-<release-version>-<build-id>.zip
+    odarehub-<release-version>-<build-id>.json
 ```
 
 The local channel is deployment state, not source code and not a package source-of-truth. The source repository and release build record remain authoritative.
@@ -163,17 +163,17 @@ The local channel is deployment state, not source code and not a package source-
 
 ```json
 {
-  "schema_version": "susankhya.local-channel.v1",
+  "schema_version": "odarehub.local-channel.v1",
   "channel": "local",
-  "product_id": "susankhya-os",
+  "product_id": "odarehub",
   "generated_at": "2026-08-19T00:00:00Z",
   "lanes": {
     "app": {
       "current": {
         "release_version": "1.0.0",
         "build_id": "git:<immutable-commit-or-build-id>",
-        "metadata": "releases/susankhya-os-1.0.0-<build-id>.json",
-        "package": "releases/susankhya-os-1.0.0-<build-id>.zip",
+        "metadata": "releases/odarehub-1.0.0-<build-id>.json",
+        "package": "releases/odarehub-1.0.0-<build-id>.zip",
         "sha256": "<64-lowercase-hex>",
         "size_bytes": 0
       }
@@ -300,5 +300,5 @@ This contract does not authorize:
 
 - `docs/architecture/deployment-update-foundation-audit.md`
 - `docs/architecture/local-deployment-update-channel-plan.md`
-- `docs/architecture/susankhya-productization-roadmap.md`
+- `docs/architecture/odarehub-productization-roadmap.md`
 - `docs/architecture/current-ownership-inventory.md`

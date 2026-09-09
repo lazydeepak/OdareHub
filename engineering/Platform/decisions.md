@@ -6,7 +6,7 @@
 **Status:** Accepted
 
 **Context**
-Susankhya currently uses `mysqli` with MySQL/MariaDB configuration, has no complete database backup provider, and must support local Windows/client installs before installers or online updates. Existing suite export/restore is selected module/table transport, not product recovery.
+OdareHub currently uses `mysqli` with MySQL/MariaDB configuration, has no complete database backup provider, and must support local Windows/client installs before installers or online updates. Existing suite export/restore is selected module/table transport, not product recovery.
 
 **Decision**
 Use one V1 local provider: a MySQL/MariaDB-compatible dump plus a filesystem ZIP archive, coordinated by a Platform-owned recovery capability and exercised through a governed CLI before any web mutation surface. Require checksum verification and an isolated restore rehearsal. Defer cloud snapshots and multi-provider abstraction until a second real deployment provider is needed.
@@ -39,7 +39,7 @@ Existing `SuiteExportService`, `SuiteRestoreService`, restore routes, history se
 The deployment audit found one PHP modular monolith, a committed `composer.lock` and `vendor/` tree, hosting scenarios where Composer cannot run, existing release ZIP generation without a channel identity/checksum contract, and no safe apply implementation.
 
 **Decision**
-Define V1 as one filesystem-backed `app`-lane Susankhya OS release package. Include `vendor/` with `composer.json` and `composer.lock`; preserve customer configuration/state outside the package; bind sidecar metadata and the future `channel.json` entry to an immutable SHA-256 and byte size; make preview read-only; and defer signing, entitlement, online distribution, and apply implementation.
+Define V1 as one filesystem-backed `app`-lane OdareHub release package. Include `vendor/` with `composer.json` and `composer.lock`; preserve customer configuration/state outside the package; bind sidecar metadata and the future `channel.json` entry to an immutable SHA-256 and byte size; make preview read-only; and defer signing, entitlement, online distribution, and apply implementation.
 
 **Consequences**
 V1 client delivery does not require Composer at install/update time. A checksum is integrity evidence only, not a signature or authorization mechanism. Backup/restore proof, compatibility preview, and explicit operator approval remain mandatory before any apply slice can be authorized.
@@ -54,19 +54,19 @@ V1 client delivery does not require Composer at install/update time. A checksum 
 Runtime discovery recognizes top-level app bundles through `apps/*/manifest.json` and `core_apps`, while module lifecycle still uses `plugin.json` and several lifecycle services use legacy suite vocabulary. Beginning Hospitality, installer, private updates, or large app/module refactors without one declared model would extend this ambiguity.
 
 **Decision**
-Keep Susankhya OS a modular monolith. Treat App as the current runtime/lifecycle unit; freeze System App, Domain App, Shared App, Module, App Extension, Plugin, and Package meanings; reserve Suite for commercial/product or documented legacy grouping terminology until first-class suite architecture is separately approved. Deliver local deployment/update, backup/restore, and installer readiness before Hospitality implementation. Defer private `update.susankhya.com`, and position `cloud.susankhya.com` first as a customer/license/control portal rather than business-data synchronization.
+Keep OdareHub a modular monolith. Treat App as the current runtime/lifecycle unit; freeze System App, Domain App, Shared App, Module, App Extension, Plugin, and Package meanings; reserve Suite for commercial/product or documented legacy grouping terminology until first-class suite architecture is separately approved. Deliver local deployment/update, backup/restore, and installer readiness before Hospitality implementation. Defer private `update.susankhya.com`, and position `cloud.susankhya.com` first as a customer/license/control portal rather than business-data synchronization.
 
 **Consequences**
 Hospitality remains a future Domain App, not a new runtime suite. Current Manufacturing Products/Parts remains Manufacturing-owned. Studio remains a future governed diagnostic/proposal workbench, not an autonomous upgrader or Hospitality generator. Any future installer or updater must consume the approved app/module/package and backup/restore contracts.
 
 **Evidence**
-`docs/architecture/susankhya-productization-roadmap.md`; supporting baselines: `app-ownership-classification-and-hospitality-readiness.md` and `local-deployment-update-channel-plan.md`.
+`docs/architecture/odarehub-productization-roadmap.md`; supporting baselines: `app-ownership-classification-and-hospitality-readiness.md` and `local-deployment-update-channel-plan.md`.
 
 ### 2026-08-19 — Local deployment and update channel comes before Hospitality
 **Status:** Accepted
 
 **Context**
-Hospitality should not start before Susankhya OS has a repeatable local deployment and update path. The repository already contains readiness, release packaging, release history, upgrade assistant, and version catalog services, but no clear local update channel baseline has been frozen.
+Hospitality should not start before OdareHub has a repeatable local deployment and update path. The repository already contains readiness, release packaging, release history, upgrade assistant, and version catalog services, but no clear local update channel baseline has been frozen.
 
 **Decision**
 Prioritize local deployment first with a filesystem-backed local update channel. Keep cloud distribution, hosted update APIs, automatic background updates, marketplace distribution, and first-class Suite lifecycle out of V1.

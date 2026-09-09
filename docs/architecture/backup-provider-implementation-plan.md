@@ -10,7 +10,7 @@ Plan the smallest recovery-point provider that satisfies `backup-restore-recover
 
 ## 2. Scope
 
-V1 supports local Windows/client and comparable local PHP installs running MySQL or MariaDB. It creates a complete database dump and a filesystem archive for one Susankhya OS installation, verifies both, records non-secret metadata, and supports a separate restore rehearsal.
+V1 supports local Windows/client and comparable local PHP installs running MySQL or MariaDB. It creates a complete database dump and a filesystem archive for one OdareHub installation, verifies both, records non-secret metadata, and supports a separate restore rehearsal.
 
 V1 does not require cloud snapshots, Studio, a hosted update service, a Windows installer, or a multi-provider abstraction.
 
@@ -68,17 +68,17 @@ Exclude only declared reproducible caches/temp files and derived assets with det
 
 ## 7. Recovery Point Metadata
 
-Proposed metadata schema: `susankhya.recovery-point.v1`.
+Proposed metadata schema: `odarehub.recovery-point.v1`.
 
 ```json
 {
-  "schema_version": "susankhya.recovery-point.v1",
+  "schema_version": "odarehub.recovery-point.v1",
   "recovery_point_id": "rp-<uuid-or-random-id>",
   "created_at": "2026-08-19T00:00:00Z",
   "created_by": "operator-identity",
   "reason": "update_apply",
   "installation": {
-    "product_id": "susankhya-os",
+    "product_id": "odarehub",
     "release_version": "1.0.0",
     "build_id": "git:<id>",
     "app_manifest_checksums": [],

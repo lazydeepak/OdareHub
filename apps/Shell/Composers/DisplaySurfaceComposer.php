@@ -58,7 +58,7 @@ final class DisplaySurfaceComposer
         $companyLogo     = htmlspecialchars(trim((string)($this->context['company_logo'] ?? '')));
         $companyLogoSvgInline = trim((string)($this->context['company_logo_svg_inline'] ?? ''));
         $companyLogoSvgTheme  = trim((string)($this->context['company_logo_svg_theme'] ?? ''));
-        $companyFallbackText = trim((string)($this->context['company_fallback_text'] ?? 'Susankhya OS'));
+        $companyFallbackText = trim((string)($this->context['company_fallback_text'] ?? 'OdareHub'));
         $companyFallbackTextCompact = trim((string)($this->context['company_fallback_text_compact'] ?? 'S'));
         $displayMode     = (string)($this->context['display_mode'] ?? 'user');
         $query           = (array)($this->context['current_query'] ?? []);

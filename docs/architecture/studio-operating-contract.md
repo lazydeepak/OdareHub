@@ -110,7 +110,7 @@ Current phase boundary:
 
 This baseline aligns with:
 
-- Charter law and Studio model: [docs/architecture/SUSANKHYA-OS-ARCHITECTURE-CHARTER-V1.md](docs/architecture/SUSANKHYA-OS-ARCHITECTURE-CHARTER-V1.md)
+- Charter law and Studio model: [docs/architecture/ODAREHUB-OS-ARCHITECTURE-CHARTER-V1.md](docs/architecture/ODAREHUB-OS-ARCHITECTURE-CHARTER-V1.md)
 - Surface contribution ownership/composition boundaries: [docs/architecture/surface-contribution-contract.md](docs/architecture/surface-contribution-contract.md)
 - Resolved runtime compiler-resolver boundaries: [docs/architecture/resolved-runtime-contract-pipeline.md](docs/architecture/resolved-runtime-contract-pipeline.md)
 - Business app/module ownership contracts: [docs/architecture/business-app-module-ownership-contract.md](docs/architecture/business-app-module-ownership-contract.md)

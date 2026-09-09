@@ -11,7 +11,7 @@ const FIRST_BOOT_MANIFEST = 'scripts/assets/first_boot_css_manifest.json';
 function compileFirstBootCssAssets(string $root, bool $apply): array
 {
     $result = [
-        'schema' => 'susankhya.first_boot_css_compile.v1',
+        'schema' => 'odarehub.first_boot_css_compile.v1',
         'mode' => $apply ? 'apply' : 'dry-run',
         'manifest' => FIRST_BOOT_MANIFEST,
         'ok' => false,
@@ -129,11 +129,11 @@ function compileThemeCssIfAvailable(string $root, bool $apply = true): array
         return ['ok' => true, 'theme_css_status' => 'skipped_no_manifest'];
     }
 
-    $sourceFingerprint = susankhyaThemeSourceFingerprint($root);
+    $sourceFingerprint = odarehubThemeSourceFingerprint($root);
     if ($sourceFingerprint === null) {
         return ['ok' => false, 'theme_css_status' => 'source_fingerprint_failed'];
     }
-    $targetFingerprint = susankhyaCompiledThemeFingerprint($themeTargetPath);
+    $targetFingerprint = odarehubCompiledThemeFingerprint($themeTargetPath);
     if ($targetFingerprint !== null && hash_equals($sourceFingerprint, $targetFingerprint)) {
         return ['ok' => true, 'theme_css_status' => 'already_current'];
     }
@@ -160,7 +160,7 @@ function compileThemeCssIfAvailable(string $root, bool $apply = true): array
         $exitCode = 0;
         @exec($command, $output, $exitCode);
 
-        $compiledFingerprint = susankhyaCompiledThemeFingerprint($themeTargetPath);
+        $compiledFingerprint = odarehubCompiledThemeFingerprint($themeTargetPath);
         if ($exitCode === 0 && $compiledFingerprint !== null && hash_equals($sourceFingerprint, $compiledFingerprint)) {
             return ['ok' => true, 'theme_css_status' => 'compiled'];
         }

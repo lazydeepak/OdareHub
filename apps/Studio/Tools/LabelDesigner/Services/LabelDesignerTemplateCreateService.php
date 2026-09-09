@@ -297,7 +297,7 @@ final class LabelDesignerTemplateCreateService
         }
 
         $result['json_valid'] = true;
-        $result['schema_valid'] = ((string)($decoded['schema'] ?? '') === 'susankhya.label.template.v1');
+        $result['schema_valid'] = ((string)($decoded['schema'] ?? '') === 'odarehub.label.template.v1');
 
         $contextRef = isset($decoded['context_ref']) && is_array($decoded['context_ref']) ? $decoded['context_ref'] : [];
         $ownerKey = (string)($contextRef['owner_key'] ?? '');

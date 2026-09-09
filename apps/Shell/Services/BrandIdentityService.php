@@ -11,7 +11,7 @@ namespace Apps\Shell\Services;
  */
 final class BrandIdentityService
 {
-    private const PLATFORM_NAME = 'Susankhya OS';
+    private const PLATFORM_NAME = 'OdareHub';
     private const APP_STUDIO_NAME = 'ERP App Studio';
     private const DEFAULT_APP_NAME = 'Workspace';
     private const DEFAULT_VERSION_LABEL = 'Identity Stabilization';
@@ -27,7 +27,7 @@ final class BrandIdentityService
      */
     public static function runtime(array $overrides = []): array
     {
-        $platformName = self::normalizeText((string)($overrides['platform_name'] ?? self::env('SUSANKHYA_PLATFORM_NAME', self::PLATFORM_NAME)));
+        $platformName = self::normalizeText((string)($overrides['platform_name'] ?? self::env('ODAREHUB_PLATFORM_NAME', self::PLATFORM_NAME)));
         if ($platformName === '') {
             $platformName = self::PLATFORM_NAME;
         }
@@ -37,12 +37,12 @@ final class BrandIdentityService
             $instanceName = $platformName;
         }
 
-        $appName = self::normalizeText((string)($overrides['app_name'] ?? self::env('SUSANKHYA_APP_NAME', self::DEFAULT_APP_NAME)));
+        $appName = self::normalizeText((string)($overrides['app_name'] ?? self::env('ODAREHUB_APP_NAME', self::DEFAULT_APP_NAME)));
         if ($appName === '') {
             $appName = self::DEFAULT_APP_NAME;
         }
 
-        $versionLabel = self::normalizeText((string)($overrides['version_label'] ?? self::env('SUSANKHYA_VERSION_LABEL', self::DEFAULT_VERSION_LABEL)));
+        $versionLabel = self::normalizeText((string)($overrides['version_label'] ?? self::env('ODAREHUB_VERSION_LABEL', self::DEFAULT_VERSION_LABEL)));
         if ($versionLabel === '') {
             $versionLabel = self::DEFAULT_VERSION_LABEL;
         }

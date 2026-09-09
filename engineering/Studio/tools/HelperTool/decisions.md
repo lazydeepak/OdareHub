@@ -12,7 +12,7 @@ Multiple engineering tools independently scan different parts of the repository,
 
 **Decision**
 
-Repository Scanner becomes the canonical provider of repository truth for Susankhya OS.
+Repository Scanner becomes the canonical provider of repository truth for OdareHub.
 
 Repository Scanner is responsible only for discovering and exposing repository truth through deterministic, read-only inspection.
 

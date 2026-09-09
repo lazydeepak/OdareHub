@@ -1861,7 +1861,7 @@ return [
     'dashboard.module_overview_title' => 'モジュール概要',
     'dashboard.module_overview_subtitle' => '有効なモジュールの最新件数を表示します。',
     'dashboard.system_status_title' => 'システム状況',
-    'dashboard.system_status_subtitle' => 'Susankhya OS とプラグイン基盤の稼働状況です。',
+    'dashboard.system_status_subtitle' => 'OdareHub とプラグイン基盤の稼働状況です。',
     'dashboard.system_status_engine' => 'エンジン',
     'dashboard.system_status_plugins' => 'プラグイン',
     'dashboard.system_status_environment' => '環境',

@@ -2784,7 +2784,7 @@ final class GuiStudioService
         }
         $template = strtolower((string)($artifact['source_template'] ?? ''));
         $owningApp = strtolower((string)($artifact['owning_app'] ?? ''));
-        if ($template === 'system_app' || in_array($owningApp, ['platform', 'shell', 'susankhya_os'], true)) {
+        if ($template === 'system_app' || in_array($owningApp, ['platform', 'shell', 'odarehub'], true)) {
             return 'SYSTEM';
         }
 

@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 if (!defined('APP_NAME')) {
-    define('APP_NAME', 'Susankhya OS');
+    define('APP_NAME', 'OdareHub');
 }
 
 if (!defined('APP_VERSION')) {

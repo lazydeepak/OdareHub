@@ -26,7 +26,7 @@ final class VersionCatalogService
         return [
             'layer' => 'core',
             'key' => 'core',
-            'label' => 'Susankhya OS Core',
+            'label' => 'OdareHub Core',
             'current_version' => APP_VERSION,
             'target_version' => APP_VERSION,
             'upgrade_available' => false,

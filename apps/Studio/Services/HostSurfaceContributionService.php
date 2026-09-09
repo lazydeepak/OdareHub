@@ -56,8 +56,8 @@ final class HostSurfaceContributionService
         return [
             [
                 'key' => 'studio_workspace_quick_link',
-                'label' => self::tr('studio.host.workspace', 'Susankhya Studio'),
-                'title' => self::tr('studio.host.workspace', 'Susankhya Studio'),
+                'label' => self::tr('studio.host.workspace', 'OdareHub Studio'),
+                'title' => self::tr('studio.host.workspace', 'OdareHub Studio'),
                 'url' => '/apps/studio',
                 'description' => self::tr('studio.host.workspace_description', 'Governed workbench for apps, modules, resources, tools, diffs, approvals, and rollback.'),
                 'weight' => 40,

@@ -91,7 +91,7 @@ function runSystemToolsInventory(): void
             echo "  ok: registry JSON parses\n";
 
             $schema = $data['schema'] ?? '';
-            if ($schema === 'susankhya.system_tools_registry.v1') {
+            if ($schema === 'odarehub.system_tools_registry.v1') {
                 echo "  ok: registry schema $schema\n";
             } else {
                 echo "  fail: unexpected registry schema\n";

@@ -6,7 +6,7 @@ Date: 2026-08-19
 
 ## 1. Purpose
 
-Record the repository's current ownership evidence using the frozen vocabulary in `susankhya-productization-roadmap.md`. Descriptor location and active discovery/lifecycle behavior take precedence over legacy names.
+Record the repository's current ownership evidence using the frozen vocabulary in `odarehub-productization-roadmap.md`. Descriptor location and active discovery/lifecycle behavior take precedence over legacy names.
 
 ## 2. Inventory Summary
 
@@ -190,4 +190,4 @@ For the first usable scope:
 - `apps/Studio/Tools/ReportDesigner/manifest.php`
 - `platform/Reports/ReportDefinitionRepository.php`
 - `platform/Reports/ReportDefinitionValidator.php`
-- `docs/architecture/susankhya-productization-roadmap.md`
+- `docs/architecture/odarehub-productization-roadmap.md`

@@ -2,7 +2,7 @@
 
 ## Runtime owner
 
-`SusankhyaOS.ShellOverlay` is the single browser runtime and policy authority.
+`OdareHubOS.ShellOverlay` is the single browser runtime and policy authority.
 
 It owns:
 

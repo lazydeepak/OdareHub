@@ -2,7 +2,7 @@
 
 Status: Verification audit. Read-only. No runtime changes, DB changes, UI changes, or implementation authorized.
 
-Purpose: Verify whether existing Susankhya OS contribution mechanisms are sufficient for report discovery, exposure, navigation, dashboard integration, display integration, and export access. This is a verification audit — it does not design a new contribution system or create a new `report_contributions` type unless a proven gap exists.
+Purpose: Verify whether existing OdareHub contribution mechanisms are sufficient for report discovery, exposure, navigation, dashboard integration, display integration, and export access. This is a verification audit — it does not design a new contribution system or create a new `report_contributions` type unless a proven gap exists.
 
 ---
 

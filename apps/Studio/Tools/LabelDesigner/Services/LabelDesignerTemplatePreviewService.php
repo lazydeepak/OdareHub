@@ -123,7 +123,7 @@ final class LabelDesignerTemplatePreviewService
         $templateKey = self::safeTemplateKey($contextKey . '.' . $selectedSize);
 
         $template = [
-            'schema' => 'susankhya.label.template.v1',
+            'schema' => 'odarehub.label.template.v1',
             'preview_only' => true,
             'write_status' => 'disabled_in_this_slice',
             'template_key' => $templateKey,
@@ -232,7 +232,7 @@ final class LabelDesignerTemplatePreviewService
                     continue;
                 }
 
-                if ((string)($decoded['schema'] ?? '') !== 'susankhya.label.context.v1') {
+                if ((string)($decoded['schema'] ?? '') !== 'odarehub.label.context.v1') {
                     continue;
                 }
 

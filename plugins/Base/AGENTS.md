@@ -1,7 +1,7 @@
 # /plugins/Base/AGENTS.md
 
 > Base is shared plugin infrastructure and legacy admin/runtime support.
-> Base must not become the owner of Susankhya Studio.
+> Base must not become the owner of OdareHub Studio.
 
 ---
 

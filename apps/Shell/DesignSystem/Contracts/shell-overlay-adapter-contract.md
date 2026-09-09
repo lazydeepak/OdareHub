@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Adapters are temporary, thin bindings between existing candidate DOM/content and `SusankhyaOS.ShellOverlay`.
+Adapters are temporary, thin bindings between existing candidate DOM/content and `OdareHubOS.ShellOverlay`.
 
 ## Allowed inputs
 

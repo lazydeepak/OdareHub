@@ -1,14 +1,14 @@
-# Susankhya Productization Roadmap
+# OdareHub Productization Roadmap
 
 Status: planning baseline. No runtime behavior, installer, update, file move, or refactor is authorized by this document.
 
 Date: 2026-08-19
 
-This roadmap consolidates the existing app-ownership and local-update planning baselines. It keeps Susankhya OS a modular monolith while productization foundations are made explicit.
+This roadmap consolidates the existing app-ownership and local-update planning baselines. It keeps OdareHub a modular monolith while productization foundations are made explicit.
 
 ## 1. Current Ground Truth
 
-Susankhya is currently a **modular monolith**: one PHP repository and deployment unit with Core runtime code in `app/`, top-level apps in `apps/`, reusable Platform code in `platform/`, technical plugins in `plugins/`, and lifecycle artifacts/services under package and storage paths.
+OdareHub is currently a **modular monolith**: one PHP repository and deployment unit with Core runtime code in `app/`, top-level apps in `apps/`, reusable Platform code in `platform/`, technical plugins in `plugins/`, and lifecycle artifacts/services under package and storage paths.
 
 | Concept | What the running architecture recognizes today | Productization reading |
 | --- | --- | --- |

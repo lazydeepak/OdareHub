@@ -13,7 +13,7 @@ $unknown = array_values(array_filter(
 
 if ($unknown !== []) {
     $result = [
-        'schema' => 'susankhya.first_boot_css_compile.v1',
+        'schema' => 'odarehub.first_boot_css_compile.v1',
         'mode' => $apply ? 'apply' : 'dry-run',
         'manifest' => FIRST_BOOT_MANIFEST,
         'ok' => false,

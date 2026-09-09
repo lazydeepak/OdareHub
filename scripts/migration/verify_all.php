@@ -1,5 +1,5 @@
 <?php
-$root = 'C:\Projects\Susankhya';
+$root = 'C:\Projects\OdareHub';
 $all = new RecursiveIteratorIterator(
     new RecursiveDirectoryIterator($root, RecursiveDirectoryIterator::SKIP_DOTS)
 );

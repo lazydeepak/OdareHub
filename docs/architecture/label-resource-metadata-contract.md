@@ -16,7 +16,7 @@ Define canonical metadata requirements for every owner-owned label resource type
 
 | Field | Type | Description |
 |---|---|---|
-| `schema` | string | Must be `susankhya.label.context.v1` |
+| `schema` | string | Must be `odarehub.label.context.v1` |
 | `owner_key` | string | Canonical owner key (e.g. `Manufacturing/Products`) |
 | `owner_type` | string | Canonical owner type (`app`, `module`, or `plugin`) |
 | `owner_root` | string | Repository-relative canonical owner root |
@@ -38,7 +38,7 @@ Define canonical metadata requirements for every owner-owned label resource type
 
 ### Validation Requirements
 
-- `schema` must match `susankhya.label.context.v1` exactly.
+- `schema` must match `odarehub.label.context.v1` exactly.
 - `owner_key` must match the owner root the file is stored under.
 - `context_key` must be unique per owner.
 - File must be stored at `{OwnerRoot}/Resources/labels/contexts/{context_key}.label-context.json`.
@@ -55,7 +55,7 @@ Define canonical metadata requirements for every owner-owned label resource type
 
 | Field | Type | Description |
 |---|---|---|
-| `schema` | string | Must be `susankhya.label.template.v1` |
+| `schema` | string | Must be `odarehub.label.template.v1` |
 | `owner_key` | string | Canonical owner key |
 | `owner_type` | string | Canonical owner type (`app`, `module`, or `plugin`) |
 | `owner_root` | string | Repository-relative canonical owner root |
@@ -77,7 +77,7 @@ Define canonical metadata requirements for every owner-owned label resource type
 
 ### Validation Requirements
 
-- `schema` must match `susankhya.label.template.v1` exactly.
+- `schema` must match `odarehub.label.template.v1` exactly.
 - `owner_key` at top level must match the owner root.
 - `template_key` must be unique per owner.
 - `context_ref.context_key` must match an existing context resource.
@@ -99,7 +99,7 @@ Existing template resources may have `owner_key` only inside `context_ref`. Thes
 
 | Field | Type | Description |
 |---|---|---|
-| `schema` | string | Must be `susankhya.label.rule.v1` |
+| `schema` | string | Must be `odarehub.label.rule.v1` |
 | `owner_key` | string | Canonical owner key |
 | `rule_key` | string | Unique rule identifier |
 | `conditions` | array | Condition expressions |
@@ -116,7 +116,7 @@ Existing template resources may have `owner_key` only inside `context_ref`. Thes
 
 ### Validation Requirements
 
-- `schema` must match `susankhya.label.rule.v1` exactly.
+- `schema` must match `odarehub.label.rule.v1` exactly.
 - `owner_key` must match the owner root.
 - `rule_key` must be unique per owner.
 - File must be stored at `{OwnerRoot}/Resources/labels/rules/{rule_key}.json`.

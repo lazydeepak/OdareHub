@@ -257,9 +257,9 @@ final class LabelDesignerMetadataMigrationService
     private static function detectResourceType(string $schema, array $decoded): string
     {
         return match ($schema) {
-            'susankhya.label.context.v1' => 'context',
-            'susankhya.label.template.v1' => 'template',
-            'susankhya.label.rule.v1' => 'rule',
+            'odarehub.label.context.v1' => 'context',
+            'odarehub.label.template.v1' => 'template',
+            'odarehub.label.rule.v1' => 'rule',
             default => 'unknown',
         };
     }

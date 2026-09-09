@@ -104,7 +104,7 @@ final class HealthDashboardService
 
         return [
             'key' => 'core',
-            'label' => 'Core Susankhya OS',
+            'label' => 'Core OdareHub',
             'enabled_label' => !empty($coreStatus['preflight']['database']['ok']) ? 'Enabled' : 'Disabled',
             'health_status' => $healthStatus,
             'runtime_health' => $runtimeHealth,

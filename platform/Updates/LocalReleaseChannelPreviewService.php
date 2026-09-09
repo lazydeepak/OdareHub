@@ -90,10 +90,10 @@ final class LocalReleaseChannelPreviewService
     /** @param array<string,mixed> $channel @param array<int,string> $blockers */
     private function validateChannel(array $channel, array &$blockers): void
     {
-        if (($channel['schema_version'] ?? null) !== 'susankhya.local-channel.v1') {
+        if (($channel['schema_version'] ?? null) !== 'odarehub.local-channel.v1') {
             $blockers[] = 'channel schema_version is invalid.';
         }
-        if (($channel['product_id'] ?? null) !== 'susankhya-os') {
+        if (($channel['product_id'] ?? null) !== 'odarehub') {
             $blockers[] = 'channel product_id is invalid.';
         }
         $this->validTimestamp($channel['generated_at'] ?? null, 'channel generated_at', $blockers);
@@ -107,10 +107,10 @@ final class LocalReleaseChannelPreviewService
                 $blockers[] = 'release metadata ' . $field . ' is required.';
             }
         }
-        if (($metadata['schema_version'] ?? null) !== 'susankhya.release.v1') {
+        if (($metadata['schema_version'] ?? null) !== 'odarehub.release.v1') {
             $blockers[] = 'release metadata schema_version is invalid.';
         }
-        if (($metadata['product_id'] ?? null) !== 'susankhya-os') {
+        if (($metadata['product_id'] ?? null) !== 'odarehub') {
             $blockers[] = 'release metadata product_id is invalid.';
         }
         if (($metadata['lane'] ?? null) !== 'app') {

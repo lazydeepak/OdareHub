@@ -1,6 +1,6 @@
 # Architecture Gates
 
-These scripts are read-only System Tools foundation checks for Susankhya OS architecture boundaries. They inspect files and the current git diff; they must not mutate runtime state, data, routes, permissions, or generated artifacts.
+These scripts are read-only System Tools foundation checks for OdareHub architecture boundaries. They inspect files and the current git diff; they must not mutate runtime state, data, routes, permissions, or generated artifacts.
 
 Run the aggregate gate suite from the repo root:
 

@@ -10,7 +10,7 @@ Related planning baseline:
 
 ## Context
 
-Hospitality Suite has been discussed as a future Susankhya OS product track. The main risk is starting it with unclear ownership vocabulary and accidentally creating another mixed layer of app, suite, plugin, and module terminology.
+Hospitality Suite has been discussed as a future OdareHub product track. The main risk is starting it with unclear ownership vocabulary and accidentally creating another mixed layer of app, suite, plugin, and module terminology.
 
 ## Confirmed Direction
 

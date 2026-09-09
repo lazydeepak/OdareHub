@@ -84,7 +84,7 @@ Local diagnostic evidence:
 | Asset group | Classification | Owner | Cleanup decision |
 |---|---|---|---|
 | `public/assets/apps/*` | DELIVERY_OUTPUT / GENERATED_OUTPUT | owning app/module/generated app | keep; regenerate from owner source, do not edit by hand |
-| `public/assets/branding/platform/susankhya-os/*` | SHARED_PLATFORM_ASSET | Platform branding | keep as canonical public platform branding |
+| `public/assets/branding/platform/odarehub/*` | SHARED_PLATFORM_ASSET | Platform branding | keep as canonical public platform branding |
 | `public/assets/branding/ipm-logo.*` | BRANDING_ASSET / KEEP_COMPAT | Platform/Organization branding compatibility | keep until branding source policy exists |
 | `public/assets/normalize.css` | SHARED_PLATFORM_ASSET | Shell shared runtime | keep as global source asset |
 | `public/assets/theme.css` | SHARED_PLATFORM_ASSET | Shell shared runtime | keep as global source asset |

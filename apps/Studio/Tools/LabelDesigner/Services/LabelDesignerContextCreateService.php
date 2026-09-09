@@ -141,7 +141,7 @@ final class LabelDesignerContextCreateService
         $validation['key_unique'] = true;
 
         $context = [
-            'schema' => 'susankhya.label.context.v1',
+            'schema' => 'odarehub.label.context.v1',
             'context_key' => $contextKey,
             'owner' => [
                 'owner_key' => (string)$selectedOwner['owner_key'],
@@ -479,7 +479,7 @@ final class LabelDesignerContextCreateService
         }
 
         $result['json_valid'] = true;
-        $result['schema_valid'] = ((string)($decoded['schema'] ?? '') === 'susankhya.label.context.v1');
+        $result['schema_valid'] = ((string)($decoded['schema'] ?? '') === 'odarehub.label.context.v1');
 
         $ownerRoot = (string)($decoded['owner']['root_path'] ?? '');
         $resolvedOwnerRoot = self::resolveOwnerRoot($ownerRoot);

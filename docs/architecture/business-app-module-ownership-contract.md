@@ -2,7 +2,7 @@
 
 Status: Minimal contract baseline for reference business apps and modules.
 
-Purpose: Make business app and module ownership explicit so Manufacturing, SBAIO, Payroll, and future business apps remain reference implementations for Susankhya OS platform contracts instead of ad-hoc sample code.
+Purpose: Make business app and module ownership explicit so Manufacturing, SBAIO, Payroll, and future business apps remain reference implementations for OdareHub platform contracts instead of ad-hoc sample code.
 
 This document does not restructure folders, rename routes, migrate modules, or change runtime behavior.
 
@@ -223,7 +223,7 @@ Rules:
 
 No `apps/Parties` (or other Shared App) is created in this slice.
 
-Reconciles: `docs/architecture/shared-app-extension-readiness.md`, `docs/architecture/susankhya-productization-roadmap.md`, `docs/architecture/app-ownership-classification-and-hospitality-readiness.md`.
+Reconciles: `docs/architecture/shared-app-extension-readiness.md`, `docs/architecture/odarehub-productization-roadmap.md`, `docs/architecture/app-ownership-classification-and-hospitality-readiness.md`.
 
 Slice 2 correction note: The previous `scoped_by_company: true` App-level boolean incorrectly bound entire App to company scope and conflated tenant (database/instance, via `storage/db_config.php`, `app/Core/DB.php`) with Company (organizational structure `org_companies` inside one DB). It is removed. Future Parties work will define scope per-entity (identity vs relationship), not per-App.
 

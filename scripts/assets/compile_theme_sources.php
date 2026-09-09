@@ -209,7 +209,7 @@ foreach ($autoDiscoveredSources as $autoSource) {
     $compiledParts[] = "/* source: {$autoId} ({$autoPath}) */\n" . rtrim($css) . "\n";
 }
 
-$sourceFingerprint = susankhyaThemeSourceFingerprint($root);
+$sourceFingerprint = odarehubThemeSourceFingerprint($root);
 if ($sourceFingerprint === null) {
     $result['errors'][] = 'source_fingerprint_failed';
     emit($result, $json);
@@ -242,7 +242,7 @@ $compiled .= implode("\n", $compiledParts);
 $result['compiled_bytes'] = strlen($compiled);
 ksort($publishedStyles);
 $compiledOptions = json_encode([
-    'schema' => 'susankhya.shell.published-theme-options.v1',
+    'schema' => 'odarehub.shell.published-theme-options.v1',
     'generated_from' => THEME_MANIFEST,
     'styles' => $publishedStyles,
 ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);

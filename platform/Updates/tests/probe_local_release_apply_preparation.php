@@ -40,7 +40,7 @@ function apply_prepare_rm_tree(string $path): void
     @rmdir($path);
 }
 
-$tmp = sys_get_temp_dir() . '/susankhya-local-apply-prepare-probe-' . bin2hex(random_bytes(6));
+$tmp = sys_get_temp_dir() . '/odarehub-local-apply-prepare-probe-' . bin2hex(random_bytes(6));
 mkdir($tmp . '/source/app', 0700, true);
 mkdir($tmp . '/source/storage', 0700, true);
 file_put_contents($tmp . '/source/app/runtime.php', '<?php return true;');
@@ -112,9 +112,9 @@ try {
     $sha = hash_file('sha256', $unsafePackage) ?: '';
     $size = filesize($unsafePackage) ?: 0;
     file_put_contents($unsafeChannel . '/releases/unsafe.json', json_encode([
-        'schema_version' => 'susankhya.release.v1',
-        'product_id' => 'susankhya-os',
-        'product_name' => 'Susankhya ERP',
+        'schema_version' => 'odarehub.release.v1',
+        'product_id' => 'odarehub',
+        'product_name' => 'OdareHub ERP',
         'release_version' => '1.0.0',
         'build_id' => 'git:unsafe',
         'channel' => 'local',
@@ -126,9 +126,9 @@ try {
         'apply_eligibility' => ['requires_preview' => true, 'requires_operator_approval' => true],
     ], JSON_PRETTY_PRINT));
     file_put_contents($unsafeChannel . '/channel.json', json_encode([
-        'schema_version' => 'susankhya.local-channel.v1',
+        'schema_version' => 'odarehub.local-channel.v1',
         'channel' => 'local',
-        'product_id' => 'susankhya-os',
+        'product_id' => 'odarehub',
         'generated_at' => '2026-08-19T00:00:00Z',
         'lanes' => [
             'app' => ['current' => ['release_version' => '1.0.0', 'build_id' => 'git:unsafe', 'metadata' => 'releases/unsafe.json', 'package' => 'releases/unsafe.zip', 'sha256' => $sha, 'size_bytes' => $size]],

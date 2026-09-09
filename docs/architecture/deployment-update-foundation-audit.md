@@ -10,7 +10,7 @@ Record the current deployment, release, package, upgrade, export, restore, recov
 
 ## 2. Current Deployment Shape
 
-Susankhya is deployed as one PHP modular monolith: repository code, `vendor/`, `public/`, `app/`, `apps/`, `platform/`, plugins, database configuration, and writable storage coexist in one installation.
+OdareHub is deployed as one PHP modular monolith: repository code, `vendor/`, `public/`, `app/`, `apps/`, `platform/`, plugins, database configuration, and writable storage coexist in one installation.
 
 | Concern | Current evidence | State |
 | --- | --- | --- |
@@ -148,8 +148,8 @@ The channel shape already proposed in `local-deployment-update-channel-plan.md` 
 storage/update-channels/local/
   channel.json
   releases/
-    susankhya-os-<version>.zip
-    susankhya-os-<version>.json
+    odarehub-<version>.zip
+    odarehub-<version>.json
 ```
 
 V1 channel metadata should bind at least:

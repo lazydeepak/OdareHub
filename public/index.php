@@ -33,9 +33,9 @@ function shouldRecompileThemeCss(string $runtimeThemePath): bool
         return true;
     }
 
-    if (function_exists('susankhyaThemeSourceFingerprint') && function_exists('susankhyaCompiledThemeFingerprint')) {
-        $sourceFingerprint = susankhyaThemeSourceFingerprint(APP_ROOT);
-        $targetFingerprint = susankhyaCompiledThemeFingerprint($runtimeThemePath);
+    if (function_exists('odarehubThemeSourceFingerprint') && function_exists('odarehubCompiledThemeFingerprint')) {
+        $sourceFingerprint = odarehubThemeSourceFingerprint(APP_ROOT);
+        $targetFingerprint = odarehubCompiledThemeFingerprint($runtimeThemePath);
         if ($sourceFingerprint !== null && ($targetFingerprint === null || !hash_equals($sourceFingerprint, $targetFingerprint))) {
             return true;
         }

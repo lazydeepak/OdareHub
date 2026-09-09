@@ -332,7 +332,7 @@ final class LabelDesignerContextEditService
             'value' => self::toRelativePath($absolutePath),
         ];
 
-        $schemaValid = ((string)($newData['schema'] ?? '') === 'susankhya.label.context.v1');
+        $schemaValid = ((string)($newData['schema'] ?? '') === 'odarehub.label.context.v1');
         $checks[] = [
             'code' => 'CE02',
             'rule' => 'schema_preserved',

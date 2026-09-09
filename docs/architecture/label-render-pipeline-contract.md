@@ -75,7 +75,7 @@ The context resource file is located and loaded from owner resource paths. Resol
 
 **Resolution checks**:
 - Context file exists and is readable.
-- Context is valid JSON and matches the schema `susankhya.label.context.v1`.
+- Context is valid JSON and matches the schema `odarehub.label.context.v1`.
 - Context has required fields (`context_key`, `allowed_fields`, `owner_key`).
 - Context `owner_key` matches the request `owner_key`.
 
@@ -86,7 +86,7 @@ The template resource file is located and loaded from owner resource paths. Reso
 
 **Resolution checks**:
 - Template file exists and is readable.
-- Template is valid JSON and matches the schema `susankhya.label.template.v1`.
+- Template is valid JSON and matches the schema `odarehub.label.template.v1`.
 - Template `context_ref.context_key` resolves to the selected context (compatibility check).
 - Template `owner_key` matches the request `owner_key` or is delegated via `context_ref.owner_key`.
 
@@ -97,7 +97,7 @@ Enabled rules for the selected context/template pair are loaded from owner rule 
 
 **Resolution checks**:
 - Rule files exist at expected paths.
-- Rules are valid JSON and match the schema `susankhya.label.rule.v1`.
+- Rules are valid JSON and match the schema `odarehub.label.rule.v1`.
 - Rules reference valid field keys, operators, and effect types.
 - Rules are within the owner boundary.
 
@@ -296,9 +296,9 @@ Each stage in the canonical chain is expanded here with required checks and beha
 **Purpose**: Verify structural validity of each loaded resource.
 
 **Required checks**:
-- Context schema is `susankhya.label.context.v1`.
-- Template schema is `susankhya.label.template.v1`.
-- Rule schema (if present) is `susankhya.label.rule.v1`.
+- Context schema is `odarehub.label.context.v1`.
+- Template schema is `odarehub.label.template.v1`.
+- Rule schema (if present) is `odarehub.label.rule.v1`.
 - Context has `allowed_fields` with required field metadata.
 - Template layout blocks reference valid field keys from context.
 - Template `context_ref.context_key` matches the requested context.

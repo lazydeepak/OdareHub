@@ -5,9 +5,9 @@ namespace Apps\Studio\Tools\LabelDesigner\Services;
 
 final class LabelDesignerResourceDiagnosticsService
 {
-    public const SCHEMA_CONTEXT = 'susankhya.label.context.v1';
-    public const SCHEMA_TEMPLATE = 'susankhya.label.template.v1';
-    public const SCHEMA_RULE = 'susankhya.label.rule.v1';
+    public const SCHEMA_CONTEXT = 'odarehub.label.context.v1';
+    public const SCHEMA_TEMPLATE = 'odarehub.label.template.v1';
+    public const SCHEMA_RULE = 'odarehub.label.rule.v1';
 
     private const ALLOWED_OPERATORS = [
         'equals', 'not_equals', 'empty', 'not_empty',

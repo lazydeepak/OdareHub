@@ -8,7 +8,7 @@ Builds on:
 
 - `docs/architecture/app-ownership-classification-and-hospitality-readiness.md` (planning baseline)
 - `docs/discussions/hospitality-suite-preimplementation-notes.md` (discussion note)
-- `ARCHITECTURE.md`, `docs/architecture/SUSANKHYA-OS-ARCHITECTURE-CHARTER-V1.md`
+- `ARCHITECTURE.md`, `docs/architecture/ODAREHUB-OS-ARCHITECTURE-CHARTER-V1.md`
 - `docs/architecture/APP-CONTRACT.md`, `docs/architecture/MODULE-CONTRACT.md`
 
 ## 1. Purpose

@@ -20,7 +20,7 @@ SBAIO owns:
 - Use app-owned routes under `/apps/sbaio/...` for canonical SBAIO surfaces.
 - Do NOT move SBAIO business logic into core.
 - Do NOT duplicate SBAIO routes/surfaces outside app ownership.
-- Do NOT create runtime dependencies on Susankhya Studio; SBAIO must run normally when `/apps/Studio` is absent or disabled.
+- Do NOT create runtime dependencies on OdareHub Studio; SBAIO must run normally when `/apps/Studio` is absent or disabled.
 - Follow `../../docs/experience-composition-architecture-plan.md` when SBAIO capabilities feed ACL, Workspace Profile, operator, display, admin, or Studio composition workflows.
 - Studio may help create or modify SBAIO artifacts, but ownership remains with SBAIO.
 

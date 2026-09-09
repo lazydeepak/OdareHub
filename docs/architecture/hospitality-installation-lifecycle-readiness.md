@@ -1,6 +1,6 @@
 # Hospitality Installation / Lifecycle Readiness
 
-Status: Verified. Hospitality behaves correctly as an installable Susankhya app
+Status: Verified. Hospitality behaves correctly as an installable OdareHub app
 through the platform's existing generic lifecycle machinery only.
 
 Date: 2026-08-24

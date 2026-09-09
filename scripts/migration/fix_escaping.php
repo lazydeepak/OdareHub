@@ -1,5 +1,5 @@
 <?php
-$root = 'C:\Projects\Susankhya';
+$root = 'C:\Projects\OdareHub';
 
 function fixLocaleFile($path) {
     $content = file_get_contents($path);

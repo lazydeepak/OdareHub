@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Engineering Workspace documents provide the authoritative engineering contract for agents operating on Susankhya OS.
+Engineering Workspace documents provide the authoritative engineering contract for agents operating on OdareHub.
 
 Every engineering operation begins by resolving its Engineering Workspace. The workspace contract is the canonical source of engineering intent and constraints for that operation.
 

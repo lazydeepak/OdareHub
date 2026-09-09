@@ -18,7 +18,7 @@ final class TOTP
         }
 
         if ($issuer === '') {
-            $issuer = 'Susankhya OS';
+            $issuer = 'OdareHub';
         }
 
         return $issuer;

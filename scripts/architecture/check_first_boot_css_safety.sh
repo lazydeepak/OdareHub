@@ -207,7 +207,7 @@ else
 fi
 
 if search 'Source fingerprint:' scripts/assets/compile_theme_sources.php \
-  && search 'susankhyaThemeSourceFingerprint' public/index.php \
+  && search 'odarehubThemeSourceFingerprint' public/index.php \
   && search 'maybeRecompileThemeCss\(\$themeCssEarlyPath\)' public/index.php; then
   ok "dynamic page runtime enforces deterministic theme source synchronization"
 else

@@ -31,7 +31,7 @@ Manufacturing owns:
 - Do NOT move Manufacturing business logic into core.
 - Do NOT add Manufacturing UI directly into shell/core.
 - Do NOT create duplicate route surfaces for the same feature.
-- Do NOT create runtime dependencies on Susankhya Studio; Manufacturing must run normally when `/apps/Studio` is absent or disabled.
+- Do NOT create runtime dependencies on OdareHub Studio; Manufacturing must run normally when `/apps/Studio` is absent or disabled.
 - Follow `../../docs/experience-composition-architecture-plan.md` when Manufacturing capabilities feed ACL, Workspace Profile, operator, display, admin, or Studio composition workflows.
 - Studio may help create or modify Manufacturing artifacts, but ownership remains with Manufacturing.
 

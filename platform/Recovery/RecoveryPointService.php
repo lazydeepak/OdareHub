@@ -161,7 +161,7 @@ final class RecoveryPointService
             'created_by' => $createdBy,
             'reason' => $reason,
             'installation' => [
-                'product_id' => (string)($installation['product_id'] ?? 'susankhya-os'),
+                'product_id' => (string)($installation['product_id'] ?? 'odarehub'),
                 'release_version' => (string)($installation['release_version'] ?? '0.0.0'),
                 'build_id' => (string)($installation['build_id'] ?? 'unknown'),
                 'app_manifest_checksums' => is_array($installation['app_manifest_checksums'] ?? null) ? $installation['app_manifest_checksums'] : [],

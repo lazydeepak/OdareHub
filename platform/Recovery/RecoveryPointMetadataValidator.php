@@ -8,7 +8,7 @@ use Throwable;
 
 final class RecoveryPointMetadataValidator
 {
-    public const SCHEMA_VERSION = 'susankhya.recovery-point.v1';
+    public const SCHEMA_VERSION = 'odarehub.recovery-point.v1';
 
     private const ALLOWED_REASONS = ['update_apply', 'repair', 'installer_upgrade', 'manual'];
 

@@ -6,7 +6,7 @@
 
 ## 1. Current State
 
-Susankhya OS has most of the ownership foundations needed for view composition, but it does not yet have one canonical definition of a composed View.
+OdareHub has most of the ownership foundations needed for view composition, but it does not yet have one canonical definition of a composed View.
 
 The current word **View** is overloaded across four levels:
 
@@ -59,7 +59,7 @@ The following contracts provide a strong foundation.
 
 ### Architecture Charter
 
-`docs/architecture/SUSANKHYA-OS-ARCHITECTURE-CHARTER-V1.md` establishes:
+`docs/architecture/ODAREHUB-OS-ARCHITECTURE-CHARTER-V1.md` establishes:
 
 - Core is locked
 - Shell is generic
@@ -688,7 +688,7 @@ A future contract must state how legacy templates participate:
 
 **B. Partial readiness**
 
-Susankhya OS is ready to define the prerequisites for View Composition Contract V1, but it is not yet ready to formalize the full V1 contract without first resolving terminology and composition-shape gaps.
+OdareHub is ready to define the prerequisites for View Composition Contract V1, but it is not yet ready to formalize the full V1 contract without first resolving terminology and composition-shape gaps.
 
 The architecture direction is sound:
 

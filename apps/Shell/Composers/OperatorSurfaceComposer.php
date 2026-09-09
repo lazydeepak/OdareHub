@@ -2652,7 +2652,7 @@ final class OperatorSurfaceComposer
                 'company_logo_icon' => trim((string)($this->context['company_logo_icon'] ?? '')),
                 'company_logo_svg_inline' => trim((string)($this->context['company_logo_svg_inline'] ?? '')),
                 'company_logo_svg_theme' => trim((string)($this->context['company_logo_svg_theme'] ?? '')),
-                'company_fallback_text' => trim((string)($this->context['company_fallback_text'] ?? 'Susankhya OS')),
+                'company_fallback_text' => trim((string)($this->context['company_fallback_text'] ?? 'OdareHub')),
                 'company_fallback_text_compact' => trim((string)($this->context['company_fallback_text_compact'] ?? 'S')),
                 'branch_name' => trim((string)($this->context['branch_name'] ?? ($this->context['branch'] ?? ''))),
                 'notifications_count' => (int)($this->context['notifications_count'] ?? (int)(($content['notifications_focus']['unread'] ?? $content['notifications_focus']['total_all'] ?? 0))),

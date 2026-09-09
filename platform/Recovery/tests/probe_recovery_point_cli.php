@@ -31,7 +31,7 @@ cli_assert($code === 2, 'create without target-dir fails safely');
 cli_assert(!file_exists(APP_ROOT . '/storage/recovery-points'), 'CLI probe does not create production recovery storage');
 cli_assert(!str_contains(implode("\n", $output), 'rehearsal.json'), 'create failure does not write rehearsal output');
 
-$tmp = sys_get_temp_dir() . '/susankhya-recovery-point-cli-probe-' . bin2hex(random_bytes(6));
+$tmp = sys_get_temp_dir() . '/odarehub-recovery-point-cli-probe-' . bin2hex(random_bytes(6));
 mkdir($tmp . '/target', 0700, true);
 mkdir($tmp . '/isolated', 0700, true);
 file_put_contents($tmp . '/target/database.sql.gz', gzencode('-- cli rehearsal'));
@@ -41,13 +41,13 @@ $zip->addFromString('app/bootstrap.php', '<?php return true;');
 $zip->close();
 $hash = str_repeat('a', 64);
 $metadata = [
-    'schema_version' => 'susankhya.recovery-point.v1',
+    'schema_version' => 'odarehub.recovery-point.v1',
     'recovery_point_id' => 'rp-cli-probe',
     'created_at' => '2026-08-19T00:00:00Z',
     'created_by' => 'probe',
     'reason' => 'manual',
     'installation' => [
-        'product_id' => 'susankhya-os',
+        'product_id' => 'odarehub',
         'release_version' => '1.0.0',
         'build_id' => 'git:probe',
         'app_manifest_checksums' => [],

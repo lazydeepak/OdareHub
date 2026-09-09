@@ -1,4 +1,4 @@
-# Susankhya OS Theme Architecture Contract v1
+# OdareHub Theme Architecture Contract v1
 
 Status: Locked architecture v1 (governed migration in progress)
 Date: 2026-06-05

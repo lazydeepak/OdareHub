@@ -6,7 +6,7 @@ Date: 2026-08-19
 
 ## Context
 
-Before building Hospitality, Susankhya OS needs a boring, repeatable local deployment and update path.
+Before building Hospitality, OdareHub needs a boring, repeatable local deployment and update path.
 
 The repository already has deployment and upgrade machinery:
 
@@ -45,7 +45,7 @@ Use these terms for deployment work:
 
 | Term | Meaning |
 |---|---|
-| Deployment | installing/running Susankhya OS in a target environment |
+| Deployment | installing/running OdareHub in a target environment |
 | Release Package | zip/archive generated from a readiness-approved source state |
 | Update Channel | discoverable source of release metadata and packages |
 | Local Channel | filesystem-backed update channel for local or controlled installs |
@@ -63,8 +63,8 @@ Minimum channel shape:
 storage/update-channels/local/
   channel.json
   releases/
-    susankhya-os-<version>.zip
-    susankhya-os-<version>.json
+    odarehub-<version>.zip
+    odarehub-<version>.json
 ```
 
 Channel metadata should include:

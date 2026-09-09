@@ -6,7 +6,7 @@ no runtime behavior.
 ## Purpose
 
 Localization Studio is a governed Studio worker for locale resource inspection,
-validation, and future edit proposals across Susankhya OS apps and modules.
+validation, and future edit proposals across OdareHub apps and modules.
 
 ## Current Phase
 
