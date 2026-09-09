@@ -2,7 +2,7 @@
   "id": "studio",
   "app_key": "studio",
   "package_type": "bundle",
-  "name": "Susankhya Studio",
+  "name": "OdareHub Studio",
   "version": "0.1.0",
   "type": "system",
   "min_core_version": "3.0.0",
