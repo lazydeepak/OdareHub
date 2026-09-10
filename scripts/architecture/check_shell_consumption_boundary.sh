@@ -170,7 +170,7 @@ check_required_path "apps/Shell/Resources/published-theme-options.json" "publish
 if php -r '
   $data = json_decode((string)file_get_contents($argv[1]), true);
   if (!is_array($data)
-      || ($data["schema"] ?? "") !== "odarehub.shell.published-theme-options.v1"
+      || ($data["schema"] ?? "") !== "susankhya.shell.published-theme-options.v1"
       || !is_array($data["styles"] ?? null)
       || ($data["styles"] ?? []) === []
   ) {
