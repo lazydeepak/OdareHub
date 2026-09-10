@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-define('APP_ROOT', '/Users/lazydeepak/dev/OdareHub');
+define('APP_ROOT', '/tmp/shared-items-impl');
 
 /**
  * Shared Items — Manufacturing Product adoption probe
