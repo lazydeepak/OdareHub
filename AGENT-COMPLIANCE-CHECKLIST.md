@@ -4577,7 +4577,7 @@ Blank token inputs reported by user were traced to **stale browser context snaps
 
 ### What was done
 
-1. Moved active visual-policy selection, strength clamping/override, CSS data attributes, CSS variables, and cleanup into `SusankhyaOS.ShellOverlay`.
+1. Moved active visual-policy selection, strength clamping/override, CSS data attributes, CSS variables, and cleanup into `OdareHubOS.ShellOverlay`.
 2. Added `ShellOverlay.visualEffects` as the controller-owned strength/state surface.
 3. Updated public and operator preference sliders to call the unified controller.
 4. Removed `ShellOverlayVisualEffects.php` and its separate namespace, event listeners, and duplicate active-instance map.
@@ -4855,3 +4855,28 @@ Blank token inputs reported by user were traced to **stale browser context snaps
 - No Core, database, schema, or business-domain behavior changes.
 - Navigation remains owner-contributed and ACL-filtered; Shell only projects resolved presentation data.
 - Legacy role-dashboard routes remain registered for compatibility.
+
+## Session Log (2026-09-07) — storage/manual-rehearsal-test-002 Provenance Classification
+
+### What was done
+1. Determined the provenance of the tracked repository mirror under `storage/manual-rehearsal-test-002/` using git requirements (no file or checker modification):
+   - `git ls-files -- storage/manual-rehearsal-test-002 | wc -l` → **4,976 tracked files**
+   - `find storage/manual-rehearsal-test-002 -type f | wc -l` → **4,976 files on disk** (exact match, no untracked files)
+   - `git check-ignore -v` (dir, dir-with-slash, sample file) → **no output** (path NOT ignored; no `.gitignore` exists in repo)
+   - `git status --short --untracked-files=all` on sample file → **no output** (clean/tracked/committed)
+   - `git log -- storage/manual-rehearsal-test-002` → single originating commit `f8dd0d4` "Sync: reflect local folder state with deletions and new additions" (bulk 15,829-file mirror commit)
+   - Blob-hash comparison: canonical `app/Core/Application.php` and `apps/Studio/Tools/CustomizationStudio/Advanced/CssLiveEditor/preview-frame.php` are **byte-identical** to their `storage/.../002` mirrors
+
+### Classification
+- **CASE_A_TRACKED_STORAGE_SOURCE_OR_FIXTURE** — `storage/manual-rehearsal-test-002/` is a git-tracked rehearsal/snapshot fixture that mirrors canonical source paths. It is not a genuine duplicate implementation and does not require repair.
+- All files are tracked, clean, non-ignored, and identical to source; there are no untracked or ignored copies.
+
+### Validation
+- No source files modified, relocated, or deleted.
+- No checker/boundary-gate script modified.
+- Working tree preserved.
+
+### Hard rules preserved
+- No Core, database, schema, or business-domain behavior changes.
+- No relocation of rehearsal artifacts into the canonical source tree.
+- No duplicate-implementation repair triggered.
