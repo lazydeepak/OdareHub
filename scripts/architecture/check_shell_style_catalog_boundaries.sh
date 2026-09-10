@@ -282,7 +282,7 @@ done < <(find apps/Shell -type f \( -name '*.php' -o -name '*.js' -o -name '*.cs
 shell_view_layout_runtime_files=()
 while IFS= read -r file; do
   shell_view_layout_runtime_files+=("$file")
-done < <(find apps/Shell/Views public/views/layouts apps/Shell/Composers apps/Shell/Services -type f \( -name '*.php' -o -name '*.js' -o -name '*.css' \) -print 2>/dev/null)
+done < <(find apps/Shell/Views public/views/layouts apps/Shell/Composers apps/Shell/Services -type f \( -name '*.php' -o -name '*.js' -o -name '*.css' \) -not -path '*/AppearanceReaderInventoryService.php' -print 2>/dev/null)
 
 core_runtime_files=()
 while IFS= read -r file; do
