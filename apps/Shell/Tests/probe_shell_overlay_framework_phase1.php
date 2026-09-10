@@ -66,8 +66,8 @@ assertProbe($frameworkPhp !== '', 'Probe can read ShellOverlayFramework.php (ser
 
 
 assertProbe(
-    str_contains($frameworkPhp, "const NS = 'SusankhyaOS.ShellOverlay'") || str_contains($frameworkPhp, 'SusankhyaOS.ShellOverlay'),
-    'ShellOverlayFramework defines JS namespace SusankhyaOS.ShellOverlay'
+    str_contains($frameworkPhp, "const NS = 'OdareHubOS.ShellOverlay'") || str_contains($frameworkPhp, 'OdareHubOS.ShellOverlay'),
+    'ShellOverlayFramework defines JS namespace OdareHubOS.ShellOverlay'
 );
 
 
