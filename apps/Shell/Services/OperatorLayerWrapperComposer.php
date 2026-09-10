@@ -353,9 +353,9 @@ HTML;
     var backdrop = document.getElementById('actionPanelBackdrop');
     if (!btn || !panel) return;
 
-    var mobileActionSheetAdapterFactory = window.SusankhyaOS
-        && window.SusankhyaOS.ShellOverlayAdapters
-        && window.SusankhyaOS.ShellOverlayAdapters.createOperatorMobileActionSheetAdapter;
+    var mobileActionSheetAdapterFactory = window.OdareHubOS
+        && window.OdareHubOS.ShellOverlayAdapters
+        && window.OdareHubOS.ShellOverlayAdapters.createOperatorMobileActionSheetAdapter;
     var mobileActionSheetAdapter = typeof mobileActionSheetAdapterFactory === 'function'
         ? mobileActionSheetAdapterFactory({
             triggerId: 'mobileActionBtn',
@@ -365,9 +365,9 @@ HTML;
             setLegacyOpen: setPanelOpen
         })
         : null;
-    window.SusankhyaOS = window.SusankhyaOS || {};
-    window.SusankhyaOS.ShellOverlayAdapters = window.SusankhyaOS.ShellOverlayAdapters || {};
-    window.SusankhyaOS.ShellOverlayAdapters.operatorMobileActionSheetAdapter = mobileActionSheetAdapter;
+    window.OdareHubOS = window.OdareHubOS || {};
+    window.OdareHubOS.ShellOverlayAdapters = window.OdareHubOS.ShellOverlayAdapters || {};
+    window.OdareHubOS.ShellOverlayAdapters.operatorMobileActionSheetAdapter = mobileActionSheetAdapter;
 
     function setPanelOpen(open) {
         panel.classList.toggle('open', open);

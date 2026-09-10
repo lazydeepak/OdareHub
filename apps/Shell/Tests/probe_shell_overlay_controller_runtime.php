@@ -41,7 +41,7 @@ global.dispatchEvent = function () {};
 JS;
 
 $assertions = <<<'JS'
-const manager = window['SusankhyaOS.ShellOverlay'].manager;
+const manager = window['OdareHubOS.ShellOverlay'].manager;
 function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
@@ -67,8 +67,8 @@ const reopened = manager.toggle({ id: 'alpha', type: 'dropdown', visual: 'none' 
 assert(reopened && manager.isOpen('alpha'), 'toggle opens a closed overlay');
 assert(manager.close(reopened.id) === true, 'close accepts the stable controller id');
 assert(manager.close(reopened.id) === false && manager.activeCount === 0, 'repeated close is idempotent');
-window['SusankhyaOS.ShellOverlay'].visualEffects.setStrength(55);
-assert(window['SusankhyaOS.ShellOverlay'].visualEffects.getState().strengthOverride === 55, 'strength control belongs to the same controller');
+window['OdareHubOS.ShellOverlay'].visualEffects.setStrength(55);
+assert(window['OdareHubOS.ShellOverlay'].visualEffects.getState().strengthOverride === 55, 'strength control belongs to the same controller');
 let opened = 0;
 let closedReason = '';
 let focused = 0;
@@ -90,7 +90,7 @@ manager.open({ id: 'camera', type: 'camera', preset: 'viewport', surfaceId: 'sur
 listeners.click({ target: elements.surface });
 assert(closedReason === 'outside-click' && !manager.isOpen('camera'), 'overlay-root self click dismisses viewport candidate');
 manager.open({ id: 'unmount', type: 'drawer', preset: 'drawer' });
-window['SusankhyaOS.ShellOverlay'].visualEffects.reset();
+window['OdareHubOS.ShellOverlay'].visualEffects.reset();
 assert(manager.activeCount === 0, 'controller reset unmounts all active overlay instances');
 assert(!attributes.shellOverlayOpen, 'controller reset removes the explicit open-state contract');
 console.log('Shell overlay controller runtime probe: 28/28 passed');
