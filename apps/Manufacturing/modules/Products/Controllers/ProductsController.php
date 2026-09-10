@@ -101,16 +101,39 @@ final class ProductsController
         }
 
         try {
-            $columns = [
-                'parts_name' => $data['parts_name'],
-                'parts_number' => $data['parts_number'],
-                'model' => $data['model'],
-                'producer' => $data['producer'],
-                'lead' => $data['lead'],
-                'cycle_time' => $data['cycle_time'],
-                'notes' => $data['notes'],
-                'is_active' => $data['is_active'],
-            ];
+        $columns = [
+            'parts_name' => $data['parts_name'],
+            'parts_number' => $data['parts_number'],
+            'model' => $data['model'],
+            'producer' => $data['producer'],
+            'lead' => $data['lead'],
+            'cycle_time' => $data['cycle_time'],
+            'notes' => $data['notes'],
+            'is_active' => $data['is_active'],
+        ];
+
+        // Shared Items adoption (Session A) — optional item_ref linkage; no identity change
+        if (isset($data['item_ref']) && $data['item_ref'] !== '' && $data['item_ref'] !== null) {
+            $refParts = array_filter(explode(':', $data['item_ref']));
+            if (count($refParts) >= 1) {
+                $itemId = (int)($refParts[0]);
+                $codeRef = $refParts[1] ?? '';
+                try {
+                    $adapter = new \Apps\Manufacturing\Module\Products\Services\SharedItemAdapter();
+                    if ($adapter->validateRef($itemId, $codeRef)) {
+                        $columns['item_ref'] = $itemId; // persist integer reference only
+                    } else {
+                        self::flash('err', 'Shared Item reference invalid or mismatched (item_ref).');
+                        header('Location: /products/add');
+                        exit;
+                    }
+                } catch (\Throwable $e) {
+                    self::flash('err', 'Shared Item resolution failed: ' . $e->getMessage());
+                    header('Location: /products/add');
+                    exit;
+                }
+            }
+        }
 
             self::appendSupplyColumns($columns, $data);
 
