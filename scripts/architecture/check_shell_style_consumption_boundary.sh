@@ -116,7 +116,7 @@ echo "- read-only Shell approved style consumption boundary diagnostics"
 shell_runtime_files=()
 while IFS= read -r file; do
   shell_runtime_files+=("$file")
-done < <(find apps/Shell -type f \( -name '*.php' -o -name '*.js' -o -name '*.css' -o -name '*.json' \) -not -path '*/AppearanceReaderInventoryService.php' -print)
+done < <(find apps/Shell -type f \( -name '*.php' -o -name '*.js' -o -name '*.css' -o -name '*.json' \) -print)
 
 shell_style_runtime_files=()
 while IFS= read -r file; do
@@ -161,10 +161,18 @@ check_no_matches \
 
 echo ""
 echo "== Shell must not reference CustomizationStudio runtime internals =="
+# Line-level grep -Ev narrowing: suppress only the 5 proven metadata declaration lines, not the inventory file itself
+filtered_inventory_tmp_d4="/tmp/filtered_inventory_consumption_$$.php"
+if [[ -f "apps/Shell/Services/AppearanceReaderInventoryService.php" ]]; then grep -v -E "'file_path' => " "apps/Shell/Services/AppearanceReaderInventoryService.php" > "$filtered_inventory_tmp_d4"; fi
+filtered_shell_runtime_files=()
+for f in "${shell_runtime_files[@]}"; do
+  if [[ "$f" == *"AppearanceReaderInventoryService.php" ]]; then filtered_shell_runtime_files+=("$filtered_inventory_tmp_d4"); else filtered_shell_runtime_files+=("$f"); fi
+done
 check_no_matches \
   "Shell must not reference CustomizationStudio runtime internals" \
   'CustomizationStudio|customization-studio|Tools/CustomizationStudio|preview-fixtures' \
-  "${shell_runtime_files[@]}"
+  "${filtered_shell_runtime_files[@]}"
+if [[ -f "$filtered_inventory_tmp_d4" ]]; then rm -f "$filtered_inventory_tmp_d4"; fi
 
 echo ""
 echo "== Shell must not use public/assets as style source truth =="

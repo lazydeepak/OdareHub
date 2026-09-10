@@ -282,7 +282,7 @@ done < <(find apps/Shell -type f \( -name '*.php' -o -name '*.js' -o -name '*.cs
 shell_view_layout_runtime_files=()
 while IFS= read -r file; do
   shell_view_layout_runtime_files+=("$file")
-done < <(find apps/Shell/Views public/views/layouts apps/Shell/Composers apps/Shell/Services -type f \( -name '*.php' -o -name '*.js' -o -name '*.css' \) -not -path '*/AppearanceReaderInventoryService.php' -print 2>/dev/null)
+done < <(find apps/Shell/Views public/views/layouts apps/Shell/Composers apps/Shell/Services -type f \( -name '*.php' -o -name '*.js' -o -name '*.css' \) -print 2>/dev/null)
 
 core_runtime_files=()
 while IFS= read -r file; do
@@ -298,10 +298,18 @@ check_no_matches \
 
 echo ""
 echo "== Shell view/layout no Customization Studio consumption =="
+# Line-level grep -Ev narrowing: suppress only the 5 proven metadata declaration lines (file_path => ...) from inventory discovery, not the file itself
+filtered_inventory_tmp="/tmp/filtered_inventory_catalog_$$.php"
+if [[ -f "apps/Shell/Services/AppearanceReaderInventoryService.php" ]]; then grep -v -E "'file_path' => " "apps/Shell/Services/AppearanceReaderInventoryService.php" > "$filtered_inventory_tmp"; fi
+filtered_shell_view_layout_runtime_files=()
+for f in "${shell_view_layout_runtime_files[@]}"; do
+  if [[ "$f" == *"AppearanceReaderInventoryService.php" ]]; then filtered_shell_view_layout_runtime_files+=("$filtered_inventory_tmp"); else filtered_shell_view_layout_runtime_files+=("$f"); fi
+done
 check_no_matches \
   "Shell view/layout runtime files must not consume Customization Studio markers yet" \
   'CustomizationStudio|customization-studio|preview-fixtures|catalog_only_not_consumed' \
-  "${shell_view_layout_runtime_files[@]}"
+  "${filtered_shell_view_layout_runtime_files[@]}"
+if [[ -f "$filtered_inventory_tmp" ]]; then rm -f "$filtered_inventory_tmp"; fi
 
 echo ""
 echo "== Shell runtime no socket catalog consumption =="
