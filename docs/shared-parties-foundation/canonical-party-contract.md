@@ -161,3 +161,40 @@ Given rules: "one minimal Shared Parties implementation slice" — smallest cohe
 3. Gate/proof (read-only): asserts no role fields in schema; extension reference defined; existing consumer contracts preserved (Hospitality, SBAIO, Manufacturing AGENTS.md intact).
 
 Not executed: no `CREATE TABLE shared_parties`; no consumer migration; no Manufacturing supplier conversion; no Suite Extension work.
+
+---
+
+## 10. Stress-Test and Validation Results
+
+### 10.1 Schema validation against repo conventions
+- `party_id` BIGINT PK — matches `sbaio_customers.id`, `hosp_guests.id`, `products.id` convention.
+- `reference` VARCHAR UNIQUE — matches `parts_number` unique code pattern without forcing Manufacturing format.
+- `name` VARCHAR — generic; does not force Manufacturing-specific labeling.
+- `type` ENUM('person','organization') — minimal distinction sufficient for routing; does not replace consumer taxonomy.
+- `status` ENUM('draft','active','deprecated','archived') — deeper lifecycle than Manufacturing `is_active` or Hospitality `guest_status`; deactivation preferred.
+- `category_ref` / `metadata_ref` VARCHAR — reference-only; no embedded taxonomy.
+- `created_at` / `updated_at` — audit convention from existing tables.
+
+### 10.2 Consumer compatibility (conceptual)
+- Hospitality Guest (`hosp_guests`): CAN reference `party_id`; must preserve `guest_status`, `full_name`, `email`, `phone`, `id_document_ref`, `note`; display override possible.
+- SBAIO Customer (`sbaio_customers`): CAN reference `party_id`; preserve `customer_name`, `contact_name`, `email`, `phone`, `status`.
+- Manufacturing Supplier (text `producer`/`default_supplier`): CAN reference `party_id` via mapping; keep supplier business rules in Manufacturing.
+- Future Member / Contact / Counterparty: CAN reference `party_id`; keep role-specific data local.
+
+### 10.3 Person / Organization identity resolved
+- `type` ENUM('person','organization') sufficient for thin foundation.
+- Organization setup (`Plugins/Organization`) stays separate; may reference Party for legal-entity identity without collapse.
+- No embedded address/phone/email master.
+
+### 10.4 Migration / adoption safety (design-only confirmation)
+- Existing consumer tables remain untouched.
+- Hospitality stand-in (`GuestsService.php` line 12) explicitly approved as temporary; adoption requires business approval, not automatic merge.
+- Manufacturing supplier/vendor fields remain Manufacturing-controlled.
+- Deactivation preferred (`status` / `guest_status`); hard delete only when unreferenced.
+
+### 10.5 Architecture gate design (proposed — not executed)
+- Read-only contract verification gate proposed (not brittle grep-only).
+- Verifies: contract exists; schema excludes role fields; reference pattern present; existing consumer contracts preserved (`AGENTS.md` intact); only one master definition; no runtime path activated.
+
+### 10.6 Readiness verdict
+- `READY INDEPENDENTLY` (as foundation; not for deployment; requires future consumer contracts and gate verification before implementation).
