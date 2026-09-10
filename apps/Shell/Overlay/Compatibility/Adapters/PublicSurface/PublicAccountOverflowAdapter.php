@@ -12,14 +12,14 @@ final class PublicAccountOverflowAdapter
 (function () {
   'use strict';
 
-  window.SusankhyaOS = window.SusankhyaOS || {};
-  window.SusankhyaOS.ShellOverlayAdapters = window.SusankhyaOS.ShellOverlayAdapters || {};
+  window.OdareHubOS = window.OdareHubOS || {};
+  window.OdareHubOS.ShellOverlayAdapters = window.OdareHubOS.ShellOverlayAdapters || {};
 
   function framework() {
-    return window['SusankhyaOS.ShellOverlay'] || null;
+    return window['OdareHubOS.ShellOverlay'] || null;
   }
 
-  window.SusankhyaOS.ShellOverlayAdapters.createPublicAccountOverflowAdapter = function (options) {
+  window.OdareHubOS.ShellOverlayAdapters.createPublicAccountOverflowAdapter = function (options) {
     var config = options && typeof options === 'object' ? options : {};
     var overlayType = 'public_account_overflow';
     var instance = null;

@@ -756,7 +756,7 @@ if ($loggedIn && function_exists('platform_user_runtime_facade')) {
 
     function applyOverlayEffectStrength(value) {
       const strength = clampOverlayEffectStrength(value);
-      const shellOverlay = window['SusankhyaOS.ShellOverlay'];
+      const shellOverlay = window['OdareHubOS.ShellOverlay'];
       const controller = shellOverlay && shellOverlay.visualEffects;
       if (controller && typeof controller.setStrength === 'function') {
         controller.setStrength(strength);
@@ -1332,9 +1332,9 @@ if ($loggedIn && function_exists('platform_user_runtime_facade')) {
       initOverlayEffectStrengthControls();
       syncSidebarViewportState();
 
-      const publicMobileSidebarAdapterFactory = window.SusankhyaOS
-        && window.SusankhyaOS.ShellOverlayAdapters
-        && window.SusankhyaOS.ShellOverlayAdapters.createPublicMobileSidebarDrawerAdapter;
+      const publicMobileSidebarAdapterFactory = window.OdareHubOS
+        && window.OdareHubOS.ShellOverlayAdapters
+        && window.OdareHubOS.ShellOverlayAdapters.createPublicMobileSidebarDrawerAdapter;
       publicMobileSidebarAdapter = typeof publicMobileSidebarAdapterFactory === 'function'
         ? publicMobileSidebarAdapterFactory({
           triggerSelector: '[data-sidebar-toggle]',
@@ -1699,9 +1699,9 @@ if ($loggedIn && function_exists('platform_user_runtime_facade')) {
         }
 
         return new Promise(function(resolve) {
-          const cameraScanAdapterFactory = window.SusankhyaOS
-            && window.SusankhyaOS.ShellOverlayAdapters
-            && window.SusankhyaOS.ShellOverlayAdapters.createCameraScanOverlayAdapter;
+          const cameraScanAdapterFactory = window.OdareHubOS
+            && window.OdareHubOS.ShellOverlayAdapters
+            && window.OdareHubOS.ShellOverlayAdapters.createCameraScanOverlayAdapter;
           const cameraScanAdapter = typeof cameraScanAdapterFactory === 'function'
             ? cameraScanAdapterFactory({
               sourceSurface: 'public',
@@ -1906,9 +1906,9 @@ if ($loggedIn && function_exists('platform_user_runtime_facade')) {
       }
 
       if (topbarSearchInput) {
-        const topbarSearchResultsAdapterFactory = window.SusankhyaOS
-          && window.SusankhyaOS.ShellOverlayAdapters
-          && window.SusankhyaOS.ShellOverlayAdapters.createPublicTopbarSearchResultsAdapter;
+        const topbarSearchResultsAdapterFactory = window.OdareHubOS
+          && window.OdareHubOS.ShellOverlayAdapters
+          && window.OdareHubOS.ShellOverlayAdapters.createPublicTopbarSearchResultsAdapter;
         topbarSearchResultsAdapter = typeof topbarSearchResultsAdapterFactory === 'function'
           ? topbarSearchResultsAdapterFactory({
             triggerId: 'topbarSearchInput',
@@ -2126,9 +2126,9 @@ if ($loggedIn && function_exists('platform_user_runtime_facade')) {
         notifDropdown.classList.toggle('open', open);
       }
 
-      const topbarOverflowAdapterFactory = window.SusankhyaOS
-        && window.SusankhyaOS.ShellOverlayAdapters
-        && window.SusankhyaOS.ShellOverlayAdapters.createPublicAccountOverflowAdapter;
+      const topbarOverflowAdapterFactory = window.OdareHubOS
+        && window.OdareHubOS.ShellOverlayAdapters
+        && window.OdareHubOS.ShellOverlayAdapters.createPublicAccountOverflowAdapter;
       const topbarOverflowAdapter = typeof topbarOverflowAdapterFactory === 'function'
         ? topbarOverflowAdapterFactory({
           triggerId: 'topbarOverflowBtn',
@@ -2145,9 +2145,9 @@ if ($loggedIn && function_exists('platform_user_runtime_facade')) {
         setOverflowOpen(open);
       }
 
-      const notificationsDropdownAdapterFactory = window.SusankhyaOS
-        && window.SusankhyaOS.ShellOverlayAdapters
-        && window.SusankhyaOS.ShellOverlayAdapters.createPublicNotificationsDropdownAdapter;
+      const notificationsDropdownAdapterFactory = window.OdareHubOS
+        && window.OdareHubOS.ShellOverlayAdapters
+        && window.OdareHubOS.ShellOverlayAdapters.createPublicNotificationsDropdownAdapter;
       const notificationsDropdownAdapter = typeof notificationsDropdownAdapterFactory === 'function'
         ? notificationsDropdownAdapterFactory({
           triggerSelector: '[data-notif-toggle]',
@@ -2164,9 +2164,9 @@ if ($loggedIn && function_exists('platform_user_runtime_facade')) {
         setNotifOpen(open);
       }
 
-      const adminActionDropdownAdapterFactory = window.SusankhyaOS
-        && window.SusankhyaOS.ShellOverlayAdapters
-        && window.SusankhyaOS.ShellOverlayAdapters.createPublicAdminActionDropdownAdapter;
+      const adminActionDropdownAdapterFactory = window.OdareHubOS
+        && window.OdareHubOS.ShellOverlayAdapters
+        && window.OdareHubOS.ShellOverlayAdapters.createPublicAdminActionDropdownAdapter;
       const adminActionDropdownAdapter = typeof adminActionDropdownAdapterFactory === 'function'
         ? adminActionDropdownAdapterFactory({
           triggerId: 'topbarActionBtn',

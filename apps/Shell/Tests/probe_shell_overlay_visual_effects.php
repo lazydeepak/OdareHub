@@ -119,7 +119,7 @@ visual_effects_assert(
 
 visual_effects_assert(
     !str_contains($publicHeader, 'ShellOverlayVisualEffects')
-        && str_contains($publicHeader, "window['SusankhyaOS.ShellOverlay']"),
+        && str_contains($publicHeader, "window['OdareHubOS.ShellOverlay']"),
     'public surface uses the single ShellOverlay controller'
 );
 
@@ -140,7 +140,7 @@ visual_effects_assert(
 
 visual_effects_assert(
     !str_contains($operatorSurface, 'ShellOverlayVisualEffects')
-        && str_contains($operatorScript, "window['SusankhyaOS.ShellOverlay']"),
+        && str_contains($operatorScript, "window['OdareHubOS.ShellOverlay']"),
     'operator surface uses the single ShellOverlay controller'
 );
 

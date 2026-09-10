@@ -12,14 +12,14 @@ final class OperatorSearchResultsAdapter
 (function () {
   'use strict';
 
-  window.SusankhyaOS = window.SusankhyaOS || {};
-  window.SusankhyaOS.ShellOverlayAdapters = window.SusankhyaOS.ShellOverlayAdapters || {};
+  window.OdareHubOS = window.OdareHubOS || {};
+  window.OdareHubOS.ShellOverlayAdapters = window.OdareHubOS.ShellOverlayAdapters || {};
 
   function framework() {
-    return window['SusankhyaOS.ShellOverlay'] || null;
+    return window['OdareHubOS.ShellOverlay'] || null;
   }
 
-  window.SusankhyaOS.ShellOverlayAdapters.createOperatorSearchResultsAdapter = function (options) {
+  window.OdareHubOS.ShellOverlayAdapters.createOperatorSearchResultsAdapter = function (options) {
     var config = options && typeof options === 'object' ? options : {};
     var overlayType = 'operator_search_results';
     var instance = null;
