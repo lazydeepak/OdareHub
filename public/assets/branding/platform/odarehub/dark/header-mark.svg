@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" class="ipm-logo" viewBox="0 0 980 240" role="img" aria-label="Susankhya OS">
+<svg xmlns="http://www.w3.org/2000/svg" class="ipm-logo" viewBox="0 0 900 240" role="img" aria-label="OdareHub">
   <defs>
     <linearGradient id="sosHdrBlue" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="#1f6fe5"/>
@@ -32,10 +32,10 @@
           fill="none" stroke="url(#sosHdrGreen)" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
   </g>
 
-  <g transform="translate(252 32)">
-    <text x="0" y="95" fill="#082d62" font-family="Segoe UI, Arial, sans-serif" font-size="66" font-weight="700" letter-spacing="4">SUSANKHYA</text>
+  <g transform="translate(260 32)">
+    <text x="0" y="95" fill="#082d62" font-family="Segoe UI, Arial, sans-serif" font-size="66" font-weight="700" letter-spacing="4">ODARE</text>
     <rect x="0" y="145" width="238" height="4" rx="2" fill="#1f6fe5"/>
-    <text x="266" y="161" fill="#46af1d" font-family="Segoe UI, Arial, sans-serif" font-size="42" font-weight="700" letter-spacing="10">OS</text>
+    <text x="266" y="161" fill="#46af1d" font-family="Segoe UI, Arial, sans-serif" font-size="42" font-weight="700" letter-spacing="10">HUB</text>
     <rect x="368" y="145" width="238" height="4" rx="2" fill="#46af1d"/>
   </g>
 </svg>
