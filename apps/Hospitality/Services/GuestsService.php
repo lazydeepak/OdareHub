@@ -58,9 +58,12 @@ final class GuestsService
             throw new \RuntimeException('HOSPITALITY_GUEST_NOT_FOUND');
         }
         [$name, $email, $phone, $docRef, $note] = self::validatedFields($post);
-
+        $party_ref = isset($post['party_ref']) ? ($post['party_ref'] !== '' && $post['party_ref'] !== null ? (int)$post['party_ref'] : null) : null;
+        if ($party_ref !== null) {
+            self::linkParty($id, $party_ref);
+        }
         DB::query(
-            'UPDATE hosp_guests SET full_name=?, email=?, phone=?, id_document_ref=?, note=? WHERE id=? LIMIT 1',
+            'UPDATE hosp_guests SET full_name=?, email=?, phone=?, id_document_ref=?, note=?, updated_at=NOW() WHERE id=? LIMIT 1',
             [$name, $email, $phone, $docRef, $note, $id]
         );
     }
@@ -121,5 +124,34 @@ final class GuestsService
         $note = mb_substr(trim((string)($post['note'] ?? '')), 0, 1000);
 
         return [$name, $email, $phone, $docRef, $note];
+    }
+
+    public function linkParty(int $id, ?int $party_ref): void
+    {
+        self::requireSchema();
+        if ($id <= 0 || !self::exists($id)) {
+            throw new \RuntimeException('HOSPITALITY_GUEST_NOT_FOUND');
+        }
+        if ($party_ref !== null && $party_ref <= 0) {
+            throw new \RuntimeException('HOSPITALITY_PARTY_REF_INVALID');
+        }
+        if ($party_ref !== null) {
+            try {
+                $partyService = new \Apps\Shared\Parties\Services\PartyService();
+                $party = $partyService->fetchById($party_ref);
+                if ($party === null || ($party['status'] ?? '') === 'archived') {
+                    throw new \RuntimeException('HOSPITALITY_PARTY_REF_NOT_FOUND');
+                }
+            } catch (\Throwable $e) {
+                if (str_contains((string)$e->getMessage(), 'HOSPITALITY_PARTY_REF_NOT_FOUND')) {
+                    throw $e;
+                }
+                throw new \RuntimeException('HOSPITALITY_PARTY_REF_NOT_FOUND');
+            }
+        }
+        DB::query(
+            'UPDATE hosp_guests SET party_ref = ? WHERE id = ? LIMIT 1',
+            [$party_ref, $id]
+        );
     }
 }
