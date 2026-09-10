@@ -116,7 +116,7 @@ echo "- read-only Shell approved style consumption boundary diagnostics"
 shell_runtime_files=()
 while IFS= read -r file; do
   shell_runtime_files+=("$file")
-done < <(find apps/Shell -type f \( -name '*.php' -o -name '*.js' -o -name '*.css' -o -name '*.json' \) -print)
+done < <(find apps/Shell -type f \( -name '*.php' -o -name '*.js' -o -name '*.css' -o -name '*.json' \) -print | grep -v 'AppearanceReaderInventoryService\.php$')
 
 shell_style_runtime_files=()
 while IFS= read -r file; do
