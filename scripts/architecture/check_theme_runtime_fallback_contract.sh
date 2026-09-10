@@ -180,7 +180,7 @@ function t(string $key, array $params = []): string { return $key; }
 function supported_theme_preferences(): array { return ['system-liquid-glass' => 'System - Liquid Glass']; }
 function default_theme_preference(): string { return 'system-liquid-glass'; }
 function platform_mode(): string { return 'production'; }
-function app_display_name(): string { return 'Susankhya'; }
+function app_display_name(): string { return 'OdareHub'; }
 function default_home_route(): string { return '/'; }
 function base_is_admin_user($user): bool { return false; }
 function base_can_access_builder($user): bool { return false; }
@@ -205,6 +205,18 @@ require $realRoot . '/apps/Shell/Services/LogoResolverService.php';
 $previousHandler = set_error_handler(static function (): bool {
   return true;
 });
+
+// The admin layout unconditionally requires the self-contained developer_strip
+// partial. Provide a faithful copy in the smoke stub root so the render completes.
+$stubPartialDir = APP_ROOT . '/apps/Shell/Views/partials';
+$stubPartial = $stubPartialDir . '/developer_strip.php';
+if (!is_dir($stubPartialDir)) {
+  mkdir($stubPartialDir, 0777, true);
+}
+if (is_file($stubPartial)) {
+  unlink($stubPartial);
+}
+copy($realRoot . '/apps/Shell/Views/partials/developer_strip.php', $stubPartial);
 
 ob_start();
 require $realRoot . '/public/views/layouts/header.php';

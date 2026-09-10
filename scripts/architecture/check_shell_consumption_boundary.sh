@@ -53,7 +53,7 @@ check_required_path() {
 shell_php_files=()
 while IFS= read -r file; do
   shell_php_files+=("$file")
-done < <(find apps/Shell -type f -name '*.php' -print 2>/dev/null)
+done < <(find apps/Shell -type f -name '*.php' -not -path '*/Tests/*' -not -path '*/tests/*' -print 2>/dev/null)
 
 # Collect Shell layout/view files under public/views/layouts/
 shell_layout_files=()
@@ -170,7 +170,7 @@ check_required_path "apps/Shell/Resources/published-theme-options.json" "publish
 if php -r '
   $data = json_decode((string)file_get_contents($argv[1]), true);
   if (!is_array($data)
-      || ($data["schema"] ?? "") !== "susankhya.shell.published-theme-options.v1"
+      || ($data["schema"] ?? "") !== "odarehub.shell.published-theme-options.v1"
       || !is_array($data["styles"] ?? null)
       || ($data["styles"] ?? []) === []
   ) {

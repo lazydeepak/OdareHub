@@ -140,9 +140,9 @@ build_preview_contract_file() {
     "$tool_dir/Views/workspaces/rules.php" \
     "$tool_dir/Views/workspaces/preview.php" \
     "$tool_dir/Views/workspaces/governance.php" \
-    "$tool_dir/lang/en.php" \
-    "$tool_dir/lang/ja.php" \
-    "$tool_dir/lang/ne.php" \
+    "$tool_dir/Resources/lang/en.php" \
+    "$tool_dir/Resources/lang/ja.php" \
+    "$tool_dir/Resources/lang/ne.php" \
     "$tool_dir/Assets/label-designer.css" \
     "$tool_dir/Assets/label-designer.js"; do
     if [[ -f "$path" ]]; then
@@ -176,9 +176,9 @@ require_file "$tool_dir/Views/workspaces/preview.php" "Label Designer preview wo
 require_file "$tool_dir/Views/workspaces/governance.php" "Label Designer governance workspace"
 require_file "$tool_dir/Assets/label-designer.css" "Label Designer CSS asset"
 require_file "$tool_dir/Assets/label-designer.js" "Label Designer JS asset"
-require_file "$tool_dir/lang/en.php" "Label Designer English lang file"
-require_file "$tool_dir/lang/ja.php" "Label Designer Japanese lang file"
-require_file "$tool_dir/lang/ne.php" "Label Designer Nepali lang file"
+require_file "$tool_dir/Resources/lang/en.php" "Label Designer English lang file"
+require_file "$tool_dir/Resources/lang/ja.php" "Label Designer Japanese lang file"
+require_file "$tool_dir/Resources/lang/ne.php" "Label Designer Nepali lang file"
 require_text "$legacy_preview_file" "require __DIR__ . '/index.php';" "legacy preview is a thin compatibility include"
 forbid_pattern "$legacy_preview_file" 'LabelDesigner(Context|Template|Rule|Resource)|<form|ld-workspace|\$_GET|\$_POST' "legacy preview contains no independent controller/view/business logic"
 require_text "$controller_file" "Views/index.php" "controller renders Label Designer index compositor"
@@ -396,7 +396,7 @@ else
       require_text "$file" "Resources/labels/rules" "rule create service targets owner rules path"
       require_text "$file" "rule-create" "rule create service writes rule-create snapshot metadata"
       require_text "$file" "storage/studio-snapshots/label-designer" "rule create service writes snapshots under approved root"
-      require_text "$file" "susankhya.label.rule.v1" "rule create service writes rule schema v1"
+      require_text "$file" "odarehub.label.rule.v1" "rule create service writes rule schema v1"
       forbid_pattern "$file" "Resources/labels/contexts/(create|new|write|save)" "rule create service does not write context resources"
       forbid_pattern "$file" "Resources/labels/templates/(create|new|write|save)" "rule create service does not write template resources"
       forbid_pattern "$file" "renderPdf|exportPdf|dispatchPrint|printLabel|executePrint|Dompdf|PdfService|PrintService|QRCode|qr/product" "rule create service has no runtime print/export/QR coupling"
@@ -485,8 +485,8 @@ forbid_pattern "$preview_renderer_file" "\bDB::|new PDO|->query\(|->exec\(|SELEC
 forbid_pattern "$preview_renderer_file" "renderPdf|exportPdf|dispatchPrint|printLabel|executePrint|Dompdf|PdfService|PrintService" "preview renderer has no runtime print/export execution"
 forbid_pattern "$preview_renderer_file" "QRCode|/qr/product/(label|scan)" "preview renderer has no QR runtime coupling"
 require_text "$preview_renderer_file" "resolveContextOptionsFromDiscovery" "preview renderer has context option resolver"
-require_text "$preview_renderer_file" "susankhya.label.context.v1" "preview renderer references context schema"
-require_text "$preview_renderer_file" "susankhya.label.template.v1" "preview renderer references template schema"
+require_text "$preview_renderer_file" "odarehub.label.context.v1" "preview renderer references context schema"
+require_text "$preview_renderer_file" "odarehub.label.template.v1" "preview renderer references template schema"
 
 forbid_pattern "$preview_renderer_file" "barcode.*real|generateBarcode|renderBarcode|barcode_image|barcode_svg|real.*barcode" "preview renderer does not generate real barcodes"
 forbid_pattern "$preview_renderer_file" "qr.*real|generateQr|renderQr|qr_image|qr_svg|real.*qr" "preview renderer does not generate real QR codes"
@@ -841,7 +841,7 @@ fi
 echo ""
 echo "== Label Rule Resource Contract =="
 rule_contract="docs/architecture/label-rule-resource-contract.md"
-require_text "$rule_contract" "susankhya.label.rule.v1" "rule contract defines canonical schema"
+require_text "$rule_contract" "odarehub.label.rule.v1" "rule contract defines canonical schema"
 require_text "$rule_contract" "rule_key" "rule contract defines required rule_key field"
 require_text "$rule_contract" "owner_key" "rule contract defines required owner_key field"
 require_text "$rule_contract" "conditions" "rule contract defines required conditions"

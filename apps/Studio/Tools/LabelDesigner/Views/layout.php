@@ -73,8 +73,8 @@ $csrf = trim((string)($model['csrf'] ?? ''));
 
 $labelDesignerLang = function_exists('current_lang') ? current_lang() : 'en';
 $labelDesignerLang = in_array($labelDesignerLang, ['en', 'ja', 'ne'], true) ? $labelDesignerLang : 'en';
-$labelDesignerFallback = require __DIR__ . '/../lang/en.php';
-$labelDesignerLangPath = __DIR__ . '/../lang/' . $labelDesignerLang . '.php';
+$labelDesignerFallback = require __DIR__ . '/../Resources/lang/en.php';
+$labelDesignerLangPath = __DIR__ . '/../Resources/lang/' . $labelDesignerLang . '.php';
 $labelDesignerStrings = is_file($labelDesignerLangPath) ? require $labelDesignerLangPath : [];
 $labelDesignerStrings = is_array($labelDesignerStrings) ? array_replace($labelDesignerFallback, $labelDesignerStrings) : $labelDesignerFallback;
 $ld = static function (string $key) use ($labelDesignerStrings, $labelDesignerFallback): string {
