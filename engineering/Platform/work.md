@@ -56,7 +56,7 @@ Local deployment and update channel baseline.
 - 2026-08-19 — Defined V1 local release package and filesystem-backed channel contract in `docs/architecture/local-release-channel-contract.md`: monolith `app` lane, vendor-included payload, immutable SHA-256 metadata, preservation/exclusion rules, read-only preview, backup/restore gates, and future private-update mapping. No runtime code changed.
 - 2026-08-19 — Completed factual deployment/update foundation audit in `docs/architecture/deployment-update-foundation-audit.md`. Readiness, packaging, lifecycle apply, export/restore, version/history, environment, checksum/signature, database backup, installer, and private-update gaps are documented. No runtime code changed.
 - 2026-08-19 — Completed Phase 1 read-only ownership inventory in `docs/architecture/current-ownership-inventory.md`: six top-level apps, 32 app modules, five root plugins, root Platform engines, Studio tools, package/release/upgrade machinery, report ownership, legacy vocabulary, and unresolved decisions. No runtime code changed.
-- 2026-08-19 — Consolidated runtime-discovery, lifecycle, naming, deployment, Studio, report, and Hospitality constraints in `docs/architecture/susankhya-productization-roadmap.md`. The roadmap is documentation-only and does not authorize runtime refactors, installer/update implementation, or Hospitality implementation.
+- 2026-08-19 — Consolidated runtime-discovery, lifecycle, naming, deployment, Studio, report, and Hospitality constraints in `docs/architecture/odarehub-productization-roadmap.md`. The roadmap is documentation-only and does not authorize runtime refactors, installer/update implementation, or Hospitality implementation.
 - 2026-08-19 — Recorded local deployment and update channel planning baseline in `docs/architecture/local-deployment-update-channel-plan.md`.
 - 2026-08-17 — Recorded app ownership classification and Hospitality readiness planning baseline in `docs/architecture/app-ownership-classification-and-hospitality-readiness.md`.
 - 2026-07-03 — Engineering Workspace execution lifecycle strengthened into a platform contract. Implementation, review, planning, and analysis must resolve and load the workspace contract before repository inspection; unresolved implementation-capable work is blocked, including platform scope.
@@ -67,3 +67,7 @@ Local deployment and update channel baseline.
 - `php platform/Engineering/tests/probe_agent_execution_gate.php` — 98 passed, 0 failed.
 - `php apps/Studio/Tools/EngineeringWorkspaces/tests/probe_agent_context_integration.php` — 19 passed, 0 failed.
 - `git diff --check` — clean.
+
+## Cloud deployment preparation — 2026-09-06
+
+Completed preparation: isolated cloud.odarehub.com workflow, release build/activation scripts, Nginx/PHP-FPM templates and runbook under `.github/cloud/`. Deployment remains disabled; no server, DB, Core, or unrelated changes. Workflow/ShellCheck, 1,738 PHP syntax checks, production payload and checksums, and adapted local server config syntax passed. Existing readiness is blocked: nine gate failures observed; remaining nested final-group checks stopped after all 49 top-level groups were reached. See `.github/cloud/SETUP.md`; no readiness bypass was added.
