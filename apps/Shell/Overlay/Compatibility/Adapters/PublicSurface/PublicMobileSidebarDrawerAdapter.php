@@ -12,14 +12,14 @@ final class PublicMobileSidebarDrawerAdapter
 (function () {
   'use strict';
 
-  window.SusankhyaOS = window.SusankhyaOS || {};
-  window.SusankhyaOS.ShellOverlayAdapters = window.SusankhyaOS.ShellOverlayAdapters || {};
+  window.OdareHubOS = window.OdareHubOS || {};
+  window.OdareHubOS.ShellOverlayAdapters = window.OdareHubOS.ShellOverlayAdapters || {};
 
   function framework() {
-    return window['SusankhyaOS.ShellOverlay'] || null;
+    return window['OdareHubOS.ShellOverlay'] || null;
   }
 
-  window.SusankhyaOS.ShellOverlayAdapters.createPublicMobileSidebarDrawerAdapter = function (options) {
+  window.OdareHubOS.ShellOverlayAdapters.createPublicMobileSidebarDrawerAdapter = function (options) {
     var config = options && typeof options === 'object' ? options : {};
     var overlayType = 'public_mobile_sidebar_drawer';
     var instance = null;

@@ -1,18 +1,18 @@
 {
-  "brand_key": "susankhya-os",
-  "platform_name": "Susankhya OS",
+  "brand_key": "odarehub",
+  "platform_name": "OdareHub",
   "asset_contract": "platform-branding.v1",
   "variants": {
     "light": {
-      "svg": "/assets/branding/platform/susankhya-os/light/mark.svg",
+      "svg": "/assets/branding/platform/odarehub/light/mark.svg",
       "usage": "Light backgrounds and printable surfaces"
     },
     "dark": {
-      "svg": "/assets/branding/platform/susankhya-os/dark/mark.svg",
+      "svg": "/assets/branding/platform/odarehub/dark/mark.svg",
       "usage": "Dark chrome, display surfaces, and operator headers"
     },
     "monochrome": {
-      "svg": "/assets/branding/platform/susankhya-os/monochrome/mark.svg",
+      "svg": "/assets/branding/platform/odarehub/monochrome/mark.svg",
       "usage": "Single-color export, watermark, and restricted-color surfaces"
     }
   },
