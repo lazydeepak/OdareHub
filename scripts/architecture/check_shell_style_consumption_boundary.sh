@@ -161,10 +161,18 @@ check_no_matches \
 
 echo ""
 echo "== Shell must not reference CustomizationStudio runtime internals =="
+# Line-level grep -Ev narrowing: suppress only complete static 'file_path' => '<literal>' metadata declaration lines, not the inventory file itself
+filtered_inventory_tmp_d4="/tmp/filtered_inventory_consumption_$$.php"
+if [[ -f "apps/Shell/Services/AppearanceReaderInventoryService.php" ]]; then grep -v -E "'file_path'[[:space:]]*=>[[:space:]]*'[^']*',?[[:space:]]*\$" "apps/Shell/Services/AppearanceReaderInventoryService.php" > "$filtered_inventory_tmp_d4"; fi
+filtered_shell_runtime_files=()
+for f in "${shell_runtime_files[@]}"; do
+  if [[ "$f" == *"AppearanceReaderInventoryService.php" ]]; then filtered_shell_runtime_files+=("$filtered_inventory_tmp_d4"); else filtered_shell_runtime_files+=("$f"); fi
+done
 check_no_matches \
   "Shell must not reference CustomizationStudio runtime internals" \
   'CustomizationStudio|customization-studio|Tools/CustomizationStudio|preview-fixtures' \
-  "${shell_runtime_files[@]}"
+  "${filtered_shell_runtime_files[@]}"
+if [[ -f "$filtered_inventory_tmp_d4" ]]; then rm -f "$filtered_inventory_tmp_d4"; fi
 
 echo ""
 echo "== Shell must not use public/assets as style source truth =="

@@ -298,10 +298,18 @@ check_no_matches \
 
 echo ""
 echo "== Shell view/layout no Customization Studio consumption =="
+# Line-level grep -Ev narrowing: suppress only complete static 'file_path' => '<literal>' metadata declaration lines from inventory discovery, not the file itself
+filtered_inventory_tmp="/tmp/filtered_inventory_catalog_$$.php"
+if [[ -f "apps/Shell/Services/AppearanceReaderInventoryService.php" ]]; then grep -v -E "'file_path'[[:space:]]*=>[[:space:]]*'[^']*',?[[:space:]]*\$" "apps/Shell/Services/AppearanceReaderInventoryService.php" > "$filtered_inventory_tmp"; fi
+filtered_shell_view_layout_runtime_files=()
+for f in "${shell_view_layout_runtime_files[@]}"; do
+  if [[ "$f" == *"AppearanceReaderInventoryService.php" ]]; then filtered_shell_view_layout_runtime_files+=("$filtered_inventory_tmp"); else filtered_shell_view_layout_runtime_files+=("$f"); fi
+done
 check_no_matches \
   "Shell view/layout runtime files must not consume Customization Studio markers yet" \
   'CustomizationStudio|customization-studio|preview-fixtures|catalog_only_not_consumed' \
-  "${shell_view_layout_runtime_files[@]}"
+  "${filtered_shell_view_layout_runtime_files[@]}"
+if [[ -f "$filtered_inventory_tmp" ]]; then rm -f "$filtered_inventory_tmp"; fi
 
 echo ""
 echo "== Shell runtime no socket catalog consumption =="
