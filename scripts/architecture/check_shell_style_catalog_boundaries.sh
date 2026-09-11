@@ -298,9 +298,9 @@ check_no_matches \
 
 echo ""
 echo "== Shell view/layout no Customization Studio consumption =="
-# Line-level grep -Ev narrowing: suppress only the 5 proven metadata declaration lines (file_path => ...) from inventory discovery, not the file itself
+# Line-level grep -Ev narrowing: suppress only complete static 'file_path' => '<literal>' metadata declaration lines from inventory discovery, not the file itself
 filtered_inventory_tmp="/tmp/filtered_inventory_catalog_$$.php"
-if [[ -f "apps/Shell/Services/AppearanceReaderInventoryService.php" ]]; then grep -v -E "'file_path' => " "apps/Shell/Services/AppearanceReaderInventoryService.php" > "$filtered_inventory_tmp"; fi
+if [[ -f "apps/Shell/Services/AppearanceReaderInventoryService.php" ]]; then grep -v -E "'file_path'[[:space:]]*=>[[:space:]]*'[^']*',?[[:space:]]*\$" "apps/Shell/Services/AppearanceReaderInventoryService.php" > "$filtered_inventory_tmp"; fi
 filtered_shell_view_layout_runtime_files=()
 for f in "${shell_view_layout_runtime_files[@]}"; do
   if [[ "$f" == *"AppearanceReaderInventoryService.php" ]]; then filtered_shell_view_layout_runtime_files+=("$filtered_inventory_tmp"); else filtered_shell_view_layout_runtime_files+=("$f"); fi

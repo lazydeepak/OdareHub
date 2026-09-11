@@ -187,8 +187,8 @@ if "$SEARCH_TOOL" "${SEARCH_ARGS[@]}" '#[0-9a-fA-F]{3,8}\b|\brgba?\(|\bhsla?\(' 
 fi
 
 domain_prefix_pattern='(^|[,{}[:space:]])\.(mfg|manufacturing|qc|dispatch|assembly|machine|machines|sbaio|platform|procurement|studio|payroll|erp|lazypos|qr|timecard)-'
-# .platform-mode-* accepted only from Shell-owned style sources (ownership-specific, not broad prefix) — line-level filter applied via allowlist path anchor
-known_shell_css_debt_allowlist='^apps/Shell/styles/[^:]+:[0-9]+:[[:space:]]*/?\*|data-dashboard-key=|\.qr-|\.timecard-|(^apps/Shell/styles/[^:]+:[0-9]+:[[:space:]]*\.platform-mode-|^public/assets/apps/shell/styles/[^:]+:[0-9]+:[[:space:]]*\.platform-mode-)'
+# .platform-mode-* accepted only for the exact Shell-owned mode selectors (ownership-specific, not broad prefix) — line-level filter applied via allowlist path anchor
+known_shell_css_debt_allowlist='^apps/Shell/styles/[^:]+:[0-9]+:[[:space:]]*/?\*|data-dashboard-key=|\.qr-|\.timecard-|(^apps/Shell/styles/[^:]+:[0-9]+:[[:space:]]*\.platform-mode-(indicator(--production|--development|--demo|-dot)?|option-label)|^public/assets/apps/shell/styles/[^:]+:[0-9]+:[[:space:]]*\.platform-mode-(indicator(--production|--development|--demo|-dot)?|option-label))'
 
 echo "- scanning for app/module-specific selectors in Shell styles"
 echo "  risky prefixes: ${risky_domain_prefixes[*]}"
