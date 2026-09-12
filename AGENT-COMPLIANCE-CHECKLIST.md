@@ -4880,3 +4880,26 @@ Blank token inputs reported by user were traced to **stale browser context snaps
 - No Core, database, schema, or business-domain behavior changes.
 - No relocation of rehearsal artifacts into the canonical source tree.
 - No duplicate-implementation repair triggered.
+
+## Session Log (2026-09-12) — Residual Rebrand Display Fix Publish, Merge, and Housekeeping
+
+### What was done
+1. Published `fix/rebrand-residual-display-strings` (`69fbc93`) to origin after verifying branch, exact HEAD SHA, clean tracked status, and absent remote branch.
+2. Merged into `main` by fast-forward (`d9c1004..69fbc93`) after user-approved relocation of the diverged local `main` ref from `316b806` to `origin/main`; old history preserved under `origin/rebrand-integrated` and parked local refs.
+3. Fix scope: 7 files, 7 insertions, 7 deletions — `Susankhya OS`/`Core Susankhya OS` display fallbacks → `OdareHub OS`/`Core OdareHub OS` in `LogoResolverService`, `OperatorHeaderComposer`, `DisplaySurfaceComposer`, `OperatorSurfaceComposer` (approved 7th file, line 2655), `display/floor.php`, `admin/setup/health.php`; stale charter path in `docs/CURRENT.md` corrected.
+4. Followup slice (`983397e`): replaced residual `Susankhya OS` prose in `docs/CURRENT.md` header/body; `grep -c Susankhya docs/CURRENT.md` → 0.
+5. Housekeeping: deleted merged branch `fix/rebrand-residual-display-strings` (local + remote); pruned duplicate parked local branches `gate-diag-316b806`, `cloud-cicd-readiness-work`, `work/shared-items-foundation-tmp`, `work/shared-parties-foundation-tmp` (all at `316b806`, SHA retained via `origin/rebrand-integrated`).
+6. Recorded this session in `AGENTS.md`.
+
+### Validation
+- Rebrand compatibility probe: `25/25`.
+- Shell consumption boundary (22 invariants), shared app extension contract, localization migration guardrail: PASS.
+- ARCHITECTURE GATES: PASS; DELETION FAMILY GATES: PASS (28/28); DEPLOYMENT READINESS: PASS.
+- Post-merge: `main` = `origin/main` = `69fbc93`; post-housekeeping `main` = `origin/main` = `983397e`.
+- Unrelated untracked Shared Parties work (migrations 012/013, `shared/`, `tests/probe_inventory_contract_reference.php`, `work/`, logs/tmp) untouched throughout.
+
+### Hard rules preserved
+- No Core (`/app`) changes; no schema, route, or compatibility-contract changes.
+- `SusankhyaOS.ShellOverlay` alias, `susankhya.label.{context,template,rule}.v1` schema IDs, and legacy `SUSANKHYA_*` env fallbacks preserved as intentional compatibility layer.
+- Remaining `Susankhya` occurrences (Core/locale/Studio labels, docs prose outside `docs/CURRENT.md`) classified and deferred pending explicit authorization.
+- No deployment performed.

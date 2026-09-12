@@ -14,6 +14,26 @@ Before making meaningful changes in this repository, read:
 
 Do not use this file as a generic memory dump. Keep durable project status in `docs/CURRENT.md`, active task context in `docs/active/`, future work in `docs/BACKLOG.md`, owner-specific state in `engineering/`, and historical records in existing architecture/runtime/audit documentation.
 
+## Session Summary (2026-09-12) — Residual Rebrand Display Fix Publish, Merge, and Housekeeping
+
+### What was done
+1. Published `fix/rebrand-residual-display-strings` at `69fbc93` to origin (verified local HEAD, clean status, remote branch absent before push).
+2. Merged the fix into `main` by fast-forward after relocating the diverged local `main` ref (`316b806`) back to `origin/main` (`d9c1004`) with user approval; pushed `origin/main` `d9c1004..69fbc93`. Old diverged history stays preserved under existing refs (`origin/rebrand-integrated`, `work/*-tmp`, `gate-diag-316b806`, `cloud-cicd-readiness-work`).
+3. The fix commit replaces residual `Susankhya OS` / `Core Susankhya OS` display fallbacks with `OdareHub OS` / `Core OdareHub OS` in 7 files: `LogoResolverService.php`, `OperatorHeaderComposer.php`, `DisplaySurfaceComposer.php`, `OperatorSurfaceComposer.php` (approved 7th file), `display/floor.php`, `admin/setup/health.php`, plus the stale charter path in `docs/CURRENT.md`.
+4. Replaced the remaining `Susankhya OS` prose in `docs/CURRENT.md` header/body (`983397e`).
+5. Housekeeping: deleted merged branch `fix/rebrand-residual-display-strings` (local + remote); pruned duplicate parked local branches at `316b806` (SHA retained via `origin/rebrand-integrated`).
+
+### Validation
+- Rebrand compatibility probe: `25/25`.
+- Shell consumption boundary (`22` invariants), shared app extension contract, localization migration guardrail: PASS.
+- ARCHITECTURE GATES: PASS; DELETION FAMILY GATES: PASS (28/28); DEPLOYMENT READINESS: PASS.
+- `main` = `origin/main`; unrelated untracked Shared Parties work untouched throughout.
+
+### Hard rules preserved
+- No Core (`/app`) changes; no schema or compatibility-contract changes.
+- `SusankhyaOS.ShellOverlay`, `susankhya.label.*.v1`, and legacy env fallbacks preserved as intentional compatibility layer.
+- Deferred residuals (Core/locale/Studio labels) remain classified, awaiting explicit authorization.
+
 ## Session Summary (2026-07-20) — UI/Navigation/Artifact Search Provider Extraction
 
 ### What was done
