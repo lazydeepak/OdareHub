@@ -1,0 +1,48 @@
+{
+    "name": "Bom",
+    "display_name": "BOM / Recipes",
+    "suite": "manufacturing",
+    "group": "ipm",
+    "category": "business",
+    "display_order": 15,
+    "type": "business",
+    "version": "1.0.0",
+    "description": "Versioned bill-of-materials and recipe lines referenced by canonical item identity (item_ref).",
+    "requires": [
+        "Base>=3.0.0",
+        "Products>=1.0.0"
+    ],
+    "entry": "routes.php",
+    "package_type": "module",
+    "owner_app": "manufacturing",
+    "module_key": "Bom",
+    "module_type": "business_entity",
+    "target_maturity_level": "L3",
+    "required_tables": [
+        "manufacturing_bom",
+        "manufacturing_bom_line"
+    ],
+    "declared_capabilities": [
+        "routes",
+        "views",
+        "forms",
+        "schema",
+        "migrations",
+        "controllers",
+        "services",
+        "permissions",
+        "menus",
+        "widgets",
+        "lifecycle_hooks",
+        "localization"
+    ],
+    "lifecycle_contract": {
+        "routes": "active_only",
+        "menus": "active_only",
+        "widgets": "active_only",
+        "reports": "active_only",
+        "dashboards": "active_only",
+        "schema": "installed_or_active"
+    },
+    "activation_contract_enforced": true
+}

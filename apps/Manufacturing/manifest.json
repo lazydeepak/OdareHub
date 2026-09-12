@@ -15,7 +15,8 @@
     "production_plans",
     "production_queue",
     "assembly_plans",
-    "assembly_entries"
+    "assembly_entries",
+    "bom"
   ],
   "legacy_bridge_plugins": [
     "Products",
@@ -35,7 +36,8 @@
     "AssemblyEntries",
     "QCPlans",
     "QCEntries",
-    "DispatchEntries"
+    "DispatchEntries",
+    "Bom"
   ],
   "migrations_path": "migrations",
   "permissions": [
@@ -343,6 +345,30 @@
       "path": "/apps/manufacturing/assembly-plans/transition"
     },
     {
+      "path": "/apps/manufacturing/bom"
+    },
+    {
+      "path": "/apps/manufacturing/bom/detail"
+    },
+    {
+      "path": "/apps/manufacturing/bom/add"
+    },
+    {
+      "path": "/apps/manufacturing/bom/update"
+    },
+    {
+      "path": "/apps/manufacturing/bom/status"
+    },
+    {
+      "path": "/apps/manufacturing/bom/lines/add"
+    },
+    {
+      "path": "/apps/manufacturing/bom/lines/update"
+    },
+    {
+      "path": "/apps/manufacturing/bom/lines/delete"
+    },
+    {
       "path": "/manufacturing/stage-board"
     },
     {
@@ -562,6 +588,15 @@
       "url": "/apps/manufacturing/assembly-plans",
       "parent": "app.mfg.root",
       "order": 50,
+      "perm": "manufacturing.view"
+    },
+    {
+      "key": "app.mfg.bom",
+      "label_key": "nav.bom",
+      "label": "BOM / Recipes",
+      "url": "/apps/manufacturing/bom",
+      "parent": "app.mfg.root",
+      "order": 51,
       "perm": "manufacturing.view"
     },
     {
@@ -1398,6 +1433,17 @@
         "nav_visible": true,
         "search_visible": true,
         "role_scoped": false
+      },
+      {
+        "name": "Bom",
+        "feature_key": "bom",
+        "runtime_surfaces": [
+          "/apps/manufacturing/bom"
+        ],
+        "kind": "canonical",
+        "nav_visible": true,
+        "search_visible": true,
+        "role_scoped": true
       }
     ]
   },
@@ -1405,7 +1451,9 @@
     "tables": [
       "mfg_part_demands",
       "mfg_stage_readiness",
-      "mfg_assembly_entries"
+      "mfg_assembly_entries",
+      "manufacturing_bom",
+      "manufacturing_bom_line"
     ],
     "drop_columns": [
       {

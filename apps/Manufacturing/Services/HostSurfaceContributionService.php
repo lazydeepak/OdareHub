@@ -519,6 +519,11 @@ final class HostSurfaceContributionService
             ],
             [
                 'regions' => ['summary_cards', 'monitoring_sections'],
+                'class' => 'Apps\\Manufacturing\\Modules\\Bom\\Services\\BomWidgetRegistry',
+                'file' => APP_ROOT . '/apps/Manufacturing/modules/Bom/Services/BomWidgetRegistry.php',
+            ],
+            [
+                'regions' => ['summary_cards', 'monitoring_sections'],
                 'class' => 'Plugins\\DispatchEntries\\Services\\DispatchEntryWidgetRegistry',
                 'file' => APP_ROOT . '/apps/Manufacturing/modules/DispatchEntries/Services/DispatchEntryWidgetRegistry.php',
             ],
