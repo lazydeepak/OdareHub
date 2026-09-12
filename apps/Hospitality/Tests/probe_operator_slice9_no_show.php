@@ -58,8 +58,9 @@ try { DB::conn(); } catch (\Throwable $e) {
 }
 
 $hospTables = ['hosp_guests','hosp_rooms','hosp_reservations','hosp_housekeeping_status','hosp_folios','hosp_folio_charges'];
-$tableExists = static fn(string $t): bool => (int)(DB::fetchOne('SELECT COUNT(*) AS c FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = ?', [$t])['c'] ?? 0) > 0;
+$tableExists = static fn(string $t): bool => is_array(DB::fetchOne('SELECT COUNT(*) AS c FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = ?', [$t])) && (int)(DB::fetchOne('SELECT COUNT(*) AS c FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = ?', [$t])['c'] ?? 0) > 0;
 
+// Pre-cleanup: drop fixtures left behind by an aborted run so reruns stay idempotent.
 try {
     $registry = new AppRegistryService();
     $originalStatus = (string)(($registry->find('hospitality') ?? [])['status'] ?? '');
@@ -68,19 +69,45 @@ try {
     }
     (new AppLocalDiscoveryService())->syncLocalApps();
 
+    if ($tableExists('hosp_reservations') && $tableExists('hosp_folios')) {
+        DB::query('DELETE fc FROM hosp_folio_charges fc INNER JOIN hosp_reservations r ON fc.folio_id IN (SELECT id FROM hosp_folios WHERE reservation_id = r.id) WHERE r.note LIKE ?', ['s9-%']);
+        DB::query('DELETE FROM hosp_folios WHERE reservation_id IN (SELECT id FROM hosp_reservations WHERE note LIKE ?)', ['s9-%']);
+    }
+    if ($tableExists('hosp_reservations')) {
+        DB::query('DELETE FROM hosp_reservations WHERE note LIKE ?', ['s9-%']);
+    }
+    if ($tableExists('hosp_housekeeping_status') && $tableExists('hosp_rooms')) {
+        DB::query('DELETE FROM hosp_housekeeping_status WHERE room_id IN (SELECT id FROM hosp_rooms WHERE note LIKE ?)', ['slice9%']);
+    }
+    if ($tableExists('hosp_rooms')) {
+        DB::query("DELETE FROM hosp_rooms WHERE room_number = 'T-S9-R'");
+    }
+    if ($tableExists('hosp_guests')) {
+        DB::query("DELETE FROM hosp_guests WHERE email = 's9@example.invalid'");
+    }
+} catch (\Throwable $e) {
+    $restorationErrors[] = 'pre-cleanup: ' . $e->getMessage();
+}
+
+$beforeRows = [];
+foreach ($hospTables as $t) { $beforeRows[$t] = $tableExists($t) ? DB::fetchAll("SELECT * FROM {$t}") : []; }
+
+try {
     // Fixtures
     DB::query("INSERT INTO hosp_guests (full_name, email, guest_status) VALUES ('S9 Guest', 's9@example.invalid', 'active')");
     $gid = (int)(DB::fetchOne("SELECT id FROM hosp_guests WHERE email='s9@example.invalid'")['id'] ?? 0);
     DB::query("INSERT INTO hosp_rooms (room_number, room_type, floor, room_status, note) VALUES ('T-S9-R', 'double', 5, 'active', 'slice9')");
     $roomId = (int)(DB::fetchOne("SELECT id FROM hosp_rooms WHERE room_number='T-S9-R'")['id'] ?? 0);
     $t1 = date('Y-m-d'); $t2 = date('Y-m-d', strtotime('+2 days'));
-    foreach ([['bk','booked',false], ['ci','checked_in',true], ['co','checked_out',false], ['cx','cancelled',false], ['ns','no_show',false]] as [$sf,$st,$hasCi]) {
-        $tsC = $hasCi ? ', actual_check_in_at' : ''; $tsV = $hasCi ? ', NOW()' : '';
+    foreach ([['bk','booked'], ['ci','checked_in'], ['co','checked_out'], ['cx','cancelled'], ['ns','no_show']] as [$sf,$st]) {
+        $tsC = $st === 'checked_in' ? ', actual_check_in_at' : ''; $tsV = $st === 'checked_in' ? ', NOW()' : '';
         DB::query(
             "INSERT INTO hosp_reservations (guest_id, room_id, check_in_date, check_out_date, adults, children, reservation_status{$tsC}, note)
              VALUES (?, ?, ?, ?, 1, 0, ?{$tsV}, ?)", [$gid, $roomId, $t1, $t2, $st, 's9-' . $sf]
         );
     }
+    $resBk = (int)(DB::fetchOne("SELECT id FROM hosp_reservations WHERE note='s9-bk'")['id'] ?? 0);
+
     \Apps\Hospitality\Services\FrontDeskService::markReservationNoShow($resBk);
     $rBk = DB::fetchOne('SELECT reservation_status FROM hosp_reservations WHERE id = ?', [$resBk]);
     (($rBk['reservation_status'] ?? '') === 'no_show')
@@ -92,12 +119,13 @@ try {
         ? $pass('timestamps remain NULL after no_show') : $fail('timestamp mutation');
 
     // Rejections from non-booked states
-    foreach ([['checked_in'], ['checked_out'], ['cancelled'], ['no_show']] as [$st]) {
-        $rid = (int)(DB::fetchOne('SELECT id FROM hosp_reservations WHERE note LIKE ?', ['s9-%'])['id'] ?? 0);
+    foreach ([['ci','checked_in'], ['co','checked_out'], ['cx','cancelled'], ['ns','no_show']] as [$sf,$st]) {
+        $rid = (int)(DB::fetchOne("SELECT id FROM hosp_reservations WHERE note = ?", ['s9-' . $sf])['id'] ?? 0);
+        if ($rid === 0) continue;
         $rejected = false;
-        try { \Apps\Hospitality\Services\ReservationsService::transition(999999, 'no_show'); }
+        try { \Apps\Hospitality\Services\ReservationsService::transition($rid, 'no_show'); }
         catch (\Throwable $e) { $rejected = true; }
-        if ($rejected) { $pass("{$st[0]} -> no_show rejected"); }
+        $rejected ? $pass("{$st} -> no_show rejected") : $fail("{$st} rejection");
     }
 
     $unknownRejected = false;

@@ -211,6 +211,13 @@ checks. `check_operator_confinement.sh` includes Hospitality and passes. Live br
 acceptance is the only remaining unchecked item; no repository-local browser harness or
 approved local HTTP executor was available during the handoff.
 
+Coverage update (2026-09-12): all eight operator probes now run inside
+`apps/Hospitality/Tests/run_all_hospitality_probes.php` (16/16 groups, 494 assertions);
+previously only the foundation group was registered. Live browser acceptance remains the
+sole unchecked item and is still environment-bound - re-verified this session: no local
+`.env`, MySQL not running, no local HTTP executor - so it needs a provisioned local
+stack (DB + assigned user with `hospitality.view`) before it can be closed.
+
 POST-static-completion runtime finding (2026-08-24): a Base resolved-experience
 catalog omission prevented app-contributed focus tokens (including hospitality)
 from passing the shared operator view gate at runtime. A generic compatibility
@@ -223,11 +230,13 @@ smoke remains separate deferred acceptance evidence.
 
 ## 10. Non-Goals
 
-- Operator-layer write actions (check-in/out, charge add, HK updates) - deferred
-  when this plan was written; Housekeeping status updates have now entered a
-  separately governed slice under `docs/active/hospitality-operator-actions-plan.md`
-  (manage-gated, CSRF, jailed POST route, same service truth). Check-in/out and
-  folio mutations remain deferred.
+- Operator-layer write actions - deferred when this plan was written, then landed
+  one at a time under `docs/active/hospitality-operator-actions-plan.md`
+  (manage-gated, CSRF, jailed POST route, single domain service, own-handle
+  binding): housekeeping status update, front-desk check-in, check-out,
+  add-charge, cancel, and no-show. Charge void remains deferred (destructive
+  financial-record mutation). This plan still governs the read-only composition;
+  it does not authorize new write actions.
 - Display/kiosk (`/displays/*`) Hospitality surfaces.
 - Workspace Profile preset authoring (e.g., `hospitality_front_desk` profile) -
   belongs to Access Control/Studio workflows after the surface exists.

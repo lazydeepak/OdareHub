@@ -176,10 +176,29 @@ Authorization rule (restated): assignment = availability; `hospitality.view` /
   controller migrated to the same command; operator UI exposes one add-charge
   control per in-house row for manage holders using CHARGE_TYPES from the
   service.
+- **Slice 5 (landed): Cancel booked reservation ONLY** - same confined pattern
+  delegating to `FrontDeskService::cancelReservation()`
+  (`POST /u/hospitality/front-desk/cancel`, `hospitality.manage` + CSRF + own-handle
+  binding). Proof: `probe_operator_slice8_cancel.php` 21/21 (non-booked states
+  rejected, unknown id rejected, cancellation creates no folio).
+- **Slice 6 (landed): Mark booked reservation no-show ONLY** - same confined pattern
+  delegating to `FrontDeskService::markReservationNoShow()`
+  (`POST /u/hospitality/front-desk/no-show`). Proof: `probe_operator_slice9_no_show.php`
+  18/18 (booked -> no_show succeeds, stay timestamps remain NULL, non-booked states
+  rejected, unknown id rejected).
 - **Charge void remains explicitly deferred**: destructive financial-record
   mutation requiring its own review (authorization/concurrency/audit).
 
-Also still deferred: reservation cancel/no-show/create,
+Also still deferred: reservation create,
 room/guest CRUD, housekeeping history/supply/maintenance workflows, staff
 scheduling, new permissions, schema changes, shared-app dependencies, and any
 generic operator-action framework beyond this bridge.
+
+### Regression coverage correction (2026-09-12)
+
+The eight operator probes were never registered in the aggregate runner, so the
+operator action slices had no suite-level protection and slice 9's probe defects
+(undefined `$resBk`, unsnapshotted `$beforeRows`, no fixture pre-cleanup) went
+undetected: the canonical `booked -> no_show` assertion had never actually run.
+Fixed in this session; `run_all_hospitality_probes.php` now runs foundation +
+operator groups (16/16 groups, 494 assertions).
