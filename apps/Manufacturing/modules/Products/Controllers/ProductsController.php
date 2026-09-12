@@ -399,6 +399,39 @@ final class ProductsController
         exit;
     }
 
+    public static function assignItemRef(array $input): void
+    {
+        $actor = Auth::user();
+        $productId = (int)($input['product_id'] ?? 0);
+
+        if (!self::canEditLeadSections($actor, $productId)) {
+            self::flash('err', 'Only the assigned lead or an admin can update item reference for this part.');
+            header('Location: /products/360?id=' . $productId);
+            exit;
+        }
+
+        $itemRef = isset($input['item_ref']) ? (int)$input['item_ref'] : null;
+        if ($itemRef !== null && $itemRef <= 0 && $input['item_ref'] !== '' && $input['item_ref'] !== '0') {
+            $itemRef = null; // clear on non-positive non-empty; service validates
+        }
+
+        $clear = isset($input['clear_item_ref']) && (bool)$input['clear_item_ref'];
+
+        try {
+            if ($clear || ((string)($input['item_ref'] ?? '')) === '') {
+                \Plugins\Products\Services\PartItemRefService::clear($productId, $actor);
+                self::flash('ok', 'Item reference cleared.');
+            } else {
+                \Plugins\Products\Services\PartItemRefService::assign($productId, $itemRef, $actor);
+                self::flash('ok', 'Item reference updated.');
+            }
+        } catch (\Throwable $e) {
+            self::flash('err', 'Item reference update failed: ' . $e->getMessage());
+        }
+        header('Location: /products/360?id=' . $productId);
+        exit;
+    }
+
     public static function assignResponsibleUser(array $input): void
     {
         $actor = Auth::user();

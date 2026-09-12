@@ -88,6 +88,7 @@ final class PartsMasterSnapshotService
             ? 'CASE WHEN uos.user_id IS NULL THEN 0 ELSE 1 END'
             : '0';
 
+        $itemRefSql = isset($columns['item_ref']) ? ', p.item_ref AS item_ref' : '';
         $sql = "SELECT
                     p.id AS part_id,
                     p.parts_name AS part_name,
@@ -98,6 +99,7 @@ final class PartsMasterSnapshotService
                     p.is_active,
                     p.updated_at,
                     {$assignedSql} AS is_assigned
+                    {$itemRefSql}
                 FROM products p";
 
         if ($hasLedger) {

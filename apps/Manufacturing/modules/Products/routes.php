@@ -174,6 +174,16 @@ $deactivateProduct = function() {
 $router->post('/apps/manufacturing/products/deactivate', $deactivateProduct);
 $router->post('/products/deactivate', $deactivateProduct);
 
+$assignProductItemRef = function() {
+    Auth::requireAppAccess('manufacturing');
+    Auth::bootSession();
+    Auth::requireCsrf((string)($_POST['csrf'] ?? ''));
+    ProductsController::assignItemRef($_POST);
+    return null;
+};
+$router->post('/apps/manufacturing/products/item-ref', $assignProductItemRef);
+$router->post('/products/item-ref', $assignProductItemRef);
+
 $renderProductImport = function() use ($view) {
     Auth::requireAppAccess('manufacturing');
     Auth::bootSession();

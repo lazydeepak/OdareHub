@@ -131,6 +131,7 @@ $scopeSummary = $scopeMode === 'all'
         <th><a class="products-sort-link" href="<?= e($sortLink('coverage_balance_qty')) ?>">Coverage / Balance <?= e($sortIndicator('coverage_balance_qty')) ?></a></th>
         <th><a class="products-sort-link" href="<?= e($sortLink('is_active')) ?>"> <?= e($tt('common.status_label')) ?> <?= e($sortIndicator('is_active')) ?></a></th>
         <th><a class="products-sort-link" href="<?= e($sortLink('updated_at')) ?>">Updated <?= e($sortIndicator('updated_at')) ?></a></th>
+        <th>Item Ref</th>
       </tr>
       </thead>
       <tbody>
