@@ -38,7 +38,7 @@ $healthStatusLabel = static fn(string $status): string => t('admin.setup_health.
 <div class="card">
   <div class="setup-health-head">
     <div>
-      <h3 class="setup-health-title"><?= e((string)($core['label'] ?? 'Core Susankhya OS')) ?></h3>
+      <h3 class="setup-health-title"><?= e((string)($core['label'] ?? 'Core OdareHub OS')) ?></h3>
       <div class="muted"><?= e((string)($core['runtime_health'] ?? '')) ?></div>
     </div>
     <?php $coreStatus = (string)($core['health_status'] ?? 'healthy'); ?><span class="pill setup-health-status <?= e($healthTone($coreStatus)) ?>"><?= e($healthStatusLabel($coreStatus)) ?></span>

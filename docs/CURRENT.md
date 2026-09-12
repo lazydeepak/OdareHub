@@ -45,7 +45,7 @@ Read these files first for broad context:
 
 - `README.md` for product vision, architecture summary, status, and roadmap
 - `ARCHITECTURE.md` for terminology and architecture rules
-- `docs/architecture/SUSANKHYA-OS-ARCHITECTURE-CHARTER-V1.md` for the mandatory OS charter
+- `docs/architecture/ODAREHUB-OS-ARCHITECTURE-CHARTER-V1.md` for the mandatory OS charter
 - `docs/architecture/CORE-LOCK-POLICY.md` before touching Core
 - `docs/architecture/APP-CONTRACT.md` and `docs/architecture/MODULE-CONTRACT.md` before app/module boundary work
 - `docs/BACKLOG.md` for queued future work

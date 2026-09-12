@@ -13,7 +13,7 @@ final class LogoResolverService
             'logo_svg' => '',
             'logo_svg_theme' => '',
             'logo_icon_url' => '',
-            'fallback_text' => 'Susankhya OS',
+            'fallback_text' => 'OdareHub OS',
             'fallback_text_compact' => 'S',
         ];
 
