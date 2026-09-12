@@ -40,6 +40,38 @@ Planned jobs after the completed push (user-selected scope):
   session-branch reconciliation (merge-vs-retire of the 6 unmerged session branches),
   rebrand residuals (await explicit authorization), docs-cleanup backlog.
 
+## Session Summary (2026-09-12) — Hospitality Operator No-show Probe Repair + Coverage
+
+### What was done
+1. Reconciled the Hospitality operator active briefs against repository state and found the
+   no-show slice's probe was broken, so its canonical behavior was never verified:
+   - `probe_operator_slice9_no_show.php` used an undefined `$resBk` (null passed to
+     `markReservationNoShow`) and never populated `$beforeRows`.
+   - No fixture pre-cleanup, so an aborted run left `T-S9-R` rows and later runs failed on
+     `uniq_hosp_room_number`.
+   - The rejection loop ignored fixture ids and only proved "unknown id rejected".
+2. Repaired the probe to mirror slice 8's proven pattern (pre-cleanup → before-snapshot →
+   fixture capture → per-state rejection): now `18/18`, idempotent on repeat runs, and the
+   `booked -> no_show` assertion genuinely executes. Cancel probe `21/21`, stable on repeat.
+3. Registered the eight operator-action probes in `run_all_hospitality_probes.php` — they had
+   never been wired in, which is why the breakage was invisible to the suite. Suite now
+   `16/16` groups, `494` assertions (foundation 267 + operator 227).
+4. Corrected stale docs: cancel and no-show are landed slices (not deferred); check-in/out and
+   add-charge no longer listed as deferred; live browser acceptance restated as
+   environment-bound. Evidence recorded in `engineering/Hospitality/work.md`.
+
+### Validation
+- Hospitality full probe suite: ✅ `16/16` groups, `494` assertions
+- PHP lint: ✅ (probe + runner)
+- ARCHITECTURE GATES: PASS; DELETION FAMILY GATES: PASS (28/28); DEPLOYMENT READINESS: PASS
+- `git diff --check`: clean
+
+### Boundaries
+- Test code and documentation only — no Hospitality production service, route, or schema change.
+- Live authenticated browser acceptance remains the sole unchecked item; it is environment-bound
+  (no local `.env`, MySQL not running, no approved local HTTP executor) and needs a provisioned
+  local stack before it can be closed.
+
 ### Boundaries
 - Core (`/app`) untouched; no schema applied to any live DB (migration files committed only).
 - Identity store remains test/verification JSON (`SHARED_ITEMS_STORE` env or `/tmp`); no

@@ -49,6 +49,35 @@ composition planning, Shared Parties minimal slice (parked in `work/`), session-
 reconciliation (6 unmerged branches), rebrand residuals (need explicit authorization),
 docs-cleanup backlog.
 
+## Session Summary (2026-09-12) — Hospitality Operator No-show Probe Repair + Coverage
+
+### What was done
+1. Reconciled the Hospitality operator briefs against repo state; the no-show probe was
+   broken so its canonical behavior was never verified: undefined `$resBk` (null passed to
+   `markReservationNoShow`), `$beforeRows` never populated, no fixture pre-cleanup (reruns
+   collided on `uniq_hosp_room_number`), and a rejection loop that only proved "unknown id
+   rejected".
+2. Repaired `probe_operator_slice9_no_show.php` to mirror slice 8's proven pattern —
+   pre-cleanup → before-snapshot → fixture capture → per-state rejection. Now `18/18` and
+   idempotent; `booked -> no_show` is genuinely asserted. Cancel probe `21/21`, stable.
+3. Registered the eight operator-action probes in `run_all_hospitality_probes.php`; they had
+   never been wired in, which is why the breakage was invisible. Suite now `16/16` groups,
+   `494` assertions.
+4. Corrected the stale briefs (cancel/no-show landed, not deferred; check-in/out and
+   add-charge no longer deferred) and recorded evidence in `engineering/Hospitality/work.md`.
+
+### Validation
+- Hospitality probe suite: ✅ `16/16` groups, `494` assertions
+- ARCHITECTURE GATES: PASS; DELETION FAMILY GATES: PASS (28/28); DEPLOYMENT READINESS: PASS
+- `git diff --check`: clean
+
+### Hard rules preserved
+- Test code and docs only; no Hospitality service, route, or schema change.
+- Live authenticated browser acceptance remains the sole unchecked item and is
+  environment-bound (no local `.env`, MySQL not running, no approved local HTTP executor).
+
+## Session Summary (2026-06-01)
+
 ### Hard rules preserved
 - Core (`/app`) untouched; no DB mutated (migration files committed only).
 - No `shared_items` SQL table; identity store stays test/verification JSON; no runtime
