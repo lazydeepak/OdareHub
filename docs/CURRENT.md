@@ -1,10 +1,10 @@
-# Susankhya OS Current Context
+# OdareHub OS Current Context
 
-This file is the current-state router for agents working in Susankhya OS. Keep it short, factual, and updated when the active milestone or architectural baseline changes.
+This file is the current-state router for agents working in OdareHub OS. Keep it short, factual, and updated when the active milestone or architectural baseline changes.
 
 ## Current State
 
-Susankhya OS is a modular business operations platform built around a Core -> Apps -> Modules architecture. Plugins are extension/provider mechanisms, not primary business applications.
+OdareHub OS is a modular business operations platform built around a Core -> Apps -> Modules architecture. Plugins are extension/provider mechanisms, not primary business applications.
 
 The active product direction is:
 
