@@ -1096,3 +1096,44 @@ reliably launch simultaneous PHP processes. Sequential CAS proofs now verify
 the compare-and-set logic directly. True multi-process concurrent testing is
 documented as deferred to integration harness. Outer-tx compatibility proof
 retained (canonical checkin->checkout on same reservation).
+
+## Operator no-show probe repair + operator regression coverage (2026-09-12)
+
+Status: Completed.
+
+Found while reconciling the operator active briefs against repository state: the
+no-show operator slice had a broken probe, so its canonical behavior was never
+actually verified.
+
+Defects in `probe_operator_slice9_no_show.php`:
+
+- `$resBk` was never defined - `FrontDeskService::markReservationNoShow(null)`
+  raised a TypeError, which the section's try/catch recorded as a single failed
+  assertion. The `booked -> no_show` assertion had therefore never executed.
+- `$beforeRows` was never populated, so the restoration fingerprint compared a
+  real after-state against an empty baseline.
+- No fixture pre-cleanup: an aborted first run left `T-S9-R` / `s9@example.invalid`
+  rows behind, and every later run failed on `uniq_hosp_room_number`.
+- The non-booked rejection loop ignored its own fixture ids and always called
+  `transition(999999, 'no_show')`, so it only proved "unknown id rejected".
+
+Fix: the probe now mirrors the proven `probe_operator_slice8_cancel.php` pattern -
+fixture pre-cleanup, then before-snapshot, then fixture capture by note, then
+per-state rejection using each reservation's real id. Result 18/18, repeated runs
+identical (idempotent). Cancel probe unaffected: 21/21, also stable on repeat.
+
+Regression-coverage gap: the eight operator probes were not registered in
+`run_all_hospitality_probes.php`, which is why the breakage was invisible to the
+suite. They are now registered alongside the foundation group - 16/16 groups,
+494 assertions (foundation 267 + operator 227).
+
+State confirmed this session: operator actions housekeeping status, check-in,
+check-out, add-charge, cancel, and no-show are all implemented and confined;
+charge void remains deferred. Live authenticated browser acceptance is still the
+sole unchecked item and stays environment-bound (no local `.env`, MySQL not
+running, no approved local HTTP executor) - it needs a provisioned local stack
+(DB plus a user assigned to hospitality with `hospitality.view`).
+
+Validation: `run_all_hospitality_probes.php` 16/16; architecture gates PASS;
+deletion family gates PASS 28/28; deployment readiness PASS; `git diff --check`
+clean.
