@@ -1,6 +1,6 @@
 # AGENT-COMPLIANCE-CHECKLIST
 
-## Session Summary (2026-09-12) — Shared Items Foundation Integration
+## Session Summary (2026-09-12) — Shared Foundation Reconciliation & Continuation (Shared Items Foundation Integration)
 
 ### What was done
 1. Verified the untracked in-progress work against the handoff before modifying anything:
@@ -29,6 +29,16 @@
 - `git diff --check`: clean
 - No `manufacturing_bom` table or Products `item_ref` column pre-existed on `main` (verified
   via `git grep` against HEAD) — no duplicate schema.
+- Pushed to origin: `0595633..29212c9  main -> main` (both slice + docs commits verified on
+  remote).
+
+### Session scope record
+Session name: `Shared Foundation Reconciliation & Continuation (2026-09-12)`.
+Planned jobs after the completed push (user-selected scope):
+- Deferred to later sessions: Hospitality operator composition planning (active task in
+  `docs/CURRENT.md`), Shared Parties minimal slice (parked Session B contract in `work/`),
+  session-branch reconciliation (merge-vs-retire of the 6 unmerged session branches),
+  rebrand residuals (await explicit authorization), docs-cleanup backlog.
 
 ### Boundaries
 - Core (`/app`) untouched; no schema applied to any live DB (migration files committed only).

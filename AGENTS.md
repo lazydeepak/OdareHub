@@ -14,7 +14,7 @@ Before making meaningful changes in this repository, read:
 
 Do not use this file as a generic memory dump. Keep durable project status in `docs/CURRENT.md`, active task context in `docs/active/`, future work in `docs/BACKLOG.md`, owner-specific state in `engineering/`, and historical records in existing architecture/runtime/audit documentation.
 
-## Session Summary (2026-09-12) — Shared Items Foundation Integration
+## Session Summary (2026-09-12) — Shared Foundation Reconciliation & Continuation (Shared Items Foundation Integration)
 
 ### What was done
 1. Verified the untracked handoff artifacts before modifying anything: `shared/` code is
@@ -40,6 +40,14 @@ Do not use this file as a generic memory dump. Keep durable project status in `d
 - Shared Items identity probe: ✅ `19/19`; PHP lint ✅
 - ARCHITECTURE GATES: PASS; DELETION FAMILY GATES: PASS (28/28); DEPLOYMENT READINESS: PASS
 - No pre-existing `manufacturing_bom` table or Products `item_ref` column on `main`.
+- Pushed to origin: `0595633..29212c9  main -> main`.
+
+### Session scope record
+Session name: `Shared Foundation Reconciliation & Continuation (2026-09-12)`. User-selected
+scope: Shared Items integration + push only. Deferred to later sessions: Hospitality operator
+composition planning, Shared Parties minimal slice (parked in `work/`), session-branch
+reconciliation (6 unmerged branches), rebrand residuals (need explicit authorization),
+docs-cleanup backlog.
 
 ### Hard rules preserved
 - Core (`/app`) untouched; no DB mutated (migration files committed only).
