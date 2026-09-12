@@ -18,16 +18,16 @@ Do not use this file as a generic memory dump. Keep durable project status in `d
 
 ### What was done
 1. Published `fix/rebrand-residual-display-strings` at `69fbc93` to origin (verified local HEAD, clean status, remote branch absent before push).
-2. Merged the fix into `main` by fast-forward after relocating the diverged local `main` ref (`316b806`) back to `origin/main` (`d9c1004`) with user approval; pushed `origin/main` `d9c1004..69fbc93`. Old diverged history stays preserved under existing refs (`origin/rebrand-integrated`, `work/*-tmp`, `gate-diag-316b806`, `cloud-cicd-readiness-work`).
+2. Merged the fix into `main` by fast-forward after relocating the diverged local `main` ref (`316b806`) back to `origin/main` (`d9c1004`) with user approval; pushed `origin/main` `d9c1004..69fbc93`. Old diverged history preserved at `origin/rebrand-integrated`.
 3. The fix commit replaces residual `Susankhya OS` / `Core Susankhya OS` display fallbacks with `OdareHub OS` / `Core OdareHub OS` in 7 files: `LogoResolverService.php`, `OperatorHeaderComposer.php`, `DisplaySurfaceComposer.php`, `OperatorSurfaceComposer.php` (approved 7th file), `display/floor.php`, `admin/setup/health.php`, plus the stale charter path in `docs/CURRENT.md`.
-4. Replaced the remaining `Susankhya OS` prose in `docs/CURRENT.md` header/body (`983397e`).
-5. Housekeeping: deleted merged branch `fix/rebrand-residual-display-strings` (local + remote); pruned duplicate parked local branches at `316b806` (SHA retained via `origin/rebrand-integrated`).
+4. Replaced the remaining `Susankhya OS` prose in `docs/CURRENT.md` header/body (`983397e`), then recorded this session in `AGENTS.md` + `AGENT-COMPLIANCE-CHECKLIST.md` (`3e7b6f5`).
+5. Housekeeping: deleted merged branch `fix/rebrand-residual-display-strings` (local + remote); removed the four linked worktrees at `316b806`; pruned the now-unused duplicate local branches `work/*-tmp`, `gate-diag-316b806`, `cloud-cicd-readiness-work`. `316b806` retained only via `origin/rebrand-integrated` (remote deletion intentionally not performed).
 
 ### Validation
 - Rebrand compatibility probe: `25/25`.
 - Shell consumption boundary (`22` invariants), shared app extension contract, localization migration guardrail: PASS.
 - ARCHITECTURE GATES: PASS; DELETION FAMILY GATES: PASS (28/28); DEPLOYMENT READINESS: PASS.
-- `main` = `origin/main`; unrelated untracked Shared Parties work untouched throughout.
+- `main` = `origin/main` = `3e7b6f5`; unrelated untracked Shared Parties work untouched throughout.
 
 ### Hard rules preserved
 - No Core (`/app`) changes; no schema or compatibility-contract changes.

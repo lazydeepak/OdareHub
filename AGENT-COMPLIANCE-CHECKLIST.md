@@ -4885,17 +4885,18 @@ Blank token inputs reported by user were traced to **stale browser context snaps
 
 ### What was done
 1. Published `fix/rebrand-residual-display-strings` (`69fbc93`) to origin after verifying branch, exact HEAD SHA, clean tracked status, and absent remote branch.
-2. Merged into `main` by fast-forward (`d9c1004..69fbc93`) after user-approved relocation of the diverged local `main` ref from `316b806` to `origin/main`; old history preserved under `origin/rebrand-integrated` and parked local refs.
+2. Merged into `main` by fast-forward (`d9c1004..69fbc93`) after user-approved relocation of the diverged local `main` ref from `316b806` to `origin/main`; old history preserved at `origin/rebrand-integrated`.
 3. Fix scope: 7 files, 7 insertions, 7 deletions — `Susankhya OS`/`Core Susankhya OS` display fallbacks → `OdareHub OS`/`Core OdareHub OS` in `LogoResolverService`, `OperatorHeaderComposer`, `DisplaySurfaceComposer`, `OperatorSurfaceComposer` (approved 7th file, line 2655), `display/floor.php`, `admin/setup/health.php`; stale charter path in `docs/CURRENT.md` corrected.
 4. Followup slice (`983397e`): replaced residual `Susankhya OS` prose in `docs/CURRENT.md` header/body; `grep -c Susankhya docs/CURRENT.md` → 0.
-5. Housekeeping: deleted merged branch `fix/rebrand-residual-display-strings` (local + remote); pruned duplicate parked local branches `gate-diag-316b806`, `cloud-cicd-readiness-work`, `work/shared-items-foundation-tmp`, `work/shared-parties-foundation-tmp` (all at `316b806`, SHA retained via `origin/rebrand-integrated`).
-6. Recorded this session in `AGENTS.md`.
+5. Housekeeping (`3e7b6f5` docs update then executed locally): deleted merged branch `fix/rebrand-residual-display-strings` (local + remote); removed the three linked worktrees at `316b806` (`gate-diag-20260910`, `work-shared-items`, `work-shared-parties`) plus pruned one missing worktree (`cloud-cicd-readiness`); deleted now-unused local branches `gate-diag-316b806`, `cloud-cicd-readiness-work`, `work/shared-items-foundation-tmp`, `work/shared-parties-foundation-tmp` (all at `316b806`, SHA retained via `origin/rebrand-integrated`; remote deletion intentionally not performed).
+6. Recorded this session in `AGENTS.md` + `AGENT-COMPLIANCE-CHECKLIST.md` (`3e7b6f5`), then corrected both records to the executed final state.
 
 ### Validation
 - Rebrand compatibility probe: `25/25`.
 - Shell consumption boundary (22 invariants), shared app extension contract, localization migration guardrail: PASS.
 - ARCHITECTURE GATES: PASS; DELETION FAMILY GATES: PASS (28/28); DEPLOYMENT READINESS: PASS.
-- Post-merge: `main` = `origin/main` = `69fbc93`; post-housekeeping `main` = `origin/main` = `983397e`.
+- `main` = `origin/main` = `3e7b6f5`; `316b806` still reachable via `origin/rebrand-integrated`.
+- `git worktree list` shows only retained workspaces; pruned worktrees removed from disk.
 - Unrelated untracked Shared Parties work (migrations 012/013, `shared/`, `tests/probe_inventory_contract_reference.php`, `work/`, logs/tmp) untouched throughout.
 
 ### Hard rules preserved
