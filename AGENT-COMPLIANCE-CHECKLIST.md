@@ -1,5 +1,43 @@
 # AGENT-COMPLIANCE-CHECKLIST
 
+## Session Summary (2026-09-12) — Shared Items Foundation Integration
+
+### What was done
+1. Verified the untracked in-progress work against the handoff before modifying anything:
+   - `shared/` files are byte-identical to `work/shared-items-impl` `shared/Item/Foundation/*`
+     (Session A artifacts) but were misplaced one path segment short (`shared/Foundation/`).
+   - `docs/shared-items-foundation/canonical-item-contract.md` referenced by the code existed
+     only on unmerged branch `work/shared-items-impl`.
+   - `tests/probe_inventory_contract_reference.php` (Session C) was text-corrupted and
+     referenced non-existent `Platform\SharedInventory\*` files.
+2. User decisions: commit the **Shared Items** slice; delete the corrupted probe; keep the
+   Shared Parties contract doc parked untracked in `work/` for its own future slice.
+3. Restored canonical layout `shared/Item/Foundation/{Contracts,Services,Tests}/` matching the
+   `Shared\Item\Foundation\*` namespaces; probe `APP_ROOT` depth now resolves correctly.
+4. Took the canonical contract + `manufacturing-product-extension.md` verbatim from
+   `work/shared-items-impl`; updated both status headers to reflect the committed slice.
+5. Committed `fdf47b9`: 2 contract docs, 3 shared identity files, Manufacturing Products
+   migrations `012_add_item_ref.sql` (reference adoption) + `013_add_manufacturing_bom.sql`
+   (Manufacturing-owned BOM foundation referencing `finished_item_ref`/`component_item_ref`).
+6. Removed `tests/probe_inventory_contract_reference.php` (corrupted, untracked).
+
+### Validation
+- Shared Items identity probe: ✅ `19/19`
+- PHP lint (3 shared files): ✅
+- ARCHITECTURE GATES: PASS; DELETION FAMILY GATES: PASS (28/28)
+- DEPLOYMENT READINESS: PASS
+- `git diff --check`: clean
+- No `manufacturing_bom` table or Products `item_ref` column pre-existed on `main` (verified
+  via `git grep` against HEAD) — no duplicate schema.
+
+### Boundaries
+- Core (`/app`) untouched; no schema applied to any live DB (migration files committed only).
+- Identity store remains test/verification JSON (`SHARED_ITEMS_STORE` env or `/tmp`); no
+  `shared_items` SQL table created; no runtime consumer wired.
+- Composer autoload for `Shared\` deferred until the first runtime consumer exists.
+- Shared Parties (Session B contract doc) intentionally not integrated — parked in `work/`.
+- Untracked runtime artifacts (`storage/logs/`, `storage/tmp/`) preserved untouched.
+
 ## Session Summary (2026-07-20) — UI/Navigation/Artifact Search Provider Extraction
 
 ### What was done

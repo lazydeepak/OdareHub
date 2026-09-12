@@ -14,6 +14,39 @@ Before making meaningful changes in this repository, read:
 
 Do not use this file as a generic memory dump. Keep durable project status in `docs/CURRENT.md`, active task context in `docs/active/`, future work in `docs/BACKLOG.md`, owner-specific state in `engineering/`, and historical records in existing architecture/runtime/audit documentation.
 
+## Session Summary (2026-09-12) — Shared Items Foundation Integration
+
+### What was done
+1. Verified the untracked handoff artifacts before modifying anything: `shared/` code is
+   byte-identical to Session A branch `work/shared-items-impl` but was misplaced at
+   `shared/Foundation/` (namespace mismatch); the cited contract doc existed only on that
+   unmerged branch; `tests/probe_inventory_contract_reference.php` was corrupted and
+   referenced never-created `Platform\SharedInventory\*` files.
+2. With user decisions (Shared Items target; corrupted probe deleted; Parties doc parked),
+   committed `fdf47b9` on `main`:
+   - `docs/shared-items-foundation/canonical-item-contract.md` +
+     `manufacturing-product-extension.md` (from `work/shared-items-impl`, status headers
+     updated to the committed state).
+   - `shared/Item/Foundation/{Contracts,Services,Tests}/` at canonical namespace-matched
+     paths (`Shared\Item\Foundation\*`).
+   - Manufacturing Products `012_add_item_ref.sql` (reference adoption) and
+     `013_add_manufacturing_bom.sql` (Manufacturing-owned BOM foundation via
+     `finished_item_ref`/`component_item_ref`).
+   - Removed the corrupted Session C inventory probe.
+3. Preserved untracked `work/` (Shared Parties Session B contract), `storage/logs/`,
+   `storage/tmp/` untouched.
+
+### Validation
+- Shared Items identity probe: ✅ `19/19`; PHP lint ✅
+- ARCHITECTURE GATES: PASS; DELETION FAMILY GATES: PASS (28/28); DEPLOYMENT READINESS: PASS
+- No pre-existing `manufacturing_bom` table or Products `item_ref` column on `main`.
+
+### Hard rules preserved
+- Core (`/app`) untouched; no DB mutated (migration files committed only).
+- No `shared_items` SQL table; identity store stays test/verification JSON; no runtime
+  consumer; Composer `Shared\` autoload deferred until first consumer.
+- Session D reference contract `@ c886b89` cited, not rewritten.
+
 ## Session Summary (2026-09-12) — Residual Rebrand Display Fix Publish, Merge, and Housekeeping
 
 ### What was done
