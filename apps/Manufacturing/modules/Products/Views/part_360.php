@@ -165,6 +165,7 @@ $heroMeta = [
     'Cycle Time' => (string)($product['cycle_time'] ?? '-'),
     'Status' => $statusLabel,
     'Access' => $roleAccessLabel,
+    'Item Ref' => isset($product['item_ref']) && (int)$product['item_ref'] > 0 ? (int)$product['item_ref'] : '-',
 ];
 
 $overviewCards = [
