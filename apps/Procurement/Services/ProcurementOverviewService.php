@@ -586,7 +586,24 @@ final class ProcurementOverviewService
         $requestId = self::toPositiveInt($input['request_id'] ?? null);
         $orderedQty = round(max(0.0, (float)($input['ordered_qty'] ?? 0)), 2);
         if ($poId > 0 && $orderedQty > 0) {
-            DB::query(
+        $poLineId = self::toPositiveInt($input['po_line_id'] ?? null);
+        $poId = self::toPositiveInt($input['po_id'] ?? null);
+
+        if ($poLineId !== null) {
+            $line = DB::fetchOne(
+                'SELECT id, po_id FROM procurement_purchase_order_lines WHERE id = ? LIMIT 1',
+                [$poLineId]
+            );
+            if (!is_array($line) || (int)($line['id'] ?? 0) <= 0) {
+                throw new \InvalidArgumentException('Receipt line reference does not exist.');
+            }
+            $linePoId = self::toPositiveInt($line['po_id'] ?? null);
+            if ($linePoId !== $poId) {
+                throw new \InvalidArgumentException('Receipt line reference does not belong to the selected purchase order.');
+            }
+        }
+
+        DB::query(
                 'INSERT INTO procurement_purchase_order_lines (po_id, product_id, line_description, ordered_qty, unit_price, line_status)
                  VALUES (?,?,?,?,?,?)',
                 [
@@ -640,13 +657,30 @@ final class ProcurementOverviewService
             $receiptRef = self::nextRef('RCV');
         }
 
+        $poLineId = self::toPositiveInt($input['po_line_id'] ?? null);
+        $poId = self::toPositiveInt($input['po_id'] ?? null);
+
+        if ($poLineId !== null) {
+            $line = DB::fetchOne(
+                'SELECT id, po_id FROM procurement_purchase_order_lines WHERE id = ? LIMIT 1',
+                [$poLineId]
+            );
+            if (!is_array($line) || (int)($line['id'] ?? 0) <= 0) {
+                throw new \InvalidArgumentException('Receipt line reference does not exist.');
+            }
+            $linePoId = self::toPositiveInt($line['po_id'] ?? null);
+            if ($linePoId !== $poId) {
+                throw new \InvalidArgumentException('Receipt line reference does not belong to the selected purchase order.');
+            }
+        }
+
         DB::query(
             'INSERT INTO procurement_receipts (receipt_ref, po_id, po_line_id, received_qty, receipt_date, receipt_status, note, created_by)
              VALUES (?,?,?,?,?,?,?,?)',
             [
                 $receiptRef,
                 self::toPositiveInt($input['po_id'] ?? null),
-                self::toPositiveInt($input['po_line_id'] ?? null),
+                $poLineId,
                 $qty,
                 self::nullIfBlank((string)($input['receipt_date'] ?? '')),
                 self::nullIfBlank((string)($input['receipt_status'] ?? 'received')) ?? 'received',
