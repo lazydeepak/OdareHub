@@ -1,3 +1,4 @@
+> Status: classification evidence insufficient (metadata reconciliation 2026-09-13); no promotion; workspace has no completed/evidence records; preserved.
 # Procurement — Work
 
 ## Current Focus

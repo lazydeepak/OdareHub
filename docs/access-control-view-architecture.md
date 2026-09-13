@@ -1,5 +1,7 @@
 # Access Control & View Architecture
 
+> Status: superseded by `docs/architecture/experience-composition-architecture-plan.md` (metadata reconciliation 2026-09-13; no content rewritten; retained as historical evidence).
+
 ## Status
 - Historical canonical decision for the first access/view-modeling pass
 - Formalized on 2026-04-19

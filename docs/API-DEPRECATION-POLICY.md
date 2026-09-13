@@ -1,5 +1,6 @@
 # API Deprecation & Redirect Policy
 
+> Status: superseded by `docs/architecture/ROUTING-STANDARD.md` (metadata reconciliation 2026-09-13 confirms; no rewrite).
 > Historical migration policy for transitional redirects.
 > Current canonical route authority is `docs/architecture/ROUTING-STANDARD.md`.
 > If this document conflicts with current routing policy, follow `docs/architecture/ROUTING-STANDARD.md`.

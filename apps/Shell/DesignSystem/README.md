@@ -1,3 +1,4 @@
+> Status: factually outdated (metadata reconciliation 2026-09-13); DesignSystem now hosts canonical socket-catalog and rendering Foundation; placeholder text preserved; no promotion/restructure.
 # Shell Style
 
 Placeholder home for future Shell-owned style sockets and runtime style consumption helpers.

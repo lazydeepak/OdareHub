@@ -1,5 +1,7 @@
 # Unified Operational Landing Strategy
 
+> Status: superseded (self-declared historical; metadata reconciliation 2026-09-13 confirms supersession by experience-composition-architecture-plan.md; no content rewritten).
+
 ## Current Status
 
 This document is historical for the pre-operator-layer landing cleanup. Current landing and experience composition policy is superseded by:
