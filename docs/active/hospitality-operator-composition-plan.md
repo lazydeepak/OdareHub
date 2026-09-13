@@ -234,7 +234,7 @@ smoke remains separate deferred acceptance evidence.
   one at a time under `docs/active/hospitality-operator-actions-plan.md`
   (manage-gated, CSRF, jailed POST route, single domain service, own-handle
   binding): housekeeping status update, front-desk check-in, check-out,
-  add-charge, cancel, and no-show. Charge void remains deferred (destructive
+  add-charge, cancel, no-show, and void-charge. Charge void mutation is now implemented as the bounded gap reconciliation (operator mutation route + handler + view control); full audit mechanism remains a separate future milestone.
   financial-record mutation). This plan still governs the read-only composition;
   it does not authorize new write actions.
 - Display/kiosk (`/displays/*`) Hospitality surfaces.

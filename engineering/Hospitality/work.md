@@ -1129,7 +1129,7 @@ suite. They are now registered alongside the foundation group - 16/16 groups,
 
 State confirmed this session: operator actions housekeeping status, check-in,
 check-out, add-charge, cancel, and no-show are all implemented and confined;
-charge void remains deferred. Live authenticated browser acceptance is still the
+charge void mutation implemented (operator mutation route + handler + view control; full audit mechanism remains a separate future milestone). Live authenticated browser acceptance is still the
 sole unchecked item and stays environment-bound (no local `.env`, MySQL not
 running, no approved local HTTP executor) - it needs a provisioned local stack
 (DB plus a user assigned to hospitality with `hospitality.view`).

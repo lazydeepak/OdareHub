@@ -84,6 +84,26 @@ final class OperatorActions
         exit;
     }
 
+    public static function frontDeskVoidCharge(array $operatorRoute): void
+    {
+        $username = rawurlencode((string)($operatorRoute['username'] ?? ''));
+        $redirectTo = '/u/' . $username . '/hospitality';
+
+        try {
+            if (!AclPolicy::can('hospitality.manage', Auth::user())) {
+                throw new \RuntimeException('HOSPITALITY_FORBIDDEN_MANAGE');
+            }
+            Auth::requireCsrf((string)($_POST['csrf'] ?? ''), $redirectTo);
+
+            FrontDeskService::voidCharge((int)($_POST['charge_id'] ?? 0));
+            $_SESSION['operator_hospitality_flash_ok'] = 'HOSPITALITY_FD_CHARGE_VOIDED';
+        } catch (Throwable $e) {
+            $_SESSION['operator_hospitality_flash_err'] = $e->getMessage();
+        }
+        header('Location: ' . $redirectTo, true, 302);
+        exit;
+    }
+
     public static function frontDeskCancelReservation(array $operatorRoute): void
     {
         $username = rawurlencode((string)($operatorRoute['username'] ?? ''));

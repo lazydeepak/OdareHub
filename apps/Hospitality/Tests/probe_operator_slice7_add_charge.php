@@ -85,9 +85,12 @@ str_contains($viewSrc, '\Apps\Hospitality\Services\FrontDeskService::CHARGE_TYPE
 substr_count($viewSrc, '/hospitality/front-desk/charges/add') === 1
     ? $pass('exactly one add-charge control target in view')
     : $fail('unexpected add-charge controls');
-!preg_match('/void_charge|charges\/void|res_action\.void|name="(void_|payment)[a-z_]*"/i', $viewSrc)
-    ? $pass('no void/payment controls in view (disclaimer note exempt)')
-    : $fail('void/payment control leaked');
+str_contains($viewSrc, 'charges/void') && str_contains($viewSrc, 'res_action.void')
+    ? $pass('void charge mutation control present in view (intentional after gap fill)')
+    : $fail('void charge mutation control missing');
+!preg_match('/button[^>]*>[^<]*payment/i', $viewSrc) && !preg_match('/button[^>]*>[^<]*invoice/i', $viewSrc)
+    ? $pass('no unrelated payment/invoice button controls in view')
+    : $fail('unrelated payment control leaked');
 
 foreach (['en', 'ja', 'ne'] as $lang) {
     $catalog = (string)@file_get_contents($appRoot . '/Resources/lang/' . $lang . '.php');

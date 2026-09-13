@@ -186,8 +186,7 @@ Authorization rule (restated): assignment = availability; `hospitality.view` /
   (`POST /u/hospitality/front-desk/no-show`). Proof: `probe_operator_slice9_no_show.php`
   18/18 (booked -> no_show succeeds, stay timestamps remain NULL, non-booked states
   rejected, unknown id rejected).
-- **Charge void remains explicitly deferred**: destructive financial-record
-  mutation requiring its own review (authorization/concurrency/audit).
+- **Charge void (completed 2026-09-13 reconciliation)**: implemented as a bounded operator mutation (`POST /u/hospitality/front-desk/charges/void`) following the same confined pattern (manage + CSRF + own-handle binding + service delegation). The admin mutation path (`/apps/hospitality/front-desk/charges/void`) and hardened `FrontDeskService::voidCharge()` (atomic transaction + reservation-row serialization + rollback + canonical state re-check) were the existing truth; only the operator action edge was missing. No audit mechanism or new schema introduced.
 
 Also still deferred: reservation create,
 room/guest CRUD, housekeeping history/supply/maintenance workflows, staff

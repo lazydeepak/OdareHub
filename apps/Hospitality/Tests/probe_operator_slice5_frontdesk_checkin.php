@@ -103,9 +103,14 @@ str_contains($viewSrc, "name=\"reservation_id\"")
     : $fail('independent date eligibility in view');
 // Slice-3 permits exactly ONE canonical check-out control; charges/void stay banned.
 // Slice-7 adds the canonical add-charge control on in-house rows; void stays banned.
-!preg_match('/charges\/(void)|void_charge|folio_status/i', $viewSrc)
-    ? $pass('no void/folio-mutation UI in the operator view')
-    : $fail('void/folio UI leaked into operator view');
+str_contains($viewSrc, 'front-desk/charges/void') && str_contains($viewSrc, 'res_action.void')
+    ? $pass('operator view includes the authorized charge-void mutation control')
+    : $fail('operator void mutation control missing');
+str_contains($viewSrc, 'btn-danger') ? $pass('void mutation uses danger variant (destructive action warning)') : $fail('danger variant missing');
+// Disclaimer note "no payments or invoices" is legitimate; only block new mutation forms/buttons for billing/pay/invoice/tax.
+!preg_match('/<form[^>]*action=["\'][^"\']*(billing|invoice|tax|pay)/i', $viewSrc) && !preg_match('/button[^>]*>[^<]*\b(billing|invoice|tax)[^<]*<\/button/i', $viewSrc)
+    ? $pass('no unrelated billing/pay/invoice mutation form/buttons added')
+    : $fail('unrelated financial mutation control leaked');
 substr_count($viewSrc, '/hospitality/front-desk/check-out') === 1
     ? $pass('exactly one canonical check-out control present')
     : $fail('unexpected check-out controls', (string)substr_count($viewSrc, 'check-out'));

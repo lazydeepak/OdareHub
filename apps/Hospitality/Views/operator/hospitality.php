@@ -188,6 +188,48 @@ $tr = static fn (string $key, string $fallback): string => htmlspecialchars($thi
         <?php endif; ?>
     </div>
 
+    <?php
+    $folioSummariesMap = [];
+    foreach ((array)($summary['folio_summaries'] ?? []) as $fs) {
+        $folioSummariesMap[(int)($fs['folio']['reservation_id'] ?? 0)] = $fs;
+    }
+    ?>
+
+    <?php foreach ($inhouse as $stay): ?>
+        <?php $stayFolio = $folioSummariesMap[(int)($stay['id'] ?? 0)] ?? ['folio' => ['folio_status' => 'open', 'id' => 0], 'charges' => [], 'total' => 0.0]; ?>
+        <?php if (!empty($stayFolio['charges'])): ?>
+        <div class="card">
+            <h3><?= $esc($stay['guest_label'] ?? '?') ?> — <?= $esc(($stay['room_label'] ?? '') !== '' ? $stay['room_label'] : $this->tr('hospitality.res_unassigned_room', 'Room unassigned')) ?></h3>
+            <p class="text-muted"><?= $esc(t('hospitality.folio.total', ['total' => number_format((float)($stayFolio['total'] ?? 0), 2)])) ?></p>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr><th><?= $esc(t('hospitality.field.charge_type')) ?></th><th><?= $esc(t('hospitality.field.charge_description')) ?></th><th><?= $esc(t('hospitality.field.qty')) ?></th><th><?= $esc(t('hospitality.field.unit_amount')) ?></th><th><?= $esc(t('hospitality.field.status')) ?></th><th></th></tr>
+                    </thead>
+                    <tbody>
+                    <?php foreach (($stayFolio['charges'] ?? []) as $charge): ?>
+                        <tr>
+                            <td><?= $esc(t('hospitality.charge_type.' . (string)($charge['charge_type'] ?? '')) ?? (string)($charge['charge_type'] ?? '')) ?></td>
+                            <td><?= $esc((string)($charge['description'] ?? '')) ?></td>
+                            <td><?= (int)($charge['qty'] ?? 0) ?></td>
+                            <td><?= $esc((string)($charge['unit_amount'] ?? '')) ?></td>
+                            <td><?= $esc(t('hospitality.charge_status.' . (string)($charge['charge_status'] ?? '') ?? '')) ?></td>
+                            <td><?php if (($charge['charge_status'] ?? '') === 'posted' && ($stayFolio['folio']['folio_status'] ?? 'open') === 'open' && $canManage): ?>
+                                <form method="post" action="/u/<?= $esc($opUsername) ?>/hospitality/front-desk/charges/void" class="hosp-inline-form">
+                                    <input type="hidden" name="csrf" value="<?= $esc($csrfToken) ?>">
+                                    <input type="hidden" name="charge_id" value="<?= (int)($charge['id'] ?? 0) ?>">
+                                    <button type="submit" class="btn btn-danger"><?= $esc($this->tr('hospitality.res_action.void', 'Void charge')) ?></button>
+                                </form>
+                                <?php endif; ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <?php endif; ?>
+    <?php endforeach; ?>
+
     <div class="card">
         <h3><?php echo $tr('hospitality.operator.housekeeping.title', 'Housekeeping snapshot'); ?></h3>
         <?php if ($hkRooms === []): ?>

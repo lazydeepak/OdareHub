@@ -1137,6 +1137,23 @@ $router->post('/u/hospitality/front-desk/charges/add', function () use ($resolve
     return null;
 });
 
+$router->post('/u/hospitality/front-desk/charges/void', function () use ($resolveOperatorPostRoute) {
+    $operatorRoute = $resolveOperatorPostRoute('hospitality', false, 'hospitality');
+
+    $authenticatedHandleVc = WorkspaceWrapperRegistry::handleFromIdentity([
+        'username' => (string)($operatorRoute['user']['username'] ?? ''),
+        'email' => (string)($operatorRoute['user']['email'] ?? ''),
+    ]);
+    if ($authenticatedHandleVc === '' || !hash_equals($authenticatedHandleVc, (string)$operatorRoute['username'])) {
+        $safeHandleVc = $authenticatedHandleVc !== '' ? $authenticatedHandleVc : (string)$operatorRoute['username'];
+        header('Location: /u/' . rawurlencode($safeHandleVc) . '/dashboard', true, 302);
+        exit;
+    }
+
+    \Apps\Hospitality\Controllers\OperatorActions::frontDeskVoidCharge($operatorRoute);
+    return null;
+});
+
 $router->post('/u/hospitality/front-desk/cancel', function () use ($resolveOperatorPostRoute) {
     $operatorRoute = $resolveOperatorPostRoute('hospitality', false, 'hospitality');
 
