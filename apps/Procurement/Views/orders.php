@@ -59,11 +59,11 @@ $chipClass = static function (string $state): string {
     </label>
     <input type="hidden" name="po_status" value="draft">
     <input type="hidden" name="order_date" value="<?= date('Y-m-d') ?>">
-    <input type="hidden" name="line_product_id" value="">
-    <input type="hidden" name="ordered_qty" value="">
-    <input type="hidden" name="unit_price" value="">
+    <label><?= e('Line product') ?><input class="input" type="number" name="line_product_id" min="1" value=""></label>
+    <label><?= e('Ordered qty') ?><input class="input" type="number" name="ordered_qty" min="0.01" step="0.01" value=""></label>
+    <label><?= e('Unit price') ?><input class="input" type="number" name="unit_price" min="0" step="0.01" value=""></label>
+    <label><?= e('Line description') ?><input class="input" type="text" name="line_description" value=""></label>
     <input type="hidden" name="line_status" value="open">
-    <input type="hidden" name="line_description" value="">
     <div class="u-style-068a8ddc17">
       <button class="btn ok" type="submit"><?= e(t('proc.orders.btn_create')) ?></button>
     </div>
