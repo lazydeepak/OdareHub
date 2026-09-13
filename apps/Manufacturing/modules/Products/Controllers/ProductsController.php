@@ -15,6 +15,7 @@ use Plugins\Supply\Services\SupplyModel;
 
 require_once __DIR__ . '/../Services/Part360Service.php';
 require_once __DIR__ . '/../Services/PartExecutionRouteResolver.php';
+require_once __DIR__ . '/../Services/PartItemRefService.php';
 require_once __DIR__ . '/../Services/PartEngineeringSchemaService.php';
 require_once __DIR__ . '/../Services/PartsMasterSnapshotService.php';
 require_once APP_ROOT . '/apps/Manufacturing/modules/MaterialManagement/Services/MaterialSchemaService.php';

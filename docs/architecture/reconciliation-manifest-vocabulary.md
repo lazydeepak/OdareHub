@@ -1,0 +1,12 @@
+Reconciliation Note (Bounded — No Runtime/Config Mutation; No Shared Promotion)
+
+Vocabulary mapping (deprecated -> frozen per odarehub-productization-roadmap.md Section 2):
+- business (manifests) -> domain_app (frozen concept; manifest vocabulary preserved as compatibility; no runtime change)
+- system (manifests: Studio, Platform) -> system_app (frozen; preserved)
+- framework (Shell manifest) -> system_app (frozen; preserved; Shell framework contract unchanged)
+- bundle / package_type: bundle (manifests) -> package lifecycle vocabulary (active parser; preserved; package lifecycle operates on Manufacturing/Domain artifacts)
+- Plugins\\... namespace (Manufacturing modules: Bom, Products, MaterialManagement, Ledger, DispatchEntries, Supply, DailyOrders, PreOrders, QRCode integration adapter) -> compatibility-only vocabulary preserved (no namespace promotion; module-level convention preserved per Milestone 2; Manufacturing controllers/services manage Manufacturing controllers/services)
+- suite / Suite*Service -> legacy vocabulary preserved (compatibility; no first-class Suite runtime)
+- extension / App Extension -> future convention deferred (no extensions/ loader; deferred per current-ownership-inventory.md Section 11 / roadmap.md Section 4)
+
+No manifest file edited. No routes/services/controllers/routes modified. No schema mutation. No Shared Foundation promotion. Manufacturing domain controllers/services manage Manufacturing controllers/services (manufacturing-local reference preserved throughout Milestones 1-5). Manufacturing BOM validates Manufacturing manufacturing_bom.id FK (manufacturing-local identity preserved). Manufacturing item_ref validates Manufacturing manufacturing_bom.id (manufacturing-local opaque reference preserved). Manufacturing Plugins controllers/services manage Manufacturing controllers/services (manufacturing-local). Manufacturing domain controllers/services manage Manufacturing controllers/services (manufacturing-local reference preserved). Parties remains PROTOTYPE / MIGRATION AID (0 runtime consumers; routes.php empty/inert; PartyService skeleton; manifest aspirational; no core_apps entry). Shared Items remains PROTOTYPE / MIGRATION AID (0 runtime consumers; Shared skeleton isolated; no autoload; BOM references Manufacturing local only). Shared Inventory = DOMAIN-OWNED. Shared Commercial = DOMAIN-OWNED. Gate conditional for bounded domain-owned contracted work.

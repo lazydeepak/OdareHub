@@ -31,7 +31,7 @@ return [
     'products.item_ref_column' => 'Item Ref',
     'products.item_ref.assign_action' => 'Set Item Reference',
     'products.item_ref.clear_action' => 'Clear Item Reference',
-    'products.item_ref.help' => 'Reference to the canonical Shared Items identity for this product. Leave blank to clear.',
+    'products.item_ref.help' => 'Opaque Manufacturing-local item reference integer. References this product\'s canonical item identity when assigned.',
     'products.export_active_message' => 'Export is active for report key',
     'products.export_unavailable_message' => 'Export is unavailable because its module is inactive or not registered.',
     'products.footprint_column' => 'Footprint',

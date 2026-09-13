@@ -11,11 +11,12 @@ use App\Core\DB;
  * Manufacturing-owned BOM/Recipe foundation.
  *
  * consumed tables: manufacturing_bom + manufacturing_bom_line (owned by this module).
- * finished_item_ref / component_item_ref are OPAQUE canonical item references per
- * docs/shared-items-foundation/canonical-item-contract.md. No FK to `products` and no
- * runtime dependency on a Shared Items registry: refs are validated as positive
- * integers, uniqueness against products is enforced, and unresolvable refs are surfaced
- * (never silently dropped) via integrityIssues().
+ * finished_item_ref / component_item_ref are opaque Manufacturing-local integer
+ * references. They are validated as positive integers and uniqueness against products
+ * is enforced within Manufacturing's own products table. No cross-domain identity
+ * registry is consulted at runtime; the reference seam is an opaque integer that
+ * Manufacturing validates and resolves within its own operational boundary.
+ * Unresolvable refs are surfaced (never silently dropped) via integrityIssues().
  */
 final class BomService
 {
