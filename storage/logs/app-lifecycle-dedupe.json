@@ -18,9 +18,9 @@
                 "search_entries entry `material_stock` uses hardcoded label; add label_key for EN/JA readiness"
             ]
         },
-        "count": 116,
+        "count": 215,
         "first_seen": "2026-08-25T22:36:49+09:00",
-        "last_seen": "2026-08-26T21:06:33+09:00"
+        "last_seen": "2026-09-13T23:42:12+09:00"
     },
     "46669a5609562438850207ceca0b963f2cf325f8": {
         "signature": "46669a5609562438850207ceca0b963f2cf325f8",
@@ -39,8 +39,8 @@
                 "search_entries entry `procurement_requests` uses hardcoded label; add label_key for EN/JA readiness"
             ]
         },
-        "count": 116,
+        "count": 215,
         "first_seen": "2026-08-25T22:36:49+09:00",
-        "last_seen": "2026-08-26T21:06:33+09:00"
+        "last_seen": "2026-09-13T23:42:12+09:00"
     }
 }
