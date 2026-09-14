@@ -11,6 +11,7 @@
     "optional": [],
     "package_type": "module",
     "owner_app": "hospitality",
+    "suite": "hospitality",
     "module_key": "Rooms",
     "required_tables": [
         "hosp_rooms"
