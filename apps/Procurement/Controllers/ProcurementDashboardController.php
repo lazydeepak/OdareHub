@@ -130,6 +130,22 @@ final class ProcurementDashboardController
         }
     }
 
+    public static function cancelRequest(): void
+    {
+        Auth::requireCsrf((string)($_POST['csrf'] ?? ''));
+        $id = (int)($_POST['id'] ?? 0);
+        if ($id <= 0) {
+            self::redirect('/apps/procurement/requests', 'err', 'Invalid request id.');
+        }
+
+        try {
+            ProcurementOverviewService::setRequestStatus($id, 'cancelled', (string)(Auth::user()['email'] ?? ''), 'Request cancelled.');
+            self::redirect('/apps/procurement/requests', 'ok', 'Request cancelled.');
+        } catch (\Throwable $e) {
+            self::redirect('/apps/procurement/requests', 'err', $e->getMessage());
+        }
+    }
+
     public static function createOrder(): void
     {
         Auth::requireCsrf((string)($_POST['csrf'] ?? ''));

@@ -91,6 +91,14 @@ $router->post('/apps/procurement/orders/create-from-request', function () {
     return null;
 });
 
+$router->post('/apps/procurement/requests/cancel', function () {
+    Auth::requireAppAccess('procurement');
+    Auth::bootSession();
+    ProcurementOverviewService::ensureSchema();
+    ProcurementDashboardController::cancelRequest();
+    return null;
+});
+
 $router->post('/apps/procurement/orders/cancel', function () {
     Auth::requireAppAccess('procurement');
     Auth::bootSession();

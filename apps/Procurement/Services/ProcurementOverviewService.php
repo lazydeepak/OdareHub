@@ -737,6 +737,13 @@ final class ProcurementOverviewService
             throw new \InvalidArgumentException('Unsupported request status transition.');
         }
 
+        if ($status === 'cancelled') {
+            $linkedPo = DB::fetchOne('SELECT id FROM procurement_purchase_orders WHERE request_id = ? LIMIT 1', [$id]);
+            if (is_array($linkedPo) && (int)($linkedPo['id'] ?? 0) > 0) {
+                throw new \RuntimeException('Cannot cancel procurement request with an existing purchase order.');
+            }
+        }
+
         DB::query(
             'UPDATE procurement_requests SET request_status=?, updated_at=NOW(), created_by=COALESCE(created_by, ?) WHERE id=? LIMIT 1',
             [$status, self::nullIfBlank($actor), $id]
