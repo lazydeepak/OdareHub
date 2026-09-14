@@ -93,6 +93,31 @@ foreach ($recentTransitions as $row) {
 </section>
 
 <section class="card">
+  <h3 class="u-style-d462248a40">Edit Supplier</h3>
+  <form method="post" action="/apps/procurement/suppliers/edit" class="grid u-style-1a42931a01">
+    <input type="hidden" name="csrf" value="<?= e(\App\Core\Auth::csrfToken()) ?>">
+    <label>Supplier <select name="supplier_id" required>
+      <option value="">Select supplier</option>
+      <?php $suppliers = is_array(($suppliers ?? null)) ? ($suppliers ?? []) : []; ?>
+      <?php foreach ($suppliers as $s): ?>
+        <option value="<?= (int)($s['id'] ?? 0) ?>"><?= e((string)($s['supplier_name'] ?? '')) ?></option>
+      <?php endforeach; ?>
+    </select></label>
+    <label>Name <input class="input" type="text" name="supplier_name" required></label>
+    <label>Code <input class="input" type="text" name="supplier_code"></label>
+    <label>Email <input class="input" type="email" name="email"></label>
+    <label>Phone <input class="input" type="text" name="phone"></label>
+    <label>Status <select name="supplier_status">
+      <option value="active">Active</option>
+      <option value="inactive">Inactive</option>
+    </select></label>
+    <div class="u-style-068a8ddc17">
+      <button class="btn ok" type="submit">Update</button>
+    </div>
+  </form>
+</section>
+
+<section class="card">
   <h3 class="u-style-d462248a40"><?= e(t('proc.dashboard.latest_requests')) ?></h3>
   <?php if (empty($latest_requests)): ?>
     <p class="muted u-style-1169661891"><?= e(t('proc.dashboard.no_requests')) ?></p>

@@ -43,6 +43,14 @@ $router->get('/apps/procurement/receipts', function () use ($view) {
     return null;
 });
 
+$router->post('/apps/procurement/suppliers/edit', function () {
+    Auth::requireAppAccess('procurement');
+    Auth::bootSession();
+    ProcurementOverviewService::ensureSchema();
+    ProcurementDashboardController::editSupplier();
+    return null;
+});
+
 $router->post('/apps/procurement/suppliers/create', function () {
     Auth::requireAppAccess('procurement');
     Auth::bootSession();

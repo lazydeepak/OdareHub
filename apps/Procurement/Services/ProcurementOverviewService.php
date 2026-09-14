@@ -421,6 +421,56 @@ final class ProcurementOverviewService
         }
     }
 
+    public static function updateSupplier(int $id, array $input, string $actor): void
+    {
+        $id = (int)$id;
+        if ($id <= 0) {
+            throw new \InvalidArgumentException('Invalid supplier id.');
+        }
+
+        $before = DB::fetchOne('SELECT id, supplier_name FROM procurement_suppliers WHERE id = ? LIMIT 1', [$id]);
+        if (!is_array($before) || (int)($before['id'] ?? 0) <= 0) {
+            throw new \RuntimeException('Supplier not found.');
+        }
+
+        $name = trim((string)($input['supplier_name'] ?? ''));
+        if ($name === '') {
+            throw new \InvalidArgumentException('Supplier name is required.');
+        }
+
+        DB::query(
+            'UPDATE procurement_suppliers SET supplier_code = ?, supplier_name = ?, contact_name = ?, email = ?, phone = ?, supplier_status = ?, updated_at = NOW() WHERE id = ? LIMIT 1',
+            [
+                self::nullIfBlank((string)($input['supplier_code'] ?? '')),
+                $name,
+                self::nullIfBlank((string)($input['contact_name'] ?? '')),
+                self::nullIfBlank((string)($input['email'] ?? '')),
+                self::nullIfBlank((string)($input['phone'] ?? '')),
+                self::nullIfBlank((string)($input['supplier_status'] ?? 'active')) ?? 'active',
+                $id,
+            ]
+        );
+
+        self::recordAudit(
+            'procurement_supplier',
+            $id,
+            AuditLogService::EVENT_WORKFLOW,
+            AuditLogService::ACTION_UPDATED,
+            $actor,
+            [
+                'app' => 'procurement',
+                'module' => 'suppliers',
+                'old_state' => (string)($before['supplier_name'] ?? ''),
+                'new_state' => $name,
+                'note' => 'Supplier updated.',
+                'metadata' => [
+                    'supplier_name' => $name,
+                    'supplier_code' => (string)($input['supplier_code'] ?? ''),
+                ],
+            ]
+        );
+    }
+
     /**
      * @param array<string,mixed> $input
      */

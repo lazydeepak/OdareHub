@@ -18,6 +18,7 @@ final class ProcurementDashboardController
             'latest_orders' => ProcurementOverviewService::latestOrders(8),
             'latest_receipts' => ProcurementOverviewService::latestReceipts(8),
             'recent_transitions' => ProcurementOverviewService::recentTransitions(24),
+            'suppliers' => ProcurementOverviewService::supplierOptions(120),
             'message' => (string)($_GET['ok'] ?? ''),
             'error' => (string)($_GET['err'] ?? ''),
         ]);
@@ -59,6 +60,22 @@ final class ProcurementDashboardController
             'message' => (string)($_GET['ok'] ?? ''),
             'error' => (string)($_GET['err'] ?? ''),
         ]);
+    }
+
+    public static function editSupplier(): void
+    {
+        Auth::requireCsrf((string)($_POST['csrf'] ?? ''));
+        $id = (int)($_POST['supplier_id'] ?? 0);
+        if ($id <= 0) {
+            self::redirect('/apps/procurement', 'err', 'Invalid supplier id.');
+        }
+
+        try {
+            ProcurementOverviewService::updateSupplier($id, $_POST, (string)(Auth::user()['email'] ?? ''));
+            self::redirect('/apps/procurement', 'ok', 'Supplier updated.');
+        } catch (\Throwable $e) {
+            self::redirect('/apps/procurement', 'err', $e->getMessage());
+        }
     }
 
     public static function createSupplier(): void
