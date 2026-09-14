@@ -88,7 +88,7 @@ $router->get('/apps/manufacturing/bom', $bomIndex);
 $router->get('/apps/manufacturing/bom/detail', $bomDetail);
 $router->get('/apps/manufacturing/bom/add', $bomForm);
 $router->post('/apps/manufacturing/bom/add', $bomCreate);
-$router->post('/apps/manufacturing/bom/update', $bomUpdate);
+$router->post('/apps/manufacturing/bom/update', $bomUpdateHeader);
 $router->post('/apps/manufacturing/bom/status', $bomStatus);
 $router->post('/apps/manufacturing/bom/lines/add', $bomLineAdd);
 $router->post('/apps/manufacturing/bom/lines/update', $bomLineUpdate);
