@@ -22,13 +22,20 @@ final class SalesService
      */
     public static function create(array $input): void
     {
+        $allowedStatus = ['draft', 'open', 'pending', 'won', 'completed', 'closed'];
+        $statusRaw = trim((string)($input['sale_status'] ?? ''));
+        $status = strtolower($statusRaw === '' ? 'open' : $statusRaw);
+        if (!in_array($status, $allowedStatus, true)) {
+            throw new \InvalidArgumentException('Invalid sale status: ' . $statusRaw . '. Allowed: ' . implode(', ', $allowedStatus) . '.');
+        }
+
         DB::query(
             'INSERT INTO sbaio_sales (sale_ref, customer_name, amount, sale_status, sale_date) VALUES (?,?,?,?,?)',
             [
                 trim((string)($input['sale_ref'] ?? '')),
                 self::nullIfBlank((string)($input['customer_name'] ?? '')),
                 self::decimalOrZero((string)($input['amount'] ?? '0')),
-                self::nullIfBlank((string)($input['sale_status'] ?? '')) ?? 'open',
+                $status,
                 self::nullIfBlank((string)($input['sale_date'] ?? '')),
             ]
         );
