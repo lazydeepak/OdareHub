@@ -14,7 +14,8 @@
         "DailyOrders>=1.0.0",
         "ProductionPlans>=1.0.0",
         "ProductionEntries>=1.0.0",
-        "QCEntries>=1.0.0"
+        "QCEntries>=1.0.0",
+        "Workflow>=1.0.0"
     ],
     "entry": "routes.php",
     "package_type": "module",
