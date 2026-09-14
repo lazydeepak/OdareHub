@@ -25,6 +25,10 @@ final class PluginCatalogService
             'title' => 'Future / Experimental',
             'subtitle' => 'Templates and placeholder modules.',
         ],
+        'hospitality' => [
+            'title' => 'Hospitality Apps',
+            'subtitle' => 'Guest, reservation, front-desk, housekeeping, and room management domain modules.',
+        ],
         'uncategorized' => [
             'title' => 'Uncategorized Apps',
             'subtitle' => 'Modules without suite metadata.',
@@ -41,6 +45,7 @@ final class PluginCatalogService
         'manufacturing' => 'manufacturing',
         'ipm' => 'manufacturing',
         'sbaio' => 'sbaio',
+        'hospitality' => 'hospitality',
         'future' => 'future',
         'experimental' => 'future',
     ];

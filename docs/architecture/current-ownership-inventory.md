@@ -72,6 +72,25 @@ All five currently declare `package_type: plugin` and `suite: core`. They are cu
 
 `App\\Core\\PdfService`, mail services, export history/services, and the Platform search-provider contracts are technical capabilities. They remain engine/provider concerns even when an app or module owns the user-facing PDF, mail, export, or search result meaning.
 
+## 5.1 Manufacturing/IPM Bundle Decomposition — Audit Closure (Read-Only Evidence)
+
+Status: `READ ONLY`. No restructuring, no module extraction, no namespace migration, no route removal, no manifest edit performed.
+Audit checkpoint: `6663b4b` (`main`).
+
+Evidence inspected (repository-grounded): `apps/Manufacturing/manifest.json`; all 18 `apps/Manufacturing/modules/*/plugin.json` descriptors; Manufacturing controllers/services/routes/styles/migrations; `PluginManager.php` (`group` derivation from `suite`); `navigation.php`; architecture contracts (`docs/manufacturing-app-boundary-migration.md`, `docs/manufacturing-phase2-route-normalization.md`, `docs/manufacturing-app-boundary-migration.md`, `docs/architecture/odarehub-future-architecture-planning-brief.md`, `docs/architecture/current-ownership-inventory.md`, `docs/architecture/shared-app-extension-readiness.md`); `work/shared-parties-foundation/` (unmerged, untouched);
+
+Conclusion recorded: Manufacturing/IPM bundle decomposition audit found no Manufacturing `SHARED-APP CANDIDATE`, no Manufacturing `SUITE EXTENSION` requiring extraction, no physically misplaced Manufacturing component, and no safe extraction candidate. Manufacturing bundle remains Manufacturing-owned (`bundle` shape, `business` type, `manufacturing` app_key, 18 modules all `owner_app: manufacturing`, `group: ipm` / `MaterialManagement`: `group: planning`). Existing Manufacturing compatibility vocabulary (`group: "ipm"`, `bundle`, `legacy_bridge_plugins`, compatibility route aliases, `plugin.json` descriptors, `Plugins\\{Module}` namespace convention) remains actively consumed by runtime contracts (`PluginManager`, loader, registry, architecture gates, navigation) and must not be removed or normalized without corresponding loader/contract authorization and architecture approval.
+
+Shared Apps: `Parties` (`apps/Parties/`, `kind: "shared_app"`) remains the only proven independent shared app (zero Manufacturing consumer declared; skeleton `routes.php`; empty `Shared/` prototype skeleton; no `core_apps` production entry; zero `party_id` FK usage in Manufacturing SQL). Manufacturing does not adopt `Parties`; `Shared/` skeleton does not establish Manufacturing-related shared authority; Manufacturing BOM identity (`manufacturing_bom.id` local FK — Manufacturing-local opaque reference) is preserved and must not be promoted to shared canonical identity without user authorization (`docs/active/future-architecture-planning-manufacturing-phase3-evidence.md` open DG-Q01).
+
+Physical ownership consistency: Manufacturing bundle components physically inside `apps/Manufacturing/`; legacy bridge plugin descriptor names correspond to Manufacturing module descriptors, not independent `plugins/{Name}` directories; `work/` (`shared-parties-foundation/`) and `storage/` artifacts untouched; no restructuring performed; no commits/pushes.
+
+Unresolved architecture questions preserved (not resolved by this audit): Manufacturing BOM identity choice (opaque-ref vs shared-canonical-test — requires user authorization); Manufacturing namespace/vocabulary alignment deferred (`Plugins\\{Module}` → `Apps\\Manufacturing\\Modules\\{Module}` — deferred, requires Manufacturing module-level updates); Manufacturing `bundle` vocabulary promotion deferred (requires loader/contract authorization); Manufacturing module promotion to shared/app-extension deferred (requires architecture authorization + second independent consumer evidence). These unresolved questions do not justify physical restructuring now.
+
+Reference: `docs/manufacturing-app-boundary-migration.md` (§2 — Manufacturing owns runtime families; §4 — Manufacturing owns routes/services/styles/module-level controllers; §5 — Manufacturing owns module-level controllers/services/routes; §6 — Manufacturing legacy plugin runtime preserved; no restructuring authorized without user authorization).
+
+Note: `group: "ipm"` is Manufacturing-internal grouping derived from `suite: manufacturing` (not shared authority). The `uncategorized` bucket for `suite: "hospitality"` (`PluginCatalogService` has no `hospitality` alias/bucket) is a grouping vocabulary gap, not an intended architecture design — see live apps-manager reconciliation (`docs/architecture/current-ownership-inventory.md` subsection 5.1). It must not be interpreted as design-correct or as authorization to leave `group: "hospitality"` unrecognized.
+
 ## 6. Platform Engines
 
 | Path | Current evidence | Classification |
