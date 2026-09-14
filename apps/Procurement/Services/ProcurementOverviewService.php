@@ -780,6 +780,13 @@ final class ProcurementOverviewService
             throw new \InvalidArgumentException('Unsupported order status transition.');
         }
 
+        if ($status === 'cancelled') {
+            $postedReceipts = DB::fetchOne("SELECT COUNT(*) AS c FROM procurement_receipts WHERE po_id = ? AND LOWER(COALESCE(receipt_status, '')) = 'posted'", [$id]);
+            if (is_array($postedReceipts) && (int)($postedReceipts['c'] ?? 0) > 0) {
+                throw new \RuntimeException('Cannot cancel purchase order with posted receipts.');
+            }
+        }
+
         if ($status === 'issued') {
             $ordered = (float)(DB::fetchOne('SELECT COALESCE(SUM(ordered_qty),0) AS q FROM procurement_purchase_order_lines WHERE po_id=?', [$id])['q'] ?? 0.0);
             if ($ordered <= 0.0) {

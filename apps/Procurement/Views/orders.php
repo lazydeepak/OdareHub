@@ -100,6 +100,12 @@ $chipClass = static function (string $state): string {
                     <input type="hidden" name="id" value="<?= (int)($r['id'] ?? 0) ?>">
                     <button class="btn" type="submit"><?= e(t('proc.orders.btn_issue')) ?></button>
                   </form>
+                <?php elseif ($poStatus !== 'cancelled'): ?>
+                  <form class="u-style-1169661891" method="post" action="/apps/procurement/orders/cancel">
+                    <input type="hidden" name="csrf" value="<?= e(\App\Core\Auth::csrfToken()) ?>">
+                    <input type="hidden" name="id" value="<?= (int)($r['id'] ?? 0) ?>">
+                    <button class="btn" type="submit"><?= e('Cancel') ?></button>
+                  </form>
                 <?php else: ?>
                   <span class="muted">-</span>
                 <?php endif; ?>
