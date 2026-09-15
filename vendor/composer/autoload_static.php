@@ -132,6 +132,7 @@ class ComposerStaticInitdaadbf481fd36e323c12f985ae256dd6
         'P' =>
         array (
             'Psr\\Http\\Message\\' => 17,
+            'Plugins\\Workflow\\Services\\' => 26,
             'Platform\\' => 9,
             'PhpParser\\' => 10,
             'PHPMailer\\PHPMailer\\' => 20,
@@ -243,6 +244,10 @@ class ComposerStaticInitdaadbf481fd36e323c12f985ae256dd6
         array (
             0 => __DIR__ . '/..' . '/psr/http-factory/src',
             1 => __DIR__ . '/..' . '/psr/http-message/src',
+        ),
+        'Plugins\\Workflow\\Services\\' =>
+        array (
+            0 => __DIR__ . '/../..' . '/apps/Manufacturing/modules/Workflow/Services',
         ),
         'Platform\\' =>
         array (
