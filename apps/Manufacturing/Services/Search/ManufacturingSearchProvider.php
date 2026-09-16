@@ -21,6 +21,7 @@ final class ManufacturingSearchProvider implements SearchProviderInterface
             'orders' => $this->label('module.daily_orders.search_group', 'Orders'),
             'plans' => $this->label('module.production_plans.search_group', 'Plans'),
             'entries' => $this->label('module.production_entries.search_group', 'Entries'),
+            'bom' => 'BOM / Recipes',
             'charts' => 'Charts',
             'workflow_actions' => 'Workflow Actions',
         ];
@@ -34,6 +35,7 @@ final class ManufacturingSearchProvider implements SearchProviderInterface
                 'parts' => 20,
                 'orders' => 30,
                 'plans' => 40,
+                'bom' => 45,
                 'entries' => 50,
                 'charts' => 90,
                 'workflow_actions' => 110,
@@ -74,6 +76,12 @@ final class ManufacturingSearchProvider implements SearchProviderInterface
         $charts = $this->searchCharts($query, $context);
         if ($charts !== []) {
             $results['charts'] = $charts;
+        }
+        if ($context->pathAllowed('/apps/manufacturing/bom')) {
+            $bomResults = $this->searchBom($query, $context);
+            if ($bomResults !== []) {
+                $results['bom'] = $bomResults;
+            }
         }
         $workflowActions = $this->searchWorkflowActions($query, $context);
         if ($workflowActions !== []) {
@@ -466,6 +474,42 @@ final class ManufacturingSearchProvider implements SearchProviderInterface
         }
 
         return array_slice($items, 0, self::RESULT_LIMIT);
+    }
+
+    /** @return array<int,array<string,mixed>> */
+    private function searchBom(string $query, SearchProviderContext $context): array
+    {
+        try {
+            $expressions = [
+                'CAST(b.id AS CHAR)', 'b.status', 'b.version', 'b.revision', 'b.notes',
+                'p.parts_name', 'p.parts_number',
+            ];
+            $baseSql = 'SELECT b.id, b.finished_item_ref, b.status, b.version, b.revision, b.notes, p.parts_name, p.parts_number FROM manufacturing_bom b LEFT JOIN products p ON p.item_ref = b.finished_item_ref';
+            [$scopeSql, $scopeParams] = $context->scopeClause('manufacturing_bom', [
+                'machine_id' => 'machine_ids', 'product_id' => 'part_ids', 'part_id' => 'part_ids',
+                'department_code' => 'department_code', 'branch_code' => 'branch_code',
+            ], 'b');
+            $rows = $this->runQuery($query, $expressions, $baseSql, 'b.id', $scopeSql, $scopeParams, $context, 10);
+            $items = [];
+            foreach ($rows as $row) {
+                $id = trim((string)($row['id'] ?? ''));
+                if ($id === '') {
+                    continue;
+                }
+                $status = trim((string)($row['status'] ?? 'draft'));
+                $label = trim((string)($row['parts_name'] ?? '') . ($row['parts_number'] ?? '') !== '' ? (string)($row['parts_name'] ?? '') . ' (' . (string)($row['parts_number'] ?? '') . ')' : 'BOM #' . $id);
+                $items[] = [
+                    'id' => $id,
+                    'label' => $label,
+                    'status' => $status,
+                    'url' => '/apps/manufacturing/bom/detail?id=' . urlencode($id),
+                    'meta' => 'BOM / Recipes • version ' . trim((string)($row['version'] ?? '')) . ' • rev ' . trim((string)($row['revision'] ?? '')),
+                ];
+            }
+            return $items;
+        } catch (\Throwable) {
+            return [];
+        }
     }
 
     /** @return array<int,array<string,mixed>> */

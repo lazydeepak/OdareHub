@@ -1346,6 +1346,16 @@
         "nav_visible": true,
         "search_visible": true,
         "role_scoped": true
+      },
+      {
+        "feature_key": "bom",
+        "canonical_surfaces": [
+          "/apps/manufacturing/bom"
+        ],
+        "compatibility_surfaces": [],
+        "nav_visible": true,
+        "search_visible": true,
+        "role_scoped": true
       }
     ],
     "plugin_modules": [
