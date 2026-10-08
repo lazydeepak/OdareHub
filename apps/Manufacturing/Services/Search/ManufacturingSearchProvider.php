@@ -21,7 +21,7 @@ final class ManufacturingSearchProvider implements SearchProviderInterface
             'orders' => $this->label('module.daily_orders.search_group', 'Orders'),
             'plans' => $this->label('module.production_plans.search_group', 'Plans'),
             'entries' => $this->label('module.production_entries.search_group', 'Entries'),
-            'bom' => 'BOM / Recipes',
+            'bom' => $this->label('nav.bom', 'BOM / Recipes'),
             'charts' => 'Charts',
             'workflow_actions' => 'Workflow Actions',
         ];
