@@ -5,8 +5,9 @@ namespace Platform\Updates;
 
 /**
  * Validates the shape and artifact binding of release-build readiness evidence.
- * It does not claim that a caller-supplied record is authentic; preview keeps
- * eligibility blocked unless an independently authorized verifier exists.
+ * It does not claim that a caller-supplied record is authentic; readiness
+ * eligibility remains blocked until an independently authorized verifier is
+ * integrated.
  */
 final class ReleaseReadinessEvidenceService
 {
@@ -89,8 +90,8 @@ final class ReleaseReadinessEvidenceService
             'ok' => $errors === [],
             'errors' => array_values(array_unique($errors)),
             'warnings' => [],
-            // No V1 signature or attestation exists; this must remain false.
-            'eligible' => $errors === [] && $allChecksPassed && ($readiness['authenticity'] ?? null) === 'authorized-verifier',
+            // Caller-controlled metadata is never release authentication.
+            'eligible' => false,
             'status' => is_string($status) ? $status : 'unknown',
             'checks' => $checks,
         ];

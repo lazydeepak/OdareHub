@@ -202,8 +202,8 @@ try {
         $readiness['evidence'][] = ['id' => $id, 'status' => 'passed', 'evidence' => ['fixture' => true], 'artifact' => $artifact];
     }
     $spoof = (new Platform\Updates\ReleaseReadinessEvidenceService())->validate($readiness, $artifact);
-    $check(($spoof['ok'] ?? false) === true && ($spoof['eligible'] ?? false) === true, 'readiness authenticity string alone reproduces eligible spoof');
-    $check(($valid['ok'] ?? false) === true && ($spoof['eligible'] ?? false) === true && ($valid['state'] ?? null) === 'verified', 'artifact verifier remains separate from readiness eligibility');
+    $check(($spoof['ok'] ?? false) === true && ($spoof['eligible'] ?? true) === false, 'readiness authenticity string cannot grant eligibility');
+    $check(($valid['ok'] ?? false) === true && ($spoof['eligible'] ?? true) === false && ($valid['state'] ?? null) === 'verified', 'artifact verification remains separate from readiness authority');
 } catch (Throwable $exception) {
     $check(false, 'probe completed without exception: ' . $exception->getMessage());
 } finally {

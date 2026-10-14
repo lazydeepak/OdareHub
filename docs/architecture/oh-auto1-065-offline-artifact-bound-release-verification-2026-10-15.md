@@ -33,19 +33,20 @@ verification window fail closed with `RAV-ARTIFACT-MUTATED`.
 
 ## Readiness spoof finding
 
-The existing `ReleaseReadinessEvidenceService` was reproduced unchanged: a
-caller-supplied readiness object with `authenticity: authorized-verifier`, the
-three required checks marked `passed`, and matching artifact fields returns:
+Before OH-AUTO1-066, the existing `ReleaseReadinessEvidenceService` was
+reproduced with a caller-supplied readiness object containing
+`authenticity: authorized-verifier`, the three required checks marked `passed`,
+and matching artifact fields. It returned:
 
 ```text
 ok=true
 eligible=true
 ```
 
-That result is metadata-driven and is not cryptographic proof. The adapter does
-not consume or interpret readiness authenticity and was not connected to
-preview or apply eligibility. Correcting that eligibility boundary requires a
-separate authorized integration change.
+That result was metadata-driven and was not cryptographic proof. OH-AUTO1-066
+now forces `eligible=false` while preserving structural validation. The adapter
+does not consume or interpret readiness authenticity and remains disconnected
+from preview or apply eligibility.
 
 ## Regression evidence
 

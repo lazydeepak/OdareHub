@@ -407,10 +407,16 @@ offline Ed25519 verifier.
 
 **Finding**
 
-`ReleaseReadinessEvidenceService::validate()` currently returns `eligible=true`
-when caller-supplied checks pass and `authenticity` equals
+`ReleaseReadinessEvidenceService::validate()` returned `eligible=true` when
+caller-supplied checks passed and `authenticity` equaled
 `authorized-verifier`; this was reproduced without cryptographic evidence.
-The service and preview eligibility behavior were intentionally not changed.
+
+### OH-AUTO1-066 correction
+
+The existing service now always returns `eligible=false`. Structural evidence,
+artifact binding, execution diagnostics, and error reporting remain unchanged.
+No cryptographic verification is interpreted as sufficient authority by this
+correction; a later separately approved integration must establish that policy.
 
 **Boundary**
 

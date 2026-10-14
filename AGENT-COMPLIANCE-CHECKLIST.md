@@ -9,9 +9,22 @@ failures, and source mutation/substitution during verification.
 
 Artifact probe: ✅ 18/18. The existing readiness service's
 `authenticity=authorized-verifier` spoof was reproduced as `ok=true,
-eligible=true`; no readiness or preview behavior was changed. No database,
+eligible=true` before OH-AUTO1-066; after the correction, the same structural
+fixture remains `ok=true` but returns `eligible=false`. No database,
 SQL, migration, signing, trust-store, installation, publication, deployment,
 or Core operation occurred.
+
+## Session Summary (2026-10-15) — OH-AUTO1-066 Fail-Closed Readiness Authentication
+
+Changed `ReleaseReadinessEvidenceService` so caller-controlled authenticity
+metadata can never produce `eligible=true`. Structural readiness validation and
+diagnostics remain intact; readiness stays ineligible until an independently
+approved authority integration exists.
+
+Focused readiness probe: ✅ 10/10; collector: ✅ 19/19; signature: ✅ 24/24;
+artifact binding: ✅ 18/18. No new authorization path, signing, trust-store,
+database, SQL, migration, installation, publication, deployment, or Core
+operation was introduced.
 
 ## Session Summary (2026-10-15) — OH-AUTO1-064 Offline Release Signature Verification
 

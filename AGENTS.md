@@ -6,7 +6,15 @@ Added a read-only exact-byte ZIP/sidecar verification adapter over the offline
 Ed25519 foundation. Stable file identity is checked before and after strict
 package inspection; traversal, direct symlink paths, metadata contradictions,
 and mutation fail closed. The readiness authenticity-string spoof was reproduced
-without changing existing eligibility behavior. Artifact probe: 18/18.
+without changing existing eligibility behavior; OH-AUTO1-066 now forces
+`eligible=false` for that caller-controlled signal. Artifact probe: 18/18.
+
+## Session Summary (2026-10-15) — OH-AUTO1-066 Fail-Closed Readiness Authentication
+
+`ReleaseReadinessEvidenceService` no longer grants eligibility from
+`authenticity=authorized-verifier`; structural validation remains unchanged and
+eligibility is always false until independently approved authority integration.
+Readiness, collector, signature, artifact, preview, and apply regressions pass.
 
 ## Session Summary (2026-10-15) — OH-AUTO1-064 Offline Release Signature Verification
 
