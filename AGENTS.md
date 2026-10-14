@@ -1,5 +1,15 @@
 # AGENTS.md
 
+## Session Summary (2026-10-15) — OH-AUTO1-064 Offline Release Signature Verification
+
+Added pure Platform Updates release-statement canonicalization and offline
+Ed25519 verification. The exact V1 statement grammar is fixed and fail-closed;
+trust records are caller-supplied in-memory fixtures, with fingerprint,
+revocation, and validity checks. Deterministic regression coverage is 24/24.
+No signing, private-key handling, trust-store mutation, package acceptance,
+release apply, database, migration, installation, deployment, or Core operation
+was performed.
+
 ## Start Here
 
 Before making meaningful changes in this repository, read:

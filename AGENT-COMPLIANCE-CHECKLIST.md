@@ -1,5 +1,19 @@
 # AGENT-COMPLIANCE-CHECKLIST
 
+## Session Summary (2026-10-15) — OH-AUTO1-064 Offline Release Signature Verification
+
+Added pure Platform Updates components for strict canonical release-statement
+validation and offline Ed25519 detached-signature verification. The verifier
+uses only PHP Sodium and caller-supplied in-memory trust records; it has no
+private-key, signing, filesystem, package, installed-state, network, database,
+trust-persistence, preview, apply, or deployment authority.
+
+Deterministic verifier probe: ✅ 24/24. Existing release/package probes and
+architecture/deployment checks remain the validation target; production release
+authorization remains unchanged and disabled. No Core, database, SQL,
+migration, installation, trust-store, publication, signing, or deployment
+operation occurred.
+
 ## Session Summary (2026-10-14) — OH-AUTO1-022 Disposable Database Test Infrastructure
 
 ### What was done

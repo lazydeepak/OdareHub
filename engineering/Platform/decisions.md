@@ -365,3 +365,31 @@ identity remains the existing channel behavior.
 `platform/Updates/LocalReleaseChannelBuilderService.php`,
 `platform/Updates/tests/probe_release_artifact_immutability.php`, and
 `docs/architecture/oh-auto1-063-immutable-release-artifact-protection-2026-10-15.md`.
+
+### 2026-10-15 — OH-AUTO1-064 offline release verification foundation
+**Status:** Accepted implementation; production integration remains disabled
+
+**Decision**
+
+Freeze a conservative canonical release statement before any apply integration:
+UTF-8 LF-only bytes, one final newline, fixed field order, ASCII-safe values,
+lowercase SHA-256 fields, canonical decimal byte size, strict UTC timestamps,
+and fixed `susankhya-os`/`app` constraints. Verify detached Ed25519 signatures
+only with PHP Sodium and caller-supplied in-memory trust records. Validate key
+ID uniqueness, public-key fingerprints, status, and validity windows; revoked
+keys and unavailable cryptography fail closed.
+
+**Boundary**
+
+The verifier has no private-key, signing, filesystem, package, installed-state,
+database, network, trust-persistence, preview, apply, or deployment authority.
+An optional artifact-binding input accepts independently computed hashes/size
+for a future adapter; it does not read or authorize artifacts. No existing
+release acceptance behavior is changed.
+
+**Evidence**
+
+`platform/Updates/ReleaseStatementCanonicalizer.php`,
+`platform/Updates/OfflineReleaseSignatureVerifier.php`,
+`platform/Updates/tests/probe_offline_release_signature_verifier.php`, and
+`docs/architecture/oh-auto1-064-offline-release-signature-verification-2026-10-15.md`.
