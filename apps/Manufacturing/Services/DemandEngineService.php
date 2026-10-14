@@ -191,8 +191,8 @@ final class DemandEngineService
 
     public static function previewRouteDecisions(?string $targetDate = null, int $limit = 50, array $productIds = []): array
     {
-        self::ensureSchema();
-
+        // Schema ownership belongs to migrations. This read/decision path is
+        // also used by runtime generation and must not perform DDL.
         $productIds = array_values(array_filter(array_map(static fn($v): int => (int)$v, $productIds), static fn(int $v): bool => $v > 0));
         $rows = self::sourceDemandRows($productIds, $targetDate, $targetDate);
         if (!$rows) {
