@@ -6301,6 +6301,30 @@ readiness remains blocked.
 - No database connection, SQL execution, application activation, commit,
   staging, push, deployment, reset, or discard.
 
+## Session Summary (2026-10-15) — OH-AUTO1-053 Aggregate Architecture Gate Reliability
+
+### Diagnosis and correction
+- The complete read-only architecture runner has 49 top-level gates.
+- The Studio deletion-family aggregate had 14 capability and 14 workspace
+  gates arranged as a dependency chain, but iterated every ancestor explicitly
+  in addition to recursive prerequisite execution.
+- The suite now validates all 28 chain links and invokes only the terminal
+  workspace gate, preserving all checks while removing the duplicate top-level
+  traversal.
+
+### Validation
+- Complete architecture suite: ✅ 49/49, `ARCHITECTURE GATES: PASS`
+- Deletion-family suite: ✅ 28/28
+- Optimized deletion-family duration: ✅ approximately 43 seconds
+- PHP/shell syntax and diff hygiene: ✅
+- Core lock: ✅
+- No database, SQL, migration, activation, deployment, or Core operation.
+
+### Boundary
+- Deployment readiness was not independently invoked because its wrapper
+  includes CSS publishing commands with `--apply`; the read-only architecture
+  suite was executed and certified instead.
+
 ### Residual risk
 - Manual `createOrder()` does not currently validate a supplied supplier ID
   with the conversion path's active-supplier rule. No authoritative manual-order

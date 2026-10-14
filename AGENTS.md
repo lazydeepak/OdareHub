@@ -6249,3 +6249,16 @@ Residual: manual `createOrder()` supplier-ID validation has no authoritative
 manual-order ownership contract; no speculative rule was added. The broader
 transaction audit retains one unrelated Manufacturing schema-ensure expectation
 failure from OH-AUTO1-047.
+
+## Session Summary (2026-10-15) — OH-AUTO1-053 Aggregate Architecture Gate Reliability
+
+Diagnosed the aggregate verification timeout as redundant recursive execution
+inside the Studio deletion-family suite. The suite retained all 14 capability
+and 14 workspace gate declarations, added dependency-chain assertions, and now
+invokes the terminal workspace gate once so the chain reaches all 28 checks
+without a second explicit traversal.
+
+Validation: complete architecture suite **49/49 PASS**; deletion-family suite
+**28/28 PASS**, approximately 43 seconds after correction versus approximately
+320 seconds before correction. No database, SQL, deployment, Core, or runtime
+operation was performed.
