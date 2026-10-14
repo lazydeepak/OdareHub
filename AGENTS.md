@@ -6289,3 +6289,12 @@ Database execution remains explicitly deferred. No MySQL startup, database
 connection, SQL, migration, activation, deployment, or test dispatch occurred.
 Production-readiness records were reconciled to mark OH-AUTO1-055 corrected
 while retaining database, release-authority, and runtime-acceptance blockers.
+
+## Session Summary (2026-10-15) — OH-AUTO1-057 Release-Control Architecture Proposal
+
+Created a documentation-only V1 design proposal for REL-001 release authority
+and REL-002 installed build identity. It distinguishes existing checksum and
+app-record behavior from proposed release attestation, trusted verification,
+installation-owned identity persistence, and fail-closed contradiction handling.
+No runtime code, schema, database, signing, release apply, deployment, or
+activation behavior changed.

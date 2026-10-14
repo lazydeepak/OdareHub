@@ -6369,6 +6369,15 @@ Production-readiness records were reconciled to reflect OH-AUTO1-055 as
 corrected while retaining database, release-authority, and runtime-acceptance
 blockers.
 
+## Session Summary (2026-10-15) — OH-AUTO1-057 Release-Control Architecture Proposal
+
+Created a documentation-only V1 proposal for REL-001 release authority and
+REL-002 installed platform identity. The proposal distinguishes current
+checksum/app-record behavior from proposed signed release statements,
+installation-owned `build_id` persistence, fail-closed verification, and
+contradiction handling. No runtime code, schema, database, signing, release
+apply, deployment, or activation behavior changed.
+
 ### Residual risk
 - Manual `createOrder()` does not currently validate a supplied supplier ID
   with the conversion path's active-supplier rule. No authoritative manual-order

@@ -2,6 +2,33 @@
 
 ## Decision Log
 
+### 2026-10-15 — OH-AUTO1-057 release authority and installed identity proposal
+**Status:** Proposed; approval required
+
+**Context**
+
+The local release contract binds packages to checksums and metadata but
+explicitly defers signing and trust. Existing app records and release history
+do not provide an authoritative installed platform `build_id`.
+
+**Proposal**
+
+Define a distinct release authority that signs a canonical V1 release
+statement, initially proposing Ed25519 detached signatures and an
+installation-owned trust anchor. Define one installation-owned current
+platform identity record, written only after verified release, migration, and
+post-install checks. Verification and identity contradictions fail closed.
+
+**Boundary**
+
+This is design-only. It does not authorize cryptographic implementation,
+schema/migration changes, package apply, deployment, or database execution.
+REL-003 and REL-004 remain separate decisions.
+
+**Evidence**
+
+`docs/architecture/oh-auto1-057-release-authority-installed-identity-design-2026-10-15.md`.
+
 ### 2026-10-15 — Authorized Core deny and plugin route rollback corrections
 **Status:** Implemented and verified
 
