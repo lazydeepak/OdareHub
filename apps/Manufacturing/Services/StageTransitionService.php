@@ -46,6 +46,8 @@ final class StageTransitionService
 
     public static function ensureSchema(): void
     {
+        // Explicit preparation helper for migration/test setup only. Runtime
+        // stage computation and actions must not issue schema DDL.
         static $done = false;
         if ($done) {
             return;
@@ -146,10 +148,6 @@ final class StageTransitionService
      */
     public static function computeForDate(string $date): array
     {
-        self::ensureSchema();
-        DemandEngineService::ensureSchema();
-        AssemblyPlanService::ensureSchema();
-
         $productRows = DB::fetchAll(
             "SELECT p.id, p.parts_name, p.parts_number,
                     p.supply_mode, p.requires_ipm_qc, p.requires_assembly,
@@ -613,8 +611,6 @@ final class StageTransitionService
             throw new \InvalidArgumentException('Invalid date format.');
         }
 
-        self::ensureSchema();
-
         $snapshotByDate = self::computeForDate($date);
         $snapshot = $snapshotByDate[$productId] ?? null;
         if (!is_array($snapshot)) {
@@ -670,8 +666,6 @@ final class StageTransitionService
         if (!in_array($overrideStatus, ['blocked', 'skipped'], true)) {
             throw new \InvalidArgumentException("Invalid override status: {$overrideStatus}");
         }
-
-        self::ensureSchema();
 
         DB::query(
             "INSERT INTO mfg_stage_readiness

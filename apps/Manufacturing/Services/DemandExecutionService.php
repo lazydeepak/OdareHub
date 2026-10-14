@@ -11,8 +11,6 @@ final class DemandExecutionService
 {
     public static function productionDemandMapByDate(string $date): array
     {
-        DemandEngineService::ensureSchema();
-
         $rows = DB::fetchAll(
             "SELECT d.*, p.supply_mode, p.requires_ipm_qc, p.requires_assembly, p.dispatch_as_is, p.fulfillment_mode, p.activity_type
              FROM mfg_part_demands d
@@ -91,9 +89,6 @@ final class DemandExecutionService
 
     public static function qcDemandRows(string $fromDate = '', string $toDate = ''): array
     {
-        DemandEngineService::ensureSchema();
-        StageTransitionService::ensureSchema();
-
         $sql = "SELECT d.*, p.parts_name, p.parts_number, p.supply_mode,
                     p.requires_assembly, p.dispatch_as_is, p.fulfillment_mode, p.activity_type,
                     msr_prod.released_qty   AS prod_released_qty,
@@ -152,10 +147,6 @@ final class DemandExecutionService
 
     public static function assemblyDemandRows(string $fromDate = '', string $toDate = ''): array
     {
-        DemandEngineService::ensureSchema();
-        StageTransitionService::ensureSchema();
-        AssemblyPlanService::ensureSchema();
-
         $sql = "SELECT d.*, p.parts_name, p.parts_number, p.supply_mode,
                     p.requires_ipm_qc, p.dispatch_as_is, p.fulfillment_mode, p.activity_type,
                     msr_prod.released_qty  AS prod_released_qty,
