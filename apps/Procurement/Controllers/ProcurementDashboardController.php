@@ -165,6 +165,7 @@ final class ProcurementDashboardController
 
     public static function createOrder(): void
     {
+        Auth::requireAppAccess('procurement');
         Auth::requireCsrf((string)($_POST['csrf'] ?? ''));
 
         try {
@@ -177,6 +178,7 @@ final class ProcurementDashboardController
 
     public static function createOrderFromRequest(): void
     {
+        Auth::requireAppAccess('procurement');
         Auth::requireCsrf((string)($_POST['csrf'] ?? ''));
         $requestId = (int)($_POST['request_id'] ?? 0);
         $supplierId = (int)($_POST['supplier_id'] ?? 0);
@@ -234,6 +236,7 @@ final class ProcurementDashboardController
 
     public static function createReceipt(): void
     {
+        Auth::requireAppAccess('procurement');
         Auth::requireCsrf((string)($_POST['csrf'] ?? ''));
 
         $qty = (float)($_POST['received_qty'] ?? 0);
