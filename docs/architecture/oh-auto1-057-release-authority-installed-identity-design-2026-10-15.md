@@ -1,7 +1,7 @@
 # OH-AUTO1-057 — Release Authority and Installed Identity V1 Design
 
-Date: 2026-10-15  
-Status: **Proposed for architecture/release-authority review**  
+Date: 2026-10-15
+Status: **Proposed for architecture/release-authority review**
 Scope: **REL-001 release authority and REL-002 installed build identity**
 
 ## 1. Decision boundary
