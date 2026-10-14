@@ -5,6 +5,14 @@ Status: **Not production-ready**
 Mode: Read-only evidence reconciliation; no Core, database, deployment, or
 release mutation.
 
+## Current correction addendum — 2026-10-15
+
+The G01/G02 failures and Core blocker entries below describe the pre-OH-AUTO1-055
+baseline. The authorized ACL and plugin route rollback corrections are now
+integrated at `5f6200d6c0624878e1c63888fbcd35ed303473df`, with regressions 12/12
+and 15/15. Database-backed requalification remains deferred; release, runtime,
+and deployment gates remain blocked.
+
 ## 1. Current baseline
 
 - Repository: `/Users/lazydeepak/dev/OdareHub`

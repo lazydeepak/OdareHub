@@ -4,6 +4,11 @@
 
 Local deployment and update channel baseline.
 
+Current reconciliation: OH-AUTO1-055 corrected the previously open Core ACL
+deny-precedence and plugin route-rollback defects. Database-backed testing is
+explicitly suspended under deferred OH-AUTO1-056; release authority, installed
+identity, and runtime acceptance remain blocked or human-gated.
+
 ## In Progress
 
 - [x] OH-AUTO1-018 — Critical business workflow and data-integrity audit. Corrected the Procurement order/receipt method-boundary defect and added a read-only regression probe. Broader DB-backed behavioral probes remain not run because they mutate the installed database. See `docs/architecture/business-workflow-data-integrity-audit-2026-10-14.md`.
@@ -57,11 +62,8 @@ Local deployment and update channel baseline.
 
 ## Blocked
 
-- Full local deployment readiness is blocked by `scripts/architecture/check_localization_migration_guardrail.sh`: tracked legacy locale files remain under `apps/Studio/Tools/LabelDesigner/lang/` (`en.php`, `ja.php`, `ne.php`).
-- OH-AUTO1-015 security audit escalated `SEC-AUTH-001`: Core ACL deny overrides can be re-added by
-  access-profile, explicit-user-permission, or assigned-app grants in
-  `app/Core/AclPolicy.php::effectivePermissionsForContext()`. No Core change was authorized;
-  remediation requires Core/security-owner review and regression coverage.
+- Database-backed production verification remains blocked because OH-AUTO1-056 is explicitly deferred.
+- Release authority/attestation, installed build identity, migration semantics, and live runtime acceptance remain unresolved or human-gated.
 
 ## Completed
 

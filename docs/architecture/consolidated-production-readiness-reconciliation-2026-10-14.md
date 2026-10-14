@@ -4,6 +4,15 @@ Date: 2026-10-14
 Mode: **Read-only repository reconciliation**
 Status: **Production readiness blocked**
 
+## Current reconciliation addendum — 2026-10-15
+
+The historical findings below record the pre-remediation baseline. As of
+`origin/main` `5f6200d6c0624878e1c63888fbcd35ed303473df`, `SEC-AUTH-001` and
+`LIFECYCLE-003` have been corrected under explicit Core authorization. Their
+in-memory regressions pass 12/12 and 15/15; architecture verification passes
+49/49. Database-backed behavior remains unverified because OH-AUTO1-056 is
+explicitly deferred.
+
 ## 1. Repository and change baseline
 
 - Repository: `/Users/lazydeepak/dev/OdareHub`
@@ -79,6 +88,10 @@ is blocked is stale and must not be used as the current verdict.
 | `REL-004` | **Open contract conflict** | Existing stored channel package can be rejected by protected-path policy because of vendor-contained development files. | Release-package policy must decide whether to exclude, allow, or reclassify the path. |
 | `ENV-DB-001` | **Environment blocker** | No independently verified disposable database identity and credential boundary. | Provision isolated MySQL/MariaDB environment with teardown guard. |
 | `OPS-001` | **Human-gated** | Live HTTP, deployment, production config, rollback, and recovery acceptance not authorized/executed. | Obtain explicit environment and operator authorization; execute controlled acceptance plan. |
+
+The `SEC-AUTH-001` and `LIFECYCLE-003` rows above are historical blocker
+records. Current correction evidence is maintained in
+`docs/architecture/oh-auto1-055-core-security-lifecycle-remediation-2026-10-15.md`.
 
 Additional non-duplicated risks: no generic tenant isolation contract, incomplete background-job/cache
 lifecycle guards, fragmented server-side logging/redaction/retention, incomplete Parties identity
