@@ -24,7 +24,9 @@ declare(strict_types=1);
  *   telemetry, not financial business audit. No schema changes performed.
  */
 
-define('APP_ROOT', dirname(__DIR__, 3));
+require_once dirname(__DIR__, 3) . '/scripts/testing/DisposableDbTestEntryPointGuard.php';
+$ohTestContext = DisposableDbTestEntryPointGuard::authorize('OH_HOSP', dirname(__DIR__, 3));
+define('APP_ROOT', $ohTestContext['app_root']);
 
 require_once APP_ROOT . '/vendor/autoload.php';
 require_once APP_ROOT . '/plugins/Base/bootstrap.php';

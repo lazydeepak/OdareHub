@@ -12,6 +12,13 @@ declare(strict_types=1);
  */
 
 $root = dirname(__DIR__, 3);
+require_once $root . '/scripts/testing/DisposableDbTestEntryPointGuard.php';
+try {
+    $ohTestContext = DisposableDbTestEntryPointGuard::authorize('OH_HOSP', $root);
+} catch (Throwable $e) {
+    fwrite(STDERR, "SKIP: Hospitality DB probe suite is blocked before child bootstrap: {$e->getMessage()}\n");
+    exit(2);
+}
 $probes = [
     'slice1 registration' => 'apps/Hospitality/Tests/probe_slice1_registration.php',
     'slice2 migrations' => 'apps/Hospitality/Tests/probe_slice2_migrations.php',

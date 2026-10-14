@@ -20,7 +20,9 @@ declare(strict_types=1);
  * Exit codes: 0 = pass, 1 = fail, 2 = environment unavailable
  */
 
-define('APP_ROOT', dirname(__DIR__, 3));
+require_once dirname(__DIR__, 3) . '/scripts/testing/DisposableDbTestEntryPointGuard.php';
+$ohTestContext = DisposableDbTestEntryPointGuard::authorize('OH_HOSP', dirname(__DIR__, 3));
+define('APP_ROOT', $ohTestContext['app_root']);
 
 require_once APP_ROOT . '/vendor/autoload.php';
 
