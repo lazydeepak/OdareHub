@@ -10,6 +10,8 @@ use Platform\Recovery\RestoreRehearsalService;
 use Platform\Updates\LocalReleaseApplyPreparationService;
 use Platform\Updates\LocalReleaseChannelBuilderService;
 use Platform\Updates\LocalReleaseChannelPreviewService;
+use Platform\Updates\InstalledSystemEvidenceProvider;
+use Platform\Updates\ReleaseReadinessEvidenceCollectorService;
 
 $root = dirname(__DIR__, 2);
 chdir($root);
@@ -61,16 +63,34 @@ if ($command === 'build-channel') {
 if ($command === 'preview-channel') {
     $channelDir = (string)($options['channel-dir'] ?? 'storage/update-channels/local');
     $recoveryDir = (string)($options['recovery-dir'] ?? '');
-    $evidence = null;
-    if ($recoveryDir !== '') {
-        $evidence = [
-            'verified' => is_file(rtrim($recoveryDir, '/') . '/recovery-point.json'),
-            'rehearsed' => (bool)((json_decode((string)@file_get_contents(rtrim($recoveryDir, '/') . '/rehearsal.json'), true)['ok'] ?? false)),
-        ];
+    $installedEvidence = InstalledSystemEvidenceProvider::fromRuntime()->collect();
+    if (($installedEvidence['ok'] ?? false) !== true) {
+        print_json([
+            'ok' => false,
+            'errors' => ['authoritative installed-state evidence is unavailable.'],
+            'installed_evidence' => $installedEvidence,
+        ]);
+        exit(1);
     }
-    $result = (new LocalReleaseChannelPreviewService())->preview($channelDir, ['product_version' => APP_VERSION], $evidence);
+    $result = (new LocalReleaseChannelPreviewService())->preview(
+        $channelDir,
+        (array)$installedEvidence['state'],
+        $recoveryDir !== '' ? $recoveryDir : null
+    );
+    $result['installed_evidence'] = [
+        'ok' => true,
+        'sources' => $installedEvidence['sources'] ?? [],
+    ];
     print_json($result);
     exit(($result['ok'] ?? false) === true ? 0 : 1);
+}
+
+if ($command === 'collect-readiness') {
+    $channelDir = (string)($options['channel-dir'] ?? 'storage/update-channels/local');
+    $result = (new ReleaseReadinessEvidenceCollectorService())->collectForChannel($channelDir, $root);
+    print_json($result);
+    // Local command observations are never an authorized attestation.
+    exit(($result['ok'] ?? false) === true && (($result['readiness']['status'] ?? '') === 'passed') ? 0 : 1);
 }
 
 if ($command === 'prepare-apply') {
@@ -84,13 +104,25 @@ if ($command === 'prepare-apply') {
         fail_cli('apply staging directory must already exist');
     }
 
-    $evidence = recovery_evidence($recoveryDir);
+    $installedEvidence = InstalledSystemEvidenceProvider::fromRuntime()->collect();
+    if (($installedEvidence['ok'] ?? false) !== true) {
+        print_json([
+            'ok' => false,
+            'errors' => ['authoritative installed-state evidence is unavailable.'],
+            'installed_evidence' => $installedEvidence,
+        ]);
+        exit(1);
+    }
     $result = (new LocalReleaseApplyPreparationService())->prepare(
         $channelDir,
         $stagingDir,
-        ['product_version' => APP_VERSION],
-        $evidence
+        (array)$installedEvidence['state'],
+        $recoveryDir
     );
+    $result['installed_evidence'] = [
+        'ok' => true,
+        'sources' => $installedEvidence['sources'] ?? [],
+    ];
     print_json($result);
     exit(($result['ok'] ?? false) === true ? 0 : 1);
 }
@@ -161,6 +193,18 @@ if ($command === 'create') {
         fail_cli('database configuration is unavailable');
     }
 
+    $installedEvidence = InstalledSystemEvidenceProvider::fromRuntime()->collect();
+    if (($installedEvidence['ok'] ?? false) !== true) {
+        print_json([
+            'ok' => false,
+            'errors' => ['authoritative installed-state evidence is unavailable; recovery identity cannot be fabricated from repository HEAD.'],
+            'installed_evidence' => $installedEvidence,
+        ]);
+        exit(1);
+    }
+    $installedState = (array)($installedEvidence['state'] ?? []);
+    $platformState = is_array($installedState['platform'] ?? null) ? $installedState['platform'] : [];
+
     $result = $service->createRecoveryPoint(
         $config,
         $root,
@@ -168,8 +212,13 @@ if ($command === 'create') {
         (string)($options['created-by'] ?? (get_current_user() ?: 'system')),
         (string)($options['reason'] ?? 'manual'),
         [
-            'release_version' => APP_VERSION,
-            'build_id' => git_head(),
+            'product_id' => (string)($installedState['product_id'] ?? ''),
+            'release_version' => (string)($installedState['product_version'] ?? ''),
+            'build_id' => (string)($platformState['build_id'] ?? ''),
+            'app_manifest_checksums' => [],
+            'module_manifest_checksums' => [],
+            'schema_state' => is_array($installedState['schema'] ?? null) ? $installedState['schema'] : [],
+            'migration_state' => is_array($installedState['migrations'] ?? null) ? $installedState['migrations'] : [],
         ],
         ['app', 'apps', 'platform', 'plugins', 'public', 'resources', 'vendor', 'composer.json', 'composer.lock', 'bin'],
         ['storage', 'packages', '.git']
@@ -207,7 +256,8 @@ function print_help(): void
     echo "  php scripts/system/recovery_point.php create --target-dir=/explicit/writable/dir [--reason=manual] [--created-by=name]\n";
     echo "  php scripts/system/recovery_point.php verify --target-dir=/existing/recovery-point/dir\n";
     echo "  php scripts/system/recovery_point.php rehearse --target-dir=/existing/recovery-point/dir --isolated-dir=/empty/dir --rehearsal-db=susankhya_rehearsal\n";
-    echo "  php scripts/system/recovery_point.php build-channel [--channel-dir=storage/update-channels/local] [--release-version=0.5.0]\n";
+     echo "  php scripts/system/recovery_point.php build-channel [--channel-dir=storage/update-channels/local] [--release-version=0.5.0]\n";
+     echo "  php scripts/system/recovery_point.php collect-readiness --channel-dir=storage/update-channels/local\n";
     echo "  php scripts/system/recovery_point.php preview-channel [--channel-dir=storage/update-channels/local] [--recovery-dir=/path/to/recovery-point]\n";
     echo "  php scripts/system/recovery_point.php prepare-apply --channel-dir=storage/update-channels/local --recovery-dir=/path/to/recovery-point --staging-dir=/empty/staging/dir\n";
 }
@@ -222,16 +272,6 @@ function fail_cli(string $message): void
 {
     fwrite(STDERR, $message . "\n");
     exit(2);
-}
-
-/** @return array<string,bool> */
-function recovery_evidence(string $recoveryDir): array
-{
-    $recoveryDir = rtrim($recoveryDir, '/');
-    return [
-        'verified' => is_file($recoveryDir . '/recovery-point.json'),
-        'rehearsed' => (bool)((json_decode((string)@file_get_contents($recoveryDir . '/rehearsal.json'), true)['ok'] ?? false)),
-    ];
 }
 
 function git_head(): string

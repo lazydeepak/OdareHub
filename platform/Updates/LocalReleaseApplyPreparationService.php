@@ -7,17 +7,14 @@ use ZipArchive;
 
 final class LocalReleaseApplyPreparationService
 {
-    /** @var array<int,string> */
-    private array $blockedPayloadPrefixes = ['storage', 'packages', '.git', 'node_modules', 'tests'];
-
     /**
      * @param array<string,mixed> $installedState
-     * @param array<string,mixed> $recoveryEvidence
+     * @param string $recoveryPointDirectory
      * @return array<string,mixed>
      */
-    public function prepare(string $channelDirectory, string $stagingDirectory, array $installedState, array $recoveryEvidence): array
+    public function prepare(string $channelDirectory, string $stagingDirectory, array $installedState, string $recoveryPointDirectory): array
     {
-        $preview = (new LocalReleaseChannelPreviewService())->preview($channelDirectory, $installedState, $recoveryEvidence);
+        $preview = (new LocalReleaseChannelPreviewService())->preview($channelDirectory, $installedState, $recoveryPointDirectory);
         if (($preview['apply_eligible'] ?? false) !== true) {
             return $this->failure('Channel preview is not apply-eligible.', ['preview' => $preview]);
         }
@@ -36,7 +33,10 @@ final class LocalReleaseApplyPreparationService
         }
 
         $packagePath = (string)$release['package_path'];
-        $inspection = $this->inspectPackage($packagePath);
+        $inspection = (new ReleasePackageInspectionService())->inspect(
+            $packagePath,
+            is_array($release['metadata'] ?? null) ? $release['metadata'] : []
+        );
         if (($inspection['ok'] ?? false) !== true) {
             return $inspection;
         }
@@ -116,40 +116,15 @@ final class LocalReleaseApplyPreparationService
             return $this->failure('Channel package path is not contained.');
         }
 
-        return ['ok' => true, 'package_path' => $packagePath];
-    }
-
-    /** @return array<string,mixed> */
-    private function inspectPackage(string $packagePath): array
-    {
-        $zip = new ZipArchive();
-        if ($zip->open($packagePath) !== true) {
-            return $this->failure('Unable to open release package.');
-        }
-
-        $entries = [];
-        for ($index = 0; $index < $zip->numFiles; $index++) {
-            $name = (string)$zip->getNameIndex($index);
-            $normalized = trim(str_replace('\\', '/', $name), '/');
-            if ($normalized === '' || str_starts_with($normalized, '/') || str_contains($normalized, '..')) {
-                $zip->close();
-                return $this->failure('Release package contains an unsafe path.');
-            }
-            if ($this->isBlockedPayloadPath($normalized)) {
-                $zip->close();
-                return $this->failure('Release package contains a preserved or blocked path: ' . $normalized);
-            }
-            $entries[] = $normalized;
-        }
-        $zip->close();
-
-        sort($entries);
+        $metadataPath = $this->containedPath($channelDirectory, (string)($current['metadata'] ?? ''));
+        $metadata = $metadataPath !== null && is_file($metadataPath)
+            ? json_decode((string)file_get_contents($metadataPath), true)
+            : null;
 
         return [
             'ok' => true,
-            'entry_count' => count($entries),
-            'entries_sha256' => hash('sha256', implode("\n", $entries)),
-            'sample_entries' => array_slice($entries, 0, 20),
+            'package_path' => $packagePath,
+            'metadata' => is_array($metadata) ? $metadata : [],
         ];
     }
 
@@ -171,17 +146,6 @@ final class LocalReleaseApplyPreparationService
         }
 
         return array_values(array_diff($items, ['.', '..'])) === [];
-    }
-
-    private function isBlockedPayloadPath(string $relativePath): bool
-    {
-        foreach ($this->blockedPayloadPrefixes as $prefix) {
-            if ($relativePath === $prefix || str_starts_with($relativePath, $prefix . '/')) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /** @param array<string,mixed> $details */

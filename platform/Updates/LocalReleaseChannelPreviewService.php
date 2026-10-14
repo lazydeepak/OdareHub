@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Platform\Updates;
 
+use Platform\Recovery\RecoveryPointService;
 use DateTimeImmutable;
 use Throwable;
 
@@ -10,10 +11,10 @@ final class LocalReleaseChannelPreviewService
 {
     /**
      * @param array<string,mixed> $installedState
-     * @param array<string,mixed>|null $recoveryEvidence
+     * @param string|null $recoveryPointDirectory
      * @return array<string,mixed>
      */
-    public function preview(string $channelDirectory, array $installedState, ?array $recoveryEvidence = null): array
+    public function preview(string $channelDirectory, array $installedState, ?string $recoveryPointDirectory = null): array
     {
         $blockers = [];
         $warnings = [];
@@ -46,11 +47,53 @@ final class LocalReleaseChannelPreviewService
         $this->validateMetadata($metadata, $blockers);
         $this->validateChannelMetadataBinding($current, $metadata, $blockers);
         $this->validatePackageBytes($packagePath, $metadata['package'] ?? [], $blockers);
-        $this->validateCompatibility($metadata['compatibility'] ?? [], $installedState, $blockers);
+        $packageInspection = (new ReleasePackageInspectionService())->inspect($packagePath, $metadata);
+        if (($packageInspection['ok'] ?? false) !== true) {
+            foreach ((array)($packageInspection['errors'] ?? []) as $error) {
+                $blockers[] = 'Release package: ' . (string)$error;
+            }
+        }
+        $artifact = [
+            'release_version' => (string)($metadata['release_version'] ?? ''),
+            'build_id' => (string)($metadata['build_id'] ?? ''),
+            'package_sha256' => (string)($metadata['package']['sha256'] ?? ''),
+            'package_size_bytes' => (int)($metadata['package']['size_bytes'] ?? 0),
+        ];
+        $readiness = is_array($metadata['readiness'] ?? null) ? $metadata['readiness'] : [];
+        $readinessResult = (new ReleaseReadinessEvidenceService())->validate($readiness, $artifact);
+        if (($readinessResult['ok'] ?? false) !== true) {
+            foreach ((array)($readinessResult['errors'] ?? []) as $error) {
+                $blockers[] = 'Readiness evidence: ' . (string)$error;
+            }
+        } elseif (($readinessResult['eligible'] ?? false) !== true) {
+            $applyBlockers[] = 'Release readiness evidence is not authenticated by an authorized verifier.';
+        }
+        $compatibility = is_array($metadata['compatibility'] ?? null) ? $metadata['compatibility'] : [];
+        $compatibilityResult = (new InstalledSystemCompatibilityPreflightService())->validate(
+            $compatibility,
+            $installedState,
+            (string)($metadata['release_version'] ?? '')
+        );
+        if (($compatibilityResult['ok'] ?? false) !== true) {
+            foreach ((array)($compatibilityResult['errors'] ?? []) as $error) {
+                $blockers[] = 'Compatibility: ' . (string)$error;
+            }
+        }
+        foreach ((array)($compatibilityResult['eligibility_blockers'] ?? []) as $blocker) {
+            $applyBlockers[] = 'Migration compatibility: ' . (string)$blocker;
+        }
 
         if (($metadata['migration']['requires_backup'] ?? true) === true) {
-            if (($recoveryEvidence['verified'] ?? false) !== true || ($recoveryEvidence['rehearsed'] ?? false) !== true) {
-                $applyBlockers[] = 'Verified and rehearsed recovery evidence is required before apply.';
+            if ($recoveryPointDirectory === null || trim($recoveryPointDirectory) === '') {
+                $applyBlockers[] = 'An authoritative recovery-point directory is required before apply.';
+            } else {
+                $recovery = RecoveryPointService::verifyUpdateEvidence($recoveryPointDirectory, $installedState);
+                if (($recovery['ok'] ?? false) !== true) {
+                    $applyBlockers[] = 'Authoritative recovery evidence verification failed.';
+                    foreach ((array)($recovery['errors'] ?? []) as $error) {
+                        $blockers[] = 'Recovery evidence: ' . (string)$error;
+                    }
+                }
             }
         }
 
@@ -64,6 +107,11 @@ final class LocalReleaseChannelPreviewService
             'build_id' => (string)($metadata['build_id'] ?? ''),
             'package_sha256' => (string)($metadata['package']['sha256'] ?? ''),
             'package_size_bytes' => (int)($metadata['package']['size_bytes'] ?? 0),
+            'readiness' => [
+                'status' => $readinessResult['status'] ?? 'unknown',
+                'checks' => $readinessResult['checks'] ?? [],
+                'eligible' => $readinessResult['eligible'] ?? false,
+            ],
         ]);
     }
 
@@ -123,6 +171,9 @@ final class LocalReleaseChannelPreviewService
         if (!is_array($metadata['compatibility'] ?? null)) {
             $blockers[] = 'release metadata compatibility object is required.';
         }
+        if (!is_array($metadata['readiness'] ?? null)) {
+            $blockers[] = 'release metadata readiness object is required.';
+        }
     }
 
     /**
@@ -165,32 +216,6 @@ final class LocalReleaseChannelPreviewService
         }
         if ((filesize($packagePath) ?: 0) !== (int)($package['size_bytes'] ?? -1)) {
             $blockers[] = 'release package size mismatch.';
-        }
-    }
-
-    /** @param array<string,mixed> $compatibility @param array<string,mixed> $installedState @param array<int,string> $blockers */
-    private function validateCompatibility(array $compatibility, array $installedState, array &$blockers): void
-    {
-        $installedVersion = (string)($installedState['product_version'] ?? '0.0.0');
-        $minimum = (string)($compatibility['minimum_product_version'] ?? '0.0.0');
-        if (version_compare($installedVersion, $minimum, '<')) {
-            $blockers[] = 'installed product version is below release minimum.';
-        }
-        $maximum = $compatibility['maximum_product_version'] ?? null;
-        if (is_string($maximum) && $maximum !== '' && version_compare($installedVersion, $maximum, '>')) {
-            $blockers[] = 'installed product version is above release maximum.';
-        }
-
-        $php = is_array($compatibility['php'] ?? null) ? $compatibility['php'] : [];
-        $minimumPhp = (string)($php['minimum'] ?? '8.1.0');
-        if (version_compare(PHP_VERSION, $minimumPhp, '<')) {
-            $blockers[] = 'PHP version is below release minimum.';
-        }
-
-        foreach (($compatibility['php_extensions'] ?? []) as $extension) {
-            if (is_string($extension) && $extension !== '' && !extension_loaded($extension)) {
-                $blockers[] = 'Required PHP extension is unavailable: ' . $extension;
-            }
         }
     }
 
