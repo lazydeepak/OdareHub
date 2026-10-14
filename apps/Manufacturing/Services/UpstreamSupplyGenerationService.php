@@ -15,8 +15,6 @@ final class UpstreamSupplyGenerationService
      */
     public static function generate(?string $targetDate = null, int $limit = 100, array $productIds = [], bool $dryRun = true): array
     {
-        self::ensureSchema();
-
         $productIds = array_values(array_filter(array_map(static fn($v): int => (int)$v, $productIds), static fn(int $v): bool => $v > 0));
         $bucketed = DemandWorkBucketService::previewBuckets($targetDate, $limit, $productIds);
         $rows = (array)($bucketed['rows'] ?? []);
@@ -81,6 +79,8 @@ final class UpstreamSupplyGenerationService
 
     public static function ensureSchema(): void
     {
+        // Explicit preparation helper for migration/test setup only. The
+        // runtime generation path must not invoke schema DDL.
         DemandEngineService::ensureSchema();
 
         DB::query("CREATE TABLE IF NOT EXISTS mfg_production_plan_candidates (
@@ -171,11 +171,19 @@ final class UpstreamSupplyGenerationService
 
         if ($targetId > 0 && self::targetExists('mfg_production_plan_candidates', $targetId)) {
             if (!$dryRun) {
-                DB::query(
-                    'UPDATE mfg_production_plan_candidates SET planned_qty=?, route_family=?, execution_path_label=?, source_summary_json=?, updated_at=NOW() WHERE id=?',
-                    [$qty, $routeFamily, (string)($row['execution_path_label'] ?? ''), self::safeJson($row), $targetId]
-                );
-                self::upsertLink('production', $productId, $demandDate, $sourceKey, $routeFamily, (string)($row['execution_path_label'] ?? ''), 'mfg_production_plan_candidates', $targetId, $qty, $row);
+                $db = DB::conn();
+                $db->begin_transaction();
+                try {
+                    DB::query(
+                        'UPDATE mfg_production_plan_candidates SET planned_qty=?, route_family=?, execution_path_label=?, source_summary_json=?, updated_at=NOW() WHERE id=?',
+                        [$qty, $routeFamily, (string)($row['execution_path_label'] ?? ''), self::safeJson($row), $targetId]
+                    );
+                    self::upsertLink('production', $productId, $demandDate, $sourceKey, $routeFamily, (string)($row['execution_path_label'] ?? ''), 'mfg_production_plan_candidates', $targetId, $qty, $row);
+                    $db->commit();
+                } catch (\Throwable $e) {
+                    $db->rollback();
+                    throw $e;
+                }
             }
             return ['action' => 'updated', 'target_id' => $targetId, 'qty' => $qty, 'count' => 1, 'counter_key' => 'production_updated'];
         }
@@ -184,26 +192,49 @@ final class UpstreamSupplyGenerationService
             return ['action' => 'create', 'target_id' => null, 'qty' => $qty, 'count' => 1, 'counter_key' => 'production_created'];
         }
 
-        DB::query(
-            'INSERT INTO mfg_production_plan_candidates (product_id, demand_date, planned_qty, route_family, execution_path_label, source_demand_reference, source_summary_json, status, created_by) VALUES (?,?,?,?,?,?,?,?,?)',
-            [
-                $productId,
-                $demandDate,
-                $qty,
-                $routeFamily,
-                (string)($row['execution_path_label'] ?? ''),
-                $sourceKey,
-                self::safeJson($row),
-                'draft',
-                self::currentUserLabel(),
-            ]
-        );
-        $targetId = (int)(DB::conn()->insert_id ?: 0);
-        if ($targetId <= 0) {
-            throw new \RuntimeException('Failed to create production plan candidate.');
-        }
+        $db = DB::conn();
+        $db->begin_transaction();
+        try {
+            DB::query(
+                'INSERT INTO mfg_production_plan_candidates (product_id, demand_date, planned_qty, route_family, execution_path_label, source_demand_reference, source_summary_json, status, created_by) VALUES (?,?,?,?,?,?,?,?,?)',
+                [
+                    $productId,
+                    $demandDate,
+                    $qty,
+                    $routeFamily,
+                    (string)($row['execution_path_label'] ?? ''),
+                    $sourceKey,
+                    self::safeJson($row),
+                    'draft',
+                    self::currentUserLabel(),
+                ]
+            );
+            $targetId = (int)($db->insert_id ?: 0);
+            if ($targetId <= 0) {
+                throw new \RuntimeException('Failed to create production plan candidate.');
+            }
 
-        self::upsertLink('production', $productId, $demandDate, $sourceKey, $routeFamily, (string)($row['execution_path_label'] ?? ''), 'mfg_production_plan_candidates', $targetId, $qty, $row);
+            self::upsertLink('production', $productId, $demandDate, $sourceKey, $routeFamily, (string)($row['execution_path_label'] ?? ''), 'mfg_production_plan_candidates', $targetId, $qty, $row);
+            $db->commit();
+        } catch (\Throwable $e) {
+            $duplicateKey = self::isDuplicateKeyFailure($e);
+            $db->rollback();
+            if ($duplicateKey) {
+                $existing = self::concurrentTargetResult(
+                    'production',
+                    $productId,
+                    $demandDate,
+                    $sourceKey,
+                    'mfg_production_plan_candidates',
+                    $qty,
+                    'production_updated'
+                );
+                if ($existing !== null) {
+                    return $existing;
+                }
+            }
+            throw $e;
+        }
         return ['action' => 'created', 'target_id' => $targetId, 'qty' => $qty, 'count' => 1, 'counter_key' => 'production_created'];
     }
 
@@ -238,11 +269,19 @@ final class UpstreamSupplyGenerationService
 
         if ($targetId > 0 && self::targetExists('mfg_procurement_demands', $targetId)) {
             if (!$dryRun) {
-                DB::query(
-                    'UPDATE mfg_procurement_demands SET required_qty=?, fulfillment_mode=?, dispatch_mode=?, route_family=?, execution_path_label=?, source_summary_json=?, updated_at=NOW() WHERE id=?',
-                    [$qty, $fulfillmentMode, $dispatchMode, $routeFamily, (string)($row['execution_path_label'] ?? ''), self::safeJson($row), $targetId]
-                );
-                self::upsertLink('procurement', $productId, $demandDate, $sourceKey, $routeFamily, (string)($row['execution_path_label'] ?? ''), 'mfg_procurement_demands', $targetId, $qty, $row);
+                $db = DB::conn();
+                $db->begin_transaction();
+                try {
+                    DB::query(
+                        'UPDATE mfg_procurement_demands SET required_qty=?, fulfillment_mode=?, dispatch_mode=?, route_family=?, execution_path_label=?, source_summary_json=?, updated_at=NOW() WHERE id=?',
+                        [$qty, $fulfillmentMode, $dispatchMode, $routeFamily, (string)($row['execution_path_label'] ?? ''), self::safeJson($row), $targetId]
+                    );
+                    self::upsertLink('procurement', $productId, $demandDate, $sourceKey, $routeFamily, (string)($row['execution_path_label'] ?? ''), 'mfg_procurement_demands', $targetId, $qty, $row);
+                    $db->commit();
+                } catch (\Throwable $e) {
+                    $db->rollback();
+                    throw $e;
+                }
             }
             return ['action' => 'updated', 'target_id' => $targetId, 'qty' => $qty, 'count' => 1, 'counter_key' => 'procurement_updated'];
         }
@@ -251,28 +290,51 @@ final class UpstreamSupplyGenerationService
             return ['action' => 'create', 'target_id' => null, 'qty' => $qty, 'count' => 1, 'counter_key' => 'procurement_created'];
         }
 
-        DB::query(
-            'INSERT INTO mfg_procurement_demands (product_id, required_qty, required_date, fulfillment_mode, dispatch_mode, route_family, execution_path_label, source_demand_reference, source_summary_json, status, created_by) VALUES (?,?,?,?,?,?,?,?,?,?,?)',
-            [
-                $productId,
-                $qty,
-                $demandDate,
-                $fulfillmentMode,
-                $dispatchMode,
-                $routeFamily,
-                (string)($row['execution_path_label'] ?? ''),
-                $sourceKey,
-                self::safeJson($row),
-                'draft',
-                self::currentUserLabel(),
-            ]
-        );
-        $targetId = (int)(DB::conn()->insert_id ?: 0);
-        if ($targetId <= 0) {
-            throw new \RuntimeException('Failed to create procurement demand.');
-        }
+        $db = DB::conn();
+        $db->begin_transaction();
+        try {
+            DB::query(
+                'INSERT INTO mfg_procurement_demands (product_id, required_qty, required_date, fulfillment_mode, dispatch_mode, route_family, execution_path_label, source_demand_reference, source_summary_json, status, created_by) VALUES (?,?,?,?,?,?,?,?,?,?,?)',
+                [
+                    $productId,
+                    $qty,
+                    $demandDate,
+                    $fulfillmentMode,
+                    $dispatchMode,
+                    $routeFamily,
+                    (string)($row['execution_path_label'] ?? ''),
+                    $sourceKey,
+                    self::safeJson($row),
+                    'draft',
+                    self::currentUserLabel(),
+                ]
+            );
+            $targetId = (int)($db->insert_id ?: 0);
+            if ($targetId <= 0) {
+                throw new \RuntimeException('Failed to create procurement demand.');
+            }
 
-        self::upsertLink('procurement', $productId, $demandDate, $sourceKey, $routeFamily, (string)($row['execution_path_label'] ?? ''), 'mfg_procurement_demands', $targetId, $qty, $row);
+            self::upsertLink('procurement', $productId, $demandDate, $sourceKey, $routeFamily, (string)($row['execution_path_label'] ?? ''), 'mfg_procurement_demands', $targetId, $qty, $row);
+            $db->commit();
+        } catch (\Throwable $e) {
+            $duplicateKey = self::isDuplicateKeyFailure($e);
+            $db->rollback();
+            if ($duplicateKey) {
+                $existing = self::concurrentTargetResult(
+                    'procurement',
+                    $productId,
+                    $demandDate,
+                    $sourceKey,
+                    'mfg_procurement_demands',
+                    $qty,
+                    'procurement_updated'
+                );
+                if ($existing !== null) {
+                    return $existing;
+                }
+            }
+            throw $e;
+        }
         return ['action' => 'created', 'target_id' => $targetId, 'qty' => $qty, 'count' => 1, 'counter_key' => 'procurement_created'];
     }
 
@@ -332,6 +394,43 @@ final class UpstreamSupplyGenerationService
             [$workType, $productId, $demandDate, $sourceKey]
         );
         return is_array($row) ? $row : null;
+    }
+
+    /**
+     * Recover the committed target after a concurrent creator loses an
+     * existing composite unique-key race. This is deliberately limited to the
+     * established target/link contract; other database failures still surface.
+     *
+     * @return array<string,mixed>|null
+     */
+    private static function concurrentTargetResult(
+        string $workType,
+        int $productId,
+        string $demandDate,
+        string $sourceKey,
+        string $targetTable,
+        float $qty,
+        string $counterKey
+    ): ?array {
+        $existing = self::findLink($workType, $productId, $demandDate, $sourceKey);
+        $targetId = $existing ? (int)($existing['target_id'] ?? 0) : 0;
+        if ($targetId <= 0 || !self::targetExists($targetTable, $targetId)) {
+            return null;
+        }
+
+        return [
+            'action' => 'updated',
+            'target_id' => $targetId,
+            'qty' => $qty,
+            'count' => 1,
+            'counter_key' => $counterKey,
+        ];
+    }
+
+    private static function isDuplicateKeyFailure(\Throwable $e): bool
+    {
+        return str_contains($e->getMessage(), 'Duplicate entry')
+            || str_contains($e->getMessage(), 'Duplicate key');
     }
 
     /**
