@@ -15,6 +15,11 @@ final class AclPolicy
     private static ?array $effectiveRolePermissions = null;
 
     /**
+     * @var array<string,array<string,bool>>|null
+     */
+    private static ?array $effectiveRoleDenials = null;
+
+    /**
      * @var array<int,string>|null
      */
     private static ?array $roleKeysCache = null;
@@ -597,6 +602,7 @@ final class AclPolicy
     public static function invalidateCache(): void
     {
         self::$effectiveRolePermissions = null;
+        self::$effectiveRoleDenials = null;
         self::$roleKeysCache = null;
     }
 
@@ -612,6 +618,7 @@ final class AclPolicy
         self::syncRegistry();
 
         $map = [];
+        $denials = [];
         foreach (self::defaultRoleMatrix() as $role => $permissions) {
             foreach ($permissions as $permission) {
                 $map[$role][$permission] = true;
@@ -644,11 +651,13 @@ final class AclPolicy
 
                 if ($state === 'deny') {
                     unset($map[$role][$permission]);
+                    $denials[$role][$permission] = true;
                     continue;
                 }
 
                 if ($state === 'allow') {
                     $map[$role][$permission] = true;
+                    unset($denials[$role][$permission]);
                 }
             }
         } catch (\Throwable $e) {
@@ -656,6 +665,7 @@ final class AclPolicy
         }
 
         self::$effectiveRolePermissions = $map;
+        self::$effectiveRoleDenials = $denials;
         return $map;
     }
 
@@ -667,6 +677,7 @@ final class AclPolicy
     {
         $effective = self::effectiveRolePermissions();
         $granted = [];
+        $denied = [];
 
         $authorityRole = trim((string)($ctx['authority_role'] ?? ''));
         // tv_display users are read-only kiosk accounts — they hold no interactive permissions
@@ -680,11 +691,17 @@ final class AclPolicy
             foreach (array_keys($effective[$authorityRole] ?? []) as $permission) {
                 $granted[$permission] = true;
             }
+            foreach (array_keys(self::$effectiveRoleDenials[$authorityRole] ?? []) as $permission) {
+                $denied[$permission] = true;
+            }
         }
 
         $legacyRole = self::roleSlug($user ?? ['role' => (string)($ctx['legacy_role'] ?? '')]);
         foreach (array_keys($effective[$legacyRole] ?? []) as $permission) {
             $granted[$permission] = true;
+        }
+        foreach (array_keys(self::$effectiveRoleDenials[$legacyRole] ?? []) as $permission) {
+            $denied[$permission] = true;
         }
 
         foreach (self::accessProfileMatrix() as $profile => $permissions) {
@@ -717,6 +734,10 @@ final class AclPolicy
                     }
                 }
             }
+        }
+
+        foreach (array_keys($denied) as $permission) {
+            unset($granted[$permission]);
         }
 
         return $granted;
