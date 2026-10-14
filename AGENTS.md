@@ -6308,3 +6308,13 @@ coverage passed **15/15**; existing builder, preview, apply-preparation, and
 readiness probes passed **13/13**, **30/30**, **7/7**, and **10/10**. No package
 publication, installation, database, migration, activation, deployment, or
 Core change occurred.
+
+## Session Summary (2026-10-15) — OH-AUTO1-059 Release Migration Governance Proposal
+
+Created a documentation-only REL-003 V1 proposal covering target-schema
+identity, immutable migration inventory, cross-owner dependency ordering,
+disabled-owner eligibility, partial-failure evidence, forward-only downgrade
+policy, and recovery boundaries. Pure fixtures passed **13/13**; existing
+migration compatibility, installed compatibility, and installed-evidence probes
+passed **16/16**, **16/16**, and **22/22**. No SQL, database, migration
+execution, schema mutation, or second migration system was added.

@@ -6387,6 +6387,16 @@ installation-owned `build_id` persistence, fail-closed verification, and
 contradiction handling. No runtime code, schema, database, signing, release
 apply, deployment, or activation behavior changed.
 
+## Session Summary (2026-10-15) — OH-AUTO1-059 Release Migration Governance Proposal
+
+Created a documentation-only REL-003 V1 proposal covering target-schema
+identity, immutable migration inventory, ledger comparison, cross-owner
+dependency ordering, disabled-owner eligibility, partial-failure evidence,
+forward-only downgrade policy, and recovery boundaries. Pure fixtures passed
+13/13; existing migration compatibility, installed compatibility, and
+installed-evidence probes passed 16/16, 16/16, and 22/22. No SQL, database,
+migration execution, schema mutation, or second migration system was added.
+
 ### Residual risk
 - Manual `createOrder()` does not currently validate a supplied supplier ID
   with the conversion path's active-supplier rule. No authoritative manual-order

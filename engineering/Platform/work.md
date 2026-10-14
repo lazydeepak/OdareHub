@@ -17,6 +17,10 @@ OH-AUTO1-058 is complete as a bounded REL-004 package-path correction. The
 work was limited to disposable ZIP fixtures and package-builder policy; no
 package publication, installation, database, or deployment operation occurred.
 
+OH-AUTO1-059 is complete as a read-only REL-003 migration-compatibility
+contract proposal. Migration execution, SQL, schema mutation, and a second
+migration system remain unauthorized.
+
 ## In Progress
 
 - [x] OH-AUTO1-018 — Critical business workflow and data-integrity audit. Corrected the Procurement order/receipt method-boundary defect and added a read-only regression probe. Broader DB-backed behavioral probes remain not run because they mutate the installed database. See `docs/architecture/business-workflow-data-integrity-audit-2026-10-14.md`.
@@ -35,6 +39,7 @@ package publication, installation, database, or deployment operation occurred.
 - [x] OH-AUTO1-055 — Applied authorized Core ACL deny-precedence and plugin route-registration rollback corrections. In-memory regressions pass 12/12 and 15/15; architecture gates pass 49/49 with the scoped Core exception. See `docs/architecture/oh-auto1-055-core-security-lifecycle-remediation-2026-10-15.md`.
 - [x] OH-AUTO1-057 — Release authority and installed identity V1 design proposal. Pending architecture/release-authority decisions; no runtime implementation. See `docs/architecture/oh-auto1-057-release-authority-installed-identity-design-2026-10-15.md`.
 - [x] OH-AUTO1-058 — Resolved vendor development metadata conflict at the release-builder boundary without weakening strict package inspection. REL-004 fixture 15/15; existing builder 13/13, preview 30/30, apply preparation 7/7, and readiness evidence 10/10. See `docs/architecture/oh-auto1-058-release-package-protected-path-compatibility-2026-10-15.md`.
+- [x] OH-AUTO1-059 — Release migration compatibility, target-schema identity, ordering, failure, and downgrade V1 contract proposal. Pending architecture/release-authority decisions; no migration execution or schema mutation. See `docs/architecture/oh-auto1-059-release-migration-compatibility-ordering-contract-2026-10-15.md`.
 - [x] OH-AUTO1-016 — Read-only application/module lifecycle enforcement audit. Corrected the SBAIO legacy fallback loader outside Core; escalated module-surface filtering, universal module route guards, and plugin partial-route rollback for Core/platform owner review. See `docs/architecture/lifecycle-enforcement-audit-2026-10-14.md`.
 - [x] OH-AUTO1-010 — CLI installed-state evidence integration.
 - [x] OH-AUTO1-011 — Migration ordering and schema-target compatibility preflight.

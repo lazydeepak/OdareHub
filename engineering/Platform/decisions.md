@@ -2,6 +2,37 @@
 
 ## Decision Log
 
+### 2026-10-15 — OH-AUTO1-059 release migration governance proposal
+**Status:** Proposed; approval required
+
+**Context**
+
+The existing `AppMigrationService` executes owner-local SQL in lexical order,
+while Platform preflight and installed evidence validate ledger facts. There is
+no approved release-wide target-schema identity or cross-owner dependency
+ordering contract.
+
+**Proposal**
+
+Use one release-owned migration inventory with immutable owner/migration
+identity, exact SQL checksum, explicit dependency edges, opaque target-schema
+identity, and stable topological ordering. Keep `AppMigrationService` as the
+execution authority. Treat failed/partial state, unknown or modified
+migrations, disabled-owner requirements, dependency errors, and downgrade
+requests as fail-closed. Use verified recovery points rather than guessed
+reverse SQL for rollback.
+
+**Boundary**
+
+This is design-only and fixture-verified. It does not add a migration runner,
+execute SQL, change schema/ledgers, or authorize rollback/apply. REL-001/002
+approval and database requalification remain separate gates.
+
+**Evidence**
+
+`docs/architecture/oh-auto1-059-release-migration-compatibility-ordering-contract-2026-10-15.md`;
+pure fixture probe 13/13 and existing migration probes 16/16, 16/16, 22/22.
+
 ### 2026-10-15 — OH-AUTO1-058 vendor development metadata is build-excluded
 **Status:** Implemented under the existing V1 package exclusion contract
 
