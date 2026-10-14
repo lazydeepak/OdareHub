@@ -66,8 +66,8 @@ final class MachinesAdapter
             $total = $defaults['kpi']['run_now'] + $defaults['kpi']['next_queue'] + $defaults['kpi']['delayed_jobs'];
             $defaults['empty'] = ($total === 0);
         } catch (\Throwable $e) {
-            $defaults['error'] = $e->getMessage();
             error_log('MachinesAdapter::getData: ' . $e->getMessage());
+            $defaults['error'] = 'operator.common.data_unavailable';
         }
 
         return $defaults;

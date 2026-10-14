@@ -77,7 +77,7 @@ final class OperatorRealtimeKpiProvider
                     $cache->set($cacheKey, $data);
                     $result[$key] = $data;
                 }
-            } catch (Exception $e) {
+            } catch (\Throwable $e) {
                 // Log error but don't fail the entire update
                 error_log("KPI fetch error for {$view}/{$key}: {$e->getMessage()}");
             }
@@ -106,7 +106,7 @@ final class OperatorRealtimeKpiProvider
                 'coverage_pct' => (float)($data['summary']['avg_coverage'] ?? 0),
                 'due_today' => (int)($data['summary']['due_today_count'] ?? 0),
             ];
-        } catch (Exception $e) {
+        } catch (\Throwable $e) {
             return null;
         }
     }
@@ -131,7 +131,7 @@ final class OperatorRealtimeKpiProvider
                 'at_risk_today' => (int)($data['summary']['at_risk_today_count'] ?? 0),
                 'overstock_parts' => (int)($data['summary']['overstock_parts'] ?? 0),
             ];
-        } catch (Exception $e) {
+        } catch (\Throwable $e) {
             return null;
         }
     }
@@ -173,7 +173,7 @@ final class OperatorRealtimeKpiProvider
                 'in_progress' => (int)($data['summary']['in_progress_count'] ?? 0),
                 'blocked' => (int)($data['summary']['blocked_count'] ?? 0),
             ];
-        } catch (Exception $e) {
+        } catch (\Throwable $e) {
             return null;
         }
     }
@@ -198,7 +198,7 @@ final class OperatorRealtimeKpiProvider
                 'low_coverage_count' => (int)($data['summary']['low_coverage_count'] ?? 0),
                 'avg_coverage' => (float)($data['summary']['avg_coverage'] ?? 0),
             ];
-        } catch (Exception $e) {
+        } catch (\Throwable $e) {
             return null;
         }
     }
@@ -222,7 +222,7 @@ final class OperatorRealtimeKpiProvider
                 'failed_qc' => (int)($data['summary']['failed_qc'] ?? 0),
                 'passed_qc' => (int)($data['summary']['passed_qc'] ?? 0),
             ];
-        } catch (Exception $e) {
+        } catch (\Throwable $e) {
             return null;
         }
     }
@@ -246,7 +246,7 @@ final class OperatorRealtimeKpiProvider
                 'idle_machines' => (int)($data['summary']['idle_machines'] ?? 0),
                 'maintenance' => (int)($data['summary']['maintenance'] ?? 0),
             ];
-        } catch (Exception $e) {
+        } catch (\Throwable $e) {
             return null;
         }
     }
@@ -270,7 +270,7 @@ final class OperatorRealtimeKpiProvider
                 'critical_stock' => (int)($data['summary']['critical_stock'] ?? 0),
                 'overstock' => (int)($data['summary']['overstock'] ?? 0),
             ];
-        } catch (Exception $e) {
+        } catch (\Throwable $e) {
             return null;
         }
     }
@@ -294,7 +294,7 @@ final class OperatorRealtimeKpiProvider
                 'in_progress' => (int)($data['summary']['in_progress'] ?? 0),
                 'completed' => (int)($data['summary']['completed'] ?? 0),
             ];
-        } catch (Exception $e) {
+        } catch (\Throwable $e) {
             return null;
         }
     }

@@ -126,8 +126,8 @@ final class MaterialsAdapter
             $defaults['kpi']['critical_shortage'] = count($defaults['critical_shortage']);
             $defaults['empty'] = ($defaults['kpi']['total_materials'] === 0);
         } catch (\Throwable $e) {
-            $defaults['error'] = $e->getMessage();
             error_log('MaterialsAdapter::getData: ' . $e->getMessage());
+            $defaults['error'] = 'operator.common.data_unavailable';
         }
 
         return $defaults;

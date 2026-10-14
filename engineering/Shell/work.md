@@ -7,6 +7,10 @@ Continue safely decomposing `OperatorSurfaceComposer.php` toward orchestration-o
 ## In Progress
 
 - [ ] Decompose next `OperatorSurfaceComposer.php` non-rendering business-data block into focused composer/service class without changing runtime output.
+- [x] OH-AUTO1-019 — Corrected raw exception propagation from operator read-surface diagnostics. Server-side logging remains intact; operator payloads now use the localized `operator.common.data_unavailable` key. See `docs/architecture/operational-diagnostics-observability-audit-2026-10-14.md` and `apps/Shell/Tests/probe_operator_diagnostic_redaction.php`.
+- [x] OH-AUTO1-038 — Redacted WebSocket test exception details, cache status exception payloads, and realtime/cache stdout exception leakage while retaining server-side diagnostics. Extended `probe_operator_diagnostic_redaction.php` to 63/63 assertions. No Core, database, or live HTTP changes.
+- [x] OH-AUTO1-039 — Realtime authentication now requires the existing session cookie, authenticated `Auth` session/CSRF authority, verified identity binding, and operator route authorization; authorization is rechecked before subscription and KPI delivery. Missing authority fails closed. Probe coverage: 81/81; no Core, database, or live WebSocket changes.
+- [x] OH-AUTO1-040 — Traced Ratchet handshake origin handling and credential exposure. The bootstrap has no `OriginCheck` and no repository trusted-origin authority; no arbitrary allowlist or protocol migration was introduced. Removed credential-bearing WebSocket URL from client console diagnostics and added explicit handshake-state coverage. Probe coverage: 89/89; origin enforcement remains a deployment/protocol decision.
 
 ## Next
 

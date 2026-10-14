@@ -61,8 +61,8 @@ final class OperatorRealtimeCacheManager
                     echo "[Cache] Redis connected at {$host}:{$port}\n";
                 }
             }
-        } catch (Exception $e) {
-            echo "[Cache] Redis unavailable: {$e->getMessage()}\n";
+        } catch (\Throwable $e) {
+            error_log('[OperatorRealtimeCacheManager] Redis unavailable: ' . $e->getMessage());
         }
 
         if (!$this->redisAvailable) {
@@ -160,8 +160,8 @@ final class OperatorRealtimeCacheManager
                 if (!empty($keys)) {
                     $this->redis->del(...$keys);
                 }
-            } catch (Exception $e) {
-                echo "[Cache] Flush error: {$e->getMessage()}\n";
+            } catch (\Throwable $e) {
+                error_log('[OperatorRealtimeCacheManager] Flush error: ' . $e->getMessage());
             }
         } else {
             $this->memoryCache = [];
@@ -181,12 +181,12 @@ final class OperatorRealtimeCacheManager
                     'entries' => count($keys),
                     'connected' => true,
                 ];
-            } catch (Exception $e) {
+            } catch (\Throwable $e) {
                 return [
                     'backend' => 'redis',
                     'entries' => 0,
                     'connected' => false,
-                    'error' => $e->getMessage(),
+                    'error' => 'cache_unavailable',
                 ];
             }
         }
@@ -218,8 +218,8 @@ final class OperatorRealtimeCacheManager
                 // Return stale value; background refresh should happen
                 return json_decode($staleValue, true);
             }
-        } catch (Exception $e) {
-            echo "[Cache] Redis get error: {$e->getMessage()}\n";
+        } catch (\Throwable $e) {
+            error_log('[OperatorRealtimeCacheManager] Redis get error: ' . $e->getMessage());
         }
 
         return null;
@@ -239,8 +239,8 @@ final class OperatorRealtimeCacheManager
             // Also store as stale copy with longer TTL
             $staleKey = "{$key}:stale";
             $this->redis->set($staleKey, $encoded, ['EX' => self::CACHE_TTL + self::STALE_GRACE_PERIOD]);
-        } catch (Exception $e) {
-            echo "[Cache] Redis set error: {$e->getMessage()}\n";
+        } catch (\Throwable $e) {
+            error_log('[OperatorRealtimeCacheManager] Redis set error: ' . $e->getMessage());
         }
     }
 

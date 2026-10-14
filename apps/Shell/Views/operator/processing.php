@@ -24,7 +24,7 @@
                             <div class="flash-ok" role="status"><?php echo htmlspecialchars($processingFlash); ?></div>
                         <?php endif; ?>
                         <?php if ($processingError !== ''): ?>
-                            <div class="flash-err" role="alert"><?php echo htmlspecialchars($processingError); ?></div>
+                            <div class="flash-err" role="alert"><?php echo htmlspecialchars($this->tr($processingError, 'Unable to load this data right now.')); ?></div>
                         <?php endif; ?>
 
                         <section class="surface-card" aria-label="<?php echo htmlspecialchars($this->tr('operator.processing.assembly.title', 'Assembly Plan')); ?>">

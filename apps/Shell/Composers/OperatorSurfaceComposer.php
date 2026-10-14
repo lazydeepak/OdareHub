@@ -749,7 +749,7 @@ final class OperatorSurfaceComposer
                 'critical_orders' => [],
                 'low_coverage_orders' => [],
                 'empty' => true,
-                'error' => $e->getMessage(),
+                'error' => 'operator.common.data_unavailable',
             ];
         }
     }
@@ -819,7 +819,7 @@ final class OperatorSurfaceComposer
             return QcAdapter::getData($days);
         } catch (\Throwable $e) {
             error_log('OperatorSurfaceComposer::buildQcFocusData: ' . $e->getMessage());
-            return ['kpi' => [], 'run_now' => [], 'pending_qc' => [], 'failed_recheck' => [], 'ready_dispatch' => [], 'sla' => [], 'today' => date('Y-m-d'), 'days' => 0, 'empty' => true, 'error' => $e->getMessage()];
+            return ['kpi' => [], 'run_now' => [], 'pending_qc' => [], 'failed_recheck' => [], 'ready_dispatch' => [], 'sla' => [], 'today' => date('Y-m-d'), 'days' => 0, 'empty' => true, 'error' => 'operator.common.data_unavailable'];
         }
     }
 
@@ -832,7 +832,7 @@ final class OperatorSurfaceComposer
             return DispatchAdapter::getData();
         } catch (\Throwable $e) {
             error_log('OperatorSurfaceComposer::buildDispatchAdapterFocusData: ' . $e->getMessage());
-            return ['kpi' => [], 'ready_now' => [], 'blocked_hold' => [], 'partial_queue' => [], 'aging_overdue' => [], 'release_candidates' => [], 'today' => date('Y-m-d'), 'empty' => true, 'error' => $e->getMessage()];
+            return ['kpi' => [], 'ready_now' => [], 'blocked_hold' => [], 'partial_queue' => [], 'aging_overdue' => [], 'release_candidates' => [], 'today' => date('Y-m-d'), 'empty' => true, 'error' => 'operator.common.data_unavailable'];
         }
     }
 
@@ -845,7 +845,7 @@ final class OperatorSurfaceComposer
             return MachinesAdapter::getData();
         } catch (\Throwable $e) {
             error_log('OperatorSurfaceComposer::buildMachinesFocusData: ' . $e->getMessage());
-            return ['kpi' => [], 'run_now' => [], 'next_queue' => [], 'delayed_jobs' => [], 'waiting_qc' => [], 'sections' => [], 'today' => date('Y-m-d'), 'empty' => true, 'error' => $e->getMessage()];
+            return ['kpi' => [], 'run_now' => [], 'next_queue' => [], 'delayed_jobs' => [], 'waiting_qc' => [], 'sections' => [], 'today' => date('Y-m-d'), 'empty' => true, 'error' => 'operator.common.data_unavailable'];
         }
     }
 
@@ -859,7 +859,7 @@ final class OperatorSurfaceComposer
             return AssemblyAdapter::getData($days);
         } catch (\Throwable $e) {
             error_log('OperatorSurfaceComposer::buildAssemblyFocusData: ' . $e->getMessage());
-            return ['kpi' => [], 'today_entries' => [], 'in_progress' => [], 'pending_approval' => [], 'today' => date('Y-m-d'), 'days' => 0, 'empty' => true, 'error' => $e->getMessage()];
+            return ['kpi' => [], 'today_entries' => [], 'in_progress' => [], 'pending_approval' => [], 'today' => date('Y-m-d'), 'days' => 0, 'empty' => true, 'error' => 'operator.common.data_unavailable'];
         }
     }
 
@@ -872,7 +872,7 @@ final class OperatorSurfaceComposer
             return MaterialsAdapter::getData();
         } catch (\Throwable $e) {
             error_log('OperatorSurfaceComposer::buildMaterialsFocusData: ' . $e->getMessage());
-            return ['kpi' => [], 'low_stock' => [], 'open_orders' => [], 'critical_shortage' => [], 'empty' => true, 'error' => $e->getMessage()];
+            return ['kpi' => [], 'low_stock' => [], 'open_orders' => [], 'critical_shortage' => [], 'empty' => true, 'error' => 'operator.common.data_unavailable'];
         }
     }
 
@@ -992,7 +992,7 @@ final class OperatorSurfaceComposer
             ];
         } catch (\Throwable $e) {
             error_log('OperatorSurfaceComposer::buildNotificationsFocusData: ' . $e->getMessage());
-            return ['alerts' => [], 'total_critical' => 0, 'total_warning' => 0, 'total_info' => 0, 'total_all' => 0, 'empty' => true, 'error' => $e->getMessage(), 'suppressed' => false, 'history' => []];
+            return ['alerts' => [], 'total_critical' => 0, 'total_warning' => 0, 'total_info' => 0, 'total_all' => 0, 'empty' => true, 'error' => 'operator.common.data_unavailable', 'suppressed' => false, 'history' => []];
         }
     }
 
@@ -1004,7 +1004,7 @@ final class OperatorSurfaceComposer
             return \Apps\Shell\Services\ShiftHandoffService::getForDate($userId, (string)($_GET['shift_date'] ?? ''));
         } catch (\Throwable $e) {
             error_log('OperatorSurfaceComposer::buildHandoffFocusData: ' . $e->getMessage());
-            return ['notes' => [], 'unacked_count' => 0, 'error' => $e->getMessage()];
+            return ['notes' => [], 'unacked_count' => 0, 'error' => 'operator.common.data_unavailable'];
         }
     }
 
@@ -1016,7 +1016,7 @@ final class OperatorSurfaceComposer
             return \Apps\Shell\Services\OperatorTaskService::getForUser($userId);
         } catch (\Throwable $e) {
             error_log('OperatorSurfaceComposer::buildTasksFocusData: ' . $e->getMessage());
-            return ['tasks' => [], 'open_count' => 0, 'error' => $e->getMessage()];
+            return ['tasks' => [], 'open_count' => 0, 'error' => 'operator.common.data_unavailable'];
         }
     }
 
@@ -1097,7 +1097,7 @@ final class OperatorSurfaceComposer
             ];
         } catch (\Throwable $e) {
             error_log('OperatorSurfaceComposer::buildMessagesFocusData: ' . $e->getMessage());
-            return ['items' => [], 'total' => 0, 'unread' => 0, 'total_warning' => 0, 'total_info' => 0, 'empty' => true, 'error' => $e->getMessage()];
+            return ['items' => [], 'total' => 0, 'unread' => 0, 'total_warning' => 0, 'total_info' => 0, 'empty' => true, 'error' => 'operator.common.data_unavailable'];
         }
     }
 
@@ -1654,7 +1654,7 @@ final class OperatorSurfaceComposer
                 'account' => [],
                 'policy' => [],
                 'flash' => '',
-                'error' => $e->getMessage(),
+                'error' => 'operator.common.data_unavailable',
             ];
         } finally {
             unset($_SESSION['my_account_flash_ok'], $_SESSION['my_account_flash_err']);

@@ -75,8 +75,8 @@ final class QcAdapter
             $total = $defaults['kpi']['run_now'] + $defaults['kpi']['pending_qc'] + $defaults['kpi']['failed_recheck'];
             $defaults['empty'] = ($total === 0);
         } catch (\Throwable $e) {
-            $defaults['error'] = $e->getMessage();
             error_log('QcAdapter::getData: ' . $e->getMessage());
+            $defaults['error'] = 'operator.common.data_unavailable';
         }
 
         return $defaults;

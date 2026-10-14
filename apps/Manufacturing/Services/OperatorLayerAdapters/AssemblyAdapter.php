@@ -109,8 +109,8 @@ final class AssemblyAdapter
 
             $defaults['empty'] = ($defaults['kpi']['today_total'] === 0);
         } catch (\Throwable $e) {
-            $defaults['error'] = $e->getMessage();
             error_log('AssemblyAdapter::getData: ' . $e->getMessage());
+            $defaults['error'] = 'operator.common.data_unavailable';
         }
 
         return $defaults;

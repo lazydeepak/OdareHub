@@ -25,7 +25,7 @@
                     <div class="coverage-focus-header">
                         <h2 class="surface-title"><?php echo htmlspecialchars($this->tr('operator.materials.page_title', 'Materials')); ?></h2>
                     </div>
-                    <?php if ($matError !== ''): ?><p class="coverage-focus-error"><?php echo htmlspecialchars($matError); ?></p><?php endif; ?>
+                    <?php if ($matError !== ''): ?><p class="coverage-focus-error"><?php echo htmlspecialchars($this->tr($matError, 'Unable to load this data right now.')); ?></p><?php endif; ?>
                     <?php if ($matEmpty && $matError === ''): ?>
                         <p class="coverage-focus-empty"><?php echo htmlspecialchars($this->tr('operator.materials.empty', 'No materials found.')); ?></p>
                     <?php else: ?>

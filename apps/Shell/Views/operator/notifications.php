@@ -32,7 +32,7 @@
     </div>
 
     <?php if ($ntfError !== ''): ?>
-        <p class="coverage-focus-error"><?php echo htmlspecialchars($ntfError); ?></p>
+        <p class="coverage-focus-error"><?php echo htmlspecialchars($this->tr($ntfError, 'Unable to load this data right now.')); ?></p>
     <?php endif; ?>
 
     <?php if ($ntfSuppressed): ?>

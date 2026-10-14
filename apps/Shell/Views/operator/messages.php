@@ -27,7 +27,7 @@
     </div>
 
     <?php if ($msgError !== ''): ?>
-        <p class="coverage-focus-error"><?php echo htmlspecialchars($msgError); ?></p>
+        <p class="coverage-focus-error"><?php echo htmlspecialchars($this->tr($msgError, 'Unable to load this data right now.')); ?></p>
     <?php endif; ?>
 
     <?php if ($msgEmpty && $msgError === ''): ?>

@@ -76,7 +76,10 @@ class OperatorRealtimeClient {
     const protocol = this.options.useSecure ? 'wss' : 'ws';
     const wsUrl = `${protocol}://${this.options.host}:${this.options.port}/operator/${this.username}/${this.view}?auth=${this.csrfToken}`;
 
-    console.debug(`[OperatorRealtime] Connecting to ${wsUrl}`);
+    // Do not emit the credential-bearing URL. The current compatibility
+    // protocol still transports auth in the query string, so browser console
+    // diagnostics must not duplicate that exposure.
+    console.debug(`[OperatorRealtime] Connecting to ${protocol}://${this.options.host}:${this.options.port}/operator/${this.username}/${this.view}`);
 
     try {
       this.socket = new WebSocket(wsUrl);

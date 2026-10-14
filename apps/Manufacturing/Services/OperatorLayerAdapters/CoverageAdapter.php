@@ -71,7 +71,7 @@ final class CoverageAdapter
             $defaults['low_coverage_orders'] = self::fetchLowCoverageOrders();
         } catch (\Throwable $e) {
             error_log('CoverageAdapter::getData: ' . $e->getMessage());
-            $defaults['error'] = 'Coverage data could not be loaded. Please try again later.';
+            $defaults['error'] = 'operator.common.data_unavailable';
         }
 
         return $defaults;

@@ -253,7 +253,7 @@
                 }, 5000);
 
             } catch (error) {
-                statusElement.textContent = `✗ <?php echo $this->tr('operator.prefs.realtime.error', 'Connection failed'); ?>: ${error.message}`;
+                statusElement.textContent = '✗ <?php echo $this->tr('operator.prefs.realtime.error', 'Connection failed'); ?>';
                 statusElement.className = 'realtime-test-status error';
             }
         }

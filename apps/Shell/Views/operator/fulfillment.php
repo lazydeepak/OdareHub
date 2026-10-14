@@ -63,7 +63,7 @@
         <?php endif; ?>
         <?php if ($preparationError !== ''): ?>
             <div class="surface-card">
-                <p class="u-m-0"><?php echo htmlspecialchars($preparationError); ?></p>
+                <p class="u-m-0"><?php echo htmlspecialchars($this->tr($preparationError, 'Unable to load this data right now.')); ?></p>
             </div>
         <?php endif; ?>
 
@@ -241,7 +241,7 @@
         <?php endif; ?>
         <?php if ($dispatchError !== ''): ?>
             <div class="surface-card">
-                <p class="u-m-0"><?php echo htmlspecialchars($dispatchError); ?></p>
+                <p class="u-m-0"><?php echo htmlspecialchars($this->tr($dispatchError, 'Unable to load this data right now.')); ?></p>
             </div>
         <?php endif; ?>
 

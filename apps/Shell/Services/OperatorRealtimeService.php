@@ -8,6 +8,8 @@ use Ratchet\MessageComponentInterface;
 use Ratchet\WebSocket\WsServer;
 use SplObjectStorage;
 use Throwable;
+use App\Core\Auth;
+use Apps\Platform\Services\UserAssignmentContext;
 
 /**
  * Operator Realtime Service
@@ -35,11 +37,20 @@ final class OperatorRealtimeService implements MessageComponentInterface
     private OperatorRealtimeKpiProvider $kpiProvider;
     private OperatorRealtimeCacheManager $cacheManager;
 
-    public function __construct()
+    /**
+     * Optional test seam for isolated authentication fixtures. Production uses
+     * the existing Auth and UserAssignmentContext authorities below.
+     *
+     * @var callable(string,string,string,string):bool|null
+     */
+    private $connectionAuthorizer;
+
+    public function __construct(?callable $connectionAuthorizer = null)
     {
         $this->clients = new SplObjectStorage();
         $this->kpiProvider = new OperatorRealtimeKpiProvider();
         $this->cacheManager = new OperatorRealtimeCacheManager();
+        $this->connectionAuthorizer = $connectionAuthorizer;
     }
 
     /**
@@ -54,11 +65,12 @@ final class OperatorRealtimeService implements MessageComponentInterface
         );
 
         // Validate CSRF token and session
-        if (!$this->validateConnection($auth, $username)) {
+        $cookieHeader = $this->cookieHeader($conn->httpRequest->getHeader('Cookie'));
+        if (!$this->validateConnection($auth, $username, $view, $cookieHeader)) {
             $conn->send(json_encode([
                 'type' => 'error',
                 'code' => 'unauthorized',
-                'message' => 'Invalid or expired CSRF token',
+                'message' => 'Realtime authentication failed',
             ]));
             $conn->close();
             return;
@@ -68,6 +80,8 @@ final class OperatorRealtimeService implements MessageComponentInterface
         $this->clients->offsetSet($conn, [
             'username' => $username,
             'view' => $view,
+            'auth_token' => $auth,
+            'session_cookie' => $cookieHeader,
             'prefs' => [
                 'refresh_interval_ms' => 5000,
                 'kpi_keys' => ['summary', 'critical_orders'],
@@ -99,6 +113,12 @@ final class OperatorRealtimeService implements MessageComponentInterface
             $type = (string)($data['type'] ?? '');
             $meta = $this->clients->offsetGet($from);
 
+            if (!is_array($meta) || !$this->isConnectionAuthorized($meta)) {
+                $this->sendUnauthorized($from);
+                $from->close();
+                return;
+            }
+
             match ($type) {
                 'subscribe' => $this->handleSubscribe($from, $data, $meta),
                 'refresh' => $this->handleRefresh($from, $meta),
@@ -106,7 +126,7 @@ final class OperatorRealtimeService implements MessageComponentInterface
                 default => null,
             };
         } catch (Throwable $e) {
-            echo "Error processing message: {$e->getMessage()}\n";
+            error_log('[OperatorRealtimeService] Error processing message: ' . $e->getMessage());
         }
     }
 
@@ -127,18 +147,130 @@ final class OperatorRealtimeService implements MessageComponentInterface
      */
     public function onError(ConnectionInterface $conn, Throwable $e): void
     {
-        echo "Error on connection {$conn->resourceId}: {$e->getMessage()}\n";
+        error_log('[OperatorRealtimeService] Error on connection ' . $conn->resourceId . ': ' . $e->getMessage());
         $conn->close();
     }
 
     /**
      * Validate CSRF token and session authorization
      */
-    private function validateConnection(string $token, string $username): bool
+    private function validateConnection(string $token, string $username, string $view = '', string $cookieHeader = ''): bool
     {
-        // TODO: Implement CSRF token validation against session store
-        // For now, accept all connections (production must implement)
-        return !empty($token) && !empty($username);
+        if ($this->connectionAuthorizer !== null) {
+            return (bool)($this->connectionAuthorizer)($token, $username, $view, $cookieHeader);
+        }
+
+        return $this->validateAgainstSession($token, $username, $view, $cookieHeader);
+    }
+
+    /**
+     * Validate the existing browser session and operator route authority.
+     *
+     * The realtime worker has no independent credential store. A missing
+     * session cookie, unavailable Auth backend, invalid CSRF token, inactive
+     * account, identity mismatch, or denied operator route fails closed.
+     */
+    private function validateAgainstSession(string $token, string $username, string $view, string $cookieHeader): bool
+    {
+        if ($token === '' || $username === '' || !$this->isRealtimeView($view) || $cookieHeader === '') {
+            return false;
+        }
+
+        try {
+            $this->seedSessionCookie($cookieHeader);
+            Auth::bootSession();
+            if (!Auth::isLoggedIn() || !hash_equals(Auth::csrfToken(), $token)) {
+                return false;
+            }
+
+            $user = Auth::user();
+            if (!is_array($user) || (int)($user['id'] ?? 0) <= 0) {
+                return false;
+            }
+
+            $context = UserAssignmentContext::context()->resolveUserContext($user);
+            $authorityRole = strtolower(trim((string)($context['authority_role'] ?? $user['authority_role'] ?? '')));
+            if ($authorityRole === 'tv_display') {
+                return false;
+            }
+
+            $identityHandle = \Apps\Shell\Services\WorkspaceWrapperRegistry::handleFromIdentity([
+                'username' => (string)($user['username'] ?? ''),
+                'email' => (string)($user['email'] ?? ''),
+            ]);
+            $requestedHandle = \Apps\Shell\Services\WorkspaceWrapperRegistry::normalizeHandle($username);
+            $isPrivileged = in_array($authorityRole, ['platform_admin', 'app_admin', 'sys_admin'], true);
+            if ($identityHandle === '' || $requestedHandle === '' || ($identityHandle !== $requestedHandle && !$isPrivileged)) {
+                return false;
+            }
+
+            $decision = UserAssignmentContext::accessPolicy()->routeAccessDecision(
+                $user,
+                '/u/' . $requestedHandle . '/' . $view,
+                'GET'
+            );
+            return ($decision['allowed'] ?? false) === true;
+        } catch (Throwable $e) {
+            error_log('[OperatorRealtimeService] Authentication authority unavailable: ' . $e->getMessage());
+            return false;
+        } finally {
+            if (session_status() === PHP_SESSION_ACTIVE) {
+                session_write_close();
+            }
+        }
+    }
+
+    private function isConnectionAuthorized(array $meta): bool
+    {
+        return $this->validateConnection(
+            (string)($meta['auth_token'] ?? ''),
+            (string)($meta['username'] ?? ''),
+            (string)($meta['view'] ?? ''),
+            (string)($meta['session_cookie'] ?? '')
+        );
+    }
+
+    private function sendUnauthorized(ConnectionInterface $conn): void
+    {
+        $conn->send(json_encode([
+            'type' => 'error',
+            'code' => 'unauthorized',
+            'message' => 'Realtime authentication failed',
+        ]));
+    }
+
+    private function isRealtimeView(string $view): bool
+    {
+        return in_array($view, [
+            'dashboard', 'production', 'dispatch', 'coverage', 'qc',
+            'machines', 'assembly', 'materials',
+        ], true);
+    }
+
+    private function cookieHeader(string|array|null $header): string
+    {
+        return is_array($header) ? implode('; ', $header) : trim((string)$header);
+    }
+
+    private function seedSessionCookie(string $cookieHeader): void
+    {
+        if (session_status() !== PHP_SESSION_NONE) {
+            return;
+        }
+
+        $configuredName = trim((string)getenv('ERP_SESSION_NAME'));
+        if ($configuredName !== '' && preg_match('/^[A-Za-z0-9_-]{3,40}$/', $configuredName)) {
+            session_name($configuredName);
+        }
+
+        $sessionName = session_name();
+        foreach (explode(';', $cookieHeader) as $part) {
+            $pair = explode('=', trim($part), 2);
+            if (count($pair) === 2 && trim($pair[0]) === $sessionName) {
+                $_COOKIE[$sessionName] = urldecode(trim($pair[1]));
+                return;
+            }
+        }
     }
 
     /**
@@ -199,6 +331,12 @@ final class OperatorRealtimeService implements MessageComponentInterface
      */
     private function sendKpiUpdate(ConnectionInterface $conn, array $meta): void
     {
+        if (!$this->isConnectionAuthorized($meta)) {
+            $this->sendUnauthorized($conn);
+            $conn->close();
+            return;
+        }
+
         try {
             $data = $this->kpiProvider->getKpiForView(
                 $meta['view'],
@@ -213,7 +351,7 @@ final class OperatorRealtimeService implements MessageComponentInterface
                 ...$data,
             ]));
         } catch (Throwable $e) {
-            echo "Error fetching KPI for {$meta['username']}/{$meta['view']}: {$e->getMessage()}\n";
+            error_log('[OperatorRealtimeService] Error fetching KPI for ' . $meta['username'] . '/' . $meta['view'] . ': ' . $e->getMessage());
         }
     }
 
@@ -241,6 +379,13 @@ final class OperatorRealtimeService implements MessageComponentInterface
             try {
                 // Get first connection to extract preferences
                 $firstMeta = $this->clients->offsetGet($conns[0]);
+                if (!is_array($firstMeta) || !$this->isConnectionAuthorized($firstMeta)) {
+                    foreach ($conns as $conn) {
+                        $this->sendUnauthorized($conn);
+                        $conn->close();
+                    }
+                    continue;
+                }
                 $kpiKeys = $firstMeta['prefs']['kpi_keys'] ?? ['summary', 'critical_orders'];
 
                 $data = $this->kpiProvider->getKpiForView(
@@ -260,7 +405,7 @@ final class OperatorRealtimeService implements MessageComponentInterface
                     $conn->send($message);
                 }
             } catch (Throwable $e) {
-                echo "Error broadcasting KPI for {$key}: {$e->getMessage()}\n";
+                error_log('[OperatorRealtimeService] Error broadcasting KPI for ' . $key . ': ' . $e->getMessage());
             }
         }
     }

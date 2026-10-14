@@ -51,7 +51,7 @@
         <p class="coverage-focus-error"><?php echo $tdFormErr; ?></p>
     <?php endif; ?>
     <?php if ($tdError !== '' && $tdFormErr === ''): ?>
-        <p class="coverage-focus-error"><?php echo htmlspecialchars($tdError); ?></p>
+        <p class="coverage-focus-error"><?php echo htmlspecialchars($this->tr($tdError, 'Unable to load this data right now.')); ?></p>
     <?php endif; ?>
 
     <!-- KPI strip -->

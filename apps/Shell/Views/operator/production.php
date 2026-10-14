@@ -25,7 +25,7 @@
                         <h2 class="dashboard-top-title"><?php echo htmlspecialchars((string)($production['title'] ?? $this->tr('operator.production.title', 'Production'))); ?></h2>
                         <p class="recent-focus-subtitle"><?php echo htmlspecialchars((string)($production['subtitle'] ?? $this->tr('operator.production.subtitle', 'Plans queue, coverage, and quick plan creation in one workspace.'))); ?></p>
                         <?php if (($production['flash'] ?? '') !== ''): ?><div class="flash-ok" role="status"><?php echo htmlspecialchars((string)$production['flash']); ?></div><?php endif; ?>
-                        <?php if (($production['error'] ?? '') !== ''): ?><div class="flash-err" role="alert"><?php echo htmlspecialchars((string)$production['error']); ?></div><?php endif; ?>
+                        <?php if (($production['error'] ?? '') !== ''): ?><div class="flash-err" role="alert"><?php echo htmlspecialchars($this->tr((string)$production['error'], 'Unable to load this data right now.')); ?></div><?php endif; ?>
 
                         <div class="recent-focus-summary">
                             <div class="recent-focus-kpi">

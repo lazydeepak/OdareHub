@@ -16,6 +16,7 @@ return [
     'common.my_account' => '',
     'common.qty' => '',
     'common.today' => '',
+    'operator.common.data_unavailable' => '現在データを読み込めません。しばらくしてからもう一度お試しください。',
     'nav.alerts' => '',
     'nav.daily_orders' => '',
     'nav.topbar_search_no_matches' => '',

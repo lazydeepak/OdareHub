@@ -67,8 +67,8 @@ final class DispatchAdapter
             $total = $defaults['kpi']['ready_now'] + $defaults['kpi']['blocked_hold'] + $defaults['kpi']['partial_queue'];
             $defaults['empty'] = ($total === 0);
         } catch (\Throwable $e) {
-            $defaults['error'] = $e->getMessage();
             error_log('DispatchAdapter::getData: ' . $e->getMessage());
+            $defaults['error'] = 'operator.common.data_unavailable';
         }
 
         return $defaults;

@@ -16,6 +16,7 @@ return [
     'common.my_account' => '',
     'common.qty' => '',
     'common.today' => '',
+    'operator.common.data_unavailable' => 'अहिले यो डेटा लोड गर्न सकिएन। कृपया पछि फेरि प्रयास गर्नुहोस्।',
     'nav.alerts' => '',
     'nav.daily_orders' => '',
     'nav.topbar_search_no_matches' => '',

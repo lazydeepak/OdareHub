@@ -16,6 +16,7 @@ return [
     'common.my_account' => 'My Account',
     'common.qty' => 'Qty',
     'common.today' => 'Today',
+    'operator.common.data_unavailable' => 'Unable to load this data right now. Please try again later.',
     'nav.alerts' => 'Alerts',
     'nav.daily_orders' => 'Daily Orders',
     'nav.topbar_search_no_matches' => 'No results found',
