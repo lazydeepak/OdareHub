@@ -2,6 +2,24 @@
 
 ## Decision Log
 
+### 2026-10-15 — Authorized Core deny and plugin route rollback corrections
+**Status:** Implemented and verified
+
+**Decision**
+
+Preserve explicit ACL role denials through all additive permission sources, and
+make each plugin bootstrap/routes operation transactional for the existing
+Router route map. Failed plugin initialization restores only the pre-operation
+routes and rethrows the original exception; successful registration remains
+live and route ordering/dispatch semantics are unchanged.
+
+**Boundary**
+
+This decision is limited to `app/Core/AclPolicy.php`, `app/Core/Router.php`,
+and `app/Core/PluginManager.php` with isolated in-memory regression probes.
+Database-backed verification, lifecycle activation, and deployment remain out
+of scope.
+
 ### 2026-08-19 — V1 recovery provider uses local MySQL/MariaDB dump plus filesystem archive
 **Status:** Accepted
 

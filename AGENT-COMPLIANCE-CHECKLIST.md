@@ -6343,6 +6343,24 @@ readiness remains blocked.
 - Core lock: ✅
 - Excluded runtime logs and PHPUnit cache preserved.
 
+## Session Summary (2026-10-15) — OH-AUTO1-055 Core Security and Lifecycle Remediation
+
+### Authorized Core corrections
+- `app/Core/AclPolicy.php`: retained explicit role denials through additive
+  access-profile, explicit-permission, and assigned-app composition.
+- `app/Core/Router.php` and `app/Core/PluginManager.php`: added scoped route
+  snapshot rollback for failed plugin bootstrap/route registration while
+  preserving exceptions and unrelated routes.
+
+### Validation
+- ACL regression: ✅ 12/12, in-memory only
+- Plugin route rollback regression: ✅ 15/15, in-memory only
+- PHP lint: ✅
+- Architecture gates with scoped Core approval: ✅ 49/49
+- Deletion-family gates: ✅ 28/28
+- Business ownership gate and diff hygiene: ✅
+- No database, SQL, migration, activation, deployment, or release apply.
+
 ### Residual risk
 - Manual `createOrder()` does not currently validate a supplied supplier ID
   with the conversion path's active-supplier rule. No authoritative manual-order

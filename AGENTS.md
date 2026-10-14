@@ -6272,3 +6272,13 @@ publication. Disposable fixture probe passed 10/10, full readiness passed in
 read-only mode, architecture gates passed 49/49, and deletion gates passed
 28/28. No database, SQL, migration, activation, deployment, or Core operation
 was performed.
+
+## Session Summary (2026-10-15) — OH-AUTO1-055 Core Security and Lifecycle Remediation
+
+Applied the explicitly authorized Core corrections: `AclPolicy` now preserves
+role denials after additive grant composition, and `PluginManager` rolls back
+only routes introduced by a failed plugin initialization scope through the
+existing `Router`. In-memory regressions passed **12/12** and **15/15**;
+architecture gates passed **49/49** with `ARCHITECTURE_GATE_ALLOW_CORE=1`.
+No unrelated Core files, database, SQL, migration, activation, deployment, or
+release operation was performed.
