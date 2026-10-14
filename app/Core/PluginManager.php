@@ -331,26 +331,34 @@ final class PluginManager
                 error_log('Plugin architecture warnings [' . $name . ']: ' . implode(' | ', $runtimeWarnings));
             }
 
-            $runtimePath = $this->runtimePath($m);
-            $this->view->addNamespace($name, $runtimePath . '/Views');
+            $routeSnapshot = $this->router->beginRouteRegistrationScope();
+            try {
+                $runtimePath = $this->runtimePath($m);
+                $this->view->addNamespace($name, $runtimePath . '/Views');
 
-            $boot = $runtimePath . '/bootstrap.php';
-            if (is_file($boot)) {
-                $c = $this->c;
-                $router = $this->router;
-                $view = $this->view;
-                $bus = $this->bus;
-                require $boot;
-            }
+                $boot = $runtimePath . '/bootstrap.php';
+                if (is_file($boot)) {
+                    $c = $this->c;
+                    $router = $this->router;
+                    $view = $this->view;
+                    $bus = $this->bus;
+                    require $boot;
+                }
 
-            $entry = $m['entry'] ?? 'routes.php';
-            $routes = $runtimePath . '/' . $entry;
-            if (is_file($routes)) {
-                $router = $this->router;
-                $c = $this->c;
-                $view = $this->view;
-                $bus = $this->bus;
-                require $routes;
+                $entry = $m['entry'] ?? 'routes.php';
+                $routes = $runtimePath . '/' . $entry;
+                if (is_file($routes)) {
+                    $router = $this->router;
+                    $c = $this->c;
+                    $view = $this->view;
+                    $bus = $this->bus;
+                    require $routes;
+                }
+                $this->router->commitRouteRegistrationScope($routeSnapshot);
+            } catch (\Throwable $e) {
+                $this->router->rollbackRouteRegistrationScope($routeSnapshot);
+                error_log('Plugin initialization failed; routes rolled back [' . $name . ']: ' . get_class($e));
+                throw $e;
             }
         }
     }
