@@ -6325,6 +6325,24 @@ readiness remains blocked.
   includes CSS publishing commands with `--apply`; the read-only architecture
   suite was executed and certified instead.
 
+## Session Summary (2026-10-15) — OH-AUTO1-054 Non-Mutating Deployment Readiness
+
+### Correction
+- Default deployment readiness now uses strict read-only `--verify` modes for
+  registered CSS and first-boot CSS assets.
+- Explicit `--apply` remains available for separately authorized publication.
+- Verification fails for missing, stale, or structurally invalid CSS and does
+  not modify generated assets, manifests, caches, or installed state.
+
+### Validation
+- Disposable CSS publication probe: ✅ 10/10
+- Deployment readiness: ✅ read-only verify mode PASS
+- Architecture gates: ✅ 49/49
+- Deletion-family gates: ✅ 28/28
+- PHP/shell syntax and diff hygiene: ✅
+- Core lock: ✅
+- Excluded runtime logs and PHPUnit cache preserved.
+
 ### Residual risk
 - Manual `createOrder()` does not currently validate a supplied supplier ID
   with the conversion path's active-supplier rule. No authoritative manual-order

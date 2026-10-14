@@ -1,6 +1,6 @@
 # Deployment Readiness Orchestration Contract
 
-`bash scripts/system/check_deployment_readiness.sh` is the preferred validation entrypoint for fresh clones, local development, shared hosting shells, and CI-like environments.
+`bash scripts/system/check_deployment_readiness.sh` is the preferred read-only validation entrypoint for fresh clones, local development, shared hosting shells, and CI-like environments. Publication is a separate explicit operation via `--apply`.
 
 Deployment readiness is a governed validation orchestrator, not a runtime owner. It must not bypass Core, ACL, owner contracts, Studio approval/snapshot rules, migrations, or audit policy. Its generated CSS delivery remains a reproducible output, not source truth.
 
@@ -11,11 +11,18 @@ bash scripts/system/check_system_tools_inventory.sh
 bash scripts/system/check_backfill_utility_aging.sh
 php -l scripts/assets/publish_registered_css.php
 php -l scripts/assets/compile_first_boot_css.php
-php scripts/assets/publish_registered_css.php --apply
-php scripts/assets/compile_first_boot_css.php --apply
+php scripts/assets/publish_registered_css.php --verify
+php scripts/assets/compile_first_boot_css.php --verify
 bash scripts/architecture/run_architecture_gates.sh
 git diff --check
 git diff --quiet -- public/assets/apps
+```
+
+The explicit publication workflow remains available but is not part of
+verification:
+
+```bash
+bash scripts/system/check_deployment_readiness.sh --apply
 ```
 
 The order is intentional:

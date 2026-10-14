@@ -6,10 +6,17 @@ chdir($root);
 
 echo "[system] check_deployment_readiness_portable\n";
 
+$apply = in_array('--apply', $argv, true);
+$unknown = array_values(array_filter(array_slice($argv, 1), static fn (string $arg): bool => $arg !== '--apply'));
+if ($unknown !== []) {
+    fwrite(STDERR, "Unsupported argument(s): " . implode(', ', $unknown) . "\n");
+    exit(2);
+}
+
 $bash = findExecutable(PHP_OS_FAMILY === 'Windows' ? ['bash.exe', 'bash'] : ['bash']);
 if ($bash !== null) {
     echo "- bash detected; delegating to authoritative shell readiness orchestrator\n\n";
-    passthru(escapeshellarg($bash) . ' scripts/system/check_deployment_readiness.sh', $exitCode);
+    passthru(escapeshellarg($bash) . ' scripts/system/check_deployment_readiness.sh' . ($apply ? ' --apply' : ''), $exitCode);
     exit($exitCode);
 }
 
@@ -23,12 +30,12 @@ runStep('PHP syntax', [
     [PHP_BINARY . ' -l scripts/assets/compile_first_boot_css.php', true],
 ], $failures);
 
-runStep('Publish registered CSS assets', [
-    [PHP_BINARY . ' scripts/assets/publish_registered_css.php --apply', true],
+runStep($apply ? 'Publish registered CSS assets' : 'Verify registered CSS assets', [
+    [PHP_BINARY . ' scripts/assets/publish_registered_css.php ' . ($apply ? '--apply' : '--verify'), true],
 ], $failures);
 
-runStep('Publish first-boot CSS assets', [
-    [PHP_BINARY . ' scripts/assets/compile_first_boot_css.php --apply', true],
+runStep($apply ? 'Publish first-boot CSS assets' : 'Verify first-boot CSS assets', [
+    [PHP_BINARY . ' scripts/assets/compile_first_boot_css.php ' . ($apply ? '--apply' : '--verify'), true],
 ], $failures);
 
 echo "\n== Shell-only diagnostics ==\n";

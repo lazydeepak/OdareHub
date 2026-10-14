@@ -528,7 +528,8 @@ for stage in \
   "bash scripts/system/check_system_tools_inventory.sh" \
   "bash scripts/system/check_backfill_utility_aging.sh" \
   "php -l scripts/assets/publish_registered_css.php" \
-  "php scripts/assets/publish_registered_css.php --apply" \
+  "php scripts/assets/publish_registered_css.php --verify" \
+  "php scripts/assets/compile_first_boot_css.php --verify" \
   "bash scripts/architecture/run_architecture_gates.sh" \
   "git diff --check" \
   "git diff --quiet -- public/assets/apps"; do

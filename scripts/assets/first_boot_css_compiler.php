@@ -8,11 +8,11 @@ const FIRST_BOOT_MANIFEST = 'scripts/assets/first_boot_css_manifest.json';
 /**
  * @return array<string,mixed>
  */
-function compileFirstBootCssAssets(string $root, bool $apply): array
+function compileFirstBootCssAssets(string $root, bool $apply, bool $verify = false): array
 {
     $result = [
         'schema' => 'susankhya.first_boot_css_compile.v1',
-        'mode' => $apply ? 'apply' : 'dry-run',
+        'mode' => $apply ? 'apply' : ($verify ? 'verify' : 'dry-run'),
         'manifest' => FIRST_BOOT_MANIFEST,
         'ok' => false,
         'assets' => [],
@@ -61,6 +61,10 @@ function compileFirstBootCssAssets(string $root, bool $apply): array
                 $result['errors'][] = 'missing_or_unreadable_source:' . $source;
                 continue 2;
             }
+            if (!isCssStructurallyValid($css)) {
+                $result['errors'][] = 'invalid_css_source:' . $source;
+                continue 2;
+            }
 
             $sourceRecords[] = [
                 'path' => $source,
@@ -74,6 +78,10 @@ function compileFirstBootCssAssets(string $root, bool $apply): array
         $status = is_string($current) && hash_equals(hash('sha256', $current), hash('sha256', $compiled))
             ? 'current'
             : (is_file($targetPath) ? 'update' : 'create');
+
+        if ($verify && $status !== 'current') {
+            $result['errors'][] = 'asset_missing_or_stale:' . $target;
+        }
 
         if ($apply && $status !== 'current') {
             $targetDir = dirname($targetPath);
@@ -102,7 +110,7 @@ function compileFirstBootCssAssets(string $root, bool $apply): array
     $result['ok'] = $result['errors'] === [];
 
     // Also ensure theme.css is available for first-boot surfaces
-    $themeResult = compileThemeCssIfAvailable($root, $apply);
+    $themeResult = compileThemeCssIfAvailable($root, $apply, $verify);
     $result['theme_css'] = $themeResult;
     if (!$themeResult['ok']) {
         $result['ok'] = false;
@@ -119,7 +127,7 @@ function compileFirstBootCssAssets(string $root, bool $apply): array
  *
  * @return array{ok: bool, theme_css_status: string, error?: string}
  */
-function compileThemeCssIfAvailable(string $root, bool $apply = true): array
+function compileThemeCssIfAvailable(string $root, bool $apply = true, bool $verify = false): array
 {
     $themeManifestPath = $root . '/resources/themes/theme-manifest.json';
     $themeCompilerPath = $root . '/scripts/assets/compile_theme_sources.php';
@@ -136,6 +144,13 @@ function compileThemeCssIfAvailable(string $root, bool $apply = true): array
     $targetFingerprint = susankhyaCompiledThemeFingerprint($themeTargetPath);
     if ($targetFingerprint !== null && hash_equals($sourceFingerprint, $targetFingerprint)) {
         return ['ok' => true, 'theme_css_status' => 'already_current'];
+    }
+    if ($verify) {
+        return [
+            'ok' => false,
+            'theme_css_status' => is_file($themeTargetPath) ? 'stale' : 'missing',
+            'error' => 'theme_css_missing_or_stale',
+        ];
     }
     if (!$apply) {
         return [
@@ -263,4 +278,45 @@ function isAllowedFirstBootTarget(string $path): bool
     }
 
     return false;
+}
+
+function isCssStructurallyValid(string $css): bool
+{
+    $depth = 0;
+    $length = strlen($css);
+    $quote = null;
+    $comment = false;
+    for ($index = 0; $index < $length; $index++) {
+        $char = $css[$index];
+        $next = $index + 1 < $length ? $css[$index + 1] : '';
+        if ($comment) {
+            if ($char === '*' && $next === '/') {
+                $comment = false;
+                $index++;
+            }
+            continue;
+        }
+        if ($quote !== null) {
+            if ($char === '\\') {
+                $index++;
+            } elseif ($char === $quote) {
+                $quote = null;
+            }
+            continue;
+        }
+        if ($char === '/' && $next === '*') {
+            $comment = true;
+            $index++;
+        } elseif ($char === '"' || $char === "'") {
+            $quote = $char;
+        } elseif ($char === '{') {
+            $depth++;
+        } elseif ($char === '}') {
+            if ($depth === 0) {
+                return false;
+            }
+            $depth--;
+        }
+    }
+    return !$comment && $quote === null && $depth === 0;
 }

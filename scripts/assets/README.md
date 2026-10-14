@@ -14,6 +14,7 @@ Run from the repository root:
 ```bash
 php scripts/assets/publish_registered_css.php
 php scripts/assets/publish_registered_css.php --json
+php scripts/assets/publish_registered_css.php --verify
 php scripts/assets/publish_registered_css.php --apply
 php scripts/assets/publish_registered_css.php --apply --json
 ```
@@ -24,7 +25,7 @@ Validate PHP syntax with:
 php -l scripts/assets/publish_registered_css.php
 ```
 
-Dry-run is the default. Dry-run reads manifest-declared `styles` entries and prints the owner source CSS path plus the expected public asset target path. It does not copy, create, delete, or modify files.
+Dry-run is the default. Dry-run reads manifest-declared `styles` entries and prints the owner source CSS path plus the expected public asset target path. `--verify` is strict read-only mode: it fails when a declared target is missing or stale and also rejects structurally invalid source CSS. Neither mode copies, creates, deletes, or modifies files.
 
 Apply mode requires explicit `--apply`. Apply mode only copies owner CSS files into the confined delivery root `public/assets/apps/...`. It may create missing directories only under that delivery root. It must not edit source CSS, manifests, Core, Shell runtime code, app logic, or database state.
 

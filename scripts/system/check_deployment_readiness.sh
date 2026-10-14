@@ -6,6 +6,14 @@ cd "$ROOT_DIR"
 
 SELF_PATH="scripts/system/check_deployment_readiness.sh"
 STAGE_LINE_RESULT=""
+MODE="verify"
+
+if [[ "${1:-}" == "--apply" ]]; then
+  MODE="apply"
+elif [[ "${1:-}" != "" ]]; then
+  echo "Unsupported argument: ${1}" >&2
+  exit 2
+fi
 
 find_stage_line() {
   local pattern="$1"
@@ -37,7 +45,11 @@ require_stage_order() {
 }
 
 echo "[system] check_deployment_readiness"
-echo "- preparing generated delivery assets and running architecture validation"
+if [[ "$MODE" == "apply" ]]; then
+  echo "- applying generated delivery assets and running architecture validation"
+else
+  echo "- verifying generated delivery assets without modifying files"
+fi
 
 echo ""
 echo "== Readiness orchestration contract =="
@@ -49,9 +61,17 @@ find_stage_line '^[[:space:]]*php -l scripts/assets/publish_registered_css\.php[
 line_php_syntax="$STAGE_LINE_RESULT"
 find_stage_line '^[[:space:]]*php -l scripts/assets/compile_first_boot_css\.php[[:space:]]*$' "first-boot CSS compiler PHP syntax"
 line_first_boot_php_syntax="$STAGE_LINE_RESULT"
-find_stage_line '^[[:space:]]*php scripts/assets/publish_registered_css\.php --apply[[:space:]]*$' "registered CSS asset publishing"
+if [[ "$MODE" == "apply" ]]; then
+  find_stage_line '^[[:space:]]*php scripts/assets/publish_registered_css\.php --apply[[:space:]]*$' "registered CSS asset publishing"
+else
+  find_stage_line '^[[:space:]]*php scripts/assets/publish_registered_css\.php --verify[[:space:]]*$' "registered CSS asset verification"
+fi
 line_css_publish="$STAGE_LINE_RESULT"
-find_stage_line '^[[:space:]]*php scripts/assets/compile_first_boot_css\.php --apply[[:space:]]*$' "first-boot CSS asset publishing"
+if [[ "$MODE" == "apply" ]]; then
+  find_stage_line '^[[:space:]]*php scripts/assets/compile_first_boot_css\.php --apply[[:space:]]*$' "first-boot CSS asset publishing"
+else
+  find_stage_line '^[[:space:]]*php scripts/assets/compile_first_boot_css\.php --verify[[:space:]]*$' "first-boot CSS asset verification"
+fi
 line_first_boot_publish="$STAGE_LINE_RESULT"
 find_stage_line '^[[:space:]]*bash scripts/architecture/run_architecture_gates\.sh[[:space:]]*$' "architecture gates"
 line_architecture_gates="$STAGE_LINE_RESULT"
@@ -83,12 +103,22 @@ php -l scripts/assets/publish_registered_css.php
 php -l scripts/assets/compile_first_boot_css.php
 
 echo ""
-echo "== Publish registered CSS assets =="
-php scripts/assets/publish_registered_css.php --apply
+if [[ "$MODE" == "apply" ]]; then
+  echo "== Publish registered CSS assets =="
+  php scripts/assets/publish_registered_css.php --apply
+else
+  echo "== Verify registered CSS assets (read-only) =="
+  php scripts/assets/publish_registered_css.php --verify
+fi
 
 echo ""
-echo "== Publish first-boot CSS assets =="
-php scripts/assets/compile_first_boot_css.php --apply
+if [[ "$MODE" == "apply" ]]; then
+  echo "== Publish first-boot CSS assets =="
+  php scripts/assets/compile_first_boot_css.php --apply
+else
+  echo "== Verify first-boot CSS assets (read-only) =="
+  php scripts/assets/compile_first_boot_css.php --verify
+fi
 
 echo ""
 echo "== Architecture gates =="
@@ -109,4 +139,8 @@ else
 fi
 
 echo ""
-echo "DEPLOYMENT READINESS: PASS"
+if [[ "$MODE" == "apply" ]]; then
+  echo "DEPLOYMENT READINESS: PASS (apply mode)"
+else
+  echo "DEPLOYMENT READINESS: PASS (read-only verify mode)"
+fi

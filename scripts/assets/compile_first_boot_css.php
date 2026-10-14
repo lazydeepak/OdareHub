@@ -5,11 +5,24 @@ require_once __DIR__ . '/first_boot_css_compiler.php';
 
 $root = dirname(__DIR__, 2);
 $apply = in_array('--apply', $argv, true);
+$verify = in_array('--verify', $argv, true);
 $json = in_array('--json', $argv, true);
 $unknown = array_values(array_filter(
     array_slice($argv, 1),
-    static fn (string $arg): bool => !in_array($arg, ['--apply', '--json'], true)
+    static fn (string $arg): bool => !in_array($arg, ['--apply', '--verify', '--json'], true)
 ));
+
+if ($apply && $verify) {
+    $result = [
+        'schema' => 'susankhya.first_boot_css_compile.v1',
+        'mode' => 'invalid',
+        'manifest' => FIRST_BOOT_MANIFEST,
+        'ok' => false,
+        'assets' => [],
+        'errors' => ['use either --apply or --verify, not both'],
+    ];
+    emitResult($result, $json);
+}
 
 if ($unknown !== []) {
     $result = [
@@ -23,7 +36,7 @@ if ($unknown !== []) {
     emitResult($result, $json);
 }
 
-$result = compileFirstBootCssAssets($root, $apply);
+$result = compileFirstBootCssAssets($root, $apply, $verify);
 emitResult($result, $json);
 
 /** @param array<string,mixed> $result */

@@ -16,6 +16,7 @@ declare(strict_types=1);
  * Usage:
  *   php scripts/assets/publish_registered_css.php
  *   php scripts/assets/publish_registered_css.php --json
+ *   php scripts/assets/publish_registered_css.php --verify
  *   php scripts/assets/publish_registered_css.php --apply
  *   php scripts/assets/publish_registered_css.php --apply --json
  */
@@ -28,13 +29,18 @@ if ($root === false) {
 
 $json = in_array('--json', $argv, true);
 $apply = in_array('--apply', $argv, true);
-$unknownArgs = array_values(array_filter(array_slice($argv, 1), static fn (string $arg): bool => !in_array($arg, ['--json', '--apply'], true)));
+$verify = in_array('--verify', $argv, true);
+$unknownArgs = array_values(array_filter(array_slice($argv, 1), static fn (string $arg): bool => !in_array($arg, ['--json', '--apply', '--verify'], true)));
+if ($apply && $verify) {
+    fwrite(STDERR, "Use either --apply or --verify, not both.\n");
+    exit(2);
+}
 if ($unknownArgs !== []) {
     fwrite(STDERR, "Unsupported argument(s): " . implode(', ', $unknownArgs) . "\n");
     exit(2);
 }
 
-$plan = buildCssPublishPlan($root, $apply ? 'apply' : 'dry-run');
+$plan = buildCssPublishPlan($root, $apply ? 'apply' : ($verify ? 'verify' : 'dry-run'));
 if ($apply) {
     applyCssPublishPlan($plan, $root);
 }
@@ -93,12 +99,27 @@ function buildCssPublishPlan(string $root, string $mode): array
         }
     }
 
+    if ($mode === 'verify') {
+        foreach ($items as $item) {
+            if (in_array($item['action'] ?? '', ['create', 'update'], true)) {
+                $errors[] = [
+                    'manifest' => $item['manifest'] ?? '',
+                    'style_index' => $item['style_index'] ?? null,
+                    'key' => $item['key'] ?? '',
+                    'message' => 'published asset is missing or stale',
+                ];
+            }
+        }
+    }
+
     return [
         'schema' => 'susankhya.css_publish_plan.v1',
         'mode' => $mode,
         'note' => $mode === 'apply'
             ? 'Apply mode copies owner CSS files only into public/assets/apps/... delivery targets.'
-            : 'Dry-run only. No files were copied or modified.',
+            : ($mode === 'verify'
+                ? 'Verify mode is read-only and fails when any declared public asset is missing or stale.'
+                : 'Dry-run only. No files were copied or modified.'),
         'summary' => summarizePlan($items, $errors, $mode),
         'items' => $items,
         'errors' => $errors,
@@ -322,6 +343,14 @@ function planStyleEntry(string $root, string $appDir, string $manifestRel, strin
         return $item;
     }
 
+    $sourceCss = @file_get_contents($source);
+    if (!is_string($sourceCss) || !isCssStructurallyValid($sourceCss)) {
+        $item['action'] = 'skip';
+        $item['status'] = 'error';
+        $item['message'] = 'source CSS is structurally invalid';
+        return $item;
+    }
+
     if (!isAllowedPublicAssetTarget($targetRel)) {
         $item['action'] = 'skip';
         $item['status'] = 'error';
@@ -373,6 +402,47 @@ function isSafeRelativePath(string $path): bool
 function isAllowedPublicAssetTarget(string $targetRel): bool
 {
     return isSafeRelativePath($targetRel) && str_starts_with($targetRel, 'public/assets/apps/') && str_ends_with($targetRel, '.css');
+}
+
+function isCssStructurallyValid(string $css): bool
+{
+    $depth = 0;
+    $length = strlen($css);
+    $quote = null;
+    $comment = false;
+    for ($index = 0; $index < $length; $index++) {
+        $char = $css[$index];
+        $next = $index + 1 < $length ? $css[$index + 1] : '';
+        if ($comment) {
+            if ($char === '*' && $next === '/') {
+                $comment = false;
+                $index++;
+            }
+            continue;
+        }
+        if ($quote !== null) {
+            if ($char === '\\') {
+                $index++;
+            } elseif ($char === $quote) {
+                $quote = null;
+            }
+            continue;
+        }
+        if ($char === '/' && $next === '*') {
+            $comment = true;
+            $index++;
+        } elseif ($char === '"' || $char === "'") {
+            $quote = $char;
+        } elseif ($char === '{') {
+            $depth++;
+        } elseif ($char === '}') {
+            if ($depth === 0) {
+                return false;
+            }
+            $depth--;
+        }
+    }
+    return !$comment && $quote === null && $depth === 0;
 }
 
 /**
@@ -447,7 +517,9 @@ function printHumanPlan(array $plan): void
     echo "Mode: {$mode}\n";
     echo $mode === 'apply'
         ? "Apply mode copies only owner CSS into public/assets/apps/...\n\n"
-        : "Dry-run only. No files were copied or modified.\n\n";
+        : ($mode === 'verify'
+            ? "Verify mode is read-only and fails when assets are missing or stale.\n\n"
+            : "Dry-run only. No files were copied or modified.\n\n");
 
     $summary = $plan['summary'];
     echo "Summary\n";
