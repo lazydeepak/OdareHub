@@ -297,3 +297,39 @@ What this enables, constrains, or requires next.
 
 **Evidence**
 Relevant validation, source references, or implementation links.
+
+### 2026-10-15 — OH-AUTO1-062 Composer autoload preparation boundary
+**Status:** Implemented correction; dependency-pruning policy required
+
+**Context**
+
+OH-AUTO1-061 showed that the package's filtered vendor tree retained Composer
+autoload metadata for 147 unique development-only targets. The repository's
+runtime contract requires vendor-inclusive packages, while Composer separates
+`require`/`require-dev` and `autoload`/`autoload-dev`.
+
+**Decision**
+
+The local release builder prepares a runner-owned source copy and runs only
+`composer dump-autoload --no-dev --no-scripts --no-plugins --no-interaction`
+with network disabled. It validates generated PSR-4, classmap, and autoload-file
+targets before packaging. It never runs Composer against the repository or an
+installed application, and it does not weaken the strict package inspector.
+
+The builder does not infer full dev-package removal from `installed.json`.
+`composer install --no-dev` or direct generated-inventory rewriting requires a
+separate approved release dependency-materialization policy.
+
+**Consequences**
+
+The broken production autoload boundary is corrected: actual-source package
+verification reports zero missing targets and no root `Tests\\` mapping. A
+fully pruned development dependency tree is not yet claimed; release authority
+must approve how installed Composer metadata and dev package materialization are
+made consistent before that boundary is closed.
+
+**Evidence**
+
+`platform/Updates/LocalReleaseChannelBuilderService.php`,
+`platform/Updates/tests/probe_production_composer_autoload_portability.php`,
+and `docs/architecture/oh-auto1-062-production-composer-autoload-portability-2026-10-15.md`.

@@ -6415,3 +6415,22 @@ and 22/22. No runtime, SQL, schema, or database change.
   ownership contract was found; no speculative policy was added.
 - The broader transaction audit retains one unrelated Manufacturing
   schema-ensure expectation failure caused by OH-AUTO1-047.
+
+## Session Summary (2026-10-15) — OH-AUTO1-062 Production Composer Autoload Portability
+
+Added runner-owned production Composer autoload preparation to the local release
+builder. Composer runs only in a disposable staging copy with
+`--no-dev --no-scripts --no-plugins --no-interaction` and network disabled;
+repository and installed application trees are never passed to Composer.
+
+Actual-source portability probe: ✅ 16/16. Missing production autoload targets
+went from 147 unique targets / 295 references to 0; the root `Tests\\` mapping
+and PHPUnit/code-coverage autoload targets are absent. The real-source package
+passed strict inspection and checksum/size binding. Existing REL-004, builder,
+preview, apply-preparation, readiness, and isolated-runner probes passed.
+
+Full dev-package pruning remains explicitly policy-gated: `dump-autoload --no-dev`
+does not remove development packages from an already-installed vendor tree, and
+this slice did not run Composer install or rewrite generated inventory metadata.
+No database, SQL, migration, bootstrap, installation, publication, deployment,
+Core change, or repository runtime artifact mutation occurred.

@@ -42,6 +42,8 @@ remain unauthorized.
 - [x] OH-AUTO1-058 — Resolved vendor development metadata conflict at the release-builder boundary without weakening strict package inspection. REL-004 fixture 15/15; existing builder 13/13, preview 30/30, apply preparation 7/7, and readiness evidence 10/10. See `docs/architecture/oh-auto1-058-release-package-protected-path-compatibility-2026-10-15.md`.
 - [x] OH-AUTO1-059 — Release migration compatibility, target-schema identity, ordering, failure, and downgrade V1 contract proposal. Pending architecture/release-authority decisions; no migration execution or schema mutation. See `docs/architecture/oh-auto1-059-release-migration-compatibility-ordering-contract-2026-10-15.md`.
 - [x] OH-AUTO1-060 — Reconciled REL-003 execution feasibility: owner-batched runner limitation, exact planned-step contract, and failed-row evidence preservation. Pure fixture 18/18; existing migration probes unchanged. No runtime implementation or database execution. See the OH-AUTO1-059 contract and Platform decision log.
+- [x] OH-AUTO1-061 — Produced and inspected an actual-source disposable package; identified the broken Composer autoload boundary caused by filtered development targets.
+- [x] OH-AUTO1-062 — Regenerated production Composer autoload metadata in runner-owned staging with `--no-dev --no-scripts --no-plugins`, verified zero missing production targets, and added a focused portability probe. Full development-package pruning remains policy-gated because Composer install/metadata rewriting is not authorized.
 - [x] OH-AUTO1-016 — Read-only application/module lifecycle enforcement audit. Corrected the SBAIO legacy fallback loader outside Core; escalated module-surface filtering, universal module route guards, and plugin partial-route rollback for Core/platform owner review. See `docs/architecture/lifecycle-enforcement-audit-2026-10-14.md`.
 - [x] OH-AUTO1-010 — CLI installed-state evidence integration.
 - [x] OH-AUTO1-011 — Migration ordering and schema-target compatibility preflight.
@@ -81,6 +83,7 @@ remain unauthorized.
 
 - Database-backed production verification remains blocked because OH-AUTO1-056 is explicitly deferred.
 - Release authority/attestation, installed build identity, migration semantics, and live runtime acceptance remain unresolved or human-gated.
+- Full production dependency pruning remains unresolved pending an approved Composer installation/metadata materialization policy; autoload portability itself is corrected and verified.
 
 ## Completed
 

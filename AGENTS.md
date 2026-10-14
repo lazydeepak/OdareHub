@@ -6330,3 +6330,17 @@ policy is approved, and distinguishes application-ledger migrations from
 legacy module/plugin paths. Pure fixtures passed **18/18**; existing migration,
 installed compatibility, and installed-evidence probes passed **16/16**,
 **16/16**, and **22/22**. No runtime, SQL, schema, or database change.
+
+## Session Summary (2026-10-15) — OH-AUTO1-062 Production Composer Autoload Portability
+
+The local release builder now regenerates Composer production autoload metadata
+inside a runner-owned staging source copy using `dump-autoload --no-dev
+--no-scripts --no-plugins --no-interaction` with network disabled. The repository
+and installed application are never passed to Composer; the strict package
+inspector remains unchanged.
+
+Actual-source portability passed **16/16**: the 147 unique missing targets found
+by OH-AUTO1-061 became zero, the root `Tests\\` mapping and PHPUnit/coverage
+autoload targets are absent, and the disposable package passed inspection and
+checksum/size binding. Full dev-package pruning remains policy-gated because
+Composer install or direct generated-inventory rewriting is not authorized.

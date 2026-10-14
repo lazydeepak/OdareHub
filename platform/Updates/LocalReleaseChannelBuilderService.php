@@ -5,6 +5,7 @@ namespace Platform\Updates;
 
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
+use FilesystemIterator;
 use ZipArchive;
 
 final class LocalReleaseChannelBuilderService
@@ -41,6 +42,15 @@ final class LocalReleaseChannelBuilderService
     ): array {
         $root = rtrim($root, '/');
         $channelDirectory = rtrim($channelDirectory, '/');
+        if (!is_dir($channelDirectory) && !mkdir($channelDirectory, 0775, true)) {
+            return $this->failure('Unable to create local channel directory.');
+        }
+        $prepared = $this->prepareProductionSource($root, $channelDirectory, $includeRoots, $excludePrefixes);
+        if ($prepared === false) {
+            return $this->failure('Unable to prepare production Composer autoload metadata.');
+        }
+        $buildRoot = $prepared['root'] ?? $root;
+        $effectiveExcludePrefixes = array_merge($excludePrefixes, $prepared['exclude_prefixes'] ?? []);
         $releasesDirectory = $channelDirectory . '/releases';
         if (!is_dir($releasesDirectory) && !mkdir($releasesDirectory, 0775, true)) {
             return $this->failure('Unable to create local channel releases directory.');
@@ -49,20 +59,21 @@ final class LocalReleaseChannelBuilderService
         $safeBuildId = preg_replace('/[^A-Za-z0-9._-]+/', '-', $buildId) ?: 'build';
         $packageName = 'susankhya-os-' . $releaseVersion . '-' . $safeBuildId . '.zip';
         $packagePath = $releasesDirectory . '/' . $packageName;
-        $zip = new ZipArchive();
-        if ($zip->open($packagePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
-            return $this->failure('Unable to create local release package.');
-        }
+        try {
+            $zip = new ZipArchive();
+            if ($zip->open($packagePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
+                return $this->failure('Unable to create local release package.');
+            }
 
-        $included = [];
-        $skipped = [];
-        foreach ($includeRoots as $relativeRoot) {
-            $this->addPath($zip, $root, $relativeRoot, $excludePrefixes, $included, $skipped);
-        }
-        if (in_array('release_metadata.json', $included, true)) {
-            $zip->close();
-            return $this->failure('Source tree must not provide release_metadata.json; the builder owns the internal metadata entry.');
-        }
+            $included = [];
+            $skipped = [];
+            foreach ($includeRoots as $relativeRoot) {
+                $this->addPath($zip, $buildRoot, $relativeRoot, $effectiveExcludePrefixes, $included, $skipped);
+            }
+            if (in_array('release_metadata.json', $included, true)) {
+                $zip->close();
+                return $this->failure('Source tree must not provide release_metadata.json; the builder owns the internal metadata entry.');
+            }
         $internalMetadata = [
             'schema_version' => self::SCHEMA_VERSION,
             'product_id' => 'susankhya-os',
@@ -80,11 +91,11 @@ final class LocalReleaseChannelBuilderService
             ],
         ];
         $internalEncoded = json_encode($internalMetadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-        if ($internalEncoded === false || !$zip->addFromString('release_metadata.json', $internalEncoded . "\n")) {
+            if ($internalEncoded === false || !$zip->addFromString('release_metadata.json', $internalEncoded . "\n")) {
+                $zip->close();
+                return $this->failure('Unable to add internal release metadata.');
+            }
             $zip->close();
-            return $this->failure('Unable to add internal release metadata.');
-        }
-        $zip->close();
 
         $inspection = (new ReleasePackageInspectionService())->inspect($packagePath, $internalMetadata);
         if (($inspection['ok'] ?? false) !== true) {
@@ -120,19 +131,235 @@ final class LocalReleaseChannelBuilderService
         ];
         file_put_contents($channelDirectory . '/channel.json', json_encode($channel, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n");
 
-        return [
-            'ok' => true,
-            'errors' => [],
-            'warnings' => [],
-            'channel_dir' => $channelDirectory,
-            'channel_path' => $channelDirectory . '/channel.json',
-            'metadata_path' => $metadataPath,
-            'package_path' => $packagePath,
-            'package_sha256' => $sha,
-            'package_size_bytes' => $size,
-            'included_count' => count($included),
-            'skipped_count' => count($skipped),
-        ];
+            return [
+                'ok' => true,
+                'errors' => [],
+                'warnings' => [],
+                'channel_dir' => $channelDirectory,
+                'channel_path' => $channelDirectory . '/channel.json',
+                'metadata_path' => $metadataPath,
+                'package_path' => $packagePath,
+                'package_sha256' => $sha,
+                'package_size_bytes' => $size,
+                'included_count' => count($included),
+                'skipped_count' => count($skipped),
+            ];
+        } finally {
+            if (isset($prepared['cleanup']) && is_callable($prepared['cleanup'])) {
+                ($prepared['cleanup'])();
+            }
+        }
+    }
+
+    /**
+     * Prepare a disposable source copy when a real Composer vendor tree is
+     * present. The repository root is never passed to Composer.
+     *
+     * @param array<int,string> $includeRoots
+     * @param array<int,string> $excludePrefixes
+     * @return array<string,mixed>|false
+     */
+    private function prepareProductionSource(string $root, string $channelDirectory, array $includeRoots, array $excludePrefixes): array|false
+    {
+        $composerJson = $root . '/composer.json';
+        $composerLock = $root . '/composer.lock';
+        $vendorAutoload = $root . '/vendor/autoload.php';
+        if (!is_file($composerJson) || !is_file($composerLock) || !is_file($vendorAutoload)) {
+            return ['root' => $root, 'exclude_prefixes' => []];
+        }
+
+        $installedJson = $root . '/vendor/composer/installed.json';
+        if (!is_file($installedJson)) {
+            // Small package fixtures may provide only a runtime loader. Treat
+            // those as non-Composer fixtures; a real Composer vendor tree
+            // with a missing inventory is incomplete and must fail closed.
+            return is_dir($root . '/vendor/composer') ? false : ['root' => $root, 'exclude_prefixes' => []];
+        }
+        $installed = json_decode((string)file_get_contents($installedJson), true);
+        if (!is_array($installed)) {
+            return false;
+        }
+        $staging = $channelDirectory . '/.production-source-' . bin2hex(random_bytes(8));
+        if (!mkdir($staging, 0700, true)) {
+            return false;
+        }
+        $cleanup = static function () use ($staging): void {
+            self::removeTree($staging);
+        };
+        try {
+            foreach ($includeRoots as $relativeRoot) {
+                $relativeRoot = $this->normalize($relativeRoot);
+                if ($relativeRoot === null || $this->isExcluded($relativeRoot, $excludePrefixes)) {
+                    continue;
+                }
+                $this->copyPath($root . '/' . $relativeRoot, $staging . '/' . $relativeRoot, $root, $excludePrefixes);
+            }
+            $composer = $this->findComposer();
+            if ($composer === null) {
+                $cleanup();
+                return false;
+            }
+            $result = $this->runComposerDump($composer, $staging);
+            if (($result['exit_code'] ?? 1) !== 0 || !$this->validateProductionAutoload($staging)) {
+                $cleanup();
+                return false;
+            }
+            return [
+                'root' => $staging,
+                // The current V1 contract filters development paths, but a
+                // full dev-package closure requires an approved Composer
+                // installation/metadata policy and is intentionally not
+                // inferred from installed.json here.
+                'exclude_prefixes' => [],
+                'cleanup' => $cleanup,
+            ];
+        } catch (Throwable $e) {
+            $cleanup();
+            return false;
+        }
+    }
+
+    /** @param array<int,string> $excludePrefixes */
+    private function copyPath(string $source, string $destination, string $root, array $excludePrefixes): void
+    {
+        if (!file_exists($source) || is_link($source)) {
+            return;
+        }
+        if (is_file($source)) {
+            $parent = dirname($destination);
+            if (!is_dir($parent)) {
+                mkdir($parent, 0700, true);
+            }
+            copy($source, $destination);
+            return;
+        }
+        $iterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($source, RecursiveDirectoryIterator::SKIP_DOTS),
+            RecursiveIteratorIterator::SELF_FIRST
+        );
+        foreach ($iterator as $file) {
+            if ($file->isLink()) {
+                continue;
+            }
+            $absolute = (string)$file->getPathname();
+            $relative = str_replace('\\', '/', substr($absolute, strlen($root) + 1));
+            if ($this->isExcluded($relative, $excludePrefixes)) {
+                continue;
+            }
+            $target = $destination . '/' . substr($relative, strlen(str_replace('\\', '/', substr($source, strlen($root) + 1))) + 1);
+            if ($file->isDir()) {
+                if (!is_dir($target)) {
+                    mkdir($target, 0700, true);
+                }
+                continue;
+            }
+            $parent = dirname($target);
+            if (!is_dir($parent)) {
+                mkdir($parent, 0700, true);
+            }
+            copy($absolute, $target);
+        }
+    }
+
+    private function findComposer(): ?string
+    {
+        if (!function_exists('proc_open')) {
+            return null;
+        }
+        $pipes = [];
+        $process = @proc_open('command -v composer', [1 => ['pipe', 'w'], 2 => ['pipe', 'w']], $pipes);
+        if (!is_resource($process)) {
+            return null;
+        }
+        $path = trim((string)stream_get_contents($pipes[1]));
+        fclose($pipes[1]);
+        fclose($pipes[2]);
+        if (proc_close($process) !== 0 || $path === '' || !is_file($path) || !is_executable($path)) {
+            return null;
+        }
+        return realpath($path) ?: null;
+    }
+
+    /** @return array<string,mixed> */
+    private function runComposerDump(string $composer, string $workingDirectory): array
+    {
+        if (!function_exists('proc_open')) {
+            return ['exit_code' => 1, 'output' => 'proc_open unavailable'];
+        }
+        $command = escapeshellarg($composer) . ' dump-autoload --no-dev --no-scripts --no-plugins --no-interaction';
+        $pipes = [];
+        $environment = getenv();
+        if (!is_array($environment)) {
+            $environment = [];
+        }
+        $environment['COMPOSER_DISABLE_NETWORK'] = '1';
+        $process = @proc_open($command, [1 => ['pipe', 'w'], 2 => ['pipe', 'w']], $pipes, $workingDirectory, $environment);
+        if (!is_resource($process)) {
+            return ['exit_code' => 1, 'output' => 'Composer process could not be started.'];
+        }
+        $output = (string)stream_get_contents($pipes[1]) . (string)stream_get_contents($pipes[2]);
+        fclose($pipes[1]);
+        fclose($pipes[2]);
+        return ['exit_code' => proc_close($process), 'output' => substr($output, 0, 2000)];
+    }
+
+    private function validateProductionAutoload(string $root): bool
+    {
+        $composerRoot = $root . '/vendor/composer';
+        foreach (['autoload_psr4.php', 'autoload_classmap.php', 'autoload_files.php'] as $file) {
+            if (!is_file($composerRoot . '/' . $file)) {
+                return false;
+            }
+        }
+        $psr4 = require $composerRoot . '/autoload_psr4.php';
+        if (isset($psr4['Tests\\'])) {
+            return false;
+        }
+        foreach ([
+            require $composerRoot . '/autoload_psr4.php',
+            require $composerRoot . '/autoload_classmap.php',
+            require $composerRoot . '/autoload_files.php',
+        ] as $map) {
+            if (!$this->autoloadPathsExist($map, $root)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private function autoloadPathsExist(mixed $value, string $root): bool
+    {
+        if (is_array($value)) {
+            foreach ($value as $item) {
+                if (!$this->autoloadPathsExist($item, $root)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        if (!is_string($value) || !str_starts_with($value, '/')) {
+            return true;
+        }
+        $realRoot = realpath($root);
+        $realValue = realpath($value);
+        return $realRoot !== false && $realValue !== false
+            && ($realValue === $realRoot || str_starts_with($realValue, $realRoot . '/'));
+    }
+
+    private static function removeTree(string $path): void
+    {
+        if (!file_exists($path) && !is_link($path)) {
+            return;
+        }
+        if (is_link($path) || is_file($path)) {
+            unlink($path);
+            return;
+        }
+        $iterator = new FilesystemIterator($path, FilesystemIterator::SKIP_DOTS);
+        foreach ($iterator as $entry) {
+            self::removeTree($entry->getPathname());
+        }
+        rmdir($path);
     }
 
     /**
