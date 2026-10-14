@@ -2,6 +2,35 @@
 
 ## Decision Log
 
+### 2026-10-15 — OH-AUTO1-058 vendor development metadata is build-excluded
+**Status:** Implemented under the existing V1 package exclusion contract
+
+**Context**
+
+The strict package inspector rejected `vendor/ratchet/rfc6455/phpunit.xml.dist`
+because its protected-path rule applies to `phpunit.xml*` at every depth, while
+the release contract requires the runtime `vendor/` tree.
+
+**Decision**
+
+Keep the inspector strict and filter only named vendor development patterns at
+build time: vendor tests/docs/examples, `.github`, `vendor/bin`, vendor
+`phpunit.xml*`, and vendor `composer.cache`. Preserve all other vendor files,
+including runtime autoload material. Reinspect the filtered package through the
+unchanged strict inspector.
+
+**Consequences**
+
+Raw packages containing protected vendor paths remain rejected. The builder is
+the only compatibility boundary changed; package acceptance is not widened.
+Future dependency-specific exceptions require evidence that the file is
+runtime-required and separate policy review.
+
+**Evidence**
+
+`docs/architecture/oh-auto1-058-release-package-protected-path-compatibility-2026-10-15.md`;
+REL-004 fixture probe 15/15.
+
 ### 2026-10-15 — OH-AUTO1-057 release authority and installed identity proposal
 **Status:** Proposed; approval required
 

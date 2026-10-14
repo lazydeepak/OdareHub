@@ -6369,6 +6369,15 @@ Production-readiness records were reconciled to reflect OH-AUTO1-055 as
 corrected while retaining database, release-authority, and runtime-acceptance
 blockers.
 
+## Session Summary (2026-10-15) — OH-AUTO1-058 Release Package Protected-Path Compatibility
+
+Resolved the REL-004 vendor metadata conflict at the non-Core builder boundary.
+Named vendor development paths are excluded before the unchanged strict package
+inspector runs; vendor runtime autoload remains included. Disposable fixture
+coverage passed 15/15, with existing builder/preview/apply-preparation/readiness
+probes passing 13/13, 30/30, 7/7, and 10/10. No package publication,
+installation, database, migration, activation, deployment, or Core change.
+
 ## Session Summary (2026-10-15) — OH-AUTO1-057 Release-Control Architecture Proposal
 
 Created a documentation-only V1 proposal for REL-001 release authority and

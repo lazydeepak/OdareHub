@@ -9,9 +9,13 @@ deny-precedence and plugin route-rollback defects. Database-backed testing is
 explicitly suspended under deferred OH-AUTO1-056; release authority, installed
 identity, and runtime acceptance remain blocked or human-gated.
 
-OH-AUTO1-057 is in progress as a documentation-only proposal for REL-001 and
-REL-002. No signing, identity persistence, database, release apply, or
-deployment implementation is authorized.
+OH-AUTO1-057 is complete as a documentation-only proposal for REL-001 and
+REL-002. Signing, identity persistence, database, release apply, and deployment
+implementation remain unauthorized.
+
+OH-AUTO1-058 is complete as a bounded REL-004 package-path correction. The
+work was limited to disposable ZIP fixtures and package-builder policy; no
+package publication, installation, database, or deployment operation occurred.
 
 ## In Progress
 
@@ -29,7 +33,8 @@ deployment implementation is authorized.
 - [x] OH-AUTO1-053 — Diagnosed and corrected redundant Studio deletion-family gate traversal. The complete architecture suite passed 49/49; deletion-family certification remains 28/28 and dropped from approximately 320 seconds to approximately 43 seconds without removing assertions. See `docs/architecture/oh-auto1-053-aggregate-gate-reliability-2026-10-15.md`.
 - [x] OH-AUTO1-054 — Separated non-mutating deployment-readiness verification from explicit CSS publication. Default readiness now uses strict `--verify`; publication remains explicit via `--apply`. Fixture probe 10/10 and full readiness pass. See `docs/architecture/oh-auto1-054-non-mutating-deployment-readiness-2026-10-15.md`.
 - [x] OH-AUTO1-055 — Applied authorized Core ACL deny-precedence and plugin route-registration rollback corrections. In-memory regressions pass 12/12 and 15/15; architecture gates pass 49/49 with the scoped Core exception. See `docs/architecture/oh-auto1-055-core-security-lifecycle-remediation-2026-10-15.md`.
-- [ ] OH-AUTO1-057 — Release authority and installed identity V1 design proposal. Pending architecture/release-authority decisions; no runtime implementation. See `docs/architecture/oh-auto1-057-release-authority-installed-identity-design-2026-10-15.md`.
+- [x] OH-AUTO1-057 — Release authority and installed identity V1 design proposal. Pending architecture/release-authority decisions; no runtime implementation. See `docs/architecture/oh-auto1-057-release-authority-installed-identity-design-2026-10-15.md`.
+- [x] OH-AUTO1-058 — Resolved vendor development metadata conflict at the release-builder boundary without weakening strict package inspection. REL-004 fixture 15/15; existing builder 13/13, preview 30/30, apply preparation 7/7, and readiness evidence 10/10. See `docs/architecture/oh-auto1-058-release-package-protected-path-compatibility-2026-10-15.md`.
 - [x] OH-AUTO1-016 — Read-only application/module lifecycle enforcement audit. Corrected the SBAIO legacy fallback loader outside Core; escalated module-surface filtering, universal module route guards, and plugin partial-route rollback for Core/platform owner review. See `docs/architecture/lifecycle-enforcement-audit-2026-10-14.md`.
 - [x] OH-AUTO1-010 — CLI installed-state evidence integration.
 - [x] OH-AUTO1-011 — Migration ordering and schema-target compatibility preflight.

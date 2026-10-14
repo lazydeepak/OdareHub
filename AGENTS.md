@@ -6298,3 +6298,13 @@ app-record behavior from proposed release attestation, trusted verification,
 installation-owned identity persistence, and fail-closed contradiction handling.
 No runtime code, schema, database, signing, release apply, deployment, or
 activation behavior changed.
+
+## Session Summary (2026-10-15) — OH-AUTO1-058 Release Package Protected-Path Compatibility
+
+Resolved the REL-004 vendor metadata conflict at the non-Core builder boundary.
+Named vendor development paths are excluded before the unchanged strict package
+inspector runs; vendor runtime autoload remains included. Disposable fixture
+coverage passed **15/15**; existing builder, preview, apply-preparation, and
+readiness probes passed **13/13**, **30/30**, **7/7**, and **10/10**. No package
+publication, installation, database, migration, activation, deployment, or
+Core change occurred.

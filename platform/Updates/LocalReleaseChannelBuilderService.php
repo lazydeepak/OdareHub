@@ -12,6 +12,21 @@ final class LocalReleaseChannelBuilderService
     private const SCHEMA_VERSION = 'susankhya.release.v1';
 
     /**
+     * Vendor-owned development material is filtered at build time. The
+     * package inspector remains strict, so a raw package containing these
+     * paths is still rejected rather than implicitly trusted.
+     *
+     * @var array<int,string>
+     */
+    private const VENDOR_DEVELOPMENT_PATH_PATTERNS = [
+        '~^vendor/(?:[^/]+/)+(?:tests?|docs?|examples?)(?:/|$)~i',
+        '~^vendor/(?:[^/]+/)+\.github(?:/|$)~i',
+        '~^vendor/bin(?:/|$)~i',
+        '~^vendor/(?:[^/]+/)+phpunit\.xml[^/]*$~i',
+        '~^vendor/(?:[^/]+/)+composer\.cache$~i',
+    ];
+
+    /**
      * @param array<int,string> $includeRoots
      * @param array<int,string> $excludePrefixes
      * @return array<string,mixed>
@@ -258,6 +273,11 @@ final class LocalReleaseChannelBuilderService
     private function isExcluded(string $relativePath, array $excludePrefixes): bool
     {
         $relativePath = trim(str_replace('\\', '/', $relativePath), '/');
+        foreach (self::VENDOR_DEVELOPMENT_PATH_PATTERNS as $pattern) {
+            if (preg_match($pattern, $relativePath) === 1) {
+                return true;
+            }
+        }
         foreach ($excludePrefixes as $prefix) {
             $prefix = trim(str_replace('\\', '/', $prefix), '/');
             if ($prefix !== '' && ($relativePath === $prefix || str_starts_with($relativePath, $prefix . '/'))) {
