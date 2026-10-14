@@ -85,28 +85,54 @@ final class ReservationsService
         if (!self::activeGuestExists($guestId)) {
             throw new \RuntimeException('HOSPITALITY_RES_GUEST_INACTIVE');
         }
-        // room is optional at booking time (unassigned stays allowed by schema)
+        // room is optional at booking time (unassigned stays allowed by schema).
+        // Assigned-room overlap validation and insertion must share a transaction:
+        // the room-row lock serializes concurrent callers before either caller
+        // evaluates the existing overlap predicate.
         $roomAssigned = false;
-        if ($roomId > 0) {
-            if (!self::activeRoomExists($roomId)) {
-                throw new \RuntimeException('HOSPITALITY_RES_ROOM_INACTIVE');
+        $transactionStarted = false;
+        try {
+            if ($roomId > 0) {
+                DB::query('START TRANSACTION');
+                $transactionStarted = true;
+
+                $room = DB::fetchOne(
+                    'SELECT id, room_status FROM hosp_rooms WHERE id=? LIMIT 1 FOR UPDATE',
+                    [$roomId]
+                );
+                if (!is_array($room) || (string)($room['room_status'] ?? '') !== 'active') {
+                    throw new \RuntimeException('HOSPITALITY_RES_ROOM_INACTIVE');
+                }
+                self::assertNoOverlap($roomId, $checkIn, $checkOut);
+                $roomAssigned = true;
             }
-            self::assertNoOverlap($roomId, $checkIn, $checkOut);
-            $roomAssigned = true;
+
+            $adults = self::validateCount((string)($post['adults'] ?? '1'));
+            $children = self::validateCount((string)($post['children'] ?? '0'));
+            $rate = self::validateRate((string)($post['rate'] ?? ''));
+            $note = mb_substr(trim((string)($post['note'] ?? '')), 0, 1000);
+
+            DB::query(
+                'INSERT INTO hosp_reservations (guest_id, room_id, check_in_date, check_out_date, adults, children, rate, reservation_status, note)
+                 VALUES (?,?,?,?,?,?,?,?,?)',
+                [$guestId, $roomAssigned ? $roomId : null, $checkIn, $checkOut, $adults, $children, $rate, 'booked', $note]
+            );
+            $row = DB::fetchOne('SELECT id FROM hosp_reservations ORDER BY id DESC LIMIT 1');
+
+            if ($transactionStarted) {
+                DB::query('COMMIT');
+            }
+            return (int)($row['id'] ?? 0);
+        } catch (\Throwable $e) {
+            if ($transactionStarted) {
+                try {
+                    DB::query('ROLLBACK');
+                } catch (\Throwable) {
+                    // Preserve the original validation/database error.
+                }
+            }
+            throw $e;
         }
-
-        $adults = self::validateCount((string)($post['adults'] ?? '1'));
-        $children = self::validateCount((string)($post['children'] ?? '0'));
-        $rate = self::validateRate((string)($post['rate'] ?? ''));
-        $note = mb_substr(trim((string)($post['note'] ?? '')), 0, 1000);
-
-        DB::query(
-            'INSERT INTO hosp_reservations (guest_id, room_id, check_in_date, check_out_date, adults, children, rate, reservation_status, note)
-             VALUES (?,?,?,?,?,?,?,?,?)',
-            [$guestId, $roomAssigned ? $roomId : null, $checkIn, $checkOut, $adults, $children, $rate, 'booked', $note]
-        );
-        $row = DB::fetchOne('SELECT id FROM hosp_reservations ORDER BY id DESC LIMIT 1');
-        return (int)($row['id'] ?? 0);
     }
 
     /**

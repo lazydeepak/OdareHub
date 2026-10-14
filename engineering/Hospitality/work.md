@@ -59,6 +59,8 @@ Validation:
   `core_app_migrations` rows for hospitality removed). Tables will be recreated properly
   by install when the app is installed/enabled via admin lifecycle.
 - Core lock gate: PASS. Business app/module contracts gate: PASS. `git diff --check`: clean.
+
+- No Core/loader/Shell files modified.
 - No Core or migration-runner files modified.
 
 Probe fix note: mysqli server-side prepares reject `SHOW TABLES LIKE ?`; probe uses
@@ -287,7 +289,95 @@ Validation evidence:
 - Prior probes re-run: slice1 24/24, slice2 21/21, slice3 88/88, slice4 27/27,
   slice5 29/29, slice6 27/27.
 - Core lock gate: PASS. Business app/module contracts gate: PASS. `git diff --check`: clean.
-- No Core/loader/Shell files modified.
+
+## OH-AUTO1-041 - Reservation integrity and concurrency (2026-10-14)
+
+Status: Completed. Source-only Hospitality-owned verification; no intentional
+installed database mutation, schema changes, migrations, deployment, commit,
+or push.
+
+Scope is limited to independently attested disposable MySQL behavioral testing
+of the existing reservation create/transition workflows. The authoritative
+overlap rule is the existing `booked`/`checked_in` date predicate with
+checkout-day adjacency allowed. Any correction requires a failing concurrent
+behavioral proof first and must remain within the existing Hospitality service
+and schema contracts.
+
+Findings and correction:
+
+- The pre-correction check-then-insert path admitted multiple overlapping rows
+  under independent connections: 3, 2, 1, 1, and 1 active rows across five
+  32-worker trials.
+- `ReservationsService::create()` now starts a transaction and locks the
+  assigned `hosp_rooms` row with `FOR UPDATE` before evaluating the existing
+  overlap predicate. The insert commits under the same transaction; validation
+  or database failures roll back and preserve the original error.
+- Unassigned bookings retain the existing behavior; no schema, status rule,
+  date predicate, or checkout-day adjacency semantics changed.
+
+Validation evidence:
+
+- Disposable authorizer: ✅ independently attested temporary MySQL instance,
+  loopback-only, no wildcard listener, temporary datadir/socket, no inherited
+  defaults, process/datadir/socket identity matched.
+- Baseline reservation behavior: ✅ 5/5 checks (valid create, overlap reject,
+  adjacent range, cancelled-room reuse, invalid date order).
+- Failure/rollback and lifecycle behavior: ✅ 6/6 checks (assigned invalid
+  count rollback, retry, inactive room, check-in/out timestamps).
+- New probe `probe_reservation_create_concurrency.php`: ✅ 3/3; one concurrent
+  winner, one canonical room-conflict loser, one durable active row.
+- Post-correction repeated race trials: ✅ 5/5 trials with one active row each;
+  no race trial admitted multiple active reservations.
+- Temporary MySQL instance, fixtures, trigger, credentials, socket, and
+  datadir were removed after verification; installed `storage/db_config.php`
+  was restored exactly. A preliminary baseline harness invocation selected the
+  installed config before this precedence was detected; its temporary baseline
+  guest/room/reservation fixtures were deleted by the script cleanup, and all
+  authorized correction/concurrency runs were then isolated correctly.
+
+Validation: PHP lint, `git diff --check`, and Hospitality-owned source review
+pass. No Core, loader, or Shell files were modified.
+
+## OH-AUTO1-042 - Database isolation incident (2026-10-14)
+
+Status: Completed for source investigation; database-backed testing suspended.
+
+The OH-AUTO1-041 preliminary baseline used the repository `APP_ROOT`, so
+`storage/db_config.php` took precedence over disposable environment values.
+The temporary baseline guest/room/reservation writes and cleanup are evidenced
+by the worker command/output, but no independent before/after snapshot exists;
+installed-database restoration therefore remains uncertain. No further database
+connection or SQL execution was performed for this assignment.
+
+The shared non-Core `DisposableDbTestConfigurationGuard` now rejects repository
+config paths, missing/contradictory identities, production-like names,
+privileged users, and post-authorization config changes. Hospitality's
+concurrency probe uses it before loading the DB layer. Static guard regression:
+14/14. The reservation correction remains preserved; no database retest is
+authorized until the guard is reviewed.
+
+## OH-AUTO1-043 - DB test entry-point isolation enforcement (2026-10-14)
+
+Status: Completed statically; no database execution authorized.
+
+Inventory found 19 Hospitality DB-capable entry points. The shared
+`DisposableDbTestEntryPointGuard` now runs before autoload/bootstrap and
+requires an isolated complete source root, exact configuration identity,
+attested process/socket/datadir, and teardown identity revalidation. The
+aggregate runner fails closed before launching children. Direct invocation
+without governed evidence rejects before application bootstrap. Existing
+behavioral assertions were retained; legacy probes remain blocked until a
+full isolated-source-root runner is separately authorized.
+
+## OH-AUTO1-045 - Isolated test execution boundary reconciliation (2026-10-14)
+
+Status: Complete without database execution.
+
+The 25-path authority list was reconciled; the omitted OH-AUTO1-041 path was
+`probe_reservation_create_concurrency.php`, already guarded before this task.
+No Hospitality guard correction was needed. The actual isolated snapshot was
+audited, vendor non-runtime trees were excluded, staged Composer autoload was
+verified from the temporary root, and runner-owned cleanup passed.
 
 ## Slice 8 - Housekeeping current-status board L1/L2 (2026-08-23)
 
@@ -1137,3 +1227,38 @@ running, no approved local HTTP executor) - it needs a provisioned local stack
 Validation: `run_all_hospitality_probes.php` 16/16; architecture gates PASS;
 deletion family gates PASS 28/28; deployment readiness PASS; `git diff --check`
 clean.
+
+## OH-AUTO1-049 — Reservation modification integrity (2026-10-14)
+
+Status: Static/mock investigation complete; no database execution authorized.
+
+Audited the implemented reservation mutation surface. `ReservationsService`
+owns create and status transition only; there are no room reassignment, date
+change, extension, update, or reactivation methods. ReservationsController
+exposes only guarded create/transition POST handlers, while FrontDesk lifecycle
+actions delegate to the same service.
+
+The existing create transaction locks the assigned room before applying the
+booked/checked-in overlap predicate. Transition CAS guards preserve lifecycle
+state and do not alter room/date fields. No bypass or correction was found.
+Static modification-integrity probe: 27/27. Existing DB-backed probes remain
+suspended.
+
+## OH-AUTO1-050 — Reservation transition authorization (2026-10-14)
+
+Status: Static/mock authorization verification complete; no database execution
+authorized.
+
+Traced all implemented transition paths. The admin reservation controller and
+FrontDesk controllers require `hospitality.manage` and CSRF before dispatch.
+The four operator lifecycle actions repeat the manage check and CSRF check;
+their Shell routes additionally resolve authenticated POST context and enforce
+self-workspace identity binding before dispatch.
+
+`ReservationsService` remains the lifecycle/state authority and intentionally
+does not duplicate ACL policy. No alternate runtime caller, unguarded route, or
+authorization bypass was found. Invalid identity, missing permission, missing
+CSRF, and stale CAS paths are covered by source-level negative-path assertions.
+
+Authorization probe: 62/62. Existing database-backed lifecycle probes remain
+suspended.
