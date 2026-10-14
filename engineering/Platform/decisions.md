@@ -393,3 +393,34 @@ release acceptance behavior is changed.
 `platform/Updates/OfflineReleaseSignatureVerifier.php`,
 `platform/Updates/tests/probe_offline_release_signature_verifier.php`, and
 `docs/architecture/oh-auto1-064-offline-release-signature-verification-2026-10-15.md`.
+
+### 2026-10-15 — OH-AUTO1-065 artifact-bound verification boundary
+**Status:** Accepted implementation; readiness integration remains separately authorized
+
+**Decision**
+
+Add a read-only `OfflineReleaseArtifactVerifier` adapter that reads exact
+co-located package and sidecar bytes, validates their identity, invokes the
+unchanged strict package inspector against an exact temporary package snapshot,
+rechecks source file identity/bytes, and passes exact hash/size bindings to the
+offline Ed25519 verifier.
+
+**Finding**
+
+`ReleaseReadinessEvidenceService::validate()` currently returns `eligible=true`
+when caller-supplied checks pass and `authenticity` equals
+`authorized-verifier`; this was reproduced without cryptographic evidence.
+The service and preview eligibility behavior were intentionally not changed.
+
+**Boundary**
+
+The adapter does not read or persist trust configuration, does not grant
+readiness/apply authority, and does not interpret readiness metadata. A future
+integration must replace self-declared authenticity with independently produced
+cryptographic evidence under a separate approval gate.
+
+**Evidence**
+
+`platform/Updates/OfflineReleaseArtifactVerifier.php`,
+`platform/Updates/tests/probe_offline_release_artifact_verifier.php`, and
+`docs/architecture/oh-auto1-065-offline-artifact-bound-release-verification-2026-10-15.md`.

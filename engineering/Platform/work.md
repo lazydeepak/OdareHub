@@ -46,6 +46,7 @@ remain unauthorized.
 - [x] OH-AUTO1-062 — Regenerated production Composer autoload metadata in runner-owned staging with `--no-dev --no-scripts --no-plugins`, verified zero missing production targets, and added a focused portability probe. Full development-package pruning remains policy-gated because Composer install/metadata rewriting is not authorized.
 - [x] OH-AUTO1-063 — Protected release identity-derived ZIP/sidecar/channel artifacts from overwrite and normalized build-ID collisions using temporary finalization and fail-closed collision checks. Immutability probe 13/13.
 - [x] OH-AUTO1-064 — Implemented pure offline Ed25519 release-statement canonicalization and verification with caller-supplied trust fixtures. Deterministic verifier probe 24/24; production release authorization remains disabled.
+- [x] OH-AUTO1-065 — Added read-only exact ZIP/sidecar artifact binding over stable byte snapshots, strict package inspection, and Ed25519 verification. Artifact probe 18/18; readiness spoof reproduced without changing eligibility behavior.
 - [x] OH-AUTO1-016 — Read-only application/module lifecycle enforcement audit. Corrected the SBAIO legacy fallback loader outside Core; escalated module-surface filtering, universal module route guards, and plugin partial-route rollback for Core/platform owner review. See `docs/architecture/lifecycle-enforcement-audit-2026-10-14.md`.
 - [x] OH-AUTO1-010 — CLI installed-state evidence integration.
 - [x] OH-AUTO1-011 — Migration ordering and schema-target compatibility preflight.

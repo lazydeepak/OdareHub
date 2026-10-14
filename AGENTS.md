@@ -1,5 +1,13 @@
 # AGENTS.md
 
+## Session Summary (2026-10-15) — OH-AUTO1-065 Offline Artifact-Bound Release Verification
+
+Added a read-only exact-byte ZIP/sidecar verification adapter over the offline
+Ed25519 foundation. Stable file identity is checked before and after strict
+package inspection; traversal, direct symlink paths, metadata contradictions,
+and mutation fail closed. The readiness authenticity-string spoof was reproduced
+without changing existing eligibility behavior. Artifact probe: 18/18.
+
 ## Session Summary (2026-10-15) — OH-AUTO1-064 Offline Release Signature Verification
 
 Added pure Platform Updates release-statement canonicalization and offline

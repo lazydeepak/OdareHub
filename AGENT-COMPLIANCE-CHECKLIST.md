@@ -1,5 +1,18 @@
 # AGENT-COMPLIANCE-CHECKLIST
 
+## Session Summary (2026-10-15) — OH-AUTO1-065 Offline Artifact-Bound Release Verification
+
+Added a read-only Platform Updates adapter that binds exact ZIP and sidecar
+bytes to the OH-AUTO1-064 canonical statement and Ed25519 verifier. It rejects
+unsafe paths, invalid metadata, package/sidecar mismatches, strict inspection
+failures, and source mutation/substitution during verification.
+
+Artifact probe: ✅ 18/18. The existing readiness service's
+`authenticity=authorized-verifier` spoof was reproduced as `ok=true,
+eligible=true`; no readiness or preview behavior was changed. No database,
+SQL, migration, signing, trust-store, installation, publication, deployment,
+or Core operation occurred.
+
 ## Session Summary (2026-10-15) — OH-AUTO1-064 Offline Release Signature Verification
 
 Added pure Platform Updates components for strict canonical release-statement
