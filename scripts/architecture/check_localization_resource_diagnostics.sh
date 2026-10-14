@@ -1,7 +1,8 @@
 #!/bin/bash
 set -euo pipefail
 
-ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+DEFAULT_ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+ROOT_DIR="${LOCALIZATION_DIAGNOSTIC_ROOT:-$DEFAULT_ROOT_DIR}"
 cd "$ROOT_DIR"
 
 PHP_BIN="${PHP_BIN:-php}"
@@ -12,6 +13,7 @@ echo ""
 
 failures=0
 warnings=0
+warning_records=""
 
 record_fail() {
   local label="$1"
@@ -21,8 +23,11 @@ record_fail() {
 
 record_warn() {
   local label="$1"
+  local category="${2:-unknown}"
+  local owner="${3:-unknown}"
   echo "  warning: $label"
   warnings=$((warnings + 1))
+  printf '%s\t%s\n' "$category" "$owner" >> "$warning_records"
 }
 
 record_pass() {
@@ -32,20 +37,16 @@ record_pass() {
 
 # ── Find all locale files ────────────────────────────────────────────
 
-LOCALE_GLOBS=(
-  "apps/*/Resources/lang/*.php"
-  "apps/*/modules/*/Resources/lang/*.php"
-  "apps/Studio/Tools/*/Resources/lang/*.php"
-  "plugins/*/Resources/lang/*.php"
-)
-
 declare -a LOCALE_FILES=()
 
-for glob in "${LOCALE_GLOBS[@]}"; do
-  while IFS= read -r -d '' f; do
-    LOCALE_FILES+=("$f")
-  done < <(find . -path "./${glob}" -type f -print0 2>/dev/null || true)
-done
+# One broad traversal is intentional: the boundary validator below decides whether
+# every discovered Resources/lang file is owned by a supported app/module/tool/plugin
+# path. Sorting and uniquing here prevents overlapping path patterns from evaluating
+# the same locale file more than once.
+DISCOVERY_FILE=""
+while IFS= read -r f; do
+  [[ -n "$f" ]] && LOCALE_FILES+=("./$f")
+done < <(find apps plugins -type f -path '*/Resources/lang/*.php' -print 2>/dev/null | sed 's#^\./##' | sort -u)
 
 if [[ ${#LOCALE_FILES[@]} -eq 0 ]]; then
   record_pass "no locale files found — nothing to validate"
@@ -66,7 +67,15 @@ DIAGNOSTIC_SCRIPT=$(cat <<'PHPEOF'
 <?php
 $root = $argv[1] ?? '.';
 $file_path = $argv[2] ?? '';
-$relative_path = str_replace($root . '/', '', $file_path);
+$normalized_root = rtrim(str_replace('\\', '/', $root), '/');
+$normalized_file = str_replace('\\', '/', $file_path);
+$relative_path = $normalized_file;
+if (str_starts_with($normalized_file, $normalized_root . '/')) {
+    $relative_path = substr($normalized_file, strlen($normalized_root) + 1);
+} else {
+    // The discovery loop intentionally passes repository-relative ./ paths.
+    $relative_path = ltrim($normalized_file, './');
+}
 $results = [];
 
 if (!is_file($file_path)) {
@@ -89,7 +98,7 @@ if (!in_array($locale, $valid_locales, true)) {
 $allowed_patterns = [
     '#^apps/[^/]+/Resources/lang/[a-z]{2}\.php$#',
     '#^apps/[^/]+/modules/[^/]+/Resources/lang/[a-z]{2}\.php$#',
-    '#^apps/Studio/Tools/[^/]+/Resources/lang/[a-z]{2}\.php$#',
+    '#^apps/Studio/Tools/.+/Resources/lang/[a-z]{2}\.php$#',
     '#^plugins/[^/]+/Resources/lang/[a-z]{2}\.php$#',
 ];
 $boundary_ok = false;
@@ -186,6 +195,8 @@ TMPDIR="${TMPDIR:-/tmp}"
 KEY_STORE="$TMPDIR/ls-resource-diag-keys-$$"
 rm -rf "$KEY_STORE" && mkdir -p "$KEY_STORE"
 trap 'rm -rf "$KEY_STORE"' EXIT
+warning_records="$KEY_STORE/warnings.tsv"
+: > "$warning_records"
 
 # Diagnostic runs as a PHP file (not `php -r`): the script carries the canonical
 # `<?php` opener which PHP rejects inside `-r` argv code on PHP 8.5. Writing it
@@ -200,7 +211,7 @@ for file in "${LOCALE_FILES[@]}"; do
   if echo "$rel" | grep -qE '^apps/[^/]+/modules/[^/]+/'; then
     owner=$(echo "$rel" | sed -E 's|^apps/([^/]+)/modules/([^/]+)/.*|\1/\2|')
   elif echo "$rel" | grep -qE '^apps/Studio/Tools/[^/]+/'; then
-    owner=$(echo "$rel" | sed -E 's|^apps/Studio/Tools/([^/]+)/.*|Studio/Tools/\1|')
+    owner=$(echo "$rel" | sed -E 's|^apps/Studio/Tools/(.+)/Resources/lang/.*|Studio/Tools/\1|')
   elif echo "$rel" | grep -qE '^apps/[^/]+/'; then
     owner=$(echo "$rel" | sed -E 's|^apps/([^/]+)/.*|\1|')
   elif echo "$rel" | grep -qE '^plugins/[^/]+/'; then
@@ -209,8 +220,13 @@ for file in "${LOCALE_FILES[@]}"; do
     owner="unknown"
   fi
 
+  # Keep canonical owner keys for diagnostics while using a reversible,
+  # collision-safe identifier for temporary filenames (owner keys may contain
+  # slashes, and underscores are valid in ordinary owner names).
+  owner_id="${owner//\//__SLASH__}"
+
   # Store file reference for owner
-  echo "$rel" >> "$KEY_STORE/owner_files_${owner//\//_}.txt"
+  echo "$rel" >> "$KEY_STORE/owner_files_${owner_id}.txt"
 
   # Run PHP diagnostic
   diag_output=$("$PHP_BIN" "$DIAGNOSTIC_FILE" "$ROOT_DIR" "$file" 2>/dev/null || echo '{"error":"diagnostic_failed"}')
@@ -242,7 +258,14 @@ for file in "${LOCALE_FILES[@]}"; do
     echo json_encode($d["results"]??[]);
   ' 2>/dev/null)
 
-  echo "$results_json" | "$PHP_BIN" -r '
+  while IFS='|' read -r sev check msg; do
+    if [[ "$sev" == "error" ]]; then
+      record_fail "$rel — [$check] $msg"
+    elif [[ "$sev" == "warning" ]]; then
+    record_warn "$rel — [$check] $msg" "$check" "$owner"
+    fi
+    # Info-level is silently recorded
+  done < <(echo "$results_json" | "$PHP_BIN" -r '
     $items = json_decode(stream_get_contents(STDIN), true) ?: [];
     foreach ($items as $item) {
       $sev = $item["severity"] ?? "info";
@@ -250,21 +273,14 @@ for file in "${LOCALE_FILES[@]}"; do
       $msg = $item["message"] ?? "";
       echo $sev . "|" . $check . "|" . $msg . "\n";
     }
-  ' 2>/dev/null | while IFS='|' read -r sev check msg; do
-    if [[ "$sev" == "error" ]]; then
-      record_fail "$rel — [$check] $msg"
-    elif [[ "$sev" == "warning" ]]; then
-      record_warn "$rel — [$check] $msg"
-    fi
-    # Info-level is silently recorded
-  done
+  ' 2>/dev/null)
 
   # Collect keys per owner per locale for cross-locale comparison
   keys_json=$(echo "$diag_result" | "$PHP_BIN" -r '
     $d=json_decode(stream_get_contents(STDIN),true);
     echo json_encode($d["keys"]??[]);
   ' 2>/dev/null)
-  key_file="$KEY_STORE/keys_${owner//\//_}_${locale}.txt"
+  key_file="$KEY_STORE/keys_${owner_id}_${locale}.txt"
   echo "$keys_json" > "$key_file"
 done
 
@@ -279,19 +295,21 @@ for owner_file in "$KEY_STORE"/keys_*.txt; do
   basename="${owner_file##*/}"
   # Extract owner (remove keys_ prefix and _locale.txt suffix)
   rest="${basename#keys_}"
-  owner_key="${rest%_*.txt}"
+  owner_id="${rest%_*.txt}"
+  owner_key="${owner_id//__SLASH__//}"
   locale="${rest##*_}"; locale="${locale%.txt}"
 
   # Build unique owner list
-  echo "$owner_key" >> "$KEY_STORE/owner_list.tmp"
+  echo "$owner_id" >> "$KEY_STORE/owner_list.tmp"
 done
 
-sort -u "$KEY_STORE/owner_list.tmp" 2>/dev/null | while IFS= read -r owner_key; do
-  [[ -z "$owner_key" ]] && continue
+while IFS= read -r owner_id; do
+  [[ -z "$owner_id" ]] && continue
+  owner_key="${owner_id//__SLASH__//}"
 
-  en_file="$KEY_STORE/keys_${owner_key}_en.txt"
-  ja_file="$KEY_STORE/keys_${owner_key}_ja.txt"
-  ne_file="$KEY_STORE/keys_${owner_key}_ne.txt"
+  en_file="$KEY_STORE/keys_${owner_id}_en.txt"
+  ja_file="$KEY_STORE/keys_${owner_id}_ja.txt"
+  ne_file="$KEY_STORE/keys_${owner_id}_ne.txt"
 
   has_en=0; has_ja=0; has_ne=0
   [[ -f "$en_file" ]] && has_en=1
@@ -331,15 +349,38 @@ sort -u "$KEY_STORE/owner_list.tmp" 2>/dev/null | while IFS= read -r owner_key; 
     ' "$ref_file" "$target_file" 2>/dev/null || echo 0)
 
     if [[ "$missing_count" -gt 0 ]]; then
-      record_warn "$owner_key: $missing_count key(s) present in $ref_name but missing in $target_name"
+      record_warn "$owner_key: $missing_count key(s) present in $ref_name but missing in $target_name" "parity" "$owner_key"
     fi
   done
-done
+done < <(sort -u "$KEY_STORE/owner_list.tmp" 2>/dev/null)
 
 # Cleanup temp list
 rm -f "$KEY_STORE/owner_list.tmp"
 
 record_pass "cross-locale key parity checked — issues reported as warnings"
+
+# ── Deterministic warning accounting ─────────────────────────────
+
+recorded_warning_lines=$(wc -l < "$warning_records" | tr -d ' ')
+if [[ "$recorded_warning_lines" -ne "$warnings" ]]; then
+  record_fail "warning accounting mismatch: recorded $recorded_warning_lines, counted $warnings"
+else
+  record_pass "warning accounting matched — emitted $warnings warning(s)"
+fi
+
+echo "== Warning totals by category =="
+if [[ "$warnings" -eq 0 ]]; then
+  echo "  none: 0"
+else
+  awk -F '\t' '{count[$1]++} END {for (key in count) print key ": " count[key]}' "$warning_records" | sort
+fi
+
+echo "== Warning totals by owner =="
+if [[ "$warnings" -eq 0 ]]; then
+  echo "  none: 0"
+else
+  awk -F '\t' '{count[$2]++} END {for (key in count) print key ": " count[key]}' "$warning_records" | sort
+fi
 
 # ── Result ─────────────────────────────────────────────────────
 
