@@ -112,6 +112,37 @@ Agents no longer have a valid implementation path that skips the workspace contr
 Updated `platform/Engineering/EngineeringWorkspaceAgentProtocol.md`, bootstrap/gate instruction prefixes, execution gate decision behavior, and probes:
 `probe_agent_bootstrap.php`, `probe_agent_execution_gate.php`, and `probe_agent_context_integration.php`.
 
+### 2026-10-14 — Installed platform build identity is not inferred from repository or package data
+**Status:** Confirmed gap; persistence decision required
+
+**Context**
+
+Release metadata and recovery metadata require an immutable `build_id`, but the current `core_apps`
+schema persists application version, manifest, and checksum only. Local discovery does not persist a
+platform build identity, and the installed evidence provider cannot obtain one from the current runtime
+database. Repository HEAD identifies a release-build input, while a package checksum proves bytes only;
+neither identifies the installed platform state.
+
+**Decision**
+
+Do not infer or synthesize an installed build identity from Git HEAD, application version, app-manifest
+checksum, package checksum, timestamp, or a generated value. Keep installed evidence and recovery-point
+creation fail-closed until an installation/upgrade-owned persistence contract defines the authoritative
+field, format, write lifecycle, and contradiction behavior.
+
+**Consequences**
+
+Recovery creation now requires the existing read-only installed evidence provider and no longer records
+repository HEAD as installed identity. Legacy installations without the authoritative identity remain
+ineligible for recovery identity binding and release apply. A future schema/install decision must be
+made before adding persistence or changing the runtime database.
+
+**Evidence**
+
+`app/Services/AppMigrationService.php`, `app/Services/AppLocalDiscoveryService.php`,
+`platform/Updates/InstalledSystemEvidenceProvider.php`, `platform/Recovery/RecoveryPointService.php`,
+`scripts/system/recovery_point.php`, and `platform/Updates/tests/probe_installed_build_identity.php`.
+
 ### YYYY-MM-DD — Decision title
 **Status:** Proposed / Accepted / Superseded
 

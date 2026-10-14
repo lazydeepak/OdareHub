@@ -1,5 +1,438 @@
 # AGENT-COMPLIANCE-CHECKLIST
 
+## Session Summary (2026-10-14) — OH-AUTO1-022 Disposable Database Test Infrastructure
+
+### What was done
+1. Inspected database/bootstrap, test, recovery, Docker, and CI conventions without connecting to any database.
+2. Confirmed the repository has no disposable DB harness; Docker CLI is installed but its daemon is unavailable.
+3. Added a fail-closed, non-executing proof validator at `scripts/testing/disposable_db_harness.php`.
+4. Added a minimal InnoDB parent/child fixture contract at `scripts/testing/disposable_db_fixture.sql` and documented provisioning prerequisites in `scripts/testing/README.md`.
+
+### Validation
+- No installed/production database connection or mutation: ✅.
+- No SQL execution: ✅.
+- No Core/schema/migration/deployment/commit/push changes: ✅.
+- Harness safety behavior: pending local proof packet; current environment correctly remains blocked.
+
+### Environment blocker
+- Docker daemon unavailable at `unix:///Users/lazydeepak/.docker/run/docker.sock`; no safe isolated MySQL/MariaDB target exists for execution.
+
+### Completion report
+- `docs/architecture/disposable-database-test-infrastructure-2026-10-14.md` records the exact isolation architecture, safety results, and provisioning prerequisites.
+- Harness missing-proof run: ✅ blocked with exit 2.
+- Synthetic proof-only run: ✅ classified mock-only and blocked with exit 2; no execution authorization issued.
+- Real engine/version, commit, rollback, constraint, isolation, and teardown: **not verified**.
+
+## Session Summary (2026-10-14) — OH-AUTO1-023 Harness Safety and SEC-AUTH-001 Preparation
+
+### Harness safety
+- Synthetic JSON proof can no longer produce an execution-ready status or exit 0.
+- Result explicitly reports `proof_kind=synthetic_input_only`, `execution_authorized=false`, and `teardown_authorized=false`.
+- Added checks for installed-config reuse, non-loopback hosts, production-like names, invalid credential source, missing ownership, reused/mismatched resource identity, forged execution claims, and teardown-resource escape.
+- Safety probe: ✅ 14/14; database connected/mutated: no.
+
+### Security reproduction
+- Added `scripts/security/probe_acl_deny_precedence.php`.
+- Probe: ✅ 10/10 in-memory assertions; no live account, DB, or Core modification.
+- Added remediation specification: `docs/architecture/security-acl-deny-precedence-remediation-spec-2026-10-14.md`.
+- SEC-AUTH-001 remains a Core/security-owner approval blocker; no semantics were changed.
+
+## Session Summary (2026-10-14) — OH-AUTO1-024 Plugin Route Registration Atomicity
+
+### Evidence
+- Added `scripts/testing/probe_plugin_route_registration_atomicity.php`.
+- In-memory route/lifecycle fixture and static loader audit: ✅ `16/16`.
+- Confirmed route registered before a thrown plugin step remains in the live Router map.
+- Confirmed retry does not clean stale routes, disabled/dependency-blocked fixtures register none, and duplicate declarations are last-write-wins.
+- Actual PluginManager activation, database access, lifecycle mutation, and live plugin execution: **not run**.
+
+### Remediation specification
+- Added `docs/architecture/plugin-route-registration-atomicity-audit-2026-10-14.md`.
+- Minimal proposal: per-plugin transaction-like staging/snapshot in the existing Router, commit on successful bootstrap/routes, restore plugin-owned changes on failure, preserve unrelated routes, and define failed-state/side-effect cleanup semantics.
+- Core remains unchanged and correction requires Core/lifecycle-owner approval.
+
+## Session Summary (2026-10-14) — OH-AUTO1-025 Integration Baseline and Change Verification
+
+### Baseline
+- Branch `main`, HEAD `42e0ccd8c0f9b695dad2b4869f856e579183ded`, upstream `origin/main`, parity `0/0`.
+- No staged, deleted, renamed, or `app/Core` changes.
+- Current inventory: 36 tracked modifications and 36 untracked files; untracked content 5,151 lines.
+- Preserved runtime logs remain separately classified from source.
+
+### Verification
+- 48 changed/untracked PHP files linted successfully.
+- 2 changed/untracked shell files passed `bash -n`.
+- Focused OH-AUTO probes passed, including Procurement, SBAIO lifecycle, operator redaction, DB harness safety, ACL reproduction, and plugin route atomicity.
+- Release/readiness probes passed; architecture gates PASS; deletion gates 28/28; deployment readiness PASS; `git diff --check` PASS.
+- DB-backed transactions, live HTTP/browser acceptance, deployment/restore/rollback, and production authorization remain unverified.
+
+### Verdict
+- `docs/architecture/integration-baseline-verification-2026-10-14.md` records the complete file-level inventory, traceability, conflicts, and required integration decisions.
+- Integration readiness: **mixed/unknown ownership requiring reconciliation; blocked from governed source integration**.
+
+## Session Summary (2026-10-14) — OH-AUTO1-026 Source Ownership and Integration Reconciliation
+
+### Ownership manifest
+- Created `docs/architecture/oh-auto1-governed-integration-manifest-2026-10-14.md`.
+- Classified the live Git union exactly at assignment completion: **73/73 paths covered**, comprising 36 tracked modifications and 37 untracked files after the manifest was created. The OH-AUTO1-027 plan is now separately classified, so the current live set is 74/74.
+- Defined nine integration groups: localization diagnostics; release/recovery safety; installed compatibility/migration; readiness collection; lifecycle/route enforcement; Procurement; operator diagnostics; disposable DB/security probes; and governance/audit records.
+- Classified two lifecycle log artifacts as preserved runtime output and explicitly excluded them from source integration.
+- No unknown provenance, staged/deleted/renamed files, or Core changes were found.
+
+### Validation
+- Machine-checkable manifest coverage: ✅ `listed=73 live=73`, no missing or extra paths.
+- `git diff --check`: ✅
+- No implementation, database, lifecycle, deployment, commit, push, staging, reset, or cleanup operation performed.
+
+### Verdict
+- 71 paths remain candidate integration content requiring planner-approved commit boundaries; 2 runtime artifacts are excluded.
+- Integration and production readiness remain blocked by `SEC-AUTH-001`, `LIFECYCLE-003`, missing DB-backed verification, unresolved release governance, and human-gated acceptance.
+
+## Session Summary (2026-10-14) — OH-AUTO1-027 Governed Source Integration Preparation
+
+### Integration plan
+- Created `docs/architecture/oh-auto1-integration-commit-plan-2026-10-14.md`.
+- Proposed 11 dependency-ordered commits covering 72 candidate paths; the two runtime logs remain excluded.
+- Commit boundaries keep implementation with directly coupled probes and separate governance records from runtime changes.
+- Explicitly documented review owners, focused commands, risk levels, dependency closure, rollback considerations, and remaining approvals.
+
+### Validation
+- Manifest reconciliation after adding the plan: ✅ `listed=74 live=74`, no missing or extra paths.
+- PHP lint: ✅ 48 affected PHP files, 0 failures.
+- Shell syntax: ✅ 2 affected shell files, 0 failures.
+- `git diff --check`: ✅
+- Core diff: ✅ none; staged files: ✅ none.
+
+### Hard rules preserved
+- No staging, commit, push, reset, cleanup, source implementation, database access, migration, deployment, or release apply.
+- Both runtime logs preserved and excluded from every proposed commit.
+
+## Session Summary (2026-10-14) — OH-AUTO1-028 Disposable Database Environment Discovery
+
+### Environment
+- Docker CLI present but daemon unavailable; Podman/Colima/Lima unavailable.
+- Existing ServBay MySQL 9.4 on PID 1181/port 3306 was not touched.
+- Existing Homebrew MySQL 9.6.0 binaries provided a safe standalone path.
+
+### Verification
+- Fresh temporary datadir, unique Unix socket, `--no-defaults`, and `--skip-networking`: ✅
+- Exact `scripts/testing/disposable_db_fixture.sql` loaded: ✅
+- Commit row: ✅; rollback row absent: ✅; foreign-key rejection: ✅
+- Safety harness remained fail-closed: exit 2, execution authorization false, SQL execution false.
+- Temporary process/datadir/socket removed; ServBay PID and port preserved: ✅
+- No installed credentials, application database, system service, or repository implementation changed.
+
+### Deliverable
+- `docs/architecture/disposable-database-environment-discovery-2026-10-14.md`
+
+## Session Summary (2026-10-14) — OH-AUTO1-021 Consolidated Production-Readiness Reconciliation
+
+### What was done
+1. Reconciled the current repository baseline, upstream parity, tracked/untracked changes, preserved runtime logs, and Core lock state.
+2. Rechecked the OH-AUTO1-015 through OH-AUTO1-020 evidence and deduplicated the security, lifecycle, transaction, release, environment, and operational blockers.
+3. Reran bounded offline probes only; no installed DB, live HTTP, deployment, migration, restore, commit, or push was performed.
+4. Created `docs/architecture/consolidated-production-readiness-reconciliation-2026-10-14.md` with the readiness matrix, canonical blocker register, current evidence, verdict, and top five assignments.
+
+### Validation
+- Offline release/readiness probes: ✅ current bounded probes pass.
+- Operator redaction: ✅ 51/51.
+- SBAIO lifecycle boundary: ✅ 13/13.
+- Transaction-contract audit: ✅ 30/30; DB atomicity remains unverified.
+- Procurement method boundary: ✅ 9/9.
+- Focused localization migration guardrail: ✅ PASS.
+- `git diff --check`: ✅ before reconciliation report append; rerun required after final documentation changes.
+
+### Verdict
+- Production readiness: **BLOCKED**.
+- No Core, database, schema, migration, activation, deployment, commit, or push changes.
+
+## Session Summary (2026-10-14) — OH-AUTO1-020 Isolated Business Transaction Verification
+
+### What was done
+1. Applied the database safety gate: no disposable database identity or isolated credentials could be proven, so no DB-backed probe or mutation was run.
+2. Added a DB-free transaction-contract probe covering Procurement multi-write methods, Manufacturing upstream target/link writes, and Hospitality transaction/row-lock evidence.
+3. Recorded the exact Procurement and Manufacturing transaction gaps, plus the stronger Hospitality static comparison, in `docs/architecture/transactional-business-verification-audit-2026-10-14.md`.
+
+### Validation
+- Static transaction-contract probe: ✅.
+- Procurement method-boundary regression probe: ✅ 9/9.
+- No installed/production database access or mutation: ✅.
+- No Core, schema, migration, activation, deployment, commit, or push changes: ✅.
+
+### Remaining evidence gap
+- Procurement and Manufacturing success, rollback, duplicate, and concurrency behavior require an explicitly disposable isolated database before any transaction correction is authorized.
+
+## Session Summary (2026-10-14) — OH-AUTO1-018 Critical Business Workflow and Data Integrity
+
+### What was done
+1. Established readiness and workflow evidence across Manufacturing, Procurement, SBAIO,
+   Hospitality, and Parties without activating disabled components or changing Core/schema state.
+2. Found and corrected a committed Procurement defect where receipt-line validation had been placed
+   inside `createOrder()` instead of remaining only in `createReceipt()`.
+3. Added read-only regression coverage at
+   `apps/Procurement/Tests/probe_order_receipt_method_boundaries.php`.
+4. Recorded the business workflow/data-integrity audit and remaining transaction/shared-identity
+   evidence gaps in `docs/architecture/business-workflow-data-integrity-audit-2026-10-14.md`.
+
+### Validation
+- Procurement method-boundary probe: ✅ 9/9.
+- Existing receipt-line contract probe: ✅ 8/8.
+- Existing Procurement form contract probe: ✅ 13/13.
+- PHP lint and `git diff --check`: ✅.
+- DB-backed behavioral probes: not run because they mutate the installed database.
+
+### Hard rules preserved
+- No Core, database/schema, migration, lifecycle-state, deployment, commit, or push changes.
+- No activation of disabled apps/modules.
+- No live HTTP or production-environment testing.
+
+## Session Summary (2026-10-14) — OH-AUTO1-017 Lifecycle Execution-Boundary Hardening
+
+### What was done
+1. Verified the OH-AUTO1-016 baseline, repository HEAD, preserved SBAIO route correction, and
+   preserved all unrelated uncommitted changes/logs.
+2. Added permanent read-only SBAIO lifecycle probe:
+   `apps/SBAIO/Tests/probe_lifecycle_execution_boundary.php`.
+3. Verified inactive installed SBAIO legacy-module routes are absent while suite-owned routes remain
+   available; no additional non-Core execution bypass was proven.
+4. Reproduced plugin partial-route retention with a disposable fixture and escalated rollback to
+   Core ownership without modifying Core.
+5. Resolved the architecture timeout classification: theme scanning passes quickly; the final
+   deletion-family suite is sequential and takes about 5m30s. The full aggregate passes in about
+   7m45s with a bounded 10-minute ceiling.
+6. Clarified OH-AUTO1-016 materialization wording so app-level enabled hooks are not misreported as
+   proven module-specific stale execution when payloads lack module identity.
+
+### Validation
+- Lifecycle execution-boundary probe: ✅ 13/13.
+- Deletion-family gates: ✅ 28/28.
+- Full architecture gates: ✅ PASS (bounded 10-minute run).
+- Focused architecture gates, PHP lint, and `git diff --check`: ✅.
+
+### Open findings
+- Module materialized-surface filtering remains a Core/platform contract gap, not a proven current
+  module-specific bypass.
+- Universal module route dispatch and plugin partial-route rollback remain Core-owned escalations.
+- Background-job lifecycle guards and cache invalidation remain unverified.
+- No Core, database, schema, lifecycle-state, deployment, commit, or push changes.
+
+## Session Summary (2026-10-14) — OH-AUTO1-016 Application and Module Lifecycle Enforcement
+
+### What was done
+1. Audited application registry authority, module/plugin discovery and activation, route loading,
+   materialized menus/permissions/hooks/search, host/operator contributions, dependency checks, and
+   background/cache lifecycle coverage.
+2. Corrected one verified non-Core defect in `apps/SBAIO/routes.php`: the legacy fallback loader
+   could reload installed inactive modules when the parent SBAIO app was enabled. Installed modules
+   are now left to the active plugin lifecycle; the fallback remains only for unregistered local
+   modules.
+3. Recorded the authoritative model, enforcement matrix, evidence, correction, and escalations in
+   `docs/architecture/lifecycle-enforcement-audit-2026-10-14.md`.
+
+### Validation
+- PHPUnit activation contract: ✅ 2 tests / 7 assertions.
+- SBAIO isolated route-loader probe: ✅ inactive installed module routes absent; no DB writes.
+- Business app/module, capability ownership, operator confinement, Studio boundary, and Shell
+  rendering gates: ✅ PASS.
+- PHP lint: ✅ touched lifecycle files.
+- `git diff --check`: ✅.
+
+### Escalations and hard rules
+- `LIFECYCLE-001`: Core runtime registries materialize module surfaces without module-status filtering.
+- `LIFECYCLE-002`: no universal module route dispatch guard exists across app route files.
+- `LIFECYCLE-003`: plugin partial-route rollback remains unverified and requires Core owner review.
+- No Core, database/schema, lifecycle-state, deployment, live HTTP, commit, or push changes.
+
+## Session Summary (2026-10-14) — OH-AUTO1-015 Security Authorization and Tenant Audit
+
+### What was done
+1. Audited authentication/session lifecycle, 2FA, logout, session invalidation, CSRF, privileged
+   routes, controller-level authorization, operator self-workspace confinement, and ACL composition.
+2. Audited organization and business schemas for company/tenant/branch ownership fields without
+   mutating the database or schema.
+3. Verified one Core ACL defect: deny overrides applied to the role baseline can be re-added by
+   access profiles, explicit user permissions, or assigned-app grants.
+4. Recorded the finding, pure in-memory proof, tenant-model classification, and remediation
+   escalation in `docs/architecture/security-authorization-tenant-isolation-audit-2026-10-14.md`.
+
+### Validation
+- Pure in-memory ACL mechanism probe: ✅ reproduced permission re-addition without DB mutation.
+- Static route/controller authorization audit: ✅ completed; thin route closures were checked at
+  their controller/service execution boundary.
+- Tenant model audit: ✅ no generic end-user tenant scope found; no unsupported isolation claim made.
+- No Core/runtime/database/schema/deployment/commit/push changes: ✅.
+
+### Escalation
+- `SEC-AUTH-001` requires Core/security-owner remediation or explicit risk acceptance. Core was not
+  modified because the active audit explicitly forbids Core and authorization-semantic changes.
+- A generic tenant contract is required before any cross-organization isolation implementation.
+
+## Session Summary (2026-10-14) — OH-AUTO1-003 Localization Diagnostic Determinism
+
+### What was done
+1. Replaced overlapping locale discovery globs with one sorted, unique traversal, reducing the
+   evaluated repository set from 220 path results to 118 unique locale files.
+2. Preserved canonical nested owner keys, including `Studio/Tools/...` and `Plugin/Base`, using
+   reversible temporary filename encoding to prevent slash/underscore collisions.
+3. Moved parity checks into the parent shell process and added warning-record accounting so every
+   emitted warning is counted exactly once.
+4. Added deterministic warning totals by category and owner.
+5. Added `scripts/architecture/tests/test_localization_resource_diagnostics.sh`, which uses only
+   disposable temporary fixture files and does not modify repository locale resources.
+
+### Validation
+- Fixture regression: ✅ PASS.
+- Focused diagnostic: ✅ 118 unique files; `82` emitted and recorded warnings.
+- Warning categories: ✅ parity `63`, dangerous-value heuristic `16`, naming `3`.
+- Architecture gates: ✅ PASS.
+- Deletion family gates: ✅ `28/28`.
+- Deployment readiness: ✅ PASS.
+- `git diff --check`: ✅.
+
+### Hard rules preserved
+- No locale resource files changed.
+- No Core, application runtime, database, schema, commit, push, or deployment changes.
+- Existing runtime log modifications were preserved.
+
+## Session Summary (2026-10-14) — OH-AUTO1-005 Authoritative Recovery Evidence Enforcement
+
+### What was done
+1. Replaced release preview/apply-preparation acceptance of caller-provided `verified` and
+   `rehearsed` booleans with an explicit recovery-point directory.
+2. Added `RecoveryPointService::verifyDirectory()` and
+   `RecoveryPointService::verifyUpdateEvidence()` as the read-only verification boundary for
+   recovery metadata, payload checksums/sizes, installed identity, and rehearsal evidence.
+3. Required `susankhya.rehearsal.v1` evidence bound to the recovery-point identity, with
+   `final_state=restored` and successful database/filesystem results.
+4. Updated the governed recovery CLI to pass the recovery directory directly and expanded update
+   probes with valid fixture evidence plus negative corruption, missing-payload, checksum,
+   identity, rehearsal, and boolean-bypass cases.
+
+### Validation
+- Update preview probe: ✅ `15/15`.
+- Local channel builder probe: ✅ `9/9`.
+- Apply preparation probe: ✅ `11/11`.
+- Recovery point service probe: ✅ `9/9`.
+- Recovery preflight/backup/restore/CLI probes: ✅ `13/13`, `19/19`, `7/7`, `10/10`, `9/9`.
+- PHP lint: ✅ touched Platform Update/Recovery/CLI files.
+- Architecture gates: ✅ PASS.
+- Deployment readiness: ✅ PASS.
+- `git diff --check`: ✅.
+
+### Hard rules preserved
+- No Core, database, schema, live recovery, restore, migration, release apply, deployment,
+  commit, or push changes.
+- No release apply operation was enabled.
+- Existing unrelated localization and runtime-log changes were preserved.
+
+## Session Summary (2026-10-14) — OH-AUTO1-006 Release Package Integrity Enforcement
+
+### What was done
+1. Added `platform/Updates/ReleasePackageInspectionService.php`, a shared read-only inspector used
+   by release builder validation, channel preview, and apply preparation.
+2. Enforced V1 app-lane package roots/files, valid ZIP structure, duplicate and normalized-path
+   collision rejection, traversal/absolute path rejection, unsafe entry-type rejection, protected
+   installation path rejection, and readable package entries.
+3. Validated Composer JSON/lock structure and declared requirement presence, required internal
+   `release_metadata.json`, internal/external release identity consistency, and package filename
+   consistency.
+4. Updated `LocalReleaseChannelBuilderService` to emit internal metadata and self-validate its
+   generated package against the same inspector used by preview.
+5. Expanded disposable preview/builder/apply fixtures for positive and fail-closed package cases.
+
+### Validation
+- Channel preview probe: ✅ `27/27`.
+- Channel builder probe: ✅ `11/11`.
+- Apply preparation probe: ✅ `11/11`.
+- Recovery probes: ✅ `9/9`, `13/13`, `19/19`, `7/7`, `10/10`, `9/9`.
+- PHP lint: ✅ all touched Update files and probes.
+- Architecture gates: ✅ PASS.
+- Deletion family gates: ✅ `28/28`.
+- Deployment readiness: ✅ PASS.
+- `git diff --check`: ✅.
+
+### Hard rules preserved
+- No Core, database, schema, live release build/publication, installation extraction, migration,
+  restore, apply, deployment, commit, or push changes.
+- Recovery evidence validation remains required and unchanged.
+- Existing unrelated localization and runtime-log changes were preserved.
+
+### Remaining release-safety limitations
+- Checksums provide integrity only; V1 does not provide signing, entitlement, or authorization.
+- Composer is not executed during preview or preparation; lock validation is structural and
+  requirement-presence based.
+
+## Session Summary (2026-10-14) — OH-AUTO1-007 Installed-System Compatibility Preflight
+
+### What was done
+1. Added `platform/Updates/InstalledSystemCompatibilityPreflightService.php` as the single
+   read-only compatibility validator for release preview.
+2. Required structured installed evidence for product/platform identity, product/platform versions,
+   app/module inventories and lifecycle states, schema baseline, and migration state.
+3. Enforced declared product/platform/app/module ranges, required app/module presence, dependency
+   presence and active status, PHP prerequisites, schema minimums, unresolved pending/failed
+   migrations, contradictory identity, malformed evidence, and downgrade rejection.
+4. Integrated the preflight into `LocalReleaseChannelPreviewService`; apply preparation remains
+   gated through preview and cannot bypass compatibility checks.
+5. Added `probe_installed_system_compatibility.php` and expanded preview/apply fixtures with
+   authoritative positive evidence and requested negative cases.
+
+### Validation
+- Installed compatibility probe: ✅ `16/16`.
+- Channel preview probe: ✅ `28/28`.
+- Channel builder probe: ✅ `11/11`.
+- Apply preparation probe: ✅ `12/12`.
+- Recovery probes: ✅ `9/9`, `13/13`, `19/19`, `7/7`, `10/10`, `9/9`.
+- PHP lint: ✅ touched Update files and probes.
+- Architecture gates: ✅ PASS.
+- Deletion family gates: ✅ `28/28`.
+- Deployment readiness: ✅ PASS.
+- `git diff --check`: ✅.
+
+### Hard rules preserved
+- No Core, database, schema, live migration, restore, installation, release apply, deployment,
+  commit, or push changes.
+- No application/module activation or compatibility inference was introduced.
+- Existing package integrity and recovery evidence gates remain enforced.
+- Existing unrelated localization and runtime-log changes were preserved.
+
+### Remaining compatibility limitations
+- Empty declared app/module requirement arrays provide no component claim to validate.
+- No generic authoritative migration-order/schema-target contract exists; unsupported semantics
+  remain blocked or unverified rather than invented.
+- The governed CLI still passes incomplete installed-state context and therefore fails closed until
+  an authoritative installed-state provider is connected.
+
+### Remaining contract limitation
+- `rehearsal.json` is structurally validated and identity-bound, but the existing V1 contract has
+  no signature or external attestation mechanism. The implementation fails closed on all detected
+  integrity/identity/state failures and does not claim signer-level authenticity.
+
+## Session Summary (2026-10-14) — OH-AUTO1-001 Production-Readiness Baseline
+
+### What was done
+1. Verified no duplicate `OH-AUTO1-001` assignment was present in repository task records.
+2. Fixed `scripts/architecture/check_localization_resource_diagnostics.sh` repository-relative
+   path normalization. Valid locale files were incorrectly rejected because the diagnostic passed
+   `./apps/...` paths while the PHP boundary check only stripped an absolute root prefix.
+3. Added nested Studio tool ownership support for `apps/Studio/Tools/**/Resources/lang/` and
+   preserved the complete nested owner key for parity grouping.
+4. Replaced the per-file result pipeline with process substitution so diagnostic failures are
+   counted by the parent shell instead of being lost in a pipeline subshell.
+
+### Validation
+- Focused localization diagnostic: ✅ `RESULT: PASS (32 warning(s))`; no boundary errors.
+- Full deployment readiness: ✅ `DEPLOYMENT READINESS: PASS`.
+- Architecture gates: ✅ PASS.
+- Deletion family gates: ✅ `28/28`.
+- `git diff --check`: ✅.
+
+### Blocker / next task
+- Transport binding and delivery are not independently verifiable from repository evidence; this
+  remains an external session-infrastructure confirmation for the planner.
+- Existing locale parity and value-quality warnings remain intentionally non-blocking.
+
+
 ## Session Summary (2026-09-12) — Shared Foundation Reconciliation & Continuation (Shared Items Foundation Integration)
 
 ### What was done
@@ -4984,3 +5417,893 @@ Blank token inputs reported by user were traced to **stale browser context snaps
 - `SusankhyaOS.ShellOverlay` alias, `susankhya.label.{context,template,rule}.v1` schema IDs, and legacy `SUSANKHYA_*` env fallbacks preserved as intentional compatibility layer.
 - Remaining `Susankhya` occurrences (Core/locale/Studio labels, docs prose outside `docs/CURRENT.md`) classified and deferred pending explicit authorization.
 - No deployment performed.
+
+## Session Summary (2026-10-14) — OH-AUTO1-008 Release Readiness Evidence
+
+### What was done
+1. Added `ReleaseReadinessEvidenceService` to validate explicit readiness identities, statuses,
+   evidence payloads, required checks, and artifact binding.
+2. Corrected `LocalReleaseChannelBuilderService` so it no longer declares readiness passed with
+   empty evidence. It records package-contract evidence, marks architecture/deployment checks
+   unknown, and sets overall readiness to blocked.
+3. Integrated readiness validation into `LocalReleaseChannelPreviewService`; unauthenticated
+   readiness remains apply-ineligible and cannot bypass package, compatibility, or recovery gates.
+4. Added readiness regression coverage for valid structure, empty/missing/unknown/failed/
+   contradictory/mismatched/malformed evidence and caller-injected success.
+
+### Validation
+- Readiness evidence probe: ✅ `10/10`.
+- Installed compatibility probe: ✅ `16/16`.
+- Channel preview probe: ✅ `30/30`.
+- Channel builder probe: ✅ `13/13`.
+- Apply preparation probe: ✅ `7/7`.
+- Recovery probes: ✅ `9/9`, `13/13`, `19/19`, `7/7`, `10/10`, `9/9`.
+- PHP lint: ✅ touched Update files and probes.
+- Architecture gates: ✅ PASS.
+- Deletion family gates: ✅ `28/28`.
+- Deployment readiness: ✅ PASS.
+- `git diff --check`: ✅.
+
+### Hard rules preserved
+- No Core, database, schema, lifecycle mutation, live migration, restore, installation, release
+  apply, deployment, commit, or push changes.
+- Readiness evidence does not bypass package integrity, installed compatibility, or recovery
+  verification.
+- Existing unrelated localization and runtime-log changes were preserved.
+
+### Remaining readiness limitations
+- V1 has no signature or external attestation mechanism; structurally valid readiness evidence
+  cannot make preview/apply eligible without an authorized verifier.
+- The builder does not execute architecture/deployment readiness and records those checks as
+  `unknown`, so generated releases remain readiness-blocked by design.
+
+## Session Summary (2026-10-14) — OH-AUTO1-009 Offline Release and Recovery Integration
+
+### What was done
+1. Added `platform/Updates/tests/probe_offline_release_recovery_integration.php` with disposable
+   source, release channel, package, installed-state, and recovery-point fixtures.
+2. Exercised the actual builder → package inspection → preview → installed compatibility → recovery
+   verification → apply-preparation chain.
+3. Verified release version, build ID, package SHA-256, and byte size remain bound across boundaries.
+4. Added negative integration cases for missing readiness evidence, incompatible schema, mismatched
+   recovery identity, corrupted package bytes, mismatched channel metadata, missing module dependency,
+   missing mandatory package file, fabricated readiness, fabricated rehearsal, cross-release recovery
+   reuse, wrong installed release, and apply-preparation bypass.
+
+### Validation
+- Offline integration probe: ✅ `23/23`.
+- Readiness evidence: ✅ `10/10`.
+- Builder: ✅ `13/13`.
+- Preview: ✅ `30/30`.
+- Apply preparation: ✅ `7/7`.
+- Installed compatibility: ✅ `16/16`.
+- Recovery probes: ✅ `9/9`, `13/13`, `19/19`, `7/7`, `10/10`, `9/9`.
+- PHP lint: ✅.
+- Architecture gates: ✅ PASS.
+- Deletion family gates: ✅ `28/28`.
+- Deployment readiness: ✅ PASS.
+- `git diff --check`: ✅.
+
+### Result and limitations
+- Structural release, compatibility, and recovery checks pass together in the positive control.
+- Readiness remains unauthenticated and apply preparation remains blocked as required.
+- No production state, database, migration, restore, deployment, commit, or push was performed.
+
+## Session Summary (2026-10-14) — OH-AUTO1-010 CLI Installed-State Evidence
+
+### What was done
+1. Added `platform/Updates/InstalledSystemEvidenceProvider.php` as the read-only collector for
+   authoritative application/module registries, product identity settings, migration ledger, and
+   schema snapshots.
+2. Wired `scripts/system/recovery_point.php` preview and prepare-apply commands to collect one
+   installed-state packet and pass it consistently into compatibility preflight.
+3. Removed the CLI's incomplete `product_version => APP_VERSION` placeholder evidence. Missing
+   explicit product identity, platform build identity, registry, schema, migration, or DB evidence
+   now fails closed with structured diagnostics.
+4. Added `probe_installed_system_evidence_provider.php` with injectable offline readers and positive /
+   negative evidence fixtures.
+
+### Validation
+- Installed evidence provider probe: ✅ `22/22`.
+- Installed compatibility: ✅ `16/16`.
+- Readiness evidence: ✅ `10/10`.
+- Builder: ✅ `13/13`.
+- Preview: ✅ `30/30`.
+- Apply preparation: ✅ `7/7`.
+- Offline release/recovery integration: ✅ `23/23`.
+- Recovery probes: ✅ `9/9`, `13/13`, `19/19`, `7/7`, `10/10`, `9/9`.
+- PHP lint: ✅.
+- Architecture gates: ✅ PASS.
+- Deletion family gates: ✅ `28/28`.
+- Deployment readiness: ✅ PASS.
+- `git diff --check`: ✅.
+
+### Authoritative source map
+- Product identity: `core_settings` product identity key.
+- Platform/application registry: `AppRegistryService` / `core_apps`.
+- Module lifecycle registry: `installed_plugins` with explicit status, version, and dependency JSON.
+- Schema baseline: explicit version in `core_schema_snapshots.snapshot_json`.
+- Migration state: `core_app_migrations` plus declared migration-file comparison for pending state.
+- Runtime prerequisites: actual CLI PHP runtime and extensions through compatibility preflight.
+
+### Current limitation and hard rules
+- The live CLI reaches the provider but current installed data lacks an explicit platform `build_id`;
+  it exits nonzero with evidence-unavailable diagnostics. No checksum is reinterpreted as build ID.
+- No Core, database, schema, migration, restore, installation, release apply, deployment, commit, or
+  push operation was performed. Unrelated localization/runtime-log changes remain preserved.
+
+## Session Summary (2026-10-14) — OH-AUTO1-011 Migration Compatibility
+
+### What was done
+1. Reconciled migration authority with `AppMigrationService`: per-application lexicographic SQL
+   ordering, `core_app_migrations` owner/version/name/checksum/status records, and
+   `core_schema_snapshots` baseline records.
+2. Added `platform/Updates/MigrationCompatibilityPreflightService.php` and integrated it into
+   `InstalledSystemCompatibilityPreflightService` and release preview/apply preparation. Unsupported
+   ordering and target-schema claims remain apply blockers instead of being synthesized.
+3. Hardened `InstalledSystemEvidenceProvider` with duplicate identity, owner, checksum, per-owner
+   ordering, schema checksum, pending, and failed migration validation.
+4. Added `platform/Updates/tests/probe_migration_compatibility.php` with authoritative fixtures and
+   negative coverage for migration and schema-target failure modes.
+
+### Validation
+- Migration compatibility probe: ✅ `16/16`.
+- Installed evidence provider: ✅ `22/22`.
+- Installed compatibility: ✅ `16/16`.
+- Builder: ✅ `13/13`.
+- Preview: ✅ `30/30`.
+- Apply preparation: ✅ `7/7`.
+- Offline release/recovery integration: ✅ `23/23`.
+- Recovery probes: ✅ `9/9`, `13/13`, `19/19`, `7/7`, `10/10`, `9/9`.
+- PHP lint: ✅.
+- Architecture gates: ✅ PASS.
+- Deletion family gates: ✅ `28/28`.
+- Deployment readiness: ✅ PASS.
+- `git diff --check`: ✅.
+
+### Remaining migration compatibility limits
+- No cross-application migration dependency/order graph exists; only the established per-application
+  filename order is enforced.
+- No generic release target-schema/result contract exists. `schema.target: null` remains blocked for
+  apply eligibility; a target is accepted only with exact independently verified evidence.
+- No downgrade or migration dependency semantics were invented.
+- No migration execution, database write, restore, installation, apply, deployment, commit, or push
+  occurred. Unrelated localization and runtime-log changes remain preserved.
+
+## Session Summary (2026-10-14) — OH-AUTO1-012 Readiness Evidence Authority
+
+### What was done
+1. Confirmed the existing trust model: package checksums and local command results establish
+   integrity/observation only. No authorized attestation provider, signer, key registry, entitlement,
+   or release authorization contract exists.
+2. Added `platform/Updates/ReleaseReadinessEvidenceCollectorService.php`. It resolves the channel's
+   exact package, validates checksum/size and package structure, records repository revision and
+   working-tree state, then runs only the fixed architecture and deployment readiness commands.
+3. Added strict execution evidence validation in `ReleaseReadinessEvidenceService`: command identity,
+   execution, exit code, output digest, revision, working-tree digest, and artifact binding.
+4. Added governed `collect-readiness` CLI output. It is observation-only and cannot persist readiness,
+   authorize apply, or claim attestation.
+5. Added `probe_release_readiness_evidence_collector.php` with positive and negative offline cases.
+
+### Validation
+- Readiness collector probe: ✅ `19/19`.
+- Readiness evidence probe: ✅ `10/10`.
+- Migration compatibility: ✅ `16/16`.
+- Installed evidence: ✅ `22/22`.
+- Installed compatibility: ✅ `16/16`.
+- Builder: ✅ `13/13`.
+- Preview: ✅ `30/30`.
+- Apply preparation: ✅ `7/7`.
+- Offline release/recovery integration: ✅ `23/23`.
+- Recovery probes: ✅ `9/9`, `13/13`, `19/19`, `7/7`, `10/10`, `9/9`.
+- Architecture gates: ✅ PASS.
+- Deletion family gates: ✅ `28/28`.
+- Deployment readiness: ✅ PASS.
+- PHP lint: ✅; `git diff --check`: ✅.
+
+### Remaining authority limits
+- Local command execution remains unattested and cannot make readiness eligible.
+- The real collector observed the current revision but blocked on the dirty working tree and absent
+  attestation authority.
+- The existing stored local package also fails package inspection due a protected vendor test file;
+  it was not modified or rebuilt.
+- No signing, key generation, entitlement, database, migration, restore, installation, apply,
+  deployment, commit, or push operation occurred.
+
+## Session Summary (2026-10-14) — OH-AUTO1-013 Authoritative Installed Build Identity
+
+### What was done
+1. Traced release `build_id`, installed registry state, recovery metadata, and compatibility identity
+   separately. Confirmed the current `core_apps` schema has no persisted platform build identity.
+2. Confirmed `core_apps.checksum` is an app-manifest checksum and repository `git_head()` is a release
+   build input, not installed-state authority.
+3. Changed governed recovery-point creation to require `InstalledSystemEvidenceProvider` and source
+   product/version/build identity from collected installed state. Repository HEAD is no longer used as
+   the installed build identity.
+4. Added `platform/Updates/tests/probe_installed_build_identity.php` covering valid structured evidence,
+   missing/blank identity, separate product identity, non-substitution, schema absence, discovery
+   non-persistence, and recovery CLI fail-closed behavior.
+5. Recorded the missing persistence contract and the no-inference decision in `engineering/Platform/`.
+
+### Validation
+- Installed build identity probe: ✅ `13/13`.
+- Installed evidence provider: ✅ `22/22`.
+- Installed compatibility: ✅ `16/16`.
+- Migration compatibility: ✅ `16/16`.
+- Preview: ✅ `30/30`; apply preparation: ✅ `7/7`.
+- Offline release/recovery integration: ✅ `23/23`.
+- Recovery probes: ✅ `9/9`, `13/13`, `19/19`, `7/7`, `10/10`, `9/9`.
+- Architecture gates: ✅ PASS; deletion gates: ✅ `28/28`.
+- Deployment readiness: ✅ PASS; PHP lint and `git diff --check`: ✅.
+
+### Remaining identity limitations
+- No authoritative installed `build_id` persistence exists in the current schema/install lifecycle.
+- Legacy installations without that identity remain blocked; no fallback is accepted.
+- No database/schema/migration execution, installation, restore, apply, deployment, commit, or push
+  occurred. Unrelated localization and runtime-log changes remain preserved.
+
+## Session Summary (2026-10-14) — OH-AUTO1-014 Consolidated Release Baseline Audit
+
+### What was done
+1. Captured repository baseline: `main`, HEAD `42e0ccd8c0f9b695dad2b4869f856e579183ded`,
+   upstream aligned `0/0`, no Core changes, accumulated OH-AUTO modifications uncommitted, and
+   unrelated lifecycle logs preserved.
+2. Audited the full file inventory from OH-AUTO1-001 through OH-AUTO1-013 and recorded it in
+   `docs/architecture/consolidated-release-baseline-audit-2026-10-14.md`.
+3. Traced package construction, package inspection, readiness evidence, installed-state evidence,
+   compatibility/migration checks, recovery verification, preview, and apply preparation.
+4. Confirmed no evidence path converts missing, failed, unknown, unauthenticated, or contradictory
+   state into release eligibility; no accidental apply path exists.
+5. No new code correction was needed beyond the already accepted OH-AUTO1-013 recovery identity
+   correction. No speculative contract or authority was introduced.
+
+### Validation
+- Installed build identity: ✅ `13/13`.
+- Installed evidence: ✅ `22/22`; compatibility: ✅ `16/16`; migration: ✅ `16/16`.
+- Readiness evidence: ✅ `10/10`; collector: ✅ `19/19`.
+- Builder: ✅ `13/13`; preview: ✅ `30/30`; apply preparation: ✅ `7/7`.
+- Offline integration: ✅ `23/23`.
+- Recovery probes: ✅ `9/9`, `13/13`, `19/19`, `7/7`, `10/10`, `9/9`.
+- Localization diagnostic fixture: ✅ PASS.
+- PHP lint: ✅ all `platform/Updates` and `platform/Recovery` PHP files.
+- Architecture gates: ✅ PASS; deletion gates: ✅ `28/28`.
+- Deployment readiness: ✅ PASS; `git diff --check`: ✅.
+
+### Remaining production blockers
+- Missing authorized readiness attestation authority.
+- Missing authoritative installed build identity persistence.
+- Missing generic target-schema and cross-application migration contracts.
+- Existing stored channel package rejected for protected vendor development file; artifact policy review
+  is required rather than weakening inspection blindly.
+- Live installation, migration, restore, deployment, and release apply remain human-gated.
+
+## Session Summary (2026-10-14) — OH-AUTO1-019 Operational Diagnostics and Observability
+
+### What was done
+1. Audited application lifecycle, identity-security, business audit, operator, plugin/admin, release,
+   recovery, health, and realtime diagnostic surfaces without bootstrapping the installed database.
+2. Confirmed a non-Core information-exposure defect: raw exception messages from operator read adapters
+   and `OperatorSurfaceComposer` were returned to `/u/*` views.
+3. Preserved existing server-side `error_log()` diagnostics while replacing operator display payloads with
+   the localized `operator.common.data_unavailable` key.
+4. Added English, Japanese, and Nepali translations and `apps/Shell/Tests/probe_operator_diagnostic_redaction.php`.
+5. Recorded remaining Core/operational ownership gaps in
+   `docs/architecture/operational-diagnostics-observability-audit-2026-10-14.md`.
+
+### Files modified
+- `apps/Manufacturing/Services/OperatorLayerAdapters/{Assembly,Coverage,Dispatch,Machines,Materials,Qc}Adapter.php`
+- `apps/Shell/Composers/OperatorSurfaceComposer.php`
+- `apps/Shell/Views/operator/{fulfillment,messages,materials,notifications,processing,production,tasks}.php`
+- `apps/Shell/Resources/lang/{en,ja,ne}.php`
+- `engineering/Shell/work.md`
+- `engineering/Manufacturing/work.md`
+- `AGENT-COMPLIANCE-CHECKLIST.md`
+
+### Files created
+- `apps/Shell/Tests/probe_operator_diagnostic_redaction.php`
+- `docs/architecture/operational-diagnostics-observability-audit-2026-10-14.md`
+
+### Hard rules preserved
+- No Core, schema, migration, database, production configuration, activation, deployment, commit, or push changes.
+- No live error injection or human-interactive testing.
+- Existing OH-AUTO changes and runtime logs preserved.
+## Session Summary (2026-10-14) — OH-AUTO1-029 Procurement Transaction Verification
+
+### What was done
+1. Added `scripts/testing/DisposableDbExecutionAuthorizer.php` as a supplementary,
+   explicit live process/socket/datadir attestation. The existing proof-only
+   `disposable_db_harness.php` remains authoritative for its non-execution contract
+   and was not weakened.
+2. Added authorizer negative/safety regression coverage: **9/9 passed**.
+3. Reproduced the Procurement `createOrder()` partial-write defect in a fresh,
+   isolated MySQL instance: the parent PO survived a controlled order-line failure.
+4. Added explicit transaction boundaries with rollback to:
+   - `createOrderFromApprovedRequest()`
+   - `createOrder()`
+   - `createReceipt()`
+5. Updated the DB-free transaction audit to require commit/rollback coverage.
+
+### Validation
+- Procurement behavioral verification: **15/15 passed** after correction.
+- Transaction-contract audit: **30/30 passed**.
+- Receipt/order method-boundary probe: **9/9 passed**.
+- PHP lint and `git diff --check`: ✅
+- Fresh temporary MySQL datadir, unique socket, loopback-only ephemeral port,
+  `--no-defaults`, and test-only credentials were used.
+- Temporary database/process resources were removed; installed ServBay PID `1181`
+  and port `3306` remained unchanged.
+
+### Hard-rules preserved
+- No Core changes.
+- No installed or production database access.
+- No deployment, commit, push, staging, reset, or release apply.
+- No schema migration change; only app-owned transaction handling changed.
+- Manufacturing verification remains queued as OH-AUTO1-034.
+
+## Session Summary (2026-10-14) — OH-AUTO1-033 Consolidated Data-Integrity Regression
+
+### What was done
+1. Added `scripts/testing/run_business_integrity_regression.sh` as a governed
+   orchestration layer around the existing Procurement and Manufacturing probes.
+2. Kept each live probe on a separate fresh disposable MySQL instance to prevent
+   fixture contamination and order dependence.
+3. Added static transaction-ownership checks for Manufacturing schema-ensure DDL
+   and current caller-owned transaction absence.
+
+### Validation
+- Authorizer safety: ✅ 9/9.
+- Static transaction/ownership audit: ✅ 32/32.
+- Procurement method boundaries: ✅ 9/9.
+- Procurement concurrency: ✅ 10/10.
+- Manufacturing transaction/rollback: ✅ 21/21.
+- Manufacturing concurrency: ✅ 11/11.
+- All disposable instances cleaned up; installed ServBay PID `1181` and port `3306` preserved.
+- PHP lint, Bash syntax, and `git diff --check`: ✅
+
+### Remaining limits
+- `UpstreamSupplyGenerationService::generate()` remains unsupported inside caller-owned transactions because schema-ensure DDL may implicitly commit.
+- No Core, schema migration, lifecycle, deployment, commit, or push changes.
+
+## Session Summary (2026-10-14) — OH-AUTO1-032 Manufacturing Concurrency Verification
+
+### What was done
+1. Added `apps/Manufacturing/Tests/probe_upstream_supply_concurrency.php` with
+   independent workers for in-house and third-party generation.
+2. Reproduced the duplicate-key loser failure while durable uniqueness preserved
+   one target/link pair.
+3. Added bounded duplicate-key recovery that reloads the committed target/link;
+   unrelated failures still propagate.
+
+### Validation
+- Disposable MySQL authorizer: ✅ 24 live isolation checks.
+- Corrected concurrency probe: ✅ **11/11**.
+- In-house and third-party concurrent calls both complete with one target and one link.
+- Post-race retries update existing targets without duplication.
+- Existing Manufacturing transaction probe rerun: ✅ **21/21**.
+- PHP lint and `git diff --check`: ✅
+- Temporary process, datadir, socket, credentials removed; ServBay PID `1181` and port `3306` preserved.
+
+### Remaining limits
+- Nested invocation inside a caller-owned transaction remains unverified.
+- `generate()` performs schema-ensure DDL before synchronization; this is not safe to claim as composable inside an external transaction.
+- No Core, schema migration, lifecycle, deployment, commit, or push changes.
+
+## Session Summary (2026-10-14) — OH-AUTO1-031 Procurement Concurrency Verification
+
+### What was done
+1. Added `apps/Procurement/Tests/probe_procurement_concurrency.php`, which launches
+   independent PHP workers against an explicitly attested disposable MySQL instance.
+2. Reproduced duplicate approved-request conversion and stale concurrent receipt
+   status before correction.
+3. Added a request-row lock before the existing-PO check and a purchase-order row
+   lock across receipt insertion/status recomputation.
+
+### Validation
+- Disposable MySQL authorizer: ✅ 24 live isolation checks.
+- Corrected concurrency/idempotency probe: ✅ **10/10**.
+- One PO/line per concurrent conversion; retry returned the existing PO.
+- Concurrent posted receipts totaled exactly the ordered quantity and left status `closed`.
+- Duplicate receipt reference produced one durable row.
+- Static transaction audit: ✅ **30/30**; method boundary: ✅ **9/9**.
+- PHP lint and `git diff --check`: ✅
+- Temporary process, datadir, socket, credentials removed; ServBay PID `1181` and port `3306` preserved.
+
+### Remaining limits
+- Receipt over-quantity policy and broader downstream audit/status concurrency remain unverified.
+- No Core, schema migration, lifecycle, deployment, commit, or push changes.
+
+## Session Summary (2026-10-14) — OH-AUTO1-030 Manufacturing Transaction Verification
+
+### What was done
+1. Selected `UpstreamSupplyGenerationService::generate()` as one bounded,
+   Manufacturing-owned workflow. No Procurement or shared-inventory authority was
+   assumed.
+2. Added `apps/Manufacturing/Tests/probe_upstream_supply_transaction.php` using
+   authoritative Products, PreOrders, DailyOrders, and DispatchEntries migration
+   fixtures.
+3. Added explicit transaction boundaries around target/link create and update pairs
+   in `syncProductionCandidate()` and `syncProcurementDemand()`.
+
+### Validation
+- Fresh disposable MySQL authorizer: ✅ 24 live isolation checks.
+- Manufacturing behavioral probe: ✅ **21/21**.
+- Verified in-house production and third-party procurement targets/links.
+- Verified repeat generation updates existing records without duplication.
+- Verified missing-product safe behavior.
+- Controlled link failure: target rolled back and no orphan link remained.
+- PHP lint and `git diff --check`: ✅
+- Installed ServBay PID `1181` and port `3306` remained unchanged.
+
+### Remaining limits
+- Cross-process concurrency and update-path failure injection remain unverified.
+- Nested invocation inside a caller-owned transaction remains unverified; the current app-local scopes are not savepoint/depth-aware.
+- Upstream tables have no declared foreign keys; application-level consistency was
+  tested.
+- No Core, schema migration, lifecycle, deployment, commit, or push changes.
+## Session Summary (2026-10-14) — OH-AUTO1-035 Core Remediation Preparation
+
+### What was done
+1. Investigated `SEC-AUTH-001` in `app/Core/AclPolicy.php` without modifying
+   Core. Confirmed later profile, explicit-user, and assigned-app grants can
+   re-add permissions removed by a role deny.
+2. Investigated `LIFECYCLE-003` in `app/Core/PluginManager.php` and
+   `app/Core/Router.php` without activation or database access. Confirmed a
+   failed plugin route file can leave earlier GET/POST routes callable.
+3. Created `docs/architecture/core-security-lifecycle-remediation-decision-2026-10-14.md`
+   with exact affected methods, minimal correction plans, acceptance matrices,
+   compatibility risks, approval gates, and production implications.
+4. Reconciled the new decision package into the manifest and commit plan:
+   **83/83** live paths, **81** candidates plus 2 excluded logs; plan coverage
+   is exact once.
+
+### Validation
+- ACL reproduction: ✅ 10/10; in-memory only.
+- Plugin route reproduction: ✅ 16/16; fixture/static only.
+- Core PHP lint: ✅ (`AclPolicy.php`, `PluginManager.php`, `Router.php`).
+- Core lock gate: ✅
+- `git diff --check`: ✅
+- No Core files modified; no DB access; no plugin activation; no staging, commit, or push.
+
+### Required approvals remain
+- Core/security approval for deny-wins semantics and ACL file changes.
+- Core/lifecycle approval for Router scope, PluginManager rollback, duplicate-route policy, and failure-state behavior.
+- Production readiness remains blocked until the authorized corrections or explicit risk acceptance.
+## Session Summary (2026-10-14) — OH-AUTO1-036 Production-Readiness Gate Reconciliation
+
+### What was done
+1. Created `docs/architecture/production-release-gate-reconciliation-2026-10-14.md`
+   with the authoritative G01–G12 matrix and explicit bounded-evidence limits.
+2. Reconciled Core security/lifecycle blockers, release authority, installed
+   compatibility, recovery, runtime acceptance, deployment acceptance, and dirty
+   source integration into one verdict.
+3. Updated the governed manifest and commit plan to account for the new decision
+   record without staging or committing anything.
+
+### Validation
+- Current branch/HEAD/upstream parity verified: `main`, `42e0ccd8`, `0/0`.
+- Core working-tree changes: ✅ none.
+- ACL reproduction: ✅ 10/10.
+- Plugin route reproduction: ✅ 16/16.
+- Core-lock gate: ✅
+- `git diff --check`: ✅
+- Manifest coverage: ✅ 84/84 paths; 82 candidates plus 2 excluded logs.
+- Commit-plan coverage: ✅ 82/82 candidate paths exactly once.
+
+### Verdict
+- **OdareHub is not production-ready.**
+- G01/G02/G06/G07/G08/G10 are failed or blocked; G11 is not verified and G12 is human-gated.
+- No Core, database, deployment, staging, commit, push, reset, or discard operation occurred.
+## Session Summary (2026-10-14) — OH-AUTO1-037 Production Blocker Execution Handoff
+
+### What was verified
+- Working-tree inventory remains **84 paths**: 82 candidate integration files and
+  2 preserved runtime logs.
+- Current proposed integration plan covers **82/82 candidates exactly once**.
+- The authoritative plan contains **13 proposed commits, C01–C13**, not 11; this
+  discrepancy is reported for planner/authorization resolution and was not
+  silently changed.
+- ACL remediation is implementation-ready for `app/Core/AclPolicy.php`; the
+  existing ACL reproduction remains pre-fix evidence and a separate acceptance
+  test is required.
+- Plugin rollback remediation is implementation-ready for
+  `app/Core/Router.php` and `app/Core/PluginManager.php`; the existing route
+  reproduction remains separate from future acceptance tests.
+
+### Validation
+- ACL reproduction: ✅ 10/10, in-memory, no database/Core mutation.
+- Plugin route reproduction: ✅ 16/16, fixture/static, no activation/lifecycle mutation.
+- Core lock gate: ✅
+- `git diff --check`: ✅
+- Staged paths: ✅ none.
+
+### Authorization boundary
+- No Core edits, commits, pushes, database operations, migrations, release apply,
+  deployment, or operational acceptance occurred.
+- Next execution requires separate authorization for local source commits, ACL
+  correction, plugin rollback correction, release identity/attestation/schema
+  decisions, and later runtime/deployment testing.
+## Session Summary (2026-10-14) — OH-AUTO1-038 Realtime and Cache Diagnostic Exposure
+
+### What was done
+1. Confirmed the operator WebSocket preference test rendered `error.message`
+   directly to the operator; replaced it with the existing localized generic
+   connection-failure message.
+2. Changed `OperatorRealtimeCacheManager::getStats()` to return the stable
+   `cache_unavailable` key instead of raw Redis exception text. Redis/cache and
+   realtime service failures now retain server-side `error_log()` diagnostics
+   without echoing raw exceptions to process output.
+3. Broadened realtime KPI catches to `Throwable` without changing successful
+   response shapes.
+4. Extended the existing operator redaction probe with a throwing-Redis fixture;
+   no database, bootstrap, live HTTP, or Redis connection is used.
+
+### Validation
+- Redaction/realtime/cache probe: ✅ 63/63.
+- PHP lint: ✅ all 5 touched PHP files.
+- Operator confinement gate: ✅
+- Core lock gate: ✅
+- `git diff --check`: ✅
+- Integration manifest/plan reconciled: ✅ 88 paths total, 86 candidates plus
+  2 excluded logs; C10 now covers 23 paths.
+
+### Remaining scope
+- No public cache-status HTTP route currently consumes `getStats()`; the unsafe
+  status contract is hardened proactively based on the verified throwing fixture.
+- WebSocket authentication remains a separate security concern: the current
+  `validateConnection()` is still a placeholder and requires its own authorized
+  contract; it was not broadened in this slice.
+## Session Summary (2026-10-14) — OH-AUTO1-039 Realtime Authentication Enforcement
+
+### What was done
+1. Traced the actual boundary: browser/client → `onOpen()` →
+   `validateConnection()` → subscription/KPI delivery in the standalone
+   Ratchet worker. The placeholder was reachable and accepted arbitrary
+   non-empty credentials.
+2. Reused existing `Auth` session/CSRF authority and
+   `UserAssignmentContext::routeAccessDecision()`; no new credential authority
+   was introduced.
+3. Required the handshake session cookie, verified the session user and CSRF
+   token, bound usernames to the verified identity, rejected `tv_display`, and
+   enforced operator route authorization.
+4. Revalidated the authority before subscription, refresh/message handling, and
+   KPI delivery/broadcast. Missing or unavailable authority fails closed.
+
+### Validation
+- Realtime authentication/redaction probe: ✅ 81/81.
+- PHP lint: ✅ all touched PHP files.
+- Core lock and operator confinement: ✅.
+- Shell CSS ownership and rendering gates: ✅.
+- `git diff --check`: ✅.
+- Integration inventory remains 88/88 paths: 86 candidates plus 2 excluded logs.
+
+### Remaining security scope
+- Live WebSocket acceptance was not run.
+- Authentication relies on the existing PHP session cookie and database-backed
+  `Auth` authority; no installed database was accessed.
+- Correlation/retention policy and broader realtime operational hardening remain
+  separate work.
+
+## Session Summary (2026-10-14) — OH-AUTO1-040 WebSocket Handshake Security Hardening
+
+### Findings and bounded correction
+- Ratchet is bootstrapped as `HttpServer(WsServer(...))`; `OriginCheck` is not
+  active.
+- No trusted-origin configuration contract exists for the documented separate
+  realtime-host deployment, so no arbitrary origin allowlist or same-host rule
+  was introduced.
+- The existing `?auth=` protocol remains unchanged; the client no longer logs
+  the credential-bearing URL to the browser console.
+- Proxy/access-log exposure of the query credential remains unresolved and
+  requires an approved handshake protocol migration.
+
+### Validation
+- Realtime authentication/handshake probe: ✅ 89/89.
+- Existing realtime PHPUnit: ✅ 3 tests, 8 assertions.
+- PHP lint, Core lock, operator confinement, Shell ownership/rendering, and
+  `git diff --check`: ✅.
+- No Core, database, live WebSocket, deployment, commit, push, or staging
+  operation performed.
+- Integration inventory remains reconciled at 90/90 working-tree paths: 87
+  candidates plus 2 preserved logs and 1 generated PHPUnit cache excluded from
+  source integration.
+
+### Remaining decision
+Define the deployment-owned trusted browser origins and choose whether to
+retain query-token compatibility or authorize a header/subprotocol/opaque-token
+handshake migration. Origin acceptance remains unverified and production
+readiness remains blocked.
+
+## Session Summary (2026-10-14) — OH-AUTO1-041 Hospitality Reservation Integrity
+
+### What was done
+1. Verified the implemented Hospitality reservation contract: overlapping
+   `booked`/`checked_in` assignments are rejected, checkout-day adjacency is
+   allowed, cancelled/finished stays do not block rooms, and lifecycle
+   timestamps/status transitions remain unchanged.
+2. Reproduced a Hospitality-owned concurrency defect on an independently
+   attested disposable MySQL instance. Five 32-worker trials admitted 3, 2, 1,
+   1, and 1 active overlapping rows before correction.
+3. Corrected only `ReservationsService::create()`: assigned-room creation now
+   locks the existing room row inside a transaction before the overlap check and
+   commits the insert atomically; failures roll back.
+4. Added the fail-closed disposable regression probe
+   `apps/Hospitality/Tests/probe_reservation_create_concurrency.php`. It refuses
+   to run with installed `storage/db_config.php`, requires explicit attestation,
+   and cleans its trigger and fixtures.
+5. Updated the governed integration manifest and commit plan from 92/89 to
+   93/90 paths/candidates, with Hospitality included in C13/G11.
+
+### Validation
+- Disposable DB authorizer: ✅ all checks passed; loopback-only temporary
+  MySQL, isolated datadir/socket, no wildcard listener, no inherited defaults.
+- New reservation concurrency probe: ✅ 3/3.
+- Post-correction repeated race trials: ✅ 5/5 single-row outcomes.
+- Baseline reservation behavior: ✅ 5/5; rollback/lifecycle behavior: ✅ 6/6.
+- PHP lint: ✅ touched Hospitality service and probe.
+- Core lock gate: ✅ no `/app` changes.
+- `git diff --check`: ✅.
+- Temporary database process, credentials, socket, datadir, trigger, and
+  fixtures removed; installed DB configuration restored. A preliminary baseline
+  harness invocation selected the installed config before precedence was
+  detected; its temporary guest/room/reservation fixtures were cleaned up by
+  the script, and all authorized correction/concurrency runs used only the
+  attested disposable instance.
+
+### Hard-rules preserved
+- No Core changes, intentional installed-database test execution after the
+  configuration correction, schema migration, deployment, commit, push, reset,
+  or discard. The preliminary configuration mistake is recorded above rather
+  than treated as a clean-boundary claim.
+- No Hospitality policy or status semantics invented; existing overlap/date
+  contract and schema were preserved.
+- No live browser, WebSocket, or human-gated operational testing.
+
+## Session Summary (2026-10-14) — OH-AUTO1-042 Database Isolation Incident
+
+### Incident finding
+- `app_db_config()` prioritizes `APP_ROOT/storage/db_config.php` over
+  `ERP_DB_*`/`DB_*` environment variables.
+- The OH-AUTO1-041 preliminary baseline used the repository APP_ROOT and
+  selected the installed configuration. It inserted temporary Hospitality guest,
+  room, and reservation fixtures, then issued narrow cleanup deletes.
+- Cleanup output exists, but no independent before/after snapshot or audit
+  evidence exists; installed-database restoration is **not certified**.
+- No further database connection or SQL execution was performed in OH-AUTO1-042.
+
+### Correction
+- Added pure non-Core `scripts/testing/DisposableDbTestConfigurationGuard.php`.
+- It rejects repository config paths, missing/contradictory identity, unsafe
+  database names/users, non-isolated APP_ROOT paths, and post-authorization
+  configuration changes without connecting or executing SQL.
+- Wired the guard into the shared business-integrity runner and Procurement,
+  Manufacturing, and Hospitality concurrency probes.
+- Runner now validates configuration and live process attestation before
+  disposable DDL/DML and fingerprints the temporary config before/after probes.
+
+### Validation
+- Static configuration guard regression: ✅ 14/14, no DB connection or SQL.
+- PHP lint: ✅ guard and all modified probe files.
+- Shell syntax: ✅ business-integrity runner.
+- `git diff --check`: ✅.
+- Core lock: ✅ no `/app` changes.
+
+### Hard-rules preserved
+- No installed or disposable database connections or SQL in OH-AUTO1-042.
+- No Core modification, deployment, staging, commit, push, reset, or discard.
+- Database-backed testing remains suspended pending review of the guard and the
+  unresolved installed-database restoration uncertainty.
+
+## Session Summary (2026-10-14) — OH-AUTO1-043 DB Entry-Point Isolation
+
+### Scope
+- Enumerated 24 DB-capable business probe entry points: 18 Hospitality, 4
+  Procurement, and 2 Manufacturing.
+- Added `DisposableDbTestEntryPointGuard`, reusing the configuration guard and
+  disposable execution authorizer.
+- Updated 20 legacy direct-bootstrap probes and the Hospitality aggregate runner.
+- Direct invocation without governed evidence now fails before autoload/bootstrap.
+- Legacy probes require a complete isolated source root; no behavioral assertions
+  were removed or weakened.
+
+### Validation
+- Entrypoint/static regression: ✅ 63/63
+- Disposable execution-authorizer safety: ✅ 9/9
+- Disposable harness safety: ✅ 14/14; no connection or SQL
+- PHP lint: ✅ all modified DB entry points
+- Shell syntax and `git diff --check`: ✅
+- Core lock gate: ✅ PASS
+- No database connections or SQL executed for OH-AUTO1-043.
+
+### Hard-rules preserved
+- Installed-database restoration remains uncertified.
+- Database-backed testing remains suspended.
+- No Core changes, deployment, commit, staging, push, reset, or discard.
+
+## Session Summary (2026-10-14) — OH-AUTO1-044 Isolated Source-Root Runner
+
+### Scope
+- Added preparation-only `IsolatedSourceRootTestRunner` plus prepare and
+  runner-owned cleanup CLIs.
+- Stages only `app/`, `apps/`, `platform/`, `plugins/`, Composer metadata, and
+  explicitly enumerated vendor dependencies into a fresh temporary source root.
+- Excludes storage/configuration, credentials, logs, database data, caches,
+  symlinks, and unrelated repository artifacts.
+- Emits a reproducible SHA-256 source manifest and creates no execution
+  authority; application bootstrap is not performed.
+
+### Validation
+- Synthetic isolated-source regression: ✅ 16/16
+- Actual repository preparation: ✅ 25 entry points, 5,271 staged files
+- Actual runner-owned cleanup: ✅
+- Configuration guard: ✅ 63/63
+- Disposable authorizer: ✅ 9/9
+- Harness safety: ✅ 14/14; `database_connected=false`, `sql_executed=false`
+- PHP lint, shell syntax, diff hygiene, and Core lock: ✅
+- No database connections, SQL, MySQL startup, or application bootstrap.
+
+### Hard-rules preserved
+- Database-backed testing remains suspended pending a separate authorization.
+- Installed-database restoration remains uncertified.
+- No Core changes, deployment, commit, staging, push, reset, or discard.
+
+## Session Summary (2026-10-14) — OH-AUTO1-045 Execution Boundary Reconciliation
+
+### Findings
+- Reconciled the 24-versus-25 discrepancy: the omitted path was
+  `apps/Hospitality/Tests/probe_reservation_create_concurrency.php`, introduced
+  by OH-AUTO1-041 and already guarded; no new OH-AUTO1-044 entry point exists.
+- Audited the actual source manifest and narrowed vendor staging by excluding
+  vendor test, documentation, example, and tooling trees.
+- Final preparation snapshot: 5,271 files across application source,
+  dependencies, Composer metadata, and 25 guarded entry points.
+- Staged Composer autoload loaded from the isolated root with no absolute
+  repository/temp references; application bootstrap was not loaded.
+
+### Validation
+- Isolated runner regression: ✅ 17/17
+- Actual preparation and owned cleanup: ✅
+- Configuration/entry-point guard: ✅ 63/63
+- Authorizer safety: ✅ 9/9
+- Harness safety: ✅ 14/14; no connection or SQL
+- PHP lint, shell syntax, Core lock, and diff hygiene: ✅
+- Integration inventory: ✅ 126/126 paths
+
+### Decision boundary
+- READY for a separately authorized disposable requalification decision only.
+- No database process, connection, SQL, installed database access, or
+  database-capable application bootstrap was performed.
+
+## Session Summary (2026-10-14) — OH-AUTO1-047 Manufacturing Runtime DDL Safety
+
+### What was done
+1. Removed the runtime `ensureSchema()` call from
+   `UpstreamSupplyGenerationService::generate()`.
+2. Removed the nested runtime `ensureSchema()` call from
+   `DemandEngineService::previewRouteDecisions()`.
+3. Retained the explicit schema-preparation helper and all migration files
+   unchanged; upstream tables are owned by migration `005` and demand by
+   migration `001`.
+4. Added a static/mock boundary probe and recorded the correction and
+   compatibility implication in the architecture/workspace evidence.
+
+### Validation
+- Runtime DDL boundary probe: ✅ 14/14
+- PHP lint: ✅ changed services and focused probe
+- `git diff --check`: ✅
+- Core lock: ✅ no `/app` changes
+- No database connection, SQL execution, MySQL startup, module activation,
+  deployment, commit, staging, push, reset, or discard.
+
+### Hard-rules preserved
+- Existing transaction, idempotency, duplicate-key recovery, and concurrency
+  implementation remains unchanged.
+- Database-backed behavioral probes remain suspended.
+- Other Manufacturing legacy schema-preparation paths remain outside scope.
+
+## Session Summary (2026-10-14) — OH-AUTO1-048 Remaining Manufacturing Runtime DDL
+
+### What was done
+1. Audited remaining Manufacturing service `ensureSchema()` and embedded DDL
+   paths, prioritizing reachable execution rather than unused helpers.
+2. Removed runtime schema preparation from `StageTransitionService`'s
+   computation, release, and override paths, plus the three
+   `DemandExecutionService` demand-read paths.
+3. Retained explicit preparation helpers where migration ownership is absent.
+   Processing execution and DispatchOps paths remain documented compatibility
+   blockers because their created tables lack repository migrations.
+4. Added static/mock inventory and regression coverage.
+
+### Validation
+- Remaining runtime-DDL boundary probe: ✅ 20/20
+- OH-AUTO1-047 regression probe: ✅ 14/14
+- PHP lint: ✅ changed service and probes
+- Manufacturing ownership gate: ✅ PASS
+- Core lock: ✅ PASS
+- `git diff --check`: ✅ PASS
+- No database connection, SQL execution, MySQL startup, module activation,
+  deployment, commit, staging, push, reset, or discard.
+
+### Hard-rules preserved
+- No schema or migration changes.
+- Database-backed testing remains suspended.
+- No fallback DDL was added elsewhere.
+- Additional DemandEngine/AssemblyPlan runtime-ensure callers were documented
+  for separate review rather than removed speculatively.
+
+## Session Summary (2026-10-14) — OH-AUTO1-049 Hospitality Reservation Modification Integrity
+
+### Findings
+- Implemented reservation mutations are limited to create and lifecycle
+  transition; no room/date update, reassignment, extension, or reactivation API
+  exists.
+- ReservationsController and FrontDesk paths converge on
+  `ReservationsService`; no alternate Hospitality source directly writes
+  reservation rows.
+- Existing overlap, room-row lock, transaction, and CAS lifecycle contracts
+  remain intact.
+
+### Validation
+- Reservation modification integrity probe: ✅ 27/27
+- PHP lint: ✅ inspected reservation files and focused probe
+- No database connection, SQL execution, module activation, deployment,
+  commit, staging, push, reset, or discard.
+- Core lock gate: ✅
+- `git diff --check`: ✅
+
+### Hard-rules preserved
+- No runtime correction was needed.
+- No routes, migrations, schemas, policies, or Core files changed.
+- Database-backed reservation probes remain suspended.
+
+## Session Summary (2026-10-14) — OH-AUTO1-050 Hospitality Reservation Transition Authorization
+
+### Findings
+- Admin reservation transition and FrontDesk lifecycle controllers enforce
+  `hospitality.manage` and CSRF before service dispatch.
+- Operator check-in, checkout, cancellation, and no-show actions repeat the
+  manage and CSRF checks; Shell routes enforce authenticated self-workspace
+  identity binding first.
+- `ReservationsService` remains the lifecycle/state authority without a
+  competing ACL policy. No alternate runtime caller or bypass was found.
+
+### Validation
+- Reservation transition authorization probe: ✅ 62/62
+- PHP lint: ✅ focused Hospitality authorization files and probe
+- No database connection, SQL execution, module activation, deployment,
+  commit, staging, push, reset, or discard.
+- Core lock gate: ✅
+- `git diff --check`: ✅
+
+### Hard-rules preserved
+- No new permission or role semantics were invented.
+- No runtime correction was required.
+- Database-backed lifecycle probes remain suspended.
+
+## Session Summary (2026-10-14) — OH-AUTO1-051 Procurement Write Authorization Integrity
+
+### Findings and correction
+- Purchase-order creation, approved-request conversion, and receipt creation
+  routes already enforce Procurement app access and CSRF.
+- The selected controller methods lacked their own app-access re-check, so
+  direct controller invocation could bypass route-level authorization.
+- Added `Auth::requireAppAccess('procurement')` to all three selected methods.
+- Preserved existing supplier, request, purchase-order, receipt-line, and
+  line-to-order ownership/state validation.
+- Did not invent mappings for declared but undocumented
+  `procurement.manage`/`procurement.approve` permissions.
+
+### Validation
+- Procurement write-authorization probe: ✅ 40/40
+- PHP lint: ✅ focused Procurement controller, service, and probe
+- Core lock gate: ✅
+- Business ownership gate: ✅
+- `git diff --check`: ✅
+- No database connection, SQL execution, application activation, commit,
+  staging, push, deployment, reset, or discard.
+
+### Residual risk
+- Manual `createOrder()` does not currently validate a supplied supplier ID
+  with the conversion path's active-supplier rule. No authoritative manual-order
+  ownership contract was found; no speculative policy was added.
+- The broader transaction audit retains one unrelated Manufacturing
+  schema-ensure expectation failure caused by OH-AUTO1-047.

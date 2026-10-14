@@ -6070,3 +6070,182 @@ Active Rendered Proof Planning Contract
 - localStorage sidebar state: ✅ does not affect hamburger
 - 480px viewport: ✅ closed, Overview text at x=-280 (off-screen)
 - All opening authorities exhausted: ✅ no auto-open code path found
+
+## Session Summary (2026-10-14) — OH-AUTO1-042 Database Isolation Hardening
+
+### What was done
+1. Reconstructed the OH-AUTO1-041 isolation breach: `app_db_config()` prefers
+   `APP_ROOT/storage/db_config.php` over database environment variables, and the
+   preliminary Hospitality baseline used the repository APP_ROOT.
+2. Documented the evidence-supported mutation scope and unresolved restoration
+   uncertainty. Cleanup output is preserved, but no independent before/after
+   snapshot exists; incident closure is not claimed.
+3. Added the non-Core, no-connection `DisposableDbTestConfigurationGuard` and
+   wired it before application autoload/DB use in the Procurement,
+   Manufacturing, and Hospitality concurrency probes.
+4. Updated the disposable regression runner to validate config identity and
+   process attestation before disposable SQL, and fingerprint the temporary
+   config before/after each probe.
+5. Updated the governed integration inventory and C09/C11 records; logs and
+   PHPUnit cache remain excluded/preserved.
+
+### Validation
+- Static configuration guard probe: ✅ 14/14, no DB connection or SQL
+- PHP lint: ✅ all touched PHP files
+- Shell syntax: ✅ business-integrity runner
+- `git diff --check`: ✅
+- Core lock: ✅ no `/app` changes
+
+### Hard-rules preserved
+- No installed or disposable database connection or SQL in OH-AUTO1-042
+- No deployment, commit, push, staging, reset, discard, or Core modification
+- Database-backed testing remains suspended pending guard review and an
+  independently authorized installed-database assessment
+
+## Session Summary (2026-10-14) — OH-AUTO1-043 DB Entry-Point Isolation
+
+### What was done
+1. Enumerated 25 DB-capable Procurement, Manufacturing, and Hospitality test
+   entry points.
+2. Added `DisposableDbTestEntryPointGuard`, reusing the existing configuration
+   guard and disposable execution authorizer before autoload/bootstrap.
+3. Migrated 20 legacy direct-bootstrap probes and the Hospitality aggregate
+   runner to fail closed without a complete isolated source root and attested
+   process/socket/datadir evidence.
+4. Preserved all behavioral assertions; legacy probes remain blocked until a
+   full isolated-source-root runner is separately authorized.
+5. Reconciled the governed inventory and commit plan to 126 paths / 123
+   candidate paths, excluding the two logs and PHPUnit cache.
+
+### Validation
+- Entrypoint/static regression: ✅ 63/63
+- Authorizer safety: ✅ 9/9
+- Harness safety: ✅ 14/14
+- PHP lint, shell syntax, diff hygiene, and Core lock: ✅
+- No database connection or SQL executed.
+
+### Hard-rules preserved
+- Installed-database restoration remains uncertified.
+- Database-backed testing remains suspended.
+- No Core modification, commit, staging, push, deployment, reset, or discard.
+
+## Session Summary (2026-10-14) — OH-AUTO1-044 Isolated Source-Root Runner
+
+### What was done
+1. Added preparation-only `IsolatedSourceRootTestRunner` and runner-owned
+   prepare/cleanup CLIs under `scripts/testing/`.
+2. Staged the repository's required application/platform/plugin source,
+   Composer metadata, and explicitly enumerated dependencies into a fresh
+   temporary source root while excluding storage/configuration, credentials,
+   logs, database data, caches, and symlinks.
+3. Added a SHA-256 source manifest, mutation detection, traversal/symlink
+   rejection, and cleanup ownership checks.
+4. Verified all 25 currently enumerated DB-capable entry points without loading
+   the staged autoloader or creating execution authority.
+
+### Validation
+- Synthetic runner regression: ✅ 16/16
+- Actual repository preparation: ✅ 5,271 staged files
+- Runner-owned cleanup: ✅
+- Existing guard/authorizer/harness safety: ✅ 63/63, 9/9, 14/14
+- PHP lint, shell syntax, diff hygiene, and Core lock: ✅
+- No database connection, SQL, MySQL startup, or application bootstrap.
+
+### Hard-rules preserved
+- Database-backed testing remains suspended.
+- Installed-database restoration remains uncertified.
+- No Core modification, commit, staging, push, deployment, reset, or discard.
+
+## Session Summary (2026-10-14) — OH-AUTO1-045 Execution Boundary Reconciliation
+
+### What was done
+1. Reconciled the 24-versus-25 count discrepancy: the omitted path was the
+   already-guarded OH-AUTO1-041 `probe_reservation_create_concurrency.php`.
+2. Audited the actual staged manifest and excluded vendor test,
+   documentation, example, and tooling trees, reducing the source snapshot
+   from 5,341 to 5,271 files.
+3. Verified staged Composer autoload from the isolated root without loading
+   application bootstrap or creating database authority.
+4. Confirmed manifest hashes, path containment, symlink rejection, and owned
+   cleanup behavior.
+
+### Validation
+- Isolated runner regression: ✅ 17/17
+- Actual preparation/cleanup: ✅
+- Configuration/entry-point guard: ✅ 63/63
+- Authorizer safety: ✅ 9/9
+- Harness safety: ✅ 14/14
+- PHP lint, shell syntax, diff hygiene, and Core lock: ✅
+- Inventory: ✅ 126/126 paths
+- No database connection, SQL, MySQL startup, or application bootstrap.
+
+### Recommendation
+READY for a separately authorized disposable requalification decision only;
+database-backed testing remains suspended.
+
+## Session Summary (2026-10-14) — OH-AUTO1-047 Manufacturing Runtime DDL Safety
+
+Removed the two runtime schema-ensure calls from the Manufacturing upstream
+generation/read path after confirming the required upstream and demand tables
+are migration-owned. The explicit preparation helper remains available for
+migration/test setup only. Added static boundary probe
+`apps/Manufacturing/Tests/probe_upstream_supply_runtime_ddl_boundary.php`.
+
+Validation: runtime DDL boundary 14/14, PHP lint, diff hygiene, and Core lock
+passed. No database connection, SQL execution, MySQL startup, module
+activation, deployment, commit, staging, push, reset, or discard was performed.
+Database-backed testing remains suspended.
+
+## Session Summary (2026-10-14) — OH-AUTO1-048 Remaining Manufacturing Runtime DDL
+
+Removed runtime schema-ensure calls from the migration-owned
+`StageTransitionService` computation, release, and override paths and the
+three `DemandExecutionService` demand-read paths. Added
+`apps/Manufacturing/Tests/probe_remaining_runtime_ddl_boundaries.php` with
+20/20 static checks. Processing execution and DispatchOps DDL remain unchanged
+and documented as compatibility blockers because repository migration coverage
+is absent.
+
+No database connection, SQL execution, module activation, deployment, commit,
+staging, push, reset, discard, or Core modification was performed.
+
+## Session Summary (2026-10-14) — OH-AUTO1-049 Hospitality Reservation Modification Integrity
+
+Audited the implemented Hospitality reservation modification surface. Only
+create and lifecycle transition APIs exist; room/date reassignment, extension,
+update, and reactivation paths are absent. Controller and FrontDesk entry
+points converge on `ReservationsService`, whose existing overlap transaction,
+room lock, and CAS lifecycle guards remain intact.
+
+Static modification-integrity probe: 27/27. No correction was required. No
+database connection, SQL execution, deployment, commit, staging, push, reset,
+discard, or Core modification was performed.
+
+## Session Summary (2026-10-14) — OH-AUTO1-050 Hospitality Reservation Transition Authorization
+
+Traced all implemented Hospitality reservation transition callers. Admin and
+FrontDesk controllers require `hospitality.manage` plus CSRF; operator actions
+repeat those checks, while Shell operator routes enforce authenticated
+self-workspace identity binding. `ReservationsService` remains the state
+authority without duplicated ACL policy. No bypass or correction was found.
+
+Authorization probe: 62/62. No database connection, SQL execution, deployment,
+commit, staging, push, reset, discard, or Core modification was performed.
+
+## Session Summary (2026-10-14) — OH-AUTO1-051 Procurement Write Authorization Integrity
+
+Audited Procurement purchase-order creation, approved-request conversion, and
+receipt creation. Routes enforced app access and CSRF, but the three selected
+controller methods lacked direct app-access re-checks. Added the smallest
+Procurement-owned correction: `Auth::requireAppAccess('procurement')` in each
+method before CSRF/service dispatch.
+
+Static write-authorization probe: 40/40. Existing identifier ownership and
+workflow validation remain intact. No database connection, SQL execution,
+commit, staging, push, deployment, reset, discard, or Core modification was
+performed.
+
+Residual: manual `createOrder()` supplier-ID validation has no authoritative
+manual-order ownership contract; no speculative rule was added. The broader
+transaction audit retains one unrelated Manufacturing schema-ensure expectation
+failure from OH-AUTO1-047.
