@@ -45,23 +45,40 @@ final class LocalReleaseChannelBuilderService
         if (!is_dir($channelDirectory) && !mkdir($channelDirectory, 0775, true)) {
             return $this->failure('Unable to create local channel directory.');
         }
+        $releasesDirectory = $channelDirectory . '/releases';
+        if (!is_dir($releasesDirectory) && !mkdir($releasesDirectory, 0775, true)) {
+            return $this->failure('Unable to create local channel releases directory.');
+        }
+        $safeBuildId = preg_replace('/[^A-Za-z0-9._-]+/', '-', $buildId) ?: 'build';
+        $packageName = 'susankhya-os-' . $releaseVersion . '-' . $safeBuildId . '.zip';
+        $packagePath = $releasesDirectory . '/' . $packageName;
+        $metadataName = 'susankhya-os-' . $releaseVersion . '-' . $safeBuildId . '.json';
+        $metadataPath = $releasesDirectory . '/' . $metadataName;
+        $collision = $this->checkArtifactCollision($channelDirectory, $packagePath, $metadataPath, $packageName, $metadataName);
+        if ($collision !== null) {
+            return $this->failure($collision);
+        }
         $prepared = $this->prepareProductionSource($root, $channelDirectory, $includeRoots, $excludePrefixes);
         if ($prepared === false) {
             return $this->failure('Unable to prepare production Composer autoload metadata.');
         }
         $buildRoot = $prepared['root'] ?? $root;
         $effectiveExcludePrefixes = array_merge($excludePrefixes, $prepared['exclude_prefixes'] ?? []);
-        $releasesDirectory = $channelDirectory . '/releases';
-        if (!is_dir($releasesDirectory) && !mkdir($releasesDirectory, 0775, true)) {
-            return $this->failure('Unable to create local channel releases directory.');
+        $temporaryDirectory = $releasesDirectory . '/.build-' . bin2hex(random_bytes(8));
+        if (!mkdir($temporaryDirectory, 0700, true)) {
+            if (isset($prepared['cleanup']) && is_callable($prepared['cleanup'])) {
+                ($prepared['cleanup'])();
+            }
+            return $this->failure('Unable to create temporary release finalization directory.');
         }
-
-        $safeBuildId = preg_replace('/[^A-Za-z0-9._-]+/', '-', $buildId) ?: 'build';
-        $packageName = 'susankhya-os-' . $releaseVersion . '-' . $safeBuildId . '.zip';
-        $packagePath = $releasesDirectory . '/' . $packageName;
+        // Keep the final basename during inspection; the inspector binds the
+        // internal package filename to the actual archive basename.
+        $temporaryPackagePath = $temporaryDirectory . '/' . $packageName;
+        $temporaryMetadataPath = $temporaryDirectory . '/' . $metadataName;
+        $temporaryChannelPath = $channelDirectory . '/channel.json.tmp-' . bin2hex(random_bytes(8));
         try {
             $zip = new ZipArchive();
-            if ($zip->open($packagePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
+            if ($zip->open($temporaryPackagePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
                 return $this->failure('Unable to create local release package.');
             }
 
@@ -97,17 +114,26 @@ final class LocalReleaseChannelBuilderService
             }
             $zip->close();
 
-        $inspection = (new ReleasePackageInspectionService())->inspect($packagePath, $internalMetadata);
+        $inspection = (new ReleasePackageInspectionService())->inspect($temporaryPackagePath, $internalMetadata);
         if (($inspection['ok'] ?? false) !== true) {
             return $this->failure('Generated release package does not satisfy the V1 package contract.', ['inspection' => $inspection]);
         }
 
-        $sha = hash_file('sha256', $packagePath) ?: '';
-        $size = filesize($packagePath) ?: 0;
+        $sha = hash_file('sha256', $temporaryPackagePath) ?: '';
+        $size = filesize($temporaryPackagePath) ?: 0;
         $metadata = $this->metadata($releaseVersion, $buildId, $packageName, $sha, $size, $included, $skipped, $inspection);
-        $metadataName = 'susankhya-os-' . $releaseVersion . '-' . $safeBuildId . '.json';
-        $metadataPath = $releasesDirectory . '/' . $metadataName;
-        file_put_contents($metadataPath, json_encode($metadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n");
+        if (!$this->writeTemporaryJson($temporaryMetadataPath, $metadata)) {
+            return $this->failure('Unable to write release metadata.');
+        }
+        if (!link($temporaryPackagePath, $packagePath)) {
+            return $this->failure('Release artifact identity became occupied before finalization.');
+        }
+        unlink($temporaryPackagePath);
+        if (!link($temporaryMetadataPath, $metadataPath)) {
+            unlink($packagePath);
+            return $this->failure('Unable to finalize release metadata.');
+        }
+        unlink($temporaryMetadataPath);
 
         $channel = [
             'schema_version' => 'susankhya.local-channel.v1',
@@ -129,7 +155,14 @@ final class LocalReleaseChannelBuilderService
                 'support' => ['current' => null],
             ],
         ];
-        file_put_contents($channelDirectory . '/channel.json', json_encode($channel, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n");
+        if (!$this->writeTemporaryJson($temporaryChannelPath, $channel) || !rename($temporaryChannelPath, $channelDirectory . '/channel.json')) {
+            if (is_file($temporaryChannelPath)) {
+                unlink($temporaryChannelPath);
+            }
+            unlink($metadataPath);
+            unlink($packagePath);
+            return $this->failure('Unable to finalize local channel metadata.');
+        }
 
             return [
                 'ok' => true,
@@ -145,6 +178,12 @@ final class LocalReleaseChannelBuilderService
                 'skipped_count' => count($skipped),
             ];
         } finally {
+            if (is_file($temporaryChannelPath)) {
+                unlink($temporaryChannelPath);
+            }
+            if (is_dir($temporaryDirectory)) {
+                self::removeTree($temporaryDirectory);
+            }
             if (isset($prepared['cleanup']) && is_callable($prepared['cleanup'])) {
                 ($prepared['cleanup'])();
             }
@@ -344,6 +383,64 @@ final class LocalReleaseChannelBuilderService
         $realValue = realpath($value);
         return $realRoot !== false && $realValue !== false
             && ($realValue === $realRoot || str_starts_with($realValue, $realRoot . '/'));
+    }
+
+    private function checkArtifactCollision(string $channelDirectory, string $packagePath, string $metadataPath, string $packageName, string $metadataName): ?string
+    {
+        foreach ([$packagePath, $metadataPath] as $path) {
+            if (file_exists($path) || is_link($path)) {
+                return 'Release identity or normalized build ID already has an occupied artifact path.';
+            }
+        }
+
+        $channelPath = $channelDirectory . '/channel.json';
+        if (!file_exists($channelPath)) {
+            return null;
+        }
+        if (is_link($channelPath)) {
+            return 'Existing channel metadata is a symlink and cannot be replaced.';
+        }
+        $channel = json_decode((string)file_get_contents($channelPath), true);
+        if (!is_array($channel)) {
+            return 'Existing channel metadata is invalid or incomplete.';
+        }
+        $current = $channel['lanes']['app']['current'] ?? null;
+        if ($current !== null && !is_array($current)) {
+            return 'Existing channel metadata is invalid or incomplete.';
+        }
+        if ($current === null) {
+            return null;
+        }
+        $currentPackage = $this->channelReference($channelDirectory, $current['package'] ?? null);
+        $currentMetadata = $this->channelReference($channelDirectory, $current['metadata'] ?? null);
+        if ($currentPackage === null || $currentMetadata === null || !is_file($currentPackage) || !is_file($currentMetadata)) {
+            return 'Existing channel metadata references an incomplete release record.';
+        }
+        if (($current['package'] ?? null) === 'releases/' . $packageName || ($current['metadata'] ?? null) === 'releases/' . $metadataName) {
+            return 'Release identity or normalized build ID is already recorded by the channel.';
+        }
+        return null;
+    }
+
+    private function channelReference(string $channelDirectory, mixed $reference): ?string
+    {
+        if (!is_string($reference) || $reference === '' || str_starts_with($reference, '/') || str_contains($reference, '..')) {
+            return null;
+        }
+        if (!str_starts_with($reference, 'releases/')) {
+            return null;
+        }
+        return $channelDirectory . '/' . $reference;
+    }
+
+    /** @param array<string,mixed> $value */
+    private function writeTemporaryJson(string $path, array $value): bool
+    {
+        $encoded = json_encode($value, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        if ($encoded === false) {
+            return false;
+        }
+        return file_put_contents($path, $encoded . "\n", LOCK_EX) !== false;
     }
 
     private static function removeTree(string $path): void

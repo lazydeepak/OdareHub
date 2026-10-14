@@ -6434,3 +6434,18 @@ does not remove development packages from an already-installed vendor tree, and
 this slice did not run Composer install or rewrite generated inventory metadata.
 No database, SQL, migration, bootstrap, installation, publication, deployment,
 Core change, or repository runtime artifact mutation occurred.
+
+## Session Summary (2026-10-15) — OH-AUTO1-063 Immutable Release Artifact Protection
+
+Corrected the local release builder's overwrite risk. Identity-derived package
+and sidecar paths are now fail-closed when occupied or incomplete; packages are
+built and inspected under runner-owned temporary names, finalized without
+overwriting, and channel metadata is atomically finalized only after both
+artifacts succeed.
+
+Immutability probe: ✅ 13/13. Existing package, sidecar, and channel hashes
+remain unchanged across replacement, repeated-identity, normalized-build-ID,
+incomplete-record, and inspection-failure attempts. Existing Composer
+portability, REL-004, builder, preview, apply-preparation, readiness, and
+architecture/deployment checks remain passing. No database, SQL, migration,
+installation, publication, deployment, Core, log, or cache changes occurred.

@@ -333,3 +333,35 @@ made consistent before that boundary is closed.
 `platform/Updates/LocalReleaseChannelBuilderService.php`,
 `platform/Updates/tests/probe_production_composer_autoload_portability.php`,
 and `docs/architecture/oh-auto1-062-production-composer-autoload-portability-2026-10-15.md`.
+
+### 2026-10-15 — OH-AUTO1-063 immutable release artifact finalization
+**Status:** Accepted and implemented
+
+**Context**
+
+The release builder used `ZipArchive::OVERWRITE` on the identity-derived ZIP
+path. That allowed a later payload to replace an existing artifact or collide
+through build-ID normalization.
+
+**Decision**
+
+Treat an existing package or sidecar path as occupied, reject incomplete
+records, and validate existing channel references before building. Produce and
+inspect the package in a runner-owned temporary directory, then use
+non-overwriting finalization for the package and sidecar. Channel JSON is
+written to a temporary file and atomically renamed only after both artifacts
+are finalized. Builder-owned temporary material is removed on every path.
+
+**Consequences**
+
+Release identities are append-only at the artifact path. Rebuilding an
+identity, colliding after build-ID normalization, or encountering an
+incomplete record fails closed without changing the prior valid artifact or
+channel state. Replacing the channel's current pointer for a genuinely new
+identity remains the existing channel behavior.
+
+**Evidence**
+
+`platform/Updates/LocalReleaseChannelBuilderService.php`,
+`platform/Updates/tests/probe_release_artifact_immutability.php`, and
+`docs/architecture/oh-auto1-063-immutable-release-artifact-protection-2026-10-15.md`.

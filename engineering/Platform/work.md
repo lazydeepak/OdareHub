@@ -44,6 +44,7 @@ remain unauthorized.
 - [x] OH-AUTO1-060 — Reconciled REL-003 execution feasibility: owner-batched runner limitation, exact planned-step contract, and failed-row evidence preservation. Pure fixture 18/18; existing migration probes unchanged. No runtime implementation or database execution. See the OH-AUTO1-059 contract and Platform decision log.
 - [x] OH-AUTO1-061 — Produced and inspected an actual-source disposable package; identified the broken Composer autoload boundary caused by filtered development targets.
 - [x] OH-AUTO1-062 — Regenerated production Composer autoload metadata in runner-owned staging with `--no-dev --no-scripts --no-plugins`, verified zero missing production targets, and added a focused portability probe. Full development-package pruning remains policy-gated because Composer install/metadata rewriting is not authorized.
+- [x] OH-AUTO1-063 — Protected release identity-derived ZIP/sidecar/channel artifacts from overwrite and normalized build-ID collisions using temporary finalization and fail-closed collision checks. Immutability probe 13/13.
 - [x] OH-AUTO1-016 — Read-only application/module lifecycle enforcement audit. Corrected the SBAIO legacy fallback loader outside Core; escalated module-surface filtering, universal module route guards, and plugin partial-route rollback for Core/platform owner review. See `docs/architecture/lifecycle-enforcement-audit-2026-10-14.md`.
 - [x] OH-AUTO1-010 — CLI installed-state evidence integration.
 - [x] OH-AUTO1-011 — Migration ordering and schema-target compatibility preflight.

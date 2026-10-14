@@ -6344,3 +6344,14 @@ by OH-AUTO1-061 became zero, the root `Tests\\` mapping and PHPUnit/coverage
 autoload targets are absent, and the disposable package passed inspection and
 checksum/size binding. Full dev-package pruning remains policy-gated because
 Composer install or direct generated-inventory rewriting is not authorized.
+
+## Session Summary (2026-10-15) — OH-AUTO1-063 Immutable Release Artifact Protection
+
+The local release builder now refuses occupied or incomplete identity-derived
+package/sidecar paths and validates existing channel references before building.
+Packages are inspected under runner-owned temporary directories, finalized
+without overwrite, and channel metadata is atomically renamed only after the
+package and sidecar succeed. The 13/13 immutability probe proves preservation
+across repeated identities, normalized build-ID collisions, incomplete records,
+and inspection failures. No database, SQL, migration, installation,
+publication, deployment, or Core operation occurred.
