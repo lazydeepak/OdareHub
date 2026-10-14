@@ -114,9 +114,17 @@ $manifest = is_file($manifestPath)
 $modulePlugins = is_array($manifest) && is_array($manifest['legacy_bridge_plugins'] ?? null)
     ? array_values(array_map('strval', (array)$manifest['legacy_bridge_plugins']))
     : [];
+$pluginManager = isset($c) ? $c->get('plugins') : null;
 
 foreach ($modulePlugins as $modulePlugin) {
     if (!preg_match('/^[A-Za-z0-9_]+$/', $modulePlugin)) {
+        continue;
+    }
+
+    // Installed legacy modules are loaded by the module/plugin lifecycle. Do not
+    // re-register inactive modules through the bundle-owned compatibility path.
+    // Keep the fallback only for local-only modules that are not registered yet.
+    if ($pluginManager && method_exists($pluginManager, 'isInstalled') && $pluginManager->isInstalled($modulePlugin)) {
         continue;
     }
 
