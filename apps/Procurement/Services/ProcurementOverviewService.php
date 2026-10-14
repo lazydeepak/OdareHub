@@ -182,95 +182,110 @@ final class ProcurementOverviewService
             }
         }
 
-        $existingPo = DB::fetchOne(
-            'SELECT id FROM procurement_purchase_orders WHERE request_id=? LIMIT 1',
-            [$requestId]
-        );
-        if (is_array($existingPo) && (int)($existingPo['id'] ?? 0) > 0) {
-            return ['po_id' => (int)$existingPo['id'], 'already_exists' => true];
-        }
+        AuditLogService::ensureSchema();
+        $db = DB::conn();
+        $db->begin_transaction();
+        try {
+            // Serialize conversion attempts for the same request before the
+            // existing-PO check. The request table has no request_id unique
+            // constraint on purchase orders, so the row lock is the
+            // application-owned idempotency boundary.
+            $request = DB::fetchOne(
+                'SELECT id, request_ref, product_id, requested_qty, needed_date, request_status
+                 FROM procurement_requests
+                 WHERE id=?
+                 LIMIT 1
+                 FOR UPDATE',
+                [$requestId]
+            );
+            if (!is_array($request)) {
+                throw new \RuntimeException('Request not found.');
+            }
 
-        $request = DB::fetchOne(
-            'SELECT id, request_ref, product_id, requested_qty, needed_date, request_status
-             FROM procurement_requests
-             WHERE id=?
-             LIMIT 1',
-            [$requestId]
-        );
-        if (!is_array($request)) {
-            throw new \RuntimeException('Request not found.');
-        }
+            $existingPo = DB::fetchOne(
+                'SELECT id FROM procurement_purchase_orders WHERE request_id=? LIMIT 1',
+                [$requestId]
+            );
+            if (is_array($existingPo) && (int)($existingPo['id'] ?? 0) > 0) {
+                $db->commit();
+                return ['po_id' => (int)$existingPo['id'], 'already_exists' => true];
+            }
 
-        $requestRef = trim((string)($request['request_ref'] ?? ''));
-        if ($requestRef === '') {
-            $requestRef = '#' . (string)$requestId;
-        }
+            $requestRef = trim((string)($request['request_ref'] ?? ''));
+            if ($requestRef === '') {
+                $requestRef = '#' . (string)$requestId;
+            }
 
-        $status = strtolower(trim((string)($request['request_status'] ?? 'draft')));
-        if ($status !== 'approved') {
-            throw new \RuntimeException('Request ' . $requestRef . ' is currently "' . $status . '". Only approved requests can be converted to PO.');
-        }
+            $status = strtolower(trim((string)($request['request_status'] ?? 'draft')));
+            if ($status !== 'approved') {
+                throw new \RuntimeException('Request ' . $requestRef . ' is currently "' . $status . '". Only approved requests can be converted to PO.');
+            }
 
-        $poRef = self::nextRef('PO');
-        $requestedQty = round(max(0.0, (float)($request['requested_qty'] ?? 0.0)), 2);
-        if ($requestedQty <= 0.0) {
-            throw new \RuntimeException('Request ' . $requestRef . ' has zero quantity. Update quantity before creating a PO.');
-        }
+            $poRef = self::nextRef('PO');
+            $requestedQty = round(max(0.0, (float)($request['requested_qty'] ?? 0.0)), 2);
+            if ($requestedQty <= 0.0) {
+                throw new \RuntimeException('Request ' . $requestRef . ' has zero quantity. Update quantity before creating a PO.');
+            }
 
-        DB::query(
-            'INSERT INTO procurement_purchase_orders (po_ref, supplier_id, request_id, po_status, order_date, expected_date, created_by)
-             VALUES (?,?,?,?,?,?,?)',
-            [
-                $poRef,
-                $supplierId,
-                $requestId,
-                'draft',
-                date('Y-m-d'),
-                self::nullIfBlank((string)($request['needed_date'] ?? '')),
-                self::nullIfBlank($actor),
-            ]
-        );
+            DB::query(
+                'INSERT INTO procurement_purchase_orders (po_ref, supplier_id, request_id, po_status, order_date, expected_date, created_by)
+                 VALUES (?,?,?,?,?,?,?)',
+                [
+                    $poRef,
+                    $supplierId,
+                    $requestId,
+                    'draft',
+                    date('Y-m-d'),
+                    self::nullIfBlank((string)($request['needed_date'] ?? '')),
+                    self::nullIfBlank($actor),
+                ]
+            );
 
-        $poId = (int)(DB::conn()->insert_id ?: 0);
-        if ($poId <= 0) {
-            throw new \RuntimeException('Failed to create PO from request.');
-        }
+            $poId = (int)($db->insert_id ?: 0);
+            if ($poId <= 0) {
+                throw new \RuntimeException('Failed to create PO from request.');
+            }
 
-        DB::query(
-            'INSERT INTO procurement_purchase_order_lines (po_id, product_id, line_description, ordered_qty, unit_price, line_status)
-             VALUES (?,?,?,?,?,?)',
-            [
+            DB::query(
+                'INSERT INTO procurement_purchase_order_lines (po_id, product_id, line_description, ordered_qty, unit_price, line_status)
+                 VALUES (?,?,?,?,?,?)',
+                [
+                    $poId,
+                    self::toPositiveInt($request['product_id'] ?? null),
+                    self::nullIfBlank('Auto from request ' . (string)($request['request_ref'] ?? ('#' . $requestId))),
+                    $requestedQty,
+                    0,
+                    'open',
+                ]
+            );
+
+            self::setRequestStatus($requestId, 'closed', $actor, 'Auto closed after PO creation from approved request.');
+
+            self::recordAudit(
+                'procurement_order',
                 $poId,
-                self::toPositiveInt($request['product_id'] ?? null),
-                self::nullIfBlank('Auto from request ' . (string)($request['request_ref'] ?? ('#' . $requestId))),
-                $requestedQty,
-                0,
-                'open',
-            ]
-        );
+                AuditLogService::EVENT_WORKFLOW,
+                AuditLogService::ACTION_CREATED,
+                $actor,
+                [
+                    'app' => 'procurement',
+                    'module' => 'orders',
+                    'old_state' => 'new',
+                    'new_state' => 'draft',
+                    'note' => 'PO created from approved request.',
+                    'metadata' => [
+                        'request_id' => $requestId,
+                        'supplier_id' => $supplierId,
+                    ],
+                ]
+            );
 
-        self::setRequestStatus($requestId, 'closed', $actor, 'Auto closed after PO creation from approved request.');
-
-        self::recordAudit(
-            'procurement_order',
-            $poId,
-            AuditLogService::EVENT_WORKFLOW,
-            AuditLogService::ACTION_CREATED,
-            $actor,
-            [
-                'app' => 'procurement',
-                'module' => 'orders',
-                'old_state' => 'new',
-                'new_state' => 'draft',
-                'note' => 'PO created from approved request.',
-                'metadata' => [
-                    'request_id' => $requestId,
-                    'supplier_id' => $supplierId,
-                ],
-            ]
-        );
-
-        return ['po_id' => $poId, 'already_exists' => false];
+            $db->commit();
+            return ['po_id' => $poId, 'already_exists' => false];
+        } catch (\Throwable $e) {
+            $db->rollback();
+            throw $e;
+        }
     }
 
     /**
@@ -618,77 +633,69 @@ final class ProcurementOverviewService
             $poRef = self::nextRef('PO');
         }
 
-        DB::query(
-            'INSERT INTO procurement_purchase_orders (po_ref, supplier_id, request_id, po_status, order_date, expected_date, created_by)
-             VALUES (?,?,?,?,?,?,?)',
-            [
-                $poRef,
-                self::toPositiveInt($input['supplier_id'] ?? null),
-                self::toPositiveInt($input['request_id'] ?? null),
-                self::nullIfBlank((string)($input['po_status'] ?? 'draft')) ?? 'draft',
-                self::nullIfBlank((string)($input['order_date'] ?? '')),
-                self::nullIfBlank((string)($input['expected_date'] ?? '')),
-                self::nullIfBlank($actor),
-            ]
-        );
-
-        $poId = (int)(DB::conn()->insert_id ?: 0);
-        $requestId = self::toPositiveInt($input['request_id'] ?? null);
-        $orderedQty = round(max(0.0, (float)($input['ordered_qty'] ?? 0)), 2);
-        if ($poId > 0 && $orderedQty > 0) {
-        $poLineId = self::toPositiveInt($input['po_line_id'] ?? null);
-        $poId = self::toPositiveInt($input['po_id'] ?? null);
-
-        if ($poLineId !== null) {
-            $line = DB::fetchOne(
-                'SELECT id, po_id FROM procurement_purchase_order_lines WHERE id = ? LIMIT 1',
-                [$poLineId]
-            );
-            if (!is_array($line) || (int)($line['id'] ?? 0) <= 0) {
-                throw new \InvalidArgumentException('Receipt line reference does not exist.');
-            }
-            $linePoId = self::toPositiveInt($line['po_id'] ?? null);
-            if ($linePoId !== $poId) {
-                throw new \InvalidArgumentException('Receipt line reference does not belong to the selected purchase order.');
-            }
-        }
-
-        DB::query(
-                'INSERT INTO procurement_purchase_order_lines (po_id, product_id, line_description, ordered_qty, unit_price, line_status)
-                 VALUES (?,?,?,?,?,?)',
+        AuditLogService::ensureSchema();
+        $db = DB::conn();
+        $db->begin_transaction();
+        try {
+            DB::query(
+                'INSERT INTO procurement_purchase_orders (po_ref, supplier_id, request_id, po_status, order_date, expected_date, created_by)
+                 VALUES (?,?,?,?,?,?,?)',
                 [
+                    $poRef,
+                    self::toPositiveInt($input['supplier_id'] ?? null),
+                    self::toPositiveInt($input['request_id'] ?? null),
+                    self::nullIfBlank((string)($input['po_status'] ?? 'draft')) ?? 'draft',
+                    self::nullIfBlank((string)($input['order_date'] ?? '')),
+                    self::nullIfBlank((string)($input['expected_date'] ?? '')),
+                    self::nullIfBlank($actor),
+                ]
+            );
+
+            $poId = (int)($db->insert_id ?: 0);
+            $requestId = self::toPositiveInt($input['request_id'] ?? null);
+            $orderedQty = round(max(0.0, (float)($input['ordered_qty'] ?? 0)), 2);
+            if ($poId > 0 && $orderedQty > 0) {
+                DB::query(
+                    'INSERT INTO procurement_purchase_order_lines (po_id, product_id, line_description, ordered_qty, unit_price, line_status)
+                     VALUES (?,?,?,?,?,?)',
+                    [
+                        $poId,
+                        self::toPositiveInt($input['line_product_id'] ?? ($input['product_id'] ?? null)),
+                        self::nullIfBlank((string)($input['line_description'] ?? '')),
+                        $orderedQty,
+                        round(max(0.0, (float)($input['unit_price'] ?? 0)), 2),
+                        self::nullIfBlank((string)($input['line_status'] ?? 'open')) ?? 'open',
+                    ]
+                );
+            }
+
+            if ($poId > 0) {
+                if ($requestId !== null) {
+                    self::setRequestStatus($requestId, 'closed', $actor, 'Auto closed after PO creation.');
+                }
+
+                self::recordAudit(
+                    'procurement_order',
                     $poId,
-                    self::toPositiveInt($input['line_product_id'] ?? ($input['product_id'] ?? null)),
-                    self::nullIfBlank((string)($input['line_description'] ?? '')),
-                    $orderedQty,
-                    round(max(0.0, (float)($input['unit_price'] ?? 0)), 2),
-                    self::nullIfBlank((string)($input['line_status'] ?? 'open')) ?? 'open',
-                ]
-            );
-        }
-
-        if ($poId > 0) {
-            if ($requestId !== null) {
-                self::setRequestStatus($requestId, 'closed', $actor, 'Auto closed after PO creation.');
+                    AuditLogService::EVENT_WORKFLOW,
+                    AuditLogService::ACTION_CREATED,
+                    $actor,
+                    [
+                        'app' => 'procurement',
+                        'module' => 'orders',
+                        'new_state' => (string)($input['po_status'] ?? 'draft'),
+                        'note' => 'Purchase order created.',
+                        'metadata' => [
+                            'request_id' => $requestId,
+                            'supplier_id' => self::toPositiveInt($input['supplier_id'] ?? null),
+                        ],
+                    ]
+                );
             }
-
-            self::recordAudit(
-                'procurement_order',
-                $poId,
-                AuditLogService::EVENT_WORKFLOW,
-                AuditLogService::ACTION_CREATED,
-                $actor,
-                [
-                    'app' => 'procurement',
-                    'module' => 'orders',
-                    'new_state' => (string)($input['po_status'] ?? 'draft'),
-                    'note' => 'Purchase order created.',
-                    'metadata' => [
-                        'request_id' => $requestId,
-                        'supplier_id' => self::toPositiveInt($input['supplier_id'] ?? null),
-                    ],
-                ]
-            );
+            $db->commit();
+        } catch (\Throwable $e) {
+            $db->rollback();
+            throw $e;
         }
     }
 
@@ -710,62 +717,84 @@ final class ProcurementOverviewService
         $poLineId = self::toPositiveInt($input['po_line_id'] ?? null);
         $poId = self::toPositiveInt($input['po_id'] ?? null);
 
-        if ($poLineId !== null) {
-            $line = DB::fetchOne(
-                'SELECT id, po_id FROM procurement_purchase_order_lines WHERE id = ? LIMIT 1',
-                [$poLineId]
-            );
-            if (!is_array($line) || (int)($line['id'] ?? 0) <= 0) {
-                throw new \InvalidArgumentException('Receipt line reference does not exist.');
+        AuditLogService::ensureSchema();
+        $db = DB::conn();
+        $db->begin_transaction();
+        try {
+            // Serialize receipt insertion and aggregate order-status
+            // recomputation for one purchase order. Without this lock two
+            // posted receipts can each calculate status from a stale snapshot.
+            if ($poId !== null) {
+                $purchaseOrder = DB::fetchOne(
+                    'SELECT id FROM procurement_purchase_orders WHERE id=? LIMIT 1 FOR UPDATE',
+                    [$poId]
+                );
+                if (!is_array($purchaseOrder) || (int)($purchaseOrder['id'] ?? 0) <= 0) {
+                    throw new \InvalidArgumentException('Purchase order reference does not exist.');
+                }
             }
-            $linePoId = self::toPositiveInt($line['po_id'] ?? null);
-            if ($linePoId !== $poId) {
-                throw new \InvalidArgumentException('Receipt line reference does not belong to the selected purchase order.');
+
+            if ($poLineId !== null) {
+                $line = DB::fetchOne(
+                    'SELECT id, po_id FROM procurement_purchase_order_lines WHERE id = ? LIMIT 1',
+                    [$poLineId]
+                );
+                if (!is_array($line) || (int)($line['id'] ?? 0) <= 0) {
+                    throw new \InvalidArgumentException('Receipt line reference does not exist.');
+                }
+                $linePoId = self::toPositiveInt($line['po_id'] ?? null);
+                if ($linePoId !== $poId) {
+                    throw new \InvalidArgumentException('Receipt line reference does not belong to the selected purchase order.');
+                }
             }
-        }
 
-        DB::query(
-            'INSERT INTO procurement_receipts (receipt_ref, po_id, po_line_id, received_qty, receipt_date, receipt_status, note, created_by)
-             VALUES (?,?,?,?,?,?,?,?)',
-            [
-                $receiptRef,
-                self::toPositiveInt($input['po_id'] ?? null),
-                $poLineId,
-                $qty,
-                self::nullIfBlank((string)($input['receipt_date'] ?? '')),
-                self::nullIfBlank((string)($input['receipt_status'] ?? 'received')) ?? 'received',
-                self::nullIfBlank((string)($input['note'] ?? '')),
-                self::nullIfBlank($actor),
-            ]
-        );
-
-        $receiptId = (int)(DB::conn()->insert_id ?: 0);
-        if ($receiptId > 0) {
-            $status = strtolower(trim((string)($input['receipt_status'] ?? 'received')));
-            self::recordAudit(
-                'procurement_receipt',
-                $receiptId,
-                AuditLogService::EVENT_WORKFLOW,
-                AuditLogService::ACTION_CREATED,
-                $actor,
+            DB::query(
+                'INSERT INTO procurement_receipts (receipt_ref, po_id, po_line_id, received_qty, receipt_date, receipt_status, note, created_by)
+                 VALUES (?,?,?,?,?,?,?,?)',
                 [
-                    'app' => 'procurement',
-                    'module' => 'receipts',
-                    'new_state' => $status,
-                    'note' => 'Receipt created.',
-                    'metadata' => [
-                        'po_id' => self::toPositiveInt($input['po_id'] ?? null),
-                        'received_qty' => $qty,
-                    ],
+                    $receiptRef,
+                    self::toPositiveInt($input['po_id'] ?? null),
+                    $poLineId,
+                    $qty,
+                    self::nullIfBlank((string)($input['receipt_date'] ?? '')),
+                    self::nullIfBlank((string)($input['receipt_status'] ?? 'received')) ?? 'received',
+                    self::nullIfBlank((string)($input['note'] ?? '')),
+                    self::nullIfBlank($actor),
                 ]
             );
 
-            if ($status === 'posted') {
-                $poId = self::toPositiveInt($input['po_id'] ?? null);
-                if ($poId !== null) {
-                    self::recomputeOrderStatusFromReceipts($poId, $actor);
+            $receiptId = (int)($db->insert_id ?: 0);
+            if ($receiptId > 0) {
+                $status = strtolower(trim((string)($input['receipt_status'] ?? 'received')));
+                self::recordAudit(
+                    'procurement_receipt',
+                    $receiptId,
+                    AuditLogService::EVENT_WORKFLOW,
+                    AuditLogService::ACTION_CREATED,
+                    $actor,
+                    [
+                        'app' => 'procurement',
+                        'module' => 'receipts',
+                        'new_state' => $status,
+                        'note' => 'Receipt created.',
+                        'metadata' => [
+                            'po_id' => self::toPositiveInt($input['po_id'] ?? null),
+                            'received_qty' => $qty,
+                        ],
+                    ]
+                );
+
+                if ($status === 'posted') {
+                    $poId = self::toPositiveInt($input['po_id'] ?? null);
+                    if ($poId !== null) {
+                        self::recomputeOrderStatusFromReceipts($poId, $actor);
+                    }
                 }
             }
+            $db->commit();
+        } catch (\Throwable $e) {
+            $db->rollback();
+            throw $e;
         }
     }
 
