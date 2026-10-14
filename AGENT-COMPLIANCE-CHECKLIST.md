@@ -6397,6 +6397,18 @@ forward-only downgrade policy, and recovery boundaries. Pure fixtures passed
 installed-evidence probes passed 16/16, 16/16, and 22/22. No SQL, database,
 migration execution, schema mutation, or second migration system was added.
 
+## Session Summary (2026-10-15) — OH-AUTO1-060 Migration Execution Feasibility
+
+Reconciled REL-003 against the actual `AppMigrationService` boundary: the
+current runner batches one owner in lexical file order, cannot express
+`A001 -> B001 -> A002`, and deletes failed ledger evidence before retry. The
+proposal now defines a future exact planned-step extension retaining the
+existing SQL authority, refuses failed-row retry until recovery/attempt-history
+policy is approved, and distinguishes application-ledger migrations from
+legacy module/plugin paths. Pure fixtures passed 18/18; existing migration,
+installed compatibility, and installed-evidence probes passed 16/16, 16/16,
+and 22/22. No runtime, SQL, schema, or database change.
+
 ### Residual risk
 - Manual `createOrder()` does not currently validate a supplied supplier ID
   with the conversion path's active-supplier rule. No authoritative manual-order

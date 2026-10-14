@@ -18,8 +18,9 @@ work was limited to disposable ZIP fixtures and package-builder policy; no
 package publication, installation, database, or deployment operation occurred.
 
 OH-AUTO1-059 is complete as a read-only REL-003 migration-compatibility
-contract proposal. Migration execution, SQL, schema mutation, and a second
-migration system remain unauthorized.
+contract proposal. OH-AUTO1-060 reconciles its executor feasibility gap.
+Migration execution, SQL, schema mutation, and a second migration system
+remain unauthorized.
 
 ## In Progress
 
@@ -40,6 +41,7 @@ migration system remain unauthorized.
 - [x] OH-AUTO1-057 — Release authority and installed identity V1 design proposal. Pending architecture/release-authority decisions; no runtime implementation. See `docs/architecture/oh-auto1-057-release-authority-installed-identity-design-2026-10-15.md`.
 - [x] OH-AUTO1-058 — Resolved vendor development metadata conflict at the release-builder boundary without weakening strict package inspection. REL-004 fixture 15/15; existing builder 13/13, preview 30/30, apply preparation 7/7, and readiness evidence 10/10. See `docs/architecture/oh-auto1-058-release-package-protected-path-compatibility-2026-10-15.md`.
 - [x] OH-AUTO1-059 — Release migration compatibility, target-schema identity, ordering, failure, and downgrade V1 contract proposal. Pending architecture/release-authority decisions; no migration execution or schema mutation. See `docs/architecture/oh-auto1-059-release-migration-compatibility-ordering-contract-2026-10-15.md`.
+- [x] OH-AUTO1-060 — Reconciled REL-003 execution feasibility: owner-batched runner limitation, exact planned-step contract, and failed-row evidence preservation. Pure fixture 18/18; existing migration probes unchanged. No runtime implementation or database execution. See the OH-AUTO1-059 contract and Platform decision log.
 - [x] OH-AUTO1-016 — Read-only application/module lifecycle enforcement audit. Corrected the SBAIO legacy fallback loader outside Core; escalated module-surface filtering, universal module route guards, and plugin partial-route rollback for Core/platform owner review. See `docs/architecture/lifecycle-enforcement-audit-2026-10-14.md`.
 - [x] OH-AUTO1-010 — CLI installed-state evidence integration.
 - [x] OH-AUTO1-011 — Migration ordering and schema-target compatibility preflight.

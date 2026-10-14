@@ -125,18 +125,52 @@ function rel003_plan(array $inventory, array $installed, string $currentSchema, 
     ];
 }
 
+/**
+ * Model the current whole-owner runner: one call consumes every file for one
+ * owner in lexical order and cannot select a single plan step.
+ *
+ * @param array<int,array<string,mixed>> $inventory
+ * @param array<int,string> $ownerOrder
+ * @return array{ok:bool,applied:array<int,string>,blocked:?string}
+ */
+function rel003_owner_batches(array $inventory, array $ownerOrder): array
+{
+    $applied = [];
+    foreach ($ownerOrder as $owner) {
+        $files = array_values(array_filter($inventory, static function (array $item) use ($owner): bool {
+            return (string)($item['owner'] ?? '') === $owner;
+        }));
+        usort($files, static fn (array $left, array $right): int => strcmp((string)$left['id'], (string)$right['id']));
+        foreach ($files as $item) {
+            foreach ((array)($item['requires'] ?? []) as $dependency) {
+                if (!in_array((string)$dependency, $applied, true)) {
+                    return ['ok' => false, 'applied' => $applied, 'blocked' => (string)$item['id']];
+                }
+            }
+            $applied[] = (string)$item['id'];
+        }
+    }
+    return ['ok' => true, 'applied' => $applied, 'blocked' => null];
+}
+
 $baseInventory = [
     ['id' => 'app:platform:001_core.sql', 'checksum' => 'aaa', 'requires' => []],
     ['id' => 'app:orders:001_orders.sql', 'checksum' => 'bbb', 'requires' => ['app:platform:001_core.sql']],
-    ['id' => 'module:orders:002_index.sql', 'checksum' => 'ccc', 'requires' => ['app:orders:001_orders.sql']],
+    ['id' => 'module:orders/Orders:002_index.sql', 'checksum' => 'ccc', 'requires' => ['app:orders:001_orders.sql']],
 ];
 $baseInstalled = [
     ['id' => 'app:platform:001_core.sql', 'checksum' => 'aaa', 'status' => 'applied'],
 ];
 
+$canonicalIdentityPattern = '/^(app|module):[^:]+:[^:]+\.sql$/';
+rel003_assert(
+    count(array_filter($baseInventory, static fn (array $item): bool => preg_match($canonicalIdentityPattern, (string)$item['id']) === 1)) === count($baseInventory),
+    'fixture migration identifiers follow the canonical owner-type/owner-key/source-name grammar'
+);
+
 $compatible = rel003_plan($baseInventory, $baseInstalled, 'schema:1', 'schema:2', '1.0.0', '1.1.0');
 rel003_assert($compatible['state'] === 'missing_migration', 'compatible upgrade produces a planned migration state');
-rel003_assert($compatible['order'] === ['app:platform:001_core.sql', 'app:orders:001_orders.sql', 'module:orders:002_index.sql'], 'dependency order is deterministic');
+rel003_assert($compatible['order'] === ['app:platform:001_core.sql', 'app:orders:001_orders.sql', 'module:orders/Orders:002_index.sql'], 'dependency order is deterministic');
 
 $stable = rel003_plan(array_reverse($baseInventory), $baseInstalled, 'schema:1', 'schema:2', '1.0.0', '1.1.0');
 rel003_assert($stable['order'] === $compatible['order'], 'independent/input-order variation does not change graph order');
@@ -144,7 +178,7 @@ rel003_assert($stable['order'] === $compatible['order'], 'independent/input-orde
 $allApplied = rel003_plan($baseInventory, [
     ['id' => 'app:platform:001_core.sql', 'checksum' => 'aaa', 'status' => 'applied'],
     ['id' => 'app:orders:001_orders.sql', 'checksum' => 'bbb', 'status' => 'applied'],
-    ['id' => 'module:orders:002_index.sql', 'checksum' => 'ccc', 'status' => 'applied'],
+    ['id' => 'module:orders/Orders:002_index.sql', 'checksum' => 'ccc', 'status' => 'applied'],
 ], 'schema:2', 'schema:2', '1.0.0', '1.1.0');
 rel003_assert($allApplied['state'] === 'compatible_upgrade', 'fully applied matching inventory is compatible');
 
@@ -181,6 +215,32 @@ rel003_assert(in_array('disabled_owner_requires_migration', $disabled['blockers'
 
 $missingSchema = rel003_plan($baseInventory, [], '', 'schema:2', '1.0.0', '1.1.0');
 rel003_assert(in_array('schema_identity_missing', $missingSchema['errors'], true), 'missing target/source schema identity blocks');
+
+$interleaved = [
+    ['id' => 'app:owner-a:001_a.sql', 'owner' => 'owner-a', 'requires' => []],
+    ['id' => 'app:owner-a:002_a.sql', 'owner' => 'owner-a', 'requires' => ['app:owner-b:001_b.sql']],
+    ['id' => 'app:owner-b:001_b.sql', 'owner' => 'owner-b', 'requires' => ['app:owner-a:001_a.sql']],
+];
+$ownerAFirst = rel003_owner_batches($interleaved, ['owner-a', 'owner-b']);
+$ownerBFirst = rel003_owner_batches($interleaved, ['owner-b', 'owner-a']);
+rel003_assert($ownerAFirst['ok'] === false && $ownerAFirst['blocked'] === 'app:owner-a:002_a.sql', 'owner A batch cannot skip its dependent second file');
+rel003_assert($ownerBFirst['ok'] === false && $ownerBFirst['blocked'] === 'app:owner-b:001_b.sql', 'owner B batch cannot run before owner A prerequisite');
+$exactApplied = [];
+foreach (['app:owner-a:001_a.sql', 'app:owner-b:001_b.sql', 'app:owner-a:002_a.sql'] as $plannedId) {
+    $plannedItem = array_values(array_filter($interleaved, static fn (array $item): bool => $item['id'] === $plannedId))[0] ?? null;
+    $dependenciesSatisfied = is_array($plannedItem)
+        && array_diff((array)($plannedItem['requires'] ?? []), $exactApplied) === [];
+    if (!$dependenciesSatisfied) {
+        break;
+    }
+    $exactApplied[] = $plannedId;
+}
+rel003_assert(count($exactApplied) === 3, 'release plan can represent exact interleaving independently of owner batches');
+
+$failedRetryPolicy = static function (string $status): string {
+    return $status === 'failed' ? 'migration_recovery_required' : 'eligible_for_step_check';
+};
+rel003_assert($failedRetryPolicy('failed') === 'migration_recovery_required', 'existing failed row is retained as a retry blocker');
 
 echo "REL-003 migration governance fixture probe: {$passed} passed, {$failed} failed\n";
 exit($failed === 0 ? 0 : 1);

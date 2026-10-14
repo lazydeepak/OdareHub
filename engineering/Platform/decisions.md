@@ -2,6 +2,41 @@
 
 ## Decision Log
 
+### 2026-10-15 — OH-AUTO1-060 migration execution feasibility reconciliation
+**Status:** Proposed; approval required
+
+**Finding**
+
+`AppMigrationService::runMigrations()` is owner-batched: it lexically sorts
+every SQL file for one owner and has no exact-step or release-plan parameter.
+It cannot express a valid cross-owner sequence such as
+`app:owner-a:001_a.sql -> app:owner-b:001_b.sql -> app:owner-a:002_a.sql`.
+It also deletes an existing failed ledger row before retry, which loses prior
+failure evidence and conflicts with REL-003 fail-closed recovery semantics.
+
+**Minimal contract correction**
+
+Retain `AppMigrationService` as the application-lane SQL authority, but later
+add an exact planned-step entry point that receives one owner-relative filename,
+expected checksum, and plan position. It must verify bytes and ledger state,
+execute only that file through the existing schema-sync authority, preserve
+failure evidence, and refuse an existing failed row until recovery/attempt
+history policy is approved. The release coordinator—not the executor—owns
+dependency satisfaction and cross-owner order.
+
+**Boundary**
+
+No runtime interface, failed-row behavior, schema, SQL, migration execution, or
+database evidence changed in OH-AUTO1-060. Module/plugin migration paths remain
+outside the application-ledger contract until governed adapters are approved.
+
+**Evidence**
+
+Pure REL-003 fixtures now pass 18/18, including A001/B001/A002 owner-batch
+limitation, exact interleaving feasibility, and failed-row retry blocking.
+Existing migration compatibility, installed compatibility, and installed
+evidence probes remain 16/16, 16/16, and 22/22.
+
 ### 2026-10-15 — OH-AUTO1-059 release migration governance proposal
 **Status:** Proposed; approval required
 
