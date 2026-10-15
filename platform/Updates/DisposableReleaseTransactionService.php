@@ -114,7 +114,7 @@ final class DisposableReleaseTransactionService
         ]);
     }
 
-    public function complete(string $transactionId, PostUpdateHealthVerificationResult $health, string $environmentToken): array
+    public function complete(string $transactionId, PostUpdateHealthVerificationResult $health, string $environmentToken, ?callable $finalizeIdentity = null): array
     {
         $this->assertEnvironment($environmentToken);
         $current = $this->read($transactionId);
@@ -133,6 +133,27 @@ final class DisposableReleaseTransactionService
             || $health->bindingDigest() !== self::fingerprint((array)($record['health_binding'] ?? []))
             || $health->expectationsDigest() !== $expectationsDigest) {
             throw new RuntimeException('health evidence is not bound to this transaction');
+        }
+        if ($finalizeIdentity !== null) {
+            try {
+                $identityResult = $finalizeIdentity();
+                if (!is_array($identityResult) || ($identityResult['verified'] ?? false) !== true) {
+                    $this->journal->append($transactionId, 'recovery_required', [
+                        'event' => 'identity_finalization_failed',
+                        'reason' => 'identity finalization did not return verified read-back evidence',
+                    ]);
+                    throw new RuntimeException('identity finalization did not return verified read-back evidence');
+                }
+            } catch (\Throwable $exception) {
+                $currentAfterFailure = $this->read($transactionId);
+                if (($currentAfterFailure['state'] ?? null) !== 'recovery_required') {
+                    $this->journal->append($transactionId, 'recovery_required', [
+                        'event' => 'identity_finalization_failed',
+                        'reason' => $exception->getMessage(),
+                    ]);
+                }
+                throw $exception;
+            }
         }
         return $this->journal->append($transactionId, 'completed', ['event' => 'health_verified', 'health' => $health->toArray()]);
     }

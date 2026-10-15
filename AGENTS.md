@@ -6480,3 +6480,19 @@ architecture 49/49; deletion 28/28; deployment readiness PASS; Core lock PASS;
 PHP lint and diff hygiene PASS. No installed database, production SQL,
 deployment, production signing, or Core change. See
 `docs/architecture/oh-auto1-078-disposable-signed-install-update-recovery-2026-10-15.md`.
+
+## Session Summary (2026-10-15) — OH-AUTO1-079 Complete Disposable Release-Cycle Proof
+
+Corrected the OH-AUTO1-078 proof: restore now imports and queries the actual
+compressed database dump, filesystem restore verifies every archive entry and
+replaces the complete backed-up payload, MySQL attestation precedes all SQL,
+and health checks read the actual disposable installation/database. The
+execution boundary revalidates fresh coordinator evidence and rejects forged
+public evidence. Identity finalization/read-back occurs before `completed`,
+with injected failure classified as `recovery_required`.
+
+Validation: complete rehearsal 34/34; transaction control 23/23; restore
+probe 10/10; architecture 49/49; deletion 28/28; deployment readiness PASS;
+Core lock, PHP lint, and diff hygiene PASS. No installed database, production
+SQL, deployment, production signing, or Core change. See
+`docs/architecture/oh-auto1-079-disposable-release-cycle-proof-2026-10-15.md`.

@@ -63,6 +63,24 @@ passes 21/21. No installed database, production
 SQL, deployment, production signing, or Core change occurred. Evidence:
 `docs/architecture/oh-auto1-078-disposable-signed-install-update-recovery-2026-10-15.md`.
 
+## OH-AUTO1-079 — Completed
+
+Corrected the OH-AUTO1-078 release-cycle proof without replacing its real
+disposable execution. Database restore now imports and queries the actual
+compressed dump in a separate attested database; filesystem restore verifies
+every archive entry and replaces the complete backed-up payload. MySQL
+attestation precedes all fixture SQL and uses a dynamically selected
+loopback-only port with `--no-defaults` and the X plugin disabled.
+
+Health observations now read the actual runner-owned installation and database.
+The execution boundary revalidates fresh coordinator evidence and rejects a
+forged public evidence wrapper. Transaction completion finalizes and reads
+back installation identity before journaling `completed`; injected identity
+failure remains `recovery_required`. Complete recovery, baseline health,
+candidate reapplication, and final health-bound identity commit pass **34/34**.
+Transaction controls pass **23/23** and restore rehearsal passes **10/10**.
+Evidence: `docs/architecture/oh-auto1-079-disposable-release-cycle-proof-2026-10-15.md`.
+
 Current reconciliation: OH-AUTO1-055 corrected the previously open Core ACL
 deny-precedence and plugin route-rollback defects. OH-AUTO1-068 has now
 requalified bounded disposable database testing; installed-database access,

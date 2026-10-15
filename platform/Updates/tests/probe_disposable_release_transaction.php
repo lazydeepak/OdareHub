@@ -97,7 +97,7 @@ try {
     $verifier = new PostUpdateHealthVerifier($sources);
     $health = $verifier->verify($transactionId, $preflight->fingerprint(), $expected);
     $check($health->status() === 'verified' && count($health->checks()) === 9, 'health verifier executes all fixed read-only checks');
-    $completed = $transactions->complete($transactionId, $health, $environment);
+    $completed = $transactions->complete($transactionId, $health, $environment, static fn(): array => ['verified' => true, 'read_back' => true]);
     $check(($completed['state'] ?? null) === 'completed', 'verified health completes transaction control state');
     $check($throws(static fn() => $transactions->complete($transactionId, $health, $environment)), 'completed transaction cannot be replayed');
     $check($throws(static fn() => $transactions->complete($transactionId, ['status' => 'verified'], $environment)), 'caller-supplied health array cannot authorize completion');
@@ -117,6 +117,20 @@ try {
     $failedHealthForTransaction = $verifier->verify($failedTransactionId, $preflight->fingerprint(), $expected);
     $check($failedHealthForTransaction->status() === 'failed' && $throws(static fn() => $transactions->complete($failedTransactionId, $failedHealthForTransaction, $environment)), 'failed health blocks transaction completion');
     $transactions->markRecoveryRequired($failedTransactionId, 'health_failed', $environment);
+
+    $orderingTransaction = $transactions->prepare($preflight, $environment);
+    $orderingId = $orderingTransaction['record']['transaction_id'];
+    $orderingChallenge = $approvals->issue($orderingId, new DateTimeImmutable('+10 minutes', new DateTimeZone('UTC')));
+    $approvals->approve($orderingId, 'simulated:fixture-admin', $orderingChallenge['token'], $preflight, new DateTimeImmutable('now', new DateTimeZone('UTC')));
+    $orderingExpected = $expected;
+    $orderingExpected['health_binding'] = $orderingTransaction['record']['health_binding'];
+    $write('bootstrap', ['available' => true]);
+    $transactions->bindHealthExpectations($orderingId, $orderingExpected, $environment);
+    $transactions->markExecuting($orderingId, $preflight, $environment);
+    $transactions->markVerifying($orderingId, $preflight, $environment);
+    $orderingHealth = $verifier->verify($orderingId, $preflight->fingerprint(), $orderingExpected);
+    $check($orderingHealth->status() === 'verified' && $throws(static fn() => $transactions->complete($orderingId, $orderingHealth, $environment, static function (): array { throw new RuntimeException('injected identity finalization failure'); })), 'identity finalization failure blocks completion');
+    $check(($transactions->read($orderingId)['state'] ?? null) === 'recovery_required', 'identity finalization failure journals recovery-required before completion');
 
     $expiredId = $transactions->prepare($preflight, $environment)['record']['transaction_id'];
     $expired = $approvals->issue($expiredId, new DateTimeImmutable('+1 minute', new DateTimeZone('UTC')));

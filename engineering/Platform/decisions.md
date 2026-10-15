@@ -1,5 +1,17 @@
 # Platform — Decisions
 
+### 2026-10-15 — OH-AUTO1-079 complete disposable release-cycle proof
+**Status:** Accepted as corrected disposable-only execution proof
+
+Restore success requires actual SQL import and independent baseline queries;
+filesystem success requires complete archive-entry verification. Runtime health
+must read the disposable installation/database and cannot use fixed expected
+observations as source substitutes. Execution must revalidate coordinator
+evidence immediately before mutation, finalize identity before the completed
+journal state, and classify identity failure as recovery-required. Complete
+replaceable-payload recovery and post-restore health are mandatory. These
+controls remain non-production and do not grant installed apply authority.
+
 ### 2026-10-15 — OH-AUTO1-078 disposable signed cycle
 **Status:** Accepted as disposable-only execution proof
 

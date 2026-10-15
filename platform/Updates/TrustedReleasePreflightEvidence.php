@@ -6,11 +6,12 @@ namespace Platform\Updates;
 use RuntimeException;
 
 /**
- * Immutable coordinator-issued evidence envelope.
+ * Immutable evidence envelope for a coordinator result.
  *
  * Transaction controls accept this object rather than a caller-supplied
- * preflight array. The only supported construction path is a verified
- * coordinator result; execution authority remains disabled in the result.
+ * preflight array. This value object does not authenticate its caller:
+ * disposable execution must invoke the authoritative coordinator again and
+ * compare this fingerprint to that fresh result before mutation.
  */
 final class TrustedReleasePreflightEvidence
 {

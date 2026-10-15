@@ -6679,3 +6679,22 @@ preserved.
   PASS; Core lock: PASS; diff hygiene: PASS.
 - [x] Preserved unrelated pre-existing `storage/logs/*` and
   `vendor/bin/.phpunit.result.cache` working-tree changes.
+
+# OH-AUTO1-079 — Complete Disposable Release-Cycle Proof
+
+- [x] Corrected restore rehearsal to import/query the actual compressed SQL
+  dump and verify baseline tables, values, migration checksum, and schema.
+- [x] Corrected filesystem rehearsal to verify every extracted archive entry.
+- [x] Attested dynamic loopback MySQL before all database/user/application SQL;
+  disabled the X plugin and hardened success/failure cleanup.
+- [x] Replaced static health claims with runner-owned installation/database,
+  identity, trust, registry, migration, schema, connectivity, and path reads.
+- [x] Added immediate authoritative coordinator revalidation and forged public
+  evidence rejection at the execution boundary.
+- [x] Completion now finalizes/read-backs identity before `completed`; injected
+  identity failure journals `recovery_required`.
+- [x] Restored the complete replaceable filesystem payload, removed
+  candidate-only content, preserved protected config/trust, and ran actual
+  post-restore health before candidate reapplication.
+- [x] Complete rehearsal: 34/34; transaction probe: 23/23; restore probe:
+  10/10; architecture 49/49; deletion 28/28; deployment readiness PASS.

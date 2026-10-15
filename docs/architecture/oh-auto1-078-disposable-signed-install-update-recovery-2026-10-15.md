@@ -51,9 +51,11 @@ classification were all asserted.
 
 `TrustedReleasePreflightEvidence` is the only accepted transaction evidence
 type; ordinary caller arrays and fixed environment tokens cannot authorize
-transaction transitions. `PostUpdateHealthVerificationResult` no longer has a
-public construction factory; only `PostUpdateHealthVerifier` can issue an
-opaque result through its private-constructor closure.
+transaction transitions. The value object itself is not caller authentication;
+OH-AUTO1-079 adds fresh coordinator revalidation at the disposable execution
+boundary. `PostUpdateHealthVerificationResult` no longer has a public
+construction factory; only `PostUpdateHealthVerifier` can issue a result
+through its private-constructor closure.
 
 ## Validation
 

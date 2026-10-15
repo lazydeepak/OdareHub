@@ -15,16 +15,17 @@ The active product direction is:
 - Shell, Platform, Studio, Manufacturing, SBAIO, Procurement, and Plugin boundaries kept explicit
 
 The current project execution authority is the release/update foundation. The
-next product milestone is to prove one isolated, non-production installation,
-signed update, post-update verification, and recovery cycle before broader
-business-feature expansion resumes.
+next product milestone is to retain the corrected proof of one isolated,
+non-production installation, signed update, post-update verification, and
+recovery cycle before broader business-feature expansion resumes.
 
 ## Active Focus
 
 Primary milestone:
 
 - Release/update foundation — isolated installation, signed update,
-  post-update verification, and recovery proof.
+  post-update verification, and recovery proof. OH-AUTO1-079 corrected
+  verification is complete; production apply remains blocked.
 
 Approved execution sequence:
 

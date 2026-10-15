@@ -104,6 +104,7 @@ try {
         $content = gzdecode((string)file_get_contents($dumpPath));
         return [
             'ok' => $content !== false && str_contains($content, 'rehearsal db') && ($identity['database'] ?? '') === 'probe',
+            'verified' => $content !== false && str_contains($content, 'rehearsal db') && ($identity['database'] ?? '') === 'probe',
             'errors' => [],
         ];
     });

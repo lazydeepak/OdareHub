@@ -47,7 +47,7 @@ final class RestoreRehearsalService
         }
 
         $databaseResult = ($this->databaseRehearsal)($databasePath, $metadata['database']['identity']);
-        if (($databaseResult['ok'] ?? false) !== true) {
+        if (($databaseResult['ok'] ?? false) !== true || ($databaseResult['verified'] ?? false) !== true) {
             return $this->state('failed_without_mutation', ['Database rehearsal failed.'], ['database' => $databaseResult]);
         }
 
@@ -108,6 +108,7 @@ final class RestoreRehearsalService
         }
 
         $entries = [];
+        $entryHashes = [];
         for ($index = 0; $index < $zip->numFiles; $index++) {
             $name = (string)$zip->getNameIndex($index);
             $normalized = trim(str_replace('\\', '/', $name), '/');
@@ -116,6 +117,15 @@ final class RestoreRehearsalService
                 return ['ok' => false, 'errors' => ['Filesystem archive contains an unsafe path.']];
             }
             $entries[] = $normalized;
+            if (str_ends_with($name, '/')) {
+                continue;
+            }
+            $bytes = $zip->getFromIndex($index);
+            if (!is_string($bytes)) {
+                $zip->close();
+                return ['ok' => false, 'errors' => ['Filesystem archive contains an unreadable file entry.']];
+            }
+            $entryHashes[$normalized] = hash('sha256', $bytes);
         }
 
         if (!$zip->extractTo($targetDirectory)) {
@@ -124,11 +134,19 @@ final class RestoreRehearsalService
         }
         $zip->close();
 
+        foreach ($entryHashes as $relative => $expectedHash) {
+            $extracted = rtrim($targetDirectory, '/') . '/' . $relative;
+            if (!is_file($extracted) || is_link($extracted) || (hash_file('sha256', $extracted) ?: '') !== $expectedHash) {
+                return ['ok' => false, 'errors' => ['Filesystem archive entry verification failed: ' . $relative]];
+            }
+        }
+
         return [
             'ok' => true,
             'errors' => [],
             'entry_count' => count($entries),
             'entries_sha256' => hash('sha256', implode("\n", $entries)),
+            'content_sha256' => hash('sha256', json_encode($entryHashes, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)),
             'sample_entries' => array_slice($entries, 0, 20),
         ];
     }
