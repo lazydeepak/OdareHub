@@ -2,6 +2,23 @@
 
 ## Decision Log
 
+### 2026-10-15 — OH-AUTO1-074 exact-step migration evidence boundary
+**Status:** Accepted for bounded non-production execution
+
+**Decision**
+
+Extend the existing `AppMigrationService` with one exact-step entry point. It
+must accept only opaque evidence produced by the structural release-plan
+validator, execute through the existing additive SQL authority, preserve failed
+ledger evidence, and never delete or automatically retry a failed row.
+
+**Boundary**
+
+The validator proves plan shape, ordering, dependency, and checksum binding; it
+does not authenticate release authority, grant administrator approval, or make
+an update eligible. The exact-step proof is limited to runner-owned disposable
+resources and must not be used against installed or production databases.
+
 ### 2026-10-15 — OH-AUTO1-069 release foundation governance reconciliation
 **Status:** Accepted project execution authority; implementation remains separately gated
 

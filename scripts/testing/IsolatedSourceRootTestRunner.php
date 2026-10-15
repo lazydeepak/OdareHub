@@ -17,6 +17,7 @@ final class IsolatedSourceRootTestRunner
     public static function databaseEntryPoints(): array
     {
         return [
+            'platform/Updates/tests/probe_controlled_exact_step_migrations.php',
             'apps/Procurement/Tests/probe_procurement_concurrency.php',
             'apps/Procurement/Tests/probe_behavioral_cancellation.php',
             'apps/Procurement/Tests/probe_behavioral_request_cancel.php',

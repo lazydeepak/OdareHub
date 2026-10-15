@@ -1,5 +1,22 @@
 # AGENTS.md
 
+## Session Summary (2026-10-15) — OH-AUTO1-074 Controlled Exact-Step Migrations
+
+Added `AppMigrationService::executePlannedStep()` as the bounded exact-step
+extension of the existing migration authority. It requires opaque validator-
+produced plan evidence, validates owner/path/checksum/ledger/order/dependency
+boundaries, executes only the selected SQL through `AppSchemaSyncService`,
+preserves failed rows, and never automatically retries them. Added the
+Platform-owned structural plan validator/evidence object and extended the
+existing isolated runner with a disposable A/B/A proof.
+
+Validation: ✅ attested disposable exact-step proof 13/13; configuration and
+live process authorizer PASS; source-root safety 17/17; migration compatibility
+16/16; installed compatibility 16/16; migration governance 18/18; PHP lint;
+diff hygiene; no installed database, production SQL, activation, release
+apply, deployment, identity update, or Core operation. Full architecture and
+deployment readiness rerun remains part of final delivery validation.
+
 ## Session Summary (2026-10-15) — OH-AUTO1-073 Installation-Owned Release Trust
 
 Implemented a versioned installation-owned Ed25519 trust reader and

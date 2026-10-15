@@ -166,6 +166,9 @@ SQL
     if [ "$prefix" = "OH_PROC" ]; then
         OH_PROC_REPO="$REPO" OH_PROC_APP_ROOT="$app_root" OH_PROC_DB_PID="$pid" OH_PROC_DB_SOCKET="$socket" OH_PROC_DB_DATADIR="$data" OH_PROC_DB_RESOURCE_ROOT="$root" OH_PROC_DB_PORT="$port" OH_PROC_DB_NAME="$db" OH_PROC_DB_USER="$user" "$PHP_BIN" "$app_root/$probe"
         rc=$?
+    elif [ "$prefix" = "OH_EXACT" ]; then
+        OH_EXACT_REPO="$REPO" OH_EXACT_APP_ROOT="$app_root" OH_EXACT_DB_PID="$pid" OH_EXACT_DB_SOCKET="$socket" OH_EXACT_DB_DATADIR="$data" OH_EXACT_DB_RESOURCE_ROOT="$root" OH_EXACT_DB_PORT="$port" OH_EXACT_DB_NAME="$db" OH_EXACT_DB_USER="$user" "$PHP_BIN" "$app_root/$probe"
+        rc=$?
     else
         OH_MFG_REPO="$REPO" OH_MFG_APP_ROOT="$app_root" OH_MFG_DB_PID="$pid" OH_MFG_DB_SOCKET="$socket" OH_MFG_DB_DATADIR="$data" OH_MFG_DB_RESOURCE_ROOT="$root" OH_MFG_DB_PORT="$port" OH_MFG_DB_NAME="$db" OH_MFG_DB_USER="$user" "$PHP_BIN" "$app_root/$probe"
         rc=$?
@@ -220,6 +223,9 @@ case "${OH_TEST_ONLY:-}" in
         ;;
     manufacturing-transaction)
         run_disposable_probe "manufacturing-transaction" "OH_MFG" "apps/Manufacturing/Tests/probe_upstream_supply_transaction.php"
+        ;;
+    exact-step-migrations)
+        run_disposable_probe "exact-step-migrations" "OH_EXACT" "platform/Updates/tests/probe_controlled_exact_step_migrations.php"
         ;;
     *)
         echo "Unknown OH_TEST_ONLY value: ${OH_TEST_ONLY}" >&2

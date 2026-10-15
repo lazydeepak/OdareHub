@@ -1,5 +1,21 @@
 # AGENT-COMPLIANCE-CHECKLIST
 
+## Session Summary (2026-10-15) — OH-AUTO1-074 Controlled Exact-Step Migrations
+
+Implemented the existing-executor exact-step migration boundary and opaque
+validated plan evidence. A registered owner, confined exact basename, exact SQL
+SHA-256, applied-ledger checksum, dependency/order evidence, and failed-row
+preservation are required. The path calls only `AppSchemaSyncService` for the
+selected SQL and never deletes or retries failed evidence. No second migration
+table or executor was added.
+
+Validation: ✅ disposable attested A/B/A proof 13/13; configuration guard and
+authorizer PASS (24 checks); isolated source-root safety 17/17; migration
+compatibility 16/16; installed compatibility 16/16; migration governance
+18/18; PHP lint and diff hygiene. No installed database, production SQL,
+activation, release apply, deployment, identity update, or unrelated lifecycle
+artifact mutation was performed.
+
 ## Session Summary (2026-10-15) — OH-AUTO1-073 Installation-Owned Release Trust
 
 Added `InstallationOwnedTrustStore`, `DisposableTrustProvisioner`, and a

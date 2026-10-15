@@ -59,8 +59,8 @@ $prepared = null;
 try {
     $prepared = IsolatedSourceRootTestRunner::prepare($repo);
     $manifest = $prepared['manifest'];
-    $check(count($manifest['entry_points']) === 25, 'all 25 guarded entry points declared');
-    $check(count(array_intersect($manifest['entry_points'], IsolatedSourceRootTestRunner::databaseEntryPoints())) === 25, 'entry-point manifest matches authority list');
+    $check(count($manifest['entry_points']) === 26, 'all 26 guarded entry points declared');
+    $check(count(array_intersect($manifest['entry_points'], IsolatedSourceRootTestRunner::databaseEntryPoints())) === 26, 'entry-point manifest matches authority list');
     $check(!is_file($prepared['source_root'] . '/storage/db_config.php'), 'installed database config excluded');
     $check(!is_file($prepared['source_root'] . '/app/.env') && !is_file($prepared['source_root'] . '/app/credentials.txt'), 'credential-bearing files excluded');
     $check(is_file($prepared['source_root'] . '/vendor/acme/runtime/src/Runtime.php') && !is_file($prepared['source_root'] . '/vendor/acme/runtime/tests/RuntimeTest.php'), 'vendor runtime retained while test tree excluded');
@@ -94,7 +94,20 @@ try {
 }
 
 // Missing source root, installed workspace, dependency gap, and symlink escape.
-$cases = static function () use ($temporary, $outside): array {
+$removeFixtureTree = static function (string $path) use (&$removeFixtureTree): void {
+    if (is_link($path) || is_file($path)) {
+        @unlink($path);
+        return;
+    }
+    if (!is_dir($path)) {
+        return;
+    }
+    foreach (new FilesystemIterator($path, FilesystemIterator::SKIP_DOTS) as $item) {
+        $removeFixtureTree($item->getPathname());
+    }
+    @rmdir($path);
+};
+$cases = static function () use ($temporary, $outside, $removeFixtureTree): array {
     $build = static function (string $name, bool $dependencies = true) use ($temporary): string {
         $root = $temporary . '/' . $name;
         mkdir($root . '/app', 0700, true);
@@ -117,7 +130,7 @@ $cases = static function () use ($temporary, $outside): array {
         return $root;
     };
     $missing = $build('missing-source');
-    rmdir($missing . '/platform');
+    $removeFixtureTree($missing . '/platform');
     $dependencyGap = $build('missing-dependency', false);
     $symlinkRoot = $build('symlink-escape');
     symlink($outside, $symlinkRoot . '/app/escape');
