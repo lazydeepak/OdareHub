@@ -1,5 +1,16 @@
 # Platform — Decisions
 
+### 2026-10-15 — OH-AUTO1-077 disposable transaction controls
+**Status:** Accepted for bounded non-production rehearsal control
+
+Transaction evidence is append-only and hash-chained under a runner-owned
+temporary root. A test-only approval simulator requires an explicit,
+transaction-bound, single-use challenge and records simulated identity without
+claiming administrator authentication. Post-update health is executed through
+fixed read-only sources and an opaque result bound to the transaction's
+immutable health fields; caller health booleans are not authority. No apply,
+SQL, identity/trust write, or production eligibility is enabled.
+
 ### 2026-10-15 — OH-AUTO1-076 evidence authority hardening
 **Status:** Accepted for non-executing disposable verification
 

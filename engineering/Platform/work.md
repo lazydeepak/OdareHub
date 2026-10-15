@@ -27,6 +27,20 @@ binding are implemented. The coordinator fixture passes 24/24; the remaining
 approval, health, execution, production trust, and isolated signed-cycle gates
 remain blocked.
 
+## OH-AUTO1-077 — Completed
+
+Implementing the disposable-only transaction journal, explicit simulated
+approval boundary, and post-update read-only health verifier. Executing and
+completed are rehearsal control states only; no release apply, SQL, installed
+database, identity/trust write, production approval, or eligibility enablement
+is authorized.
+
+The append-only transaction journal, explicit simulated approval authority, and
+fixed-source post-update health verifier are complete. The disposable control
+probe passes 20/20; executing/completed remain rehearsal states only and all
+production approval, apply, SQL, identity/trust, and eligibility boundaries
+remain disabled.
+
 ## Current Focus
 
 Release/update foundation governance and controlled-cycle readiness.
