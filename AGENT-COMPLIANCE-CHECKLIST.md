@@ -1,5 +1,23 @@
 # AGENT-COMPLIANCE-CHECKLIST
 
+## Session Summary (2026-10-15) — OH-AUTO1-096 Scope-safe work/process summary
+
+Implemented a bounded Manufacturing-owned read-only work/process summary on
+the existing operator dashboard. `ProcessingAdapter` remains the sole source:
+Assembly and QC lanes require its exact existing authority flags and already
+part-scoped rows. The broad My Work queue, unproven machine/production
+projections, and process-stage derivation without authorized product
+attributes were excluded. Area labels are presentation-only. Shell receives
+pure owner data, renders only on the dashboard, and emits same-user Processing
+links only after existing GET route authority approves them.
+
+Validation: summary/render proof **23/23**; Processing **35/35**;
+worker/task **41/41**; role-home **26/26**; architecture **49/49**;
+deletion **28/28**; deployment readiness **PASS**; PHP lint and diff hygiene
+PASS. No Core, database/schema, browser, activation, deployment, or production
+operation. Existing lifecycle logs and PHPUnit cache were preserved and remain
+uncommitted.
+
 ## Session Summary (2026-10-15) — OH-AUTO1-095 Work/process-area authority inventory
 
 Completed the requested read-only authority inventory. Existing authoritative

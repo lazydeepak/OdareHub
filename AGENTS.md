@@ -1,5 +1,19 @@
 # AGENTS.md
 
+## Session Summary (2026-10-15) — OH-AUTO1-096 Scope-safe work/process summary
+
+Added a Manufacturing-owned read-only dashboard contribution over the existing
+scope-safe Processing projection. Assembly and QC lanes are shown only from
+exact existing authority flags and pre-limit part-scoped rows; broad My Work,
+unproven machine/production sources, and stage derivation without product
+attributes remain excluded. Shell receives the contribution through a pure
+adapter and renders it only on the dashboard with same-user route-authorized
+links. Isolated summary/render proof is **23/23**; Processing, worker/task, and
+role-home regressions are **35/35**, **41/41**, and **26/26**. Architecture
+**49/49**, deletion **28/28**, and deployment readiness PASS. No Core,
+database/schema, browser, activation, deployment, or production operation.
+Lifecycle logs and PHPUnit cache remain uncommitted.
+
 ## Session Summary (2026-10-15) — OH-AUTO1-093 Scope-aware Processing workspace
 
 The active `/u/{username}/processing` projection now uses a Manufacturing-owned
