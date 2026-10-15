@@ -2,6 +2,34 @@
 
 ## Decision Log
 
+### 2026-10-15 — OH-AUTO1-087 machine scope handoff
+
+**Status:** Accepted
+
+**Decision**
+
+The Shell operator composer passes the authenticated user to the existing
+Manufacturing `MachinesAdapter`; it no longer invokes the machine dashboard
+service with `null`. The adapter requires resolved Platform context, active
+Manufacturing assignment, machine-module access, and a present scope object.
+Missing identity or scope evidence fails closed. An existing resolved empty
+machine/part scope retains its established authorized-unrestricted meaning.
+
+`MachineLeaderDashboardService` remains the owner of scope-aware SQL and task
+type behavior. Its machine filters and sections are narrowed to the effective
+machine scope, and the adapter applies a pure post-projection guard so rows,
+assigned-machine lists, filters, sections, and count KPIs cannot diverge.
+Display composition calls the adapter with explicit `display` mode and no
+operator identity; no operator permission is reused for display authorization.
+
+**Consequences**
+
+- Machine and part restrictions apply to current work, queues, delayed/QC
+  records, filters, sections, and count KPIs.
+- No new scope policy, route, schema, or business logic exists in Shell.
+- The existing display surface remains read-only and preserves its prior
+  display-owned data path.
+
 ### 2026-09-15 — Workflow Services Composer Autoload Mapping (Scoped, Candidate A)
 **Status:** Accepted (scoped loader/contract authorization; not yet committed)
 

@@ -44,7 +44,10 @@ final class MachineLeaderDashboardService
         $allMachines = DB::fetchAll(
             'SELECT id, machine_no, machine_name, section FROM machines WHERE is_active=1 ORDER BY machine_no ASC LIMIT 1000'
         );
-        $sections = self::extractSections($allMachines);
+        $filterMachines = $scopeMachineIds === []
+            ? $allMachines
+            : array_values(array_filter($allMachines, static fn(array $machine): bool => in_array((int)($machine['id'] ?? 0), $scopeMachineIds, true)));
+        $sections = self::extractSections($filterMachines);
 
         $rows = [];
         if (!empty($machineIds)) {
@@ -170,7 +173,7 @@ final class MachineLeaderDashboardService
                 'scope_part_ids' => $scopePartIds,
             ],
             'filters' => [
-                'machines' => $allMachines,
+                'machines' => $filterMachines,
                 'sections' => $sections,
             ],
             'assigned_machines' => $scopedMachines,
@@ -266,7 +269,7 @@ final class MachineLeaderDashboardService
         $sql .= ' ORDER BY note_match DESC, COALESCE(mp.open_jobs,0) DESC, m.machine_no ASC LIMIT 200';
         $rows = DB::fetchAll($sql, $params);
 
-        if ($machineId > 0 || $section !== '') {
+        if ($machineId > 0 || $section !== '' || $allowedMachineIds !== []) {
             return $rows;
         }
 

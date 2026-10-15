@@ -2,6 +2,10 @@
 
 ## Current Focus
 
+OH-AUTO1-087 scope-aware machine operator projection is complete. Continue
+ through the same owner-contract pattern for parts, work areas, and process
+ areas only as separately bounded milestones.
+
 Future Manufacturing work touching identity, Shared/Foundation, extensions, suite ownership,
 or cross-domain authority is subordinate to
 `docs/architecture/odarehub-future-architecture-planning-brief.md`.
@@ -10,6 +14,12 @@ No Shared/Foundation code, schema, storage, or runtime restructuring is authoriz
 brief's pressure-test workstreams and synthesis complete.
 
 ## In Progress
+
+- [x] OH-AUTO1-087 — passed authenticated operator identity and effective
+  assignment context into `MachinesAdapter`; Manufacturing retains machine,
+  part, task-type, queue, filter, section, and KPI scope enforcement. Display
+  callers use an explicit read-only display mode and do not receive operator
+  identity.
 
 - [ ] Keep Manufacturing identity/extension planning aligned with the canonical future architecture brief.
 - [ ] Manufacturing Phase 3 evidence (BOM / product identity / revision) is retained as evidence and migration input only — it must not be used to conclude the final future architecture. See `docs/active/future-architecture-planning-manufacturing-phase3-evidence.md`.
@@ -23,6 +33,10 @@ brief's pressure-test workstreams and synthesis complete.
 - Nested invocation inside a caller-owned transaction remains unverified; current callers do not wrap `generate()`.
 
 ## Completed
+
+- OH-AUTO1-087 — machine scope correction and isolated projection proof:
+  **11/11** assertions. No database, SQL, activation, display-route, schema,
+  production, or Core operation.
 
 - OH-AUTO1-019 — Manufacturing operator adapters now return a stable localized diagnostic key instead of raw exception text while retaining existing server-side error logging. See `docs/architecture/operational-diagnostics-observability-audit-2026-10-14.md`.
 - OH-AUTO1-020 — Static audit identified unverified target/link atomicity in upstream supply synchronization; no correction made without disposable failure-path evidence. See `docs/architecture/transactional-business-verification-audit-2026-10-14.md`.

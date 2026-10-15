@@ -1,5 +1,23 @@
 # AGENT-COMPLIANCE-CHECKLIST
 
+## Session Summary (2026-10-15) — OH-AUTO1-087 Scope-aware machine work
+
+Bound the `/u/{username}/machines` path to authenticated operator identity and
+effective Manufacturing scope. Shell now passes the authenticated user to
+`MachinesAdapter`; the adapter fails closed for missing identity, assignment,
+module access, or scope evidence. Manufacturing's existing
+`MachineLeaderDashboardService` remains the scope authority for machine IDs,
+part IDs, and task types, with restricted filters/sections and a pure
+post-projection guard keeping rows and count KPIs aligned.
+
+Display composition calls the adapter explicitly in read-only `display` mode
+without operator identity, preserving the display boundary. No routes, schema,
+database, activation, production, or Core changes.
+
+Validation: machine scope projection **11/11**; role-home **26/26**;
+worker/task **41/41**; responsive navigation **51/51**; PHP lint and diff
+hygiene passed. Existing lifecycle logs and PHPUnit cache remain uncommitted.
+
 ## Session Summary (2026-10-15) — OH-AUTO1-086 role-home access boundary closure
 
 Closed the three OH-AUTO1-085 source-review gaps. Operator widget and role-home

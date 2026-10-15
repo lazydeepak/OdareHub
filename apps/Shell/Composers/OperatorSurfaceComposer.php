@@ -895,7 +895,10 @@ final class OperatorSurfaceComposer
     private function buildMachinesFocusData(): array
     {
         try {
-            return MachinesAdapter::getData();
+            return MachinesAdapter::getData(
+                is_array($this->context['operator_user'] ?? null) ? $this->context['operator_user'] : null,
+                'operator'
+            );
         } catch (\Throwable $e) {
             error_log('OperatorSurfaceComposer::buildMachinesFocusData: ' . $e->getMessage());
             return ['kpi' => [], 'run_now' => [], 'next_queue' => [], 'delayed_jobs' => [], 'waiting_qc' => [], 'sections' => [], 'today' => date('Y-m-d'), 'empty' => true, 'error' => 'operator.common.data_unavailable'];

@@ -22,7 +22,7 @@ final class WidgetBlueprintRuntimeContributionService
                 'coverage.summary' => CoverageAdapter::getData(),
                 'qc.status' => QcAdapter::getData(0),
                 'dispatch.queue' => DispatchAdapter::getData(),
-                'machines.workboard' => MachinesAdapter::getData(),
+                'machines.workboard' => MachinesAdapter::getData(null, 'display'),
                 'assembly.execution' => AssemblyAdapter::getData(0),
                 'materials.pressure' => MaterialsAdapter::getData(),
                 default => null,

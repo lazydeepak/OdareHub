@@ -73,7 +73,7 @@ final class DisplaySurfaceComposer
         // Gather data from adapters
         $coverage = $this->safeGet('coverage', static fn() => CoverageAdapter::getData());
         $dispatch = $this->safeGet('dispatch', static fn() => DispatchAdapter::getData());
-        $machines = $this->safeGet('machines', static fn() => MachinesAdapter::getData());
+        $machines = $this->safeGet('machines', static fn() => MachinesAdapter::getData(null, 'display'));
         $qc       = $this->safeGet('qc', static fn() => QcAdapter::getData());
 
         // Recent activity feed (last 2 hours)

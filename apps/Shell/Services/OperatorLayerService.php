@@ -188,6 +188,7 @@ final class OperatorLayerService
             'operator_home_eligible' => !in_array(strtolower(trim((string)($ctx['authority_role'] ?? ''))), ['tv_display', 'platform_admin', 'app_admin'], true),
             'authenticated_user_id' => $userId,
             'operator_identity_bound' => $operatorIdentityBound,
+            'operator_user' => $authenticatedUser,
             'operator_username' => $resolvedUsername,
             'operator_route_access_resolver' => static function (string $path) use ($authenticatedUser): bool {
                 try {

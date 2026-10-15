@@ -2,10 +2,21 @@
 
 ## Current Focus
 
-OH-AUTO1-086 role-home access-boundary closure is complete. Resume broader
+OH-AUTO1-087 scope-aware machine handoff is complete. Resume broader
 operator capabilities, especially computed-scope-aware machine, part,
 work-area, and process-area presentation; do not expand the dashboard
 foundation without a new bounded objective.
+
+## 2026-10-15 — OH-AUTO1-087 scope-aware machine handoff
+
+- [x] Operator composition now passes the authenticated user into the
+  Manufacturing machine adapter; the prior `null` user path is removed.
+- [x] Display composition uses explicit read-only display mode and does not
+  inherit operator identity or operator scope.
+- [x] Manufacturing retains machine/part/task-type scope authority and adds a
+  pure projection guard for rows, filters, sections, and count KPIs.
+- [x] Isolated machine projection coverage: **11/11**; role-home **26/26**,
+  worker/task **41/41**, and responsive navigation **51/51** remain passing.
 
 ## 2026-10-15 — OH-AUTO1-086 role-home access boundary closure
 

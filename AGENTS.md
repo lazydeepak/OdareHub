@@ -1,5 +1,15 @@
 # AGENTS.md
 
+## Session Summary (2026-10-15) — OH-AUTO1-087 Scope-aware machine work
+
+Bound the operator machine view to authenticated identity and existing
+Manufacturing machine/part/task scope. Shell passes the user to the owner
+adapter; missing identity, assignment, module, or scope evidence fails closed.
+Display callers use explicit read-only mode without operator identity. Machine
+filters, sections, rows, and count KPIs stay aligned. Machine projection
+**11/11**, role-home **26/26**, worker/task **41/41**, and responsive navigation
+**51/51** pass. No database, browser, production operation, or Core change.
+
 ## Session Summary (2026-10-15) — OH-AUTO1-086 Role-home access boundary closure
 
 Closed the OH-AUTO1-085 review gaps without redesigning the dashboard: strict
