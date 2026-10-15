@@ -1,5 +1,16 @@
 # AGENTS.md
 
+## Session Summary (2026-10-16) — OH-AUTO2-105 Provider scope authorization
+
+Manufacturing `/me` summary/module providers now require existing Platform
+app/module authority before provider file loading or operational queries, with
+separate Ops authority for approval aggregation. SBAIO personnel/payroll
+summaries and watchlists are suppressed because no record-level authorization
+contract exists; route-authorized navigation remains filtered by existing
+authority. Host authorization proof **12/12**; prior containment **15/15**;
+Material proof **18/18**. No Core, schema, route, database, browser,
+activation, or deployment operation.
+
 ## Session Summary (2026-10-16) — OH-AUTO2-104 Material Management read safety
 
 Added an explicit non-mutating Material Management summary path for `/me` host

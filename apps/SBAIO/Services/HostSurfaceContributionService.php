@@ -71,9 +71,10 @@ final class HostSurfaceContributionService
      */
     private static function meSummaryCards(): array
     {
-        $cards = self::moduleWidgets('summary_cards');
-        usort($cards, static fn(array $a, array $b): int => ((int)($a['weight'] ?? 0)) <=> ((int)($b['weight'] ?? 0)));
-        return self::annotateSummaryWidgets(array_values($cards));
+        // No existing SBAIO contract proves record-level personnel/payroll
+        // authorization for this host surface. Do not collect or aggregate
+        // sensitive employee data until such evidence exists.
+        return [];
     }
 
     /**
@@ -126,24 +127,10 @@ final class HostSurfaceContributionService
      */
     private static function meMonitoringSections(): array
     {
-        $items = self::watchlistItems();
-        $total = array_sum(array_map(
-            static fn(array $item): int => (int)($item['count'] ?? 0),
-            $items
-        ));
-
-        return self::annotateMonitoringWidgets([
-            [
-                'view_kind' => 'queue',
-                'title' => t('sbaio.host.watchlist_title'),
-                'kind' => 'watchlist',
-                'items' => $items,
-                'total_count' => $total,
-                'summary' => t('sbaio.host.items_to_watch', ['count' => $total]),
-                'empty_message' => t('sbaio.host.watchlist_empty'),
-                'weight' => 60,
-            ],
-        ]);
+        // Watchlists contain staff identities and module-specific operational
+        // state; suppress the entire collection rather than broad-query then
+        // filter after limiting.
+        return [];
     }
 
     /**

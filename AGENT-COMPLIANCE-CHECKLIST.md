@@ -1,5 +1,31 @@
 # AGENT-COMPLIANCE-CHECKLIST
 
+## Session Summary (2026-10-16) — OH-AUTO2-105 Host-provider scope authorization
+
+Manufacturing `/me` summaries and module widget providers now fail closed
+before provider loading/collection unless the existing Platform app/module
+policy authorizes the requested operational module. Approval aggregation also
+requires existing Ops authority. SBAIO attendance, timecard, payroll, and
+leave summaries/watchlists remain suppressed because no independently proven
+record-level personnel authorization contract exists; route-authorized links
+remain subject to existing route filtering.
+
+Files changed:
+- `apps/Manufacturing/Services/HostSurfaceContributionService.php`
+- `apps/SBAIO/Services/HostSurfaceContributionService.php`
+- `apps/Manufacturing/Tests/probe_host_provider_scope_authorization.php`
+- `docs/CURRENT.md`
+- `engineering/Manufacturing/work.md`
+- `engineering/Manufacturing/decisions.md`
+- `engineering/SBAIO/work.md`
+- `engineering/SBAIO/decisions.md`
+- `AGENT-COMPLIANCE-CHECKLIST.md`
+
+Validation: host-provider authorization **12/12**; prior host containment
+**15/15**; Material read safety **18/18**; preflight **17/17**; restricted
+containment **21/21**; visibility **14/14**. No Core, schema, database,
+browser, activation, deployment, or route change.
+
 ## Session Summary (2026-10-16) — OH-AUTO2-104 Material Management Read Safety
 
 Added `MaterialManagementService::summaryReadOnly()` and routed the

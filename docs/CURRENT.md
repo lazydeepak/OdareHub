@@ -81,6 +81,13 @@ Evidence for the completed milestones is recorded in:
   storage is surfaced as unavailable to the My Work projection. Explicit
   escalation service entry points remain separate; no scheduler or route was
   added.
+- OH-AUTO2-104 — Material Management `/me` summaries now use a non-mutating
+  read path with missing/incompatible storage suppression; ordinary setup and
+  mutation consumers retain schema authority.
+- OH-AUTO2-105 — Manufacturing host providers now require existing Platform
+  app/module authority before operational collection. SBAIO personnel/payroll
+  summaries and watchlists remain suppressed because no record-level
+  authorization contract is available; route-authorized navigation remains.
 
 After the release/update cycle is proven, resume the product roadmap focus from
 `README.md`:

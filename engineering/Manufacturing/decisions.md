@@ -2,6 +2,21 @@
 
 ## Decision Log
 
+### 2026-10-16 — OH-AUTO2-105 Manufacturing host provider admission
+
+**Status:** Accepted — reuse existing Platform policy before collection
+
+Manufacturing `/me` summaries and module widget registries must prove the
+existing Platform app/module access policy before loading provider files or
+running operational queries. Approval-inbox aggregation additionally requires
+the existing Ops module authority. Missing policy, user, app, or module
+evidence fails closed. This is not a new authorization model and does not
+change canonical module routes.
+
+Material Management continues through the OH-AUTO2-104 non-mutating summary
+path. Record-level scope reconstruction beyond the existing unrestricted
+Platform view contract remains deferred.
+
 ### 2026-10-16 — OH-AUTO2-104 Material Management host summary boundary
 
 **Status:** Accepted — explicit non-mutating host summary path

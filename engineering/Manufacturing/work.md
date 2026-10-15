@@ -7,6 +7,19 @@ Continue
 through the same owner-contract pattern for parts, work areas, and process
 areas only as separately bounded milestones.
 
+## 2026-10-16 — OH-AUTO2-105 Manufacturing host-provider scope authorization
+
+- [x] Manufacturing `/me` summary and module-widget providers now require the
+  existing Platform app/module access policy before provider file loading or
+  operational queries.
+- [x] Manufacturing approval counts require separate existing Ops module
+  authority; route filtering remains downstream for emitted links.
+- [x] The established Material Management `summaryReadOnly()` path remains
+  intact and is not bypassed.
+- [x] Isolated host-provider authorization proof: **12/12**; restricted host
+  containment remains **15/15**. No Core, schema, database, browser,
+  activation, deployment, or route operation.
+
 ## 2026-10-16 — OH-AUTO2-104 Material Management read-only summary boundary
 
 - [x] Added `MaterialManagementService::summaryReadOnly()` for host-surface

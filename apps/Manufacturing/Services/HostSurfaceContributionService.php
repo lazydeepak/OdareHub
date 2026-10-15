@@ -18,6 +18,9 @@ final class HostSurfaceContributionService
         $surface = trim((string)($request['surface'] ?? ''));
         $region = trim((string)($request['region'] ?? ''));
         $context = is_array($request['context'] ?? null) ? (array)$request['context'] : [];
+        if (!isset($context['user']) && is_array($request['user'] ?? null)) {
+            $context['user'] = (array)$request['user'];
+        }
 
         return match ($surface . ':' . $region) {
             'me:header_actions' => self::meHeaderActions($context),
@@ -103,9 +106,12 @@ final class HostSurfaceContributionService
      */
     private static function meSummaryCards(array $context = []): array
     {
+        if (!self::hasHostReadAuthority($context, ['coverage', 'demands'])) {
+            return [];
+        }
+
         $lowCoverage = self::countOpenOrders("LOWER(COALESCE(coverage_status, '')) IN ('low','partial')");
         $urgentRisk = self::countOpenOrders("COALESCE(shortage_qty, 0) > 0");
-        $pendingApprovals = self::pendingApprovalCount();
         $materialSummary = self::materialSummary();
         $materialRisk = (int)($materialSummary['shortage_risk_count'] ?? 0);
 
@@ -128,16 +134,21 @@ final class HostSurfaceContributionService
                 'tone' => 'danger',
                 'weight' => 11,
             ],
-            [
+        ];
+
+        // Approval rows use the separate Ops authority; do not collect them
+        // merely because Manufacturing summary authority was established.
+        if (self::hasHostReadAuthority($context, ['ops'])) {
+            $cards[] = [
                 'key' => 'approval_inbox',
                 'title' => t('nav.approval_inbox'),
-                'value' => $pendingApprovals,
+                'value' => self::pendingApprovalCount(),
                 'meta' => t('ops.common.awaiting_approval'),
                 'url' => '/ops/approval-inbox',
                 'tone' => 'info',
                 'weight' => 14,
-            ],
-        ];
+            ];
+        }
 
         $cards = array_merge($cards, self::moduleWidgets('summary_cards', $context));
 
@@ -219,6 +230,41 @@ final class HostSurfaceContributionService
     }
 
     /**
+     * Admit only existing Platform app/module authority before broad host
+     * summary queries run. This is deliberately an app-local adapter, not a
+     * new authorization model; missing policy evidence fails closed.
+     *
+     * @param array<string,mixed> $context
+     * @param array<int,string> $modules
+     */
+    private static function hasHostReadAuthority(array $context, array $modules): bool
+    {
+        if (!function_exists('platform_user_access_policy_contract')) {
+            return false;
+        }
+
+        $user = is_array($context['user'] ?? null) ? (array)$context['user'] : null;
+        if (!is_array($user) || (int)($user['id'] ?? 0) <= 0) {
+            return false;
+        }
+
+        try {
+            $policy = platform_user_access_policy_contract();
+            if (!is_object($policy) || !$policy->isAppEnabled('manufacturing')) {
+                return false;
+            }
+            foreach ($modules as $module) {
+                if (!$policy->canAccessModule($user, $module)) {
+                    return false;
+                }
+            }
+            return true;
+        } catch (\Throwable $e) {
+            return false;
+        }
+    }
+
+    /**
      * @return array<int,array<string,mixed>>
      */
     private static function approvalHeaderActions(): array
@@ -293,6 +339,11 @@ final class HostSurfaceContributionService
             $class = trim((string)($provider['class'] ?? ''));
             $file = trim((string)($provider['file'] ?? ''));
             if ($class === '' || $file === '' || !is_file($file)) {
+                continue;
+            }
+
+            $module = trim((string)($provider['module'] ?? ''));
+            if ($module === '' || !self::hasHostReadAuthority($context, [$module])) {
                 continue;
             }
 
@@ -474,66 +525,79 @@ final class HostSurfaceContributionService
         return [
             [
                 'regions' => ['summary_cards', 'monitoring_sections'],
+                'module' => 'coverage',
                 'class' => 'Plugins\\Coverage\\Services\\CoverageWidgetRegistry',
                 'file' => APP_ROOT . '/apps/Manufacturing/modules/Coverage/Services/CoverageWidgetRegistry.php',
             ],
             [
                 'regions' => ['summary_cards', 'monitoring_sections'],
+                'module' => 'demands',
                 'class' => 'Plugins\\DailyOrders\\Services\\DailyOrderWidgetRegistry',
                 'file' => APP_ROOT . '/apps/Manufacturing/modules/DailyOrders/Services/DailyOrderWidgetRegistry.php',
             ],
             [
                 'regions' => ['summary_cards', 'monitoring_sections'],
+                'module' => 'production',
                 'class' => 'Plugins\\Machines\\Services\\MachinesWidgetRegistry',
                 'file' => APP_ROOT . '/apps/Manufacturing/modules/Machines/Services/MachinesWidgetRegistry.php',
             ],
             [
                 'regions' => ['summary_cards', 'monitoring_sections'],
+                'module' => 'production',
                 'class' => 'Plugins\\ProductionEntries\\Services\\ProductionEntryWidgetRegistry',
                 'file' => APP_ROOT . '/apps/Manufacturing/modules/ProductionEntries/Services/ProductionEntryWidgetRegistry.php',
             ],
             [
                 'regions' => ['summary_cards', 'monitoring_sections'],
+                'module' => 'qc',
                 'class' => 'Plugins\\QCEntries\\Services\\QCEntryWidgetRegistry',
                 'file' => APP_ROOT . '/apps/Manufacturing/modules/QCEntries/Services/QCEntryWidgetRegistry.php',
             ],
             [
                 'regions' => ['summary_cards', 'monitoring_sections'],
+                'module' => 'production',
                 'class' => 'Plugins\\ProductionPlans\\Services\\ProductionPlanWidgetRegistry',
                 'file' => APP_ROOT . '/apps/Manufacturing/modules/ProductionPlans/Services/ProductionPlanWidgetRegistry.php',
             ],
             [
                 'regions' => ['summary_cards', 'monitoring_sections'],
+                'module' => 'production',
                 'class' => 'Plugins\\ProductionQueue\\Services\\ProductionQueueWidgetRegistry',
                 'file' => APP_ROOT . '/apps/Manufacturing/modules/ProductionQueue/Services/ProductionQueueWidgetRegistry.php',
             ],
             [
                 'regions' => ['summary_cards', 'monitoring_sections'],
+                'module' => 'assembly',
                 'class' => 'Apps\\Manufacturing\\Modules\\AssemblyPlans\\Services\\AssemblyPlanWidgetRegistry',
                 'file' => APP_ROOT . '/apps/Manufacturing/modules/AssemblyPlans/Services/AssemblyPlanWidgetRegistry.php',
             ],
             [
                 'regions' => ['summary_cards', 'monitoring_sections'],
+                'module' => 'assembly',
                 'class' => 'Apps\\Manufacturing\\Modules\\AssemblyEntries\\Services\\AssemblyEntryWidgetRegistry',
                 'file' => APP_ROOT . '/apps/Manufacturing/modules/AssemblyEntries/Services/AssemblyEntryWidgetRegistry.php',
             ],
             [
                 'regions' => ['summary_cards', 'monitoring_sections'],
+                'module' => 'assembly',
                 'class' => 'Apps\\Manufacturing\\Modules\\Bom\\Services\\BomWidgetRegistry',
                 'file' => APP_ROOT . '/apps/Manufacturing/modules/Bom/Services/BomWidgetRegistry.php',
             ],
             [
                 'regions' => ['summary_cards', 'monitoring_sections'],
+                'module' => 'dispatch',
                 'class' => 'Plugins\\DispatchEntries\\Services\\DispatchEntryWidgetRegistry',
                 'file' => APP_ROOT . '/apps/Manufacturing/modules/DispatchEntries/Services/DispatchEntryWidgetRegistry.php',
             ],
             [
                 'regions' => ['summary_cards', 'monitoring_sections'],
+                'module' => 'demands',
                 'class' => 'Plugins\\Products\\Services\\ProductWidgetRegistry',
                 'file' => APP_ROOT . '/apps/Manufacturing/modules/Products/Services/ProductWidgetRegistry.php',
             ],
             [
                 'regions' => ['summary_cards', 'monitoring_sections'],
+                'module' => 'materials',
                 'class' => 'Plugins\\MaterialManagement\\Services\\MaterialManagementWidgetRegistry',
                 'file' => APP_ROOT . '/apps/Manufacturing/modules/MaterialManagement/Services/MaterialManagementWidgetRegistry.php',
             ],
