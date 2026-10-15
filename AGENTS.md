@@ -16,6 +16,14 @@ without changing existing eligibility behavior; OH-AUTO1-066 now forces
 eligibility is always false until independently approved authority integration.
 Readiness, collector, signature, artifact, preview, and apply regressions pass.
 
+## Session Summary (2026-10-15) — OH-AUTO1-067 Read-only Release Authenticity Preview
+
+`LocalReleaseChannelPreviewService` now exposes additive authenticity
+diagnostics from explicit in-memory statement/signature/key/trust inputs via
+the exact ZIP/sidecar verifier. Verified signatures remain diagnostic-only;
+readiness eligibility and apply preparation stay fail-closed. Preview
+authenticity regression: 44/44; apply preparation: 7/7.
+
 ## Session Summary (2026-10-15) — OH-AUTO1-064 Offline Release Signature Verification
 
 Added pure Platform Updates release-statement canonicalization and offline

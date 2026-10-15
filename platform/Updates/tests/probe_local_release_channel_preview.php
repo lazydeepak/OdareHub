@@ -233,6 +233,47 @@ function write_preview_recovery(string $root, string $releaseVersion = '0.5.0'):
     return $root;
 }
 
+/** @return array<string,mixed> */
+function preview_authentication_input(string $root, Platform\Updates\ReleaseStatementCanonicalizer $canonicalizer, string $secretKey, array $trustRecord, ?string $detachedSignature = null, ?string $keyId = null): array
+{
+    $package = $root . '/releases/susankhya-os-1.0.0-build.zip';
+    $metadata = $root . '/releases/susankhya-os-1.0.0-build.json';
+    $sidecar = json_decode((string)file_get_contents($metadata), true, 512, JSON_THROW_ON_ERROR);
+    $statement = $canonicalizer->canonicalize([
+        'product_id' => 'susankhya-os',
+        'release_version' => $sidecar['release_version'],
+        'build_id' => $sidecar['build_id'],
+        'lane' => $sidecar['lane'],
+        'package_sha256' => hash_file('sha256', $package),
+        'package_bytes' => (string)filesize($package),
+        'metadata_sha256' => hash_file('sha256', $metadata),
+        'minimum_supported_schema' => '1.0.0',
+        'created_at' => $sidecar['created_at'],
+    ]);
+    return [
+        'statement_bytes' => $statement,
+        'detached_signature' => $detachedSignature ?? sodium_crypto_sign_detached($statement, $secretKey),
+        'key_id' => $keyId ?? $trustRecord['key_id'],
+        'trusted_keys' => [$trustRecord],
+        'verification_timestamp' => '2026-10-16T00:00:00Z',
+    ];
+}
+
+function refresh_preview_package_binding(string $root): void
+{
+    $package = $root . '/releases/susankhya-os-1.0.0-build.zip';
+    $metadataPath = $root . '/releases/susankhya-os-1.0.0-build.json';
+    $metadata = json_decode((string)file_get_contents($metadataPath), true, 512, JSON_THROW_ON_ERROR);
+    $metadata['package']['sha256'] = hash_file('sha256', $package);
+    $metadata['package']['size_bytes'] = filesize($package);
+    file_put_contents($metadataPath, json_encode($metadata, JSON_PRETTY_PRINT));
+    $channelPath = $root . '/channel.json';
+    $channel = json_decode((string)file_get_contents($channelPath), true, 512, JSON_THROW_ON_ERROR);
+    $channel['lanes']['app']['current']['sha256'] = $metadata['package']['sha256'];
+    $channel['lanes']['app']['current']['size_bytes'] = $metadata['package']['size_bytes'];
+    file_put_contents($channelPath, json_encode($channel, JSON_PRETTY_PRINT));
+}
+
 $tmp = sys_get_temp_dir() . '/susankhya-local-channel-preview-probe-' . bin2hex(random_bytes(6));
 mkdir($tmp, 0700, true);
 $productionChannelExistsBefore = file_exists(APP_ROOT . '/storage/update-channels');
@@ -242,8 +283,24 @@ try {
     $channel = $tmp . '/channel';
     write_preview_channel($channel);
 
+    $canonicalizer = new Platform\Updates\ReleaseStatementCanonicalizer();
+    $keyPair = sodium_crypto_sign_seed_keypair(str_repeat("\x31", SODIUM_CRYPTO_SIGN_SEEDBYTES));
+    $secretKey = sodium_crypto_sign_secretkey($keyPair);
+    $publicKey = sodium_crypto_sign_publickey($keyPair);
+    $trustRecord = [
+        'key_id' => 'preview-fixture-key',
+        'algorithm' => 'ed25519',
+        'public_key' => $publicKey,
+        'fingerprint' => hash('sha256', $publicKey),
+        'status' => 'active',
+        'not_before' => '2026-01-01T00:00:00Z',
+        'not_after' => null,
+    ];
+    $validAuthenticity = preview_authentication_input($channel, $canonicalizer, $secretKey, $trustRecord);
+
     $preview = $service->preview($channel, preview_installed_state());
     preview_assert($preview['ok'] === true, 'valid local channel preview passes package checks');
+    preview_assert(($preview['authenticity']['state'] ?? null) === Platform\Updates\OfflineReleaseSignatureVerifier::VERIFICATION_UNAVAILABLE, 'preview reports missing authenticity inputs as unavailable');
     preview_assert($preview['apply_eligible'] === false, 'valid preview remains apply-ineligible without recovery evidence');
     preview_assert(in_array('An authoritative recovery-point directory is required before apply.', $preview['apply_blockers'], true), 'preview reports missing recovery evidence blocker');
 
@@ -253,6 +310,68 @@ try {
     $recovery = write_preview_recovery($tmp . '/valid-recovery');
     $eligible = $service->preview($channel, preview_installed_state(), $recovery);
     preview_assert($eligible['ok'] === true && $eligible['apply_eligible'] === false, 'unattested readiness keeps preview apply-ineligible despite recovery evidence');
+
+    $authenticated = $service->preview($channel, preview_installed_state(), null, $validAuthenticity);
+    preview_assert(($authenticated['authenticity']['verified'] ?? false) === true, 'valid signed release is reported as verified');
+    preview_assert(($authenticated['authenticity']['state'] ?? null) === Platform\Updates\OfflineReleaseSignatureVerifier::VERIFIED, 'valid signed release reports verified state');
+    preview_assert($authenticated['apply_eligible'] === false, 'verified signature alone never grants apply eligibility');
+
+    $unsignedInput = $validAuthenticity;
+    $unsignedInput['detached_signature'] = null;
+    $unsigned = $service->preview($channel, preview_installed_state(), null, $unsignedInput);
+    preview_assert(($unsigned['authenticity']['state'] ?? null) === Platform\Updates\OfflineReleaseSignatureVerifier::UNSIGNED, 'unsigned release is reported without changing preview compatibility');
+
+    $invalidSignatureInput = $validAuthenticity;
+    $invalidSignatureInput['detached_signature'] = str_repeat('x', SODIUM_CRYPTO_SIGN_BYTES);
+    $invalidSignature = $service->preview($channel, preview_installed_state(), null, $invalidSignatureInput);
+    preview_assert(($invalidSignature['authenticity']['state'] ?? null) === Platform\Updates\OfflineReleaseSignatureVerifier::INVALID_SIGNATURE, 'invalid signature is reported');
+
+    $unknownInput = $validAuthenticity;
+    $unknownInput['key_id'] = 'unknown-preview-key';
+    $unknown = $service->preview($channel, preview_installed_state(), null, $unknownInput);
+    preview_assert(($unknown['authenticity']['state'] ?? null) === Platform\Updates\OfflineReleaseSignatureVerifier::UNTRUSTED_KEY, 'unknown signing key is reported');
+
+    $revokedRecord = array_replace($trustRecord, ['status' => 'revoked']);
+    $revokedInput = $validAuthenticity;
+    $revokedInput['trusted_keys'] = [$revokedRecord];
+    $revoked = $service->preview($channel, preview_installed_state(), null, $revokedInput);
+    preview_assert(($revoked['authenticity']['state'] ?? null) === Platform\Updates\OfflineReleaseSignatureVerifier::REVOKED_KEY, 'revoked signing key is reported');
+
+    $forgedReadinessChannel = $tmp . '/forged-readiness';
+    write_preview_channel($forgedReadinessChannel, ['readiness' => ['status' => 'passed', 'authenticity' => 'authorized-verifier', 'evidence' => []]]);
+    $forged = $service->preview($forgedReadinessChannel, preview_installed_state(), null);
+    preview_assert(($forged['release']['readiness']['eligible'] ?? true) === false, 'forged readiness authenticity remains ineligible');
+    preview_assert(($forged['authenticity']['verified'] ?? true) === false, 'forged readiness metadata is not authenticity evidence');
+
+    $failedReadinessChannel = $tmp . '/failed-readiness';
+    write_preview_channel($failedReadinessChannel, ['readiness' => ['status' => 'failed', 'evidence' => []]]);
+    $failedReadinessAuth = preview_authentication_input($failedReadinessChannel, $canonicalizer, $secretKey, $trustRecord);
+    $failedReadiness = $service->preview($failedReadinessChannel, preview_installed_state(), null, $failedReadinessAuth);
+    preview_assert($failedReadiness['ok'] === false && ($failedReadiness['authenticity']['verified'] ?? false) === true, 'valid signature with failed readiness stays blocked');
+
+    $failedCompatibilityChannel = $tmp . '/failed-compatibility';
+    write_preview_channel($failedCompatibilityChannel, ['metadata' => ['compatibility' => ['minimum_product_version' => '9.0.0']]]);
+    $failedCompatibilityAuth = preview_authentication_input($failedCompatibilityChannel, $canonicalizer, $secretKey, $trustRecord);
+    $failedCompatibility = $service->preview($failedCompatibilityChannel, preview_installed_state(), null, $failedCompatibilityAuth);
+    preview_assert($failedCompatibility['ok'] === false && ($failedCompatibility['authenticity']['verified'] ?? false) === true, 'valid signature with failed compatibility stays blocked');
+
+    $modifiedPackageChannel = $tmp . '/modified-package';
+    write_preview_channel($modifiedPackageChannel);
+    $modifiedPackageAuth = preview_authentication_input($modifiedPackageChannel, $canonicalizer, $secretKey, $trustRecord);
+    file_put_contents($modifiedPackageChannel . '/releases/susankhya-os-1.0.0-build.zip', 'modified-package');
+    refresh_preview_package_binding($modifiedPackageChannel);
+    $modifiedPackage = $service->preview($modifiedPackageChannel, preview_installed_state(), null, $modifiedPackageAuth);
+    preview_assert(($modifiedPackage['authenticity']['verified'] ?? true) === false, 'modified package is rejected by authenticity binding');
+
+    $modifiedSidecarChannel = $tmp . '/modified-sidecar';
+    write_preview_channel($modifiedSidecarChannel);
+    $modifiedSidecarAuth = preview_authentication_input($modifiedSidecarChannel, $canonicalizer, $secretKey, $trustRecord);
+    $modifiedSidecarPath = $modifiedSidecarChannel . '/releases/susankhya-os-1.0.0-build.json';
+    $modifiedSidecar = json_decode((string)file_get_contents($modifiedSidecarPath), true, 512, JSON_THROW_ON_ERROR);
+    $modifiedSidecar['build_id'] = 'git:modified-sidecar';
+    file_put_contents($modifiedSidecarPath, json_encode($modifiedSidecar, JSON_PRETTY_PRINT));
+    $modifiedSidecar = $service->preview($modifiedSidecarChannel, preview_installed_state(), null, $modifiedSidecarAuth);
+    preview_assert(($modifiedSidecar['authenticity']['verified'] ?? true) === false, 'modified sidecar is rejected by authenticity binding');
 
     $emptyReadinessChannel = $tmp . '/empty-readiness';
     write_preview_channel($emptyReadinessChannel, ['readiness' => ['status' => 'passed', 'evidence' => []]]);

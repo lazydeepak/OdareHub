@@ -418,6 +418,17 @@ artifact binding, execution diagnostics, and error reporting remain unchanged.
 No cryptographic verification is interpreted as sufficient authority by this
 correction; a later separately approved integration must establish that policy.
 
+### OH-AUTO1-067 read-only preview diagnostics
+
+The local release preview may expose independently verified authenticity as an
+additive diagnostic when the caller explicitly supplies detached signature
+material, a key identifier, in-memory trust records, and a verification time.
+The preview delegates exact ZIP/sidecar binding to
+`OfflineReleaseArtifactVerifier`; it does not trust release metadata
+authenticity and does not convert a verified signature into readiness or apply
+eligibility. Trust records remain process-local fixtures until a separate
+release-authority decision approves operational provisioning.
+
 **Boundary**
 
 The adapter does not read or persist trust configuration, does not grant

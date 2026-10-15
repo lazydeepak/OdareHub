@@ -12,9 +12,11 @@ final class LocalReleaseChannelPreviewService
     /**
      * @param array<string,mixed> $installedState
      * @param string|null $recoveryPointDirectory
+     * @param array<string,mixed>|null $authenticityInput Explicit, in-memory
+     *        verification inputs; no release metadata authenticity is trusted.
      * @return array<string,mixed>
      */
-    public function preview(string $channelDirectory, array $installedState, ?string $recoveryPointDirectory = null): array
+    public function preview(string $channelDirectory, array $installedState, ?string $recoveryPointDirectory = null, ?array $authenticityInput = null): array
     {
         $blockers = [];
         $warnings = [];
@@ -59,6 +61,12 @@ final class LocalReleaseChannelPreviewService
             'package_sha256' => (string)($metadata['package']['sha256'] ?? ''),
             'package_size_bytes' => (int)($metadata['package']['size_bytes'] ?? 0),
         ];
+        $authenticity = $this->verifyAuthenticity(
+            $packagePath,
+            $metadataPath,
+            $authenticityInput,
+            $current
+        );
         $readiness = is_array($metadata['readiness'] ?? null) ? $metadata['readiness'] : [];
         $readinessResult = (new ReleaseReadinessEvidenceService())->validate($readiness, $artifact);
         if (($readinessResult['ok'] ?? false) !== true) {
@@ -112,7 +120,8 @@ final class LocalReleaseChannelPreviewService
                 'checks' => $readinessResult['checks'] ?? [],
                 'eligible' => $readinessResult['eligible'] ?? false,
             ],
-        ]);
+            'authenticity' => $authenticity,
+        ], $authenticity);
     }
 
     /**
@@ -248,10 +257,12 @@ final class LocalReleaseChannelPreviewService
      * @param array<int,string> $warnings
      * @param array<int,string> $applyBlockers
      * @param array<string,mixed> $release
+     * @param array<string,mixed>|null $authenticity
      * @return array<string,mixed>
      */
-    private function result(bool $ok, bool $applyEligible, array $blockers, array $warnings, array $applyBlockers, array $release = []): array
+    private function result(bool $ok, bool $applyEligible, array $blockers, array $warnings, array $applyBlockers, array $release = [], ?array $authenticity = null): array
     {
+        $authenticity ??= $this->authenticityUnavailable();
         return [
             'ok' => $ok,
             'apply_eligible' => $applyEligible,
@@ -259,6 +270,70 @@ final class LocalReleaseChannelPreviewService
             'warnings' => array_values(array_unique($warnings)),
             'apply_blockers' => array_values(array_unique($applyBlockers)),
             'release' => $release,
+            'authenticity' => $authenticity,
+        ];
+    }
+
+    /**
+     * Verify caller-supplied detached-signature evidence against the exact
+     * package and sidecar bytes. This is diagnostic-only: it never changes
+     * readiness eligibility or apply authority.
+     *
+     * @param array<string,mixed>|null $input
+     * @param array<string,mixed> $channelRecord
+     * @return array<string,mixed>
+     */
+    private function verifyAuthenticity(string $packagePath, string $metadataPath, ?array $input, array $channelRecord): array
+    {
+        if ($input === null) {
+            return $this->authenticityUnavailable(
+                'RCP-AUTH-INPUTS',
+                'Detached signature verification inputs were not supplied.'
+            );
+        }
+
+        foreach (['statement_bytes', 'detached_signature', 'key_id', 'trusted_keys', 'verification_timestamp'] as $field) {
+            if (!array_key_exists($field, $input)) {
+                return $this->authenticityUnavailable('RCP-AUTH-INPUTS', 'Detached signature verification input ' . $field . ' is missing.');
+            }
+        }
+        if (!is_string($input['statement_bytes'])
+            || !($input['detached_signature'] === null || is_string($input['detached_signature']))
+            || !($input['key_id'] === null || is_string($input['key_id']))
+            || !is_array($input['trusted_keys'])
+            || !is_string($input['verification_timestamp'])) {
+            return $this->authenticityUnavailable('RCP-AUTH-INPUTS', 'Detached signature verification inputs have invalid types.');
+        }
+
+        $verification = (new OfflineReleaseArtifactVerifier())->verify(
+            $packagePath,
+            $metadataPath,
+            $input['statement_bytes'],
+            $input['detached_signature'],
+            $input['key_id'],
+            $input['trusted_keys'],
+            $input['verification_timestamp'],
+            $channelRecord
+        );
+
+        return [
+            'state' => $verification['state'] ?? OfflineReleaseSignatureVerifier::VERIFICATION_UNAVAILABLE,
+            'verified' => ($verification['verified'] ?? false) === true,
+            'key_id' => $verification['key_id'] ?? $input['key_id'],
+            'diagnostics' => $verification['diagnostics'] ?? [],
+            'artifact' => $verification['artifact'] ?? null,
+        ];
+    }
+
+    /** @return array<string,mixed> */
+    private function authenticityUnavailable(string $code = 'RCP-AUTH-UNAVAILABLE', string $message = 'Release authenticity verification is unavailable.'): array
+    {
+        return [
+            'state' => OfflineReleaseSignatureVerifier::VERIFICATION_UNAVAILABLE,
+            'verified' => false,
+            'key_id' => null,
+            'diagnostics' => [['code' => $code, 'message' => $message]],
+            'artifact' => null,
         ];
     }
 }

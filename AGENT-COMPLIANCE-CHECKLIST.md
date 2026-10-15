@@ -26,6 +26,20 @@ artifact binding: ✅ 18/18. No new authorization path, signing, trust-store,
 database, SQL, migration, installation, publication, deployment, or Core
 operation was introduced.
 
+## Session Summary (2026-10-15) — OH-AUTO1-067 Read-only Release Authenticity Preview
+
+Added an optional, additive `LocalReleaseChannelPreviewService::preview()`
+authenticity result. Explicit in-memory statement/signature/key/trust inputs
+delegate to the existing exact ZIP/sidecar artifact verifier. Missing or
+invalid inputs report diagnostics; release metadata authenticity remains
+untrusted.
+
+Preview regression: ✅ 44/44; existing apply preparation: ✅ 7/7. Verified
+signatures remain diagnostic-only and cannot produce `eligible=true` or
+`apply_eligible=true`. No signing, trust-store persistence, database, SQL,
+migration, installation, activation, publication, deployment, or Core
+operation occurred.
+
 ## Session Summary (2026-10-15) — OH-AUTO1-064 Offline Release Signature Verification
 
 Added pure Platform Updates components for strict canonical release-statement
