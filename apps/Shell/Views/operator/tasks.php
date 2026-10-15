@@ -14,8 +14,52 @@
     $tdBase    = '/u/' . $tdUser . '/tasks';
     $tdSaved   = (isset($_GET['saved'])  && $_GET['saved']  === '1');
     $tdDone    = (isset($_GET['done'])   && $_GET['done']   === '1');
-    $tdFormErr = htmlspecialchars(trim((string)($_GET['error'] ?? '')));
-    $tdSelectedId = max(0, (int)($_GET['task_id'] ?? 0));
+    $tdFormErrRaw = trim((string)($_GET['error'] ?? ''));
+    $tdFormErr = htmlspecialchars($this->tr($tdFormErrRaw, $tdFormErrRaw));
+    $tdSelectorState = static function (): array {
+        $rawQuery = (string)($_SERVER['QUERY_STRING'] ?? '');
+        $rawTaskValue = null;
+        $selectorCount = 0;
+        $invalid = false;
+
+        foreach ($rawQuery === '' ? [] : explode('&', $rawQuery) as $rawPart) {
+            if ($rawPart === '') {
+                continue;
+            }
+            [$rawKey, $rawValue] = array_pad(explode('=', $rawPart, 2), 2, '');
+            $decodedKey = rawurldecode($rawKey);
+            if ($decodedKey === 'id' || str_starts_with($decodedKey, 'task_id')) {
+                if ($decodedKey !== 'task_id' || $rawKey !== 'task_id' || $selectorCount > 0) {
+                    $invalid = true;
+                    continue;
+                }
+                $selectorCount++;
+                $rawTaskValue = $rawValue;
+            }
+        }
+
+        if (array_key_exists('task_id', $_GET)) {
+            if (!is_string($_GET['task_id']) || $rawTaskValue === null || !preg_match('/^[1-9][0-9]*$/D', $rawTaskValue)) {
+                $invalid = true;
+            }
+        } elseif ($selectorCount > 0) {
+            $invalid = true;
+        }
+
+        if ($invalid || $rawTaskValue === null) {
+            return ['present' => $rawTaskValue !== null || array_key_exists('task_id', $_GET), 'valid' => false, 'id' => 0];
+        }
+
+        $max = (string)PHP_INT_MAX;
+        if (strlen($rawTaskValue) > strlen($max) || (strlen($rawTaskValue) === strlen($max) && strcmp($rawTaskValue, $max) > 0)) {
+            return ['present' => true, 'valid' => false, 'id' => 0];
+        }
+
+        return ['present' => true, 'valid' => true, 'id' => (int)$rawTaskValue];
+    };
+    $tdSelector = $tdSelectorState();
+    $tdSelectedId = $tdSelector['valid'] === true ? (int)$tdSelector['id'] : 0;
+    $tdSelectorInvalid = ($tdSelector['present'] ?? false) === true && ($tdSelector['valid'] ?? false) !== true;
     $tdSelected = null;
 
     // Group by status for display
@@ -59,10 +103,12 @@
         <p class="coverage-focus-error"><?php echo htmlspecialchars($this->tr($tdError, 'Unable to load this data right now.')); ?></p>
     <?php endif; ?>
 
-    <?php if ($tdSelectedId > 0): ?>
+    <?php if ($tdSelectorInvalid || $tdSelectedId > 0): ?>
         <section class="coverage-orders-section operator-task-focus" id="operator-task-focus" data-task-focus-id="<?php echo $tdSelectedId; ?>">
             <h3 class="coverage-orders-title"><?php echo htmlspecialchars($this->tr('operator.tasks.selected.title', 'Selected task')); ?></h3>
-            <?php if (!is_array($tdSelected)): ?>
+            <?php if ($tdSelectorInvalid): ?>
+                <p class="coverage-focus-error"><?php echo htmlspecialchars($this->tr('operator.tasks.selected.invalid', 'The selected task link is invalid.')); ?></p>
+            <?php elseif (!is_array($tdSelected)): ?>
                 <p class="coverage-focus-error"><?php echo htmlspecialchars($this->tr('operator.tasks.selected.not_found', 'This assigned task is no longer available.')); ?></p>
             <?php else: ?>
                 <article class="operator-task-card operator-task-card--selected" id="operator-task-<?php echo (int)$tdSelected['id']; ?>">
@@ -77,6 +123,24 @@
                             <?php if (!empty($tdSelected['due_date'])): ?><span class="operator-task-meta-item"><?php echo htmlspecialchars($this->tr('operator.tasks.meta.due', 'Due:')); ?> <?php echo htmlspecialchars((string)$tdSelected['due_date']); ?></span><?php endif; ?>
                         </div>
                     </div>
+                    <?php
+                    $tdSelectedStatus = (string)($tdSelected['status'] ?? '');
+                    $tdSelectedCanAdvance = in_array($tdSelectedStatus, [OperatorTaskService::STATUS_OPEN, OperatorTaskService::STATUS_IN_PROGRESS], true);
+                    $tdSelectedNextLabel = $tdSelectedStatus === OperatorTaskService::STATUS_OPEN
+                        ? $this->tr('operator.tasks.action.start', 'Start')
+                        : $this->tr('operator.tasks.action.done', 'Mark Done');
+                    ?>
+                    <?php if ($tdSelectedCanAdvance): ?>
+                        <div class="operator-task-card__actions">
+                            <form method="post" action="<?php echo htmlspecialchars($tdBase . '/advance'); ?>">
+                                <input type="hidden" name="csrf" value="<?php echo htmlspecialchars((string)\App\Core\Auth::csrfToken()); ?>">
+                                <input type="hidden" name="task_id" value="<?php echo (int)$tdSelected['id']; ?>">
+                                <button type="submit" class="btn-sm<?php echo $tdSelectedStatus === OperatorTaskService::STATUS_IN_PROGRESS ? ' btn-primary' : ''; ?>">
+                                    <?php echo htmlspecialchars($tdSelectedNextLabel); ?>
+                                </button>
+                            </form>
+                        </div>
+                    <?php endif; ?>
                 </article>
             <?php endif; ?>
             <a class="operator-task-focus__back" href="<?php echo htmlspecialchars($tdBase); ?>"><?php echo htmlspecialchars($this->tr('operator.tasks.selected.back', 'View all assigned tasks')); ?></a>

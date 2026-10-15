@@ -5,6 +5,10 @@ define('APP_ROOT', dirname(__DIR__, 3));
 require_once APP_ROOT . '/apps/Shell/Composers/OperatorWorkerWorkComposer.php';
 require_once APP_ROOT . '/apps/Shell/Services/OperatorLayerSidebarService.php';
 require_once APP_ROOT . '/apps/Shell/Services/OperatorLayerWidgetService.php';
+require_once APP_ROOT . '/app/Core/Auth.php';
+require_once APP_ROOT . '/apps/Shell/Services/OperatorTaskService.php';
+
+\App\Core\Auth::bootSession();
 
 use Apps\Shell\Composers\OperatorWorkerWorkComposer;
 use Apps\Shell\Services\OperatorLayerSidebarService;
@@ -28,6 +32,7 @@ $tasks = [
     ['id' => 13, 'title' => 'Traversal destination', 'assigned_to' => 7, 'status' => 'open', 'priority' => 'low', 'destination' => '/u/worker/../admin', 'due_date' => date('Y-m-d')],
     ['id' => 14, 'title' => 'Malformed destination', 'assigned_to' => 7, 'status' => 'open', 'priority' => 'low', 'destination' => '/u/worker/tasks/%ZZ', 'due_date' => date('Y-m-d')],
     ['id' => 15, 'title' => 'Owner task destination', 'assigned_to' => 7, 'status' => 'open', 'priority' => 'low', 'destination' => '/u/worker/tasks?task_id=150', 'due_date' => date('Y-m-d')],
+    ['id' => 18, 'title' => 'Owner-specific destination', 'assigned_to' => 7, 'status' => 'open', 'priority' => 'low', 'destination' => '/u/worker/coverage?focus=task', 'due_date' => date('Y-m-d')],
     ['id' => 8, 'title' => 'Unsupported status', 'assigned_to' => 7, 'status' => 'blocked', 'priority' => 'high', 'due_date' => date('Y-m-d')],
     ['id' => 4, 'title' => 'Unauthorized item', 'assigned_to' => 99, 'status' => 'open', 'priority' => 'high', 'due_date' => date('Y-m-d')],
     ['id' => 5, 'title' => 'Completed item', 'assigned_to' => 7, 'status' => 'done', 'priority' => 'low', 'due_date' => date('Y-m-d')],
@@ -40,7 +45,7 @@ $workerContext = [
     'operator_route_access_resolver' => $allowWorkerRoute,
 ];
 $result = OperatorWorkerWorkComposer::compose(['tasks' => $tasks, 'error' => ''], $workerContext, 'worker');
-$assert(count($result['current']) === 9 && $result['current'][0]['item_id'] === 1, 'current work precedes upcoming classification');
+$assert(count($result['current']) === 10 && $result['current'][0]['item_id'] === 1, 'current work precedes upcoming classification');
 $assert(count($result['upcoming']) === 1 && $result['upcoming'][0]['item_id'] === 2, 'future due item is upcoming');
 $assert(count($result['attention']) === 1 && $result['attention'][0]['item_id'] === 3 && $result['attention'][0]['attention_reason'] === 'overdue', 'overdue work is distinguishable as attention');
 $assert(!in_array(99, array_column($result['current'], 'assigned_to'), true), 'unauthorized item remains hidden');
@@ -57,7 +62,9 @@ $assert(($unsafe[0]['destination'] ?? '') === '/u/worker/tasks?task_id=7' && ($u
 $unsafeDestinations = array_values(array_filter($result['current'], static fn (array $item): bool => in_array($item['item_id'], [9, 10, 11, 12, 13, 14], true)));
 $assert(count($unsafeDestinations) === 6 && count(array_filter($unsafeDestinations, static fn (array $item): bool => $item['destination'] !== '/u/worker/tasks?task_id=' . $item['item_id'])) === 0, 'external, cross-user, fragment, malformed, traversal, and unsafe-query destinations fall back safely');
 $ownerDestination = array_values(array_filter($result['current'], static fn (array $item): bool => $item['item_id'] === 15));
-$assert(($ownerDestination[0]['destination'] ?? '') === '/u/worker/tasks?task_id=150', 'valid owner task destination remains unchanged');
+$assert(($ownerDestination[0]['destination'] ?? '') === '/u/worker/tasks?task_id=15', 'conflicting owner task selector is canonicalized to the represented task');
+$ownerSpecificDestination = array_values(array_filter($result['current'], static fn (array $item): bool => $item['item_id'] === 18));
+$assert(($ownerSpecificDestination[0]['destination'] ?? '') === '/u/worker/coverage?focus=task', 'authorized non-task owner destination remains usable');
 $assert($result['current'][0]['item_scope'] === null, 'missing provider item scope remains unavailable without fabrication');
 $empty = OperatorWorkerWorkComposer::compose(['tasks' => [], 'error' => ''], $workerContext, 'worker');
 $assert($empty['available'] === true && $empty['current'] === [] && $empty['upcoming'] === [] && $empty['attention'] === [], 'empty assignments produce safe empty lanes');
@@ -102,7 +109,77 @@ $assert($formattedMobile === $formatted, 'desktop and mobile navigation share th
 $layerSource = (string)file_get_contents(APP_ROOT . '/apps/Shell/Services/OperatorLayerService.php');
 $assert(str_contains($layerSource, 'routeAccessDecision') && str_contains($layerSource, 'operator_route_access_resolver'), 'profile destinations delegate to existing route-access authority');
 $tasksViewSource = (string)file_get_contents(APP_ROOT . '/apps/Shell/Views/operator/tasks.php');
-$assert(str_contains($tasksViewSource, "\$_GET['task_id']") && str_contains($tasksViewSource, 'operator-task-focus') && str_contains($tasksViewSource, 'operator.tasks.selected.back'), 'task page renders a selected assigned-task focus state');
+$assert(str_contains($tasksViewSource, "\$_GET['task_id']") && str_contains($tasksViewSource, 'operator-task-focus') && str_contains($tasksViewSource, 'operator.tasks.selected.back') && !str_contains($tasksViewSource, 'getById('), 'task page renders a selected assigned-task focus state without direct lookup');
+$routeSource = (string)file_get_contents(APP_ROOT . '/apps/Shell/routes.php');
+$assert(str_contains($routeSource, "'/u/tasks/advance'") && str_contains($routeSource, 'requireCsrf') && str_contains($routeSource, 'advanceStatus'), 'selected-task action reuses the existing CSRF-protected status contract');
+
+final class OperatorTaskViewProbeRenderer
+{
+    public function tr(string $key, string $fallback = ''): string
+    {
+        return $fallback !== '' ? $fallback : $key;
+    }
+
+    /** @param array<int,array<string,mixed>> $tasks */
+    public function render(array $tasks, string $query): string
+    {
+        $_GET = [];
+        parse_str($query, $_GET);
+        $_SERVER['QUERY_STRING'] = $query;
+        $data = [
+            'username' => 'worker',
+            'tasks_focus' => ['tasks' => $tasks, 'open_count' => 2, 'error' => ''],
+        ];
+        ob_start();
+        include APP_ROOT . '/apps/Shell/Views/operator/tasks.php';
+        return (string)ob_get_clean();
+    }
+}
+
+$renderTasks = [
+    ['id' => 15, 'title' => 'Open assigned task', 'description' => 'Open description', 'description_safe' => 'Open description', 'assigned_to' => 7, 'status' => 'open', 'priority' => 'high', 'due_date' => date('Y-m-d')],
+    ['id' => 16, 'title' => 'In progress assigned task', 'description' => 'Progress description', 'description_safe' => 'Progress description', 'assigned_to' => 7, 'status' => 'in_progress', 'priority' => 'medium', 'due_date' => date('Y-m-d')],
+    ['id' => 17, 'title' => 'Completed assigned task', 'description' => '', 'description_safe' => '', 'assigned_to' => 7, 'status' => 'done', 'priority' => 'low', 'due_date' => date('Y-m-d')],
+];
+$viewProbe = new OperatorTaskViewProbeRenderer();
+$focusFragment = static function (string $html): string {
+    $start = strpos($html, '<section class="coverage-orders-section operator-task-focus"');
+    if ($start === false) {
+        return '';
+    }
+    $end = strpos($html, '</section>', $start);
+    return $end === false ? substr($html, $start) : substr($html, $start, $end - $start + strlen('</section>'));
+};
+$openHtml = $viewProbe->render($renderTasks, 'task_id=15');
+$openFocus = $focusFragment($openHtml);
+$assert(str_contains($openFocus, 'Open assigned task') && str_contains($openFocus, 'Start') && str_contains($openFocus, 'action="/u/worker/tasks/advance"'), 'valid open selector renders the assigned task and Start form');
+$progressHtml = $viewProbe->render($renderTasks, 'task_id=16');
+$progressFocus = $focusFragment($progressHtml);
+$assert(str_contains($progressFocus, 'In progress assigned task') && str_contains($progressFocus, 'Mark Done') && str_contains($progressFocus, 'action="/u/worker/tasks/advance"'), 'valid in-progress selector renders the existing Mark Done action form');
+$doneHtml = $viewProbe->render($renderTasks, 'task_id=17');
+$doneFocus = $focusFragment($doneHtml);
+$assert(str_contains($doneFocus, 'Completed assigned task') && !str_contains($doneFocus, 'action="/u/tasks/advance"'), 'completed selected tasks do not expose advancement controls');
+$invalidHtml = $viewProbe->render($renderTasks, 'task_id=15abc');
+$invalidFocus = $focusFragment($invalidHtml);
+$assert(str_contains($invalidFocus, 'The selected task link is invalid.') && !str_contains($invalidFocus, 'operator-task-15'), 'malformed selector is rejected without selecting another task');
+$duplicateHtml = $viewProbe->render($renderTasks, 'task_id=15&task_id=16');
+$duplicateFocus = $focusFragment($duplicateHtml);
+$assert(str_contains($duplicateFocus, 'The selected task link is invalid.') && !str_contains($duplicateFocus, 'operator-task-16'), 'duplicate selector is rejected');
+$otherHtml = $viewProbe->render($renderTasks, 'task_id=99');
+$otherFocus = $focusFragment($otherHtml);
+$assert(str_contains($otherFocus, 'This assigned task is no longer available.') && !str_contains($otherFocus, 'operator-task-card--selected'), 'unassigned selector produces a safe unavailable state');
+foreach ([
+    'task_id=0' => 'zero selector is rejected',
+    'task_id=-1' => 'negative selector is rejected',
+    'task_id=1.0' => 'floating-point selector is rejected',
+    'task_id=1e2' => 'exponent selector is rejected',
+    'task_id=%2015' => 'whitespace selector is rejected',
+    'task_id[]=15' => 'array selector is rejected',
+    'task_id=9223372036854775808' => 'overflow selector is rejected',
+] as $invalidQuery => $label) {
+    $invalidSelectorFocus = $focusFragment($viewProbe->render($renderTasks, $invalidQuery));
+    $assert(str_contains($invalidSelectorFocus, 'The selected task link is invalid.') && !str_contains($invalidSelectorFocus, 'operator-task-card--selected'), $label);
+}
 
 echo "RESULT: {$passed}/" . ($passed + $failed) . " assertions passed\n";
 exit($failed === 0 ? 0 : 1);

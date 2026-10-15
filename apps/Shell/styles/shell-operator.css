@@ -69,6 +69,10 @@
 .operator-worker-item__meta dd { color: var(--text); margin: 0; overflow-wrap: anywhere; }
 .operator-worker-item__link { color: var(--accent); font-size: 12px; font-weight: 700; }
 
+.operator-task-focus { display: grid; gap: 10px; }
+.operator-task-card--selected { border-color: var(--accent); box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 28%, transparent); }
+.operator-task-focus__back { color: var(--accent); font-size: 12px; font-weight: 700; }
+
 .dashboard-top-grid {
                     display: grid;
                     gap: 12px;

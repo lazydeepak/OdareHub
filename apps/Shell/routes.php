@@ -1355,16 +1355,21 @@ $router->post('/u/tasks/advance', function () use ($resolveOperatorPostRoute, $n
     \App\Core\Auth::requireCsrf((string)($_POST['csrf'] ?? ''), $redirectTo);
 
     $userId = (int)(\App\Core\Auth::user()['id'] ?? 0);
-    $taskId = (int)($_POST['task_id'] ?? 0);
+    $rawTaskId = $_POST['task_id'] ?? null;
+    $maxTaskId = (string)PHP_INT_MAX;
+    if (!is_string($rawTaskId)
+        || !preg_match('/^[1-9][0-9]*$/D', $rawTaskId)
+        || strlen($rawTaskId) > strlen($maxTaskId)
+        || (strlen($rawTaskId) === strlen($maxTaskId) && strcmp($rawTaskId, $maxTaskId) > 0)
+    ) {
+        header('Location: ' . $redirectTo . '?error=' . rawurlencode('operator.tasks.error.invalid_id'), true, 302);
+        exit;
+    }
+    $taskId = (int)$rawTaskId;
 
     $result = \Apps\Shell\Services\OperatorTaskService::advanceStatus($taskId, $userId);
-    $qs = $result['ok']
-        ? ('?done=' . ($result['ok'] && \Apps\Shell\Services\OperatorTaskService::getById($taskId) !== null
-            ? '0' : '1') . '&saved=1')
-        : '?error=' . rawurlencode($result['error']);
-
-    // Simplify: always redirect with ?saved=1 on success, ?error= on failure
-    header('Location: ' . $redirectTo . ($result['ok'] ? '?saved=1' : '?error=' . rawurlencode($result['error'])), true, 302);
+    $focusQuery = '?task_id=' . $taskId;
+    header('Location: ' . $redirectTo . $focusQuery . ($result['ok'] ? '&saved=1' : '&error=' . rawurlencode($result['error'])), true, 302);
     exit;
 });
 

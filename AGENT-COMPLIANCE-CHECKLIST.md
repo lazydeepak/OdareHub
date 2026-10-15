@@ -19,6 +19,24 @@ catalog checks; diff hygiene; architecture gates PASS; deletion family gates
 **28/28 PASS**; deployment readiness PASS. Existing lifecycle logs and PHPUnit
 cache remain untouched.
 
+## Session Summary (2026-10-15) — OH-AUTO1-084 Exact task selection and actionable focus
+
+Canonicalized `/u/{username}/tasks` dashboard destinations to the verified
+provider task ID, replacing conflicting owner `task_id` selectors. Strictly
+validated raw selected-task selectors and rejected aliases, duplicates, arrays,
+malformed values, zero/negative values, and overflow without direct task
+lookup. The existing assigned-task page now renders Start or Mark Done in the
+selected focus for authorized open/in-progress tasks and preserves the same
+focus after the existing CSRF-protected POST redirect; completed/cancelled
+tasks remain actionless.
+
+Validation: actual isolated view and access probe **40/40**; PHP lint;
+localization catalog checks; diff hygiene; architecture gates PASS; deletion
+family gates **28/28 PASS**; deployment readiness PASS. No new route, schema,
+task service, database operation, production installation/update, live browser,
+Core, `/me` routing, or specialized operator-view change. Existing lifecycle
+logs and PHPUnit cache remain untouched.
+
 ## Session Summary (2026-10-15) — OH-AUTO1-082 Worker access and evidence hardening
 
 Corrected OH-AUTO1-081 without changing its worker-first dashboard structure.

@@ -50,6 +50,21 @@ Continue safely decomposing `OperatorSurfaceComposer.php` toward orchestration-o
 - [x] Added EN/JA/NE labels and expanded isolated worker coverage to **25/25**.
   No database, production installation/update, live browser, or Core change.
 
+## 2026-10-15 — OH-AUTO1-084 exact task selection and actionable focus
+
+- [x] Canonicalized every `/u/{username}/tasks` dashboard destination to the
+  represented provider task ID; conflicting owner-supplied selectors cannot
+  open another task, while non-task owner destinations remain preserved.
+- [x] Replaced permissive selected-task integer casting with strict canonical
+  positive-decimal, range-bounded, duplicate-aware query validation. Invalid,
+  array, overflow, and malformed selectors render a localized safe state.
+- [x] Added the existing CSRF-protected Start/Mark Done form to selected open
+  and in-progress tasks. Completed/cancelled tasks remain actionless, and
+  successful status redirects retain the canonical selected task.
+- [x] Added actual isolated view rendering coverage; the focused probe now
+  passes **40/40**. No new route, schema, task service, database operation,
+  production installation/update, live browser, or Core change.
+
 ## In Progress
 
 - [ ] Decompose next `OperatorSurfaceComposer.php` non-rendering business-data block into focused composer/service class without changing runtime output.

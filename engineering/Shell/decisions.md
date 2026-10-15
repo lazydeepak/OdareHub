@@ -80,6 +80,38 @@ query, mutation, or new task capability.
 - Specialized operator views, `/me` compatibility routing, and production
   release/update controls remain unchanged.
 
+### 2026-10-15 — OH-AUTO1-084 exact task selection and actionable focus
+
+**Status:** Accepted
+
+**Decision**
+
+The worker task route is item-bound at both navigation and rendering
+boundaries. For `/u/{username}/tasks`, Shell removes conflicting `task_id` or
+`id` selectors and appends the verified provider task ID. Duplicate selector
+shapes fall back to the same canonical item-bound destination rather than
+preserving owner-provided ambiguity.
+
+The task page accepts only one raw, canonical positive decimal `task_id` that
+fits the PHP integer range. Arrays, aliases, duplicate keys, suffixes,
+whitespace, floating-point/exponent forms, zero, negative values, and overflow
+are rejected before collection selection. Selection still searches only the
+already-authorized assigned-task projection.
+
+The selected focus reuses the existing `/u/tasks/advance` POST contract,
+including CSRF and provider authorization. It exposes Start for `open` and
+Mark Done for `in_progress`; completed and cancelled records remain
+actionless. POST redirects retain the canonical selected ID without adding a
+new action or lookup authority.
+
+**Consequences**
+
+- A worker cannot use an owner-supplied task selector to switch the selected
+  record represented by a dashboard card.
+- Malformed selectors fail visibly and do not silently coerce to another task.
+- The selected task is actionable without duplicating status-transition logic
+  or introducing a second mutation endpoint.
+
 ### 2026-07-20 — Runtime catalogs and owner providers are search discovery authority
 **Status:** Accepted
 

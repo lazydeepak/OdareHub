@@ -6559,3 +6559,18 @@ EN/JA/NE labels and no new route, schema, query, or mutation authority.
 Focused coverage is **25/25**; architecture, deletion, and deployment
 readiness checks pass. No production installation/update, database, live
 browser, Core, `/me` routing, or specialized operator-view change.
+
+## Session Summary (2026-10-15) — OH-AUTO1-084 Exact task selection and actionable focus
+
+Canonicalized task-route dashboard destinations to the represented provider
+task ID, rejecting conflicting owner selectors while preserving authorized
+non-task destinations. Replaced selected-task integer casting with strict raw
+query validation for canonical positive decimal IDs, including duplicate,
+array, malformed, and overflow rejection. The existing assigned-task focus
+now reuses the CSRF-protected Start/Mark Done contract for open/in-progress
+tasks and remains actionless for completed/cancelled tasks.
+
+Actual isolated view/access coverage is **40/40**; architecture, deletion, and
+deployment readiness checks pass. No new route, schema, task service,
+database, production installation/update, live browser, Core, `/me` routing,
+or specialized operator-view change.

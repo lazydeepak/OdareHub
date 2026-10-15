@@ -128,21 +128,40 @@ final class OperatorWorkerWorkComposer
             $candidate = $fallback;
         }
 
-        $candidateParts = parse_url($candidate);
-        $fallbackPath = '/u/' . rawurlencode($username) . '/tasks';
-        if (is_array($candidateParts)
-            && (string)($candidateParts['path'] ?? '') === $fallbackPath
-            && trim((string)($candidateParts['query'] ?? '')) === ''
-        ) {
-            $candidate .= '?task_id=' . $taskId;
+        $boundCandidate = self::bindTaskSelector($candidate, $username, $taskId);
+        if ($boundCandidate === null) {
+            $candidate = $fallback;
+        } else {
+            $candidate = $boundCandidate;
         }
 
         $path = (string)parse_url($candidate, PHP_URL_PATH);
         try {
-            return $resolver($path) === true ? $candidate : '';
+        return $resolver($path) === true ? $candidate : '';
         } catch (\Throwable) {
             return '';
         }
+    }
+
+    private static function bindTaskSelector(string $url, string $username, int $taskId): ?string
+    {
+        $parts = parse_url($url);
+        $taskPath = '/u/' . rawurlencode($username) . '/tasks';
+        if (!is_array($parts) || (string)($parts['path'] ?? '') !== $taskPath) {
+            return $url;
+        }
+
+        $queryValues = [];
+        parse_str((string)($parts['query'] ?? ''), $queryValues);
+        foreach ($queryValues as $key => $value) {
+            if (in_array((string)$key, ['task_id', 'id'], true) && is_array($value)) {
+                return null;
+            }
+        }
+        unset($queryValues['task_id'], $queryValues['id']);
+        $query = http_build_query($queryValues, '', '&', PHP_QUERY_RFC3986);
+        $query .= ($query === '' ? '' : '&') . 'task_id=' . $taskId;
+        return $taskPath . '?' . $query;
     }
 
     private static function isSafeOperatorUrl(string $url, string $username): bool

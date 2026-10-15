@@ -29,8 +29,8 @@ Completed execution milestone:
 
 Current product milestone:
 
-- OH-AUTO1-083 — task-to-action navigation from the worker-first dashboard to
-  the existing assigned-task surface.
+- OH-AUTO1-084 — exact task selection and actionable focus on the existing
+  assigned-task surface. OH-AUTO1-083 task-to-action navigation is complete.
 
 Approved execution sequence:
 
@@ -59,6 +59,7 @@ After the release/update cycle is proven, resume the product roadmap focus from
 - display-safe read-only surfaces
 - dynamic worker navigation from effective access
 - task-to-action navigation for specific assigned work on `/u/*`
+- exact selected-task identity and existing status actions on `/u/*`
 
 ## Deferred Product Work
 
