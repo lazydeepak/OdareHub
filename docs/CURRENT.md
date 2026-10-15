@@ -76,6 +76,11 @@ Evidence for the completed milestones is recorded in:
   denied, and unavailable evidence remains contained; explicit unrestricted
   scope preserves the established path. Unrestricted notification/escalation
   safety and parallel `/me` provider mutation remain deferred.
+- OH-AUTO2-101 — My Work notification summary and recent-list reads no longer
+  initialize notification schema or invoke escalation. Missing notification
+  storage is surfaced as unavailable to the My Work projection. Explicit
+  escalation service entry points remain separate; no scheduler or route was
+  added.
 
 After the release/update cycle is proven, resume the product roadmap focus from
 `README.md`:

@@ -5,13 +5,6 @@ namespace Plugins\Base\Services;
 
 use App\Core\DB;
 
-if (defined('APP_ROOT')) {
-    $escalationServicePath = APP_ROOT . '/plugins/Base/Services/EscalationService.php';
-    if (is_file($escalationServicePath)) {
-        require_once $escalationServicePath;
-    }
-}
-
 final class NotificationService
 {
     public const STATUS_NEW = 'new';
@@ -417,9 +410,6 @@ final class NotificationService
      */
     public static function unreadCountForUser(?array $user): int
     {
-        self::ensureTable();
-        self::runEscalationSweep();
-
         $role = self::canonicalRole((string)($user['role'] ?? ''));
         $userId = (int)($user['id'] ?? 0);
         if ($role === '' && $userId <= 0) {
@@ -458,9 +448,6 @@ final class NotificationService
      */
     public static function listForUser(?array $user, string $status = ''): array
     {
-        self::ensureTable();
-        self::runEscalationSweep();
-
         $role = self::canonicalRole((string)($user['role'] ?? ''));
         $userId = (int)($user['id'] ?? 0);
         if ($role === '' && $userId <= 0) {
@@ -512,13 +499,22 @@ final class NotificationService
      */
     public static function recentForUser(?array $user, int $limit = 6, bool $unreadOnly = false): array
     {
-        self::ensureTable();
-        self::runEscalationSweep();
+        return self::recentReadForUser($user, $limit, $unreadOnly)['rows'];
+    }
+
+    /**
+     * Read recent notifications without schema initialization or escalation.
+     *
+     * @param array<string,mixed>|null $user
+     * @return array{available:bool,rows:array<int,array<string,mixed>>}
+     */
+    public static function recentReadForUser(?array $user, int $limit = 6, bool $unreadOnly = false): array
+    {
 
         $role = self::canonicalRole((string)($user['role'] ?? ''));
         $userId = (int)($user['id'] ?? 0);
         if ($role === '' && $userId <= 0) {
-            return [];
+            return ['available' => true, 'rows' => []];
         }
 
         $where = [];
@@ -544,16 +540,20 @@ final class NotificationService
         }
 
         $limit = max(1, min(25, $limit));
-        $rows = DB::fetchAll(
-            'SELECT id, severity, status, event_type, title, message, entity_type, entity_id, stage, action_url, created_at
-             FROM workflow_notifications
-             WHERE ' . implode(' AND ', $where) . '
-             ORDER BY created_at DESC, id DESC
-             LIMIT ' . $limit,
-            $params
-        );
+        try {
+            $rows = DB::fetchAll(
+                'SELECT id, severity, status, event_type, title, message, entity_type, entity_id, stage, action_url, created_at
+                 FROM workflow_notifications
+                 WHERE ' . implode(' AND ', $where) . '
+                 ORDER BY created_at DESC, id DESC
+                 LIMIT ' . $limit,
+                $params
+            );
+        } catch (\Throwable) {
+            return ['available' => false, 'rows' => []];
+        }
 
-        return is_array($rows) ? $rows : [];
+        return ['available' => true, 'rows' => is_array($rows) ? $rows : []];
     }
 
     /**
@@ -678,17 +678,30 @@ final class NotificationService
 
     /**
      * @param array<string,mixed>|null $user
-     * @return array<string,int>
+     * @return array<string,int|bool>
      */
     public static function summaryForUser(?array $user): array
     {
-        self::ensureTable();
-        self::runEscalationSweep();
+        $result = self::summaryReadForUser($user);
+        if (($result['available'] ?? false) !== true) {
+            return array_merge($result['summary'], ['available' => false]);
+        }
+        return $result['summary'];
+    }
+
+    /**
+     * Read notification counts without schema initialization or escalation.
+     *
+     * @param array<string,mixed>|null $user
+     * @return array{available:bool,summary:array<string,int>}
+     */
+    public static function summaryReadForUser(?array $user): array
+    {
 
         $role = self::canonicalRole((string)($user['role'] ?? ''));
         $userId = (int)($user['id'] ?? 0);
         if ($role === '' && $userId <= 0) {
-            return ['total' => 0, 'unread' => 0, 'critical' => 0, 'warning' => 0, 'action_required' => 0, 'approval_required' => 0];
+            return ['available' => true, 'summary' => self::emptySummary()];
         }
 
         $where = [];
@@ -708,25 +721,48 @@ final class NotificationService
             $params[] = $userId;
         }
 
-        $row = DB::fetchOne(
-            'SELECT COUNT(*) AS total,
-                    SUM(CASE WHEN status = "new" THEN 1 ELSE 0 END) AS unread,
-                    SUM(CASE WHEN severity = "critical" THEN 1 ELSE 0 END) AS critical,
-                    SUM(CASE WHEN severity = "warning" THEN 1 ELSE 0 END) AS warning,
-                    SUM(CASE WHEN severity = "action_required" THEN 1 ELSE 0 END) AS action_required,
-                    SUM(CASE WHEN severity = "approval_required" THEN 1 ELSE 0 END) AS approval_required
-             FROM workflow_notifications
-             WHERE ' . implode(' AND ', $where),
-            $params
-        ) ?: [];
+        try {
+            $row = DB::fetchOne(
+                'SELECT COUNT(*) AS total,
+                        SUM(CASE WHEN status = "new" THEN 1 ELSE 0 END) AS unread,
+                        SUM(CASE WHEN severity = "critical" THEN 1 ELSE 0 END) AS critical,
+                        SUM(CASE WHEN severity = "warning" THEN 1 ELSE 0 END) AS warning,
+                        SUM(CASE WHEN severity = "action_required" THEN 1 ELSE 0 END) AS action_required,
+                        SUM(CASE WHEN severity = "approval_required" THEN 1 ELSE 0 END) AS approval_required
+                 FROM workflow_notifications
+                 WHERE ' . implode(' AND ', $where),
+                $params
+            ) ?: [];
+        } catch (\Throwable) {
+            return [
+                'available' => false,
+                'summary' => self::emptySummary(),
+            ];
+        }
 
         return [
-            'total' => (int)($row['total'] ?? 0),
-            'unread' => (int)($row['unread'] ?? 0),
-            'critical' => (int)($row['critical'] ?? 0),
-            'warning' => (int)($row['warning'] ?? 0),
-            'action_required' => (int)($row['action_required'] ?? 0),
-            'approval_required' => (int)($row['approval_required'] ?? 0),
+            'available' => true,
+            'summary' => [
+                'total' => (int)($row['total'] ?? 0),
+                'unread' => (int)($row['unread'] ?? 0),
+                'critical' => (int)($row['critical'] ?? 0),
+                'warning' => (int)($row['warning'] ?? 0),
+                'action_required' => (int)($row['action_required'] ?? 0),
+                'approval_required' => (int)($row['approval_required'] ?? 0),
+            ],
+        ];
+    }
+
+    /** @return array<string,int> */
+    private static function emptySummary(): array
+    {
+        return [
+            'total' => 0,
+            'unread' => 0,
+            'critical' => 0,
+            'warning' => 0,
+            'action_required' => 0,
+            'approval_required' => 0,
         ];
     }
 
@@ -1151,25 +1187,6 @@ final class NotificationService
             'dispatch_entry' => '/dispatch-entries/edit?id=' . $entityId,
             default => '/ops/notifications',
         };
-    }
-
-    private static function runEscalationSweep(): void
-    {
-        static $ran = false;
-        if ($ran) {
-            return;
-        }
-        $ran = true;
-
-        if (!class_exists(EscalationService::class)) {
-            return;
-        }
-
-        try {
-            EscalationService::runSweep();
-        } catch (\Throwable $e) {
-            // Keep notifications page resilient even if sweep fails.
-        }
     }
 
     private static function stageLabel(string $stage): string

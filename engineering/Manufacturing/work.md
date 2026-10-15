@@ -7,6 +7,18 @@ Continue
 through the same owner-contract pattern for parts, work areas, and process
 areas only as separately bounded milestones.
 
+## 2026-10-16 — OH-AUTO2-101 notification read-path safety
+
+- [x] My Work uses notification read results that do not call notification
+  schema initialization or escalation sweeps.
+- [x] Missing notification storage is represented as unavailable rather than
+  a verified empty notification state; recipient filters remain unchanged.
+- [x] Restricted My Work still returns before notification retrieval, while
+  explicit escalation service entry points remain available separately.
+- [x] Notification proof: **16/16**; preflight **17/17**; containment **21/21**;
+  visibility **14/14**. No Core, route, schema, database, activation,
+  deployment, or browser operation.
+
 ## 2026-10-16 — OH-AUTO2-100 restricted My Work non-mutating preflight
 
 - [x] Manufacturing My Work accepts a preflight-resolved context and returns

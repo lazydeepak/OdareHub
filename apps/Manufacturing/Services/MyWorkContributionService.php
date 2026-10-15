@@ -57,6 +57,7 @@ final class MyWorkContributionService
      */
     public static function build(?array $user, array $input = []): array
     {
+        $user = is_array($user) ? $user : [];
         $userContext = is_array($user['_scope_preflight_context'] ?? null)
             ? $user['_scope_preflight_context']
             : null;
@@ -188,11 +189,19 @@ final class MyWorkContributionService
         $notificationSummary = [];
         $recentNotifications = [];
         $unreadNotifications = 0;
+        $notificationSourceAvailable = false;
         if (class_exists(NotificationService::class)) {
             try {
-                $notificationSummary = NotificationService::summaryForUser($user);
-                $recentNotifications = NotificationService::recentForUser($user, 8, true);
-                $unreadNotifications = (int)($notificationSummary['unread'] ?? 0);
+                $summaryRead = NotificationService::summaryReadForUser($user);
+                if (($summaryRead['available'] ?? false) === true) {
+                    $recentRead = NotificationService::recentReadForUser($user, 8, true);
+                    if (($recentRead['available'] ?? false) === true) {
+                        $notificationSummary = (array)($summaryRead['summary'] ?? []);
+                        $recentNotifications = (array)($recentRead['rows'] ?? []);
+                        $unreadNotifications = (int)($notificationSummary['unread'] ?? 0);
+                        $notificationSourceAvailable = true;
+                    }
+                }
             } catch (\Throwable $e) {
                 $notificationSummary = [];
                 $recentNotifications = [];
@@ -220,6 +229,8 @@ final class MyWorkContributionService
             'notification_summary' => $notificationSummary,
             'recent_notifications' => $recentNotifications,
             'unread_notifications' => $unreadNotifications,
+            'notification_source_available' => $notificationSourceAvailable,
+            'notification_source_state' => $notificationSourceAvailable ? 'available' : 'unavailable',
             'active_assigned_apps' => $activeAssignedApps,
         ];
     }
@@ -335,6 +346,8 @@ final class MyWorkContributionService
             'notification_summary' => [],
             'recent_notifications' => [],
             'unread_notifications' => 0,
+            'notification_source_available' => false,
+            'notification_source_state' => 'unavailable',
             'active_assigned_apps' => array_values((array)($ctx['active_assigned_apps'] ?? [])),
             'scope_containment' => [
                 'state' => $state,

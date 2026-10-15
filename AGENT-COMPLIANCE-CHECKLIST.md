@@ -1,5 +1,25 @@
 # AGENT-COMPLIANCE-CHECKLIST
 
+## Session Summary (2026-10-16) — OH-AUTO2-101 Notification and Escalation Read-Path Safety
+
+Removed schema initialization and implicit escalation execution from
+notification read paths. Added availability-aware summary/recent read methods;
+My Work now exposes notification data only when both reads are available and
+preserves an explicit unavailable state otherwise. Notification creation and
+status mutation methods retain their existing write/schema authority.
+
+Restricted My Work still bypasses notification retrieval through the
+OH-AUTO2-100 preflight boundary. Explicit escalation remains callable through
+the existing `EscalationService::runSweep()` and Manufacturing contribution
+entry points; no scheduler, route, schema, installed database, Core, browser,
+activation, deployment, or production operation was added. No in-repository
+scheduler caller was found, so adding one remains outside this assignment.
+
+Validation: notification read safety **16/16**; preflight **17/17**;
+restricted containment **21/21**; visibility **14/14**; PHP lint and
+`git diff --check` PASS. Lifecycle logs and PHPUnit cache remain preserved and
+uncommitted.
+
 ## Session Summary (2026-10-16) — OH-AUTO2-100 Restricted My Work non-mutating preflight
 
 Added a bounded read-only assignment/scope preflight before the legacy Base
