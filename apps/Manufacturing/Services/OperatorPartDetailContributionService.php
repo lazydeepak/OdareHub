@@ -3,21 +3,21 @@ declare(strict_types=1);
 
 namespace Apps\Manufacturing\Services;
 
-use App\Core\DB;
 use Plugins\Products\Services\Part360Service;
 
 final class OperatorPartDetailContributionService
 {
     /**
      * @param array<string,mixed> $query
+     * @param array<string,mixed>|null $user
      * @return array<string,mixed>
      */
-    public static function getData(array $query = [], string $username = ''): array
+    public static function getData(array $query = [], string $username = '', ?array $user = null): array
     {
         $defaults = self::defaults();
 
         try {
-            $productId = self::resolveProductId($query);
+            $productId = OperatorPartsWorkspaceService::resolveAuthorizedPartId($query, $user);
             if ($productId <= 0) {
                 $defaults['error'] = 'operator.parts.detail.not_found';
                 return $defaults;
@@ -62,45 +62,6 @@ final class OperatorPartDetailContributionService
             'empty' => true,
             'error' => '',
         ];
-    }
-
-    /**
-     * @param array<string,mixed> $query
-     */
-    private static function resolveProductId(array $query): int
-    {
-        $productId = (int)($query['part_id'] ?? $query['product_id'] ?? $query['id'] ?? 0);
-        if ($productId > 0) {
-            return $productId;
-        }
-
-        $partNumber = trim((string)($query['part_number'] ?? ''));
-        $search = trim((string)($query['q'] ?? $query['part_q'] ?? ''));
-        if ($partNumber === '' && $search === '') {
-            return 0;
-        }
-
-        $params = [];
-        $where = '';
-        if ($partNumber !== '') {
-            $where = 'TRIM(parts_number) = ?';
-            $params[] = $partNumber;
-        } else {
-            $where = '(parts_name LIKE ? OR parts_number LIKE ? OR model LIKE ?)';
-            $like = '%' . substr($search, 0, 80) . '%';
-            $params = [$like, $like, $like];
-        }
-
-        $row = DB::fetchOne(
-            "SELECT id
-             FROM products
-             WHERE {$where}
-             ORDER BY is_active DESC, parts_name ASC, id ASC
-             LIMIT 1",
-            $params
-        );
-
-        return is_array($row) ? (int)($row['id'] ?? 0) : 0;
     }
 
     /**

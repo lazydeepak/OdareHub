@@ -16,8 +16,8 @@ The active product direction is:
 
 The disposable release/update foundation is complete through OH-AUTO1-080.
 Production installation, update, and apply remain unauthorized. Product
-development has resumed on the Shell worker surface; OH-AUTO1-089 is the
-current fail-closed machine-scope normalization milestone.
+development has resumed on the Shell worker surface; OH-AUTO1-090 is the
+current scope-aware operator Parts workspace milestone.
 
 ## Active Focus
 
@@ -29,9 +29,9 @@ Completed execution milestone:
 
 Current product milestone:
 
-- OH-AUTO1-089 — reject malformed and contradictory machine/part scope IDs,
-  preserve the existing `[-1]` denial sentinel, and keep quantity provenance
-  fail-closed over the OH-AUTO1-088 projection consistency correction.
+- OH-AUTO1-090 — scope the operator Parts list and detail selection to the
+  authenticated user's effective Manufacturing part permissions, preserving
+  list/detail consistency and preventing unauthorized Part360 schema access.
 
 Approved execution sequence:
 

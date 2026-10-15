@@ -2,6 +2,28 @@
 
 ## Decision Log
 
+### 2026-10-15 — OH-AUTO1-090 operator Parts scope boundary
+
+**Status:** Accepted
+
+**Decision**
+
+Manufacturing owns the operator Parts selection boundary through
+`OperatorPartsWorkspaceService`. It requires authenticated identity, active
+Manufacturing assignment, enabled app state, Products module access, and a
+present scope object. Part restrictions are applied in the SQL predicate before
+the list `LIMIT`; direct IDs, part numbers, and search selection use the same
+authorized predicate.
+
+`OperatorPartDetailContributionService` resolves an authorized product before
+calling `Part360Service::build()`. Unauthorized or unavailable products return
+the existing empty detail state, so Part360's schema initialization is never
+reached for them. The operator read path itself adds no schema initialization.
+
+Explicit empty `part_ids` remains the established authorized-unrestricted case;
+missing, malformed, zero, negative, or denied scope fails closed. Shell only
+passes authenticated context and renders the owner-provided projection.
+
 ### 2026-10-15 — OH-AUTO1-089 fail-closed scope normalization
 
 **Status:** Accepted

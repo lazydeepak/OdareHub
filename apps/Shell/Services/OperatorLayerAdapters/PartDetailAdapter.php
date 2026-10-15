@@ -11,11 +11,11 @@ final class PartDetailAdapter
      * @param array<string,mixed> $query
      * @return array<string,mixed>
      */
-    public static function getData(array $query = [], string $username = ''): array
+    public static function getData(array $query = [], string $username = '', ?array $user = null): array
     {
         try {
             if (class_exists(OperatorPartDetailContributionService::class) && method_exists(OperatorPartDetailContributionService::class, 'getData')) {
-                return OperatorPartDetailContributionService::getData($query, $username);
+                return OperatorPartDetailContributionService::getData($query, $username, $user);
             }
         } catch (\Throwable $e) {
             error_log('PartDetailAdapter::getData: ' . $e->getMessage());

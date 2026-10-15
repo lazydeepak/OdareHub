@@ -1,5 +1,13 @@
 # AGENTS.md
 
+## Session Summary (2026-10-15) — OH-AUTO1-090 Scope-aware operator Parts workspace
+
+Manufacturing now authorizes Parts list/detail selection before pagination or
+Part360 build. Identity, assignment, Products access, and effective part scope
+are required; unauthorized and malformed scope fails closed. Isolated Parts
+coverage is **14/14** and machine denied-scope KPI regression is covered.
+No database, browser, production operation, or Core change.
+
 ## Session Summary (2026-10-15) — OH-AUTO1-089 Fail-closed machine scope normalization
 
 Strictly validates machine/part scope IDs, preserves the `[-1]` denial

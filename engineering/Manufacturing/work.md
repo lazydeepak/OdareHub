@@ -2,7 +2,7 @@
 
 ## Current Focus
 
-OH-AUTO1-089 fail-closed machine-scope normalization is complete. Continue
+OH-AUTO1-090 scope-aware operator Parts workspace is complete. Continue
  through the same owner-contract pattern for parts, work areas, and process
  areas only as separately bounded milestones.
 
@@ -23,6 +23,10 @@ brief's pressure-test workstreams and synthesis complete.
 - [x] OH-AUTO1-089 — strictly validates canonical scope IDs, preserves the
   owner `[-1]` denial sentinel, rejects malformed/mixed restrictions, and
   applies the same validation to quantity provenance.
+
+- [x] OH-AUTO1-090 — Manufacturing-owned Parts list and detail selection
+  requires authenticated identity, active Manufacturing assignment, Products
+  module access, and effective part scope before pagination or Part360 build.
 
 - [x] OH-AUTO1-087 — passed authenticated operator identity and effective
   assignment context into `MachinesAdapter`; Manufacturing retains machine,
@@ -50,6 +54,10 @@ brief's pressure-test workstreams and synthesis complete.
 - OH-AUTO1-089 — fail-closed scope normalization and negative fixture proof:
   **24/24** assertions. No database, SQL, activation, display-route, schema,
   production, or Core operation.
+
+- OH-AUTO1-090 — operator Parts authorization and list/detail consistency:
+  **14/14** assertions; machine regression **27/27**. No database, schema
+  initialization, activation, display-route, production, or Core operation.
 
 - OH-AUTO1-019 — Manufacturing operator adapters now return a stable localized diagnostic key instead of raw exception text while retaining existing server-side error logging. See `docs/architecture/operational-diagnostics-observability-audit-2026-10-14.md`.
 - OH-AUTO1-020 — Static audit identified unverified target/link atomicity in upstream supply synchronization; no correction made without disposable failure-path evidence. See `docs/architecture/transactional-business-verification-audit-2026-10-14.md`.

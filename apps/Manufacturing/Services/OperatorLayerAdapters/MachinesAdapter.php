@@ -201,6 +201,7 @@ final class MachinesAdapter
             foreach (['run_now', 'next_queue', 'delayed_jobs', 'waiting_qc', 'risk_jobs', 'assigned_machines'] as $key) {
                 $result[$key] = [];
             }
+            $machines = [];
             $result['filters'] = ['machines' => [], 'sections' => []];
             $result['sections'] = [];
         }

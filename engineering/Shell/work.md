@@ -2,10 +2,19 @@
 
 ## Current Focus
 
-OH-AUTO1-088 machine projection consistency is complete. Resume broader
+OH-AUTO1-090 scope-aware Parts workspace is complete. Resume broader
 operator capabilities, especially computed-scope-aware machine, part,
 work-area, and process-area presentation; do not expand the dashboard
 foundation without a new bounded objective.
+
+## 2026-10-15 — OH-AUTO1-090 scope-aware operator Parts workspace
+
+- [x] Shell passes authenticated operator context into the Manufacturing-owned
+  Parts list and detail adapters.
+- [x] Shell does not resolve product permissions or call Part360 directly;
+  unauthorized detail selection is rejected before owner build/schema paths.
+- [x] Existing operator routes, localization, and rendering surfaces remain
+  unchanged; isolated Parts coverage is **14/14**.
 
 ## 2026-10-15 — OH-AUTO1-088 machine projection consistency
 

@@ -13,13 +13,13 @@ use Apps\Manufacturing\Services\OperatorLayerAdapters\DailyOrdersAdapter;
 use Apps\Manufacturing\Services\OperatorLayerAdapters\DemandAdapter;
 use Apps\Manufacturing\Services\OperatorLayerAdapters\DispatchAdapter;
 use Apps\Manufacturing\Services\OperatorLayerAdapters\MachinesAdapter;
+use Apps\Manufacturing\Services\OperatorPartsWorkspaceService;
 use Apps\Manufacturing\Services\OperatorLayerAdapters\MaterialsAdapter;
 use Apps\Shell\Services\OperatorLayerAdapters\PartDetailAdapter;
 use Apps\Manufacturing\Services\OperatorLayerAdapters\QcAdapter;
 use Apps\Shell\Services\OperatorLayerSidebarService;
 use Apps\Shell\Services\OperatorSurfaceContributionRegistry;
 use Apps\Shell\Services\PlatformWidgetBlueprintRuntimeService;
-use Apps\Shell\Services\PartsTableService;
 use Apps\Shell\Services\OperatorPreferencesService;
 use Apps\Shell\Services\ThemePreferenceService;
 use Platform\Search\AuthorizedSearchIndexService;
@@ -535,7 +535,9 @@ final class OperatorSurfaceComposer
                 $this->buildCriticalZairyoDetailData(),
             ] : [],
             'recent_activity' => $recentActivity,
-            'parts_table' => PartsTableService::getPartsTable(),
+            'parts_table' => OperatorPartsWorkspaceService::getPartsTable(
+                is_array($this->context['operator_user'] ?? null) ? $this->context['operator_user'] : null
+            ),
             'part_detail_focus' => $hasManufacturing ? $this->buildPartDetailFocusData() : [],
             'production_focus' => $hasManufacturing ? $this->buildProductionFocusData() : [],
             'processing_focus' => $hasManufacturing ? $this->buildProcessingFocusData() : [],
@@ -606,7 +608,11 @@ final class OperatorSurfaceComposer
     private function buildPartDetailFocusData(): array
     {
         try {
-            return PartDetailAdapter::getData((array)($this->context['current_query'] ?? []), $this->username);
+            return PartDetailAdapter::getData(
+                (array)($this->context['current_query'] ?? []),
+                $this->username,
+                is_array($this->context['operator_user'] ?? null) ? $this->context['operator_user'] : null
+            );
         } catch (\Throwable $e) {
             error_log('OperatorSurfaceComposer::buildPartDetailFocusData: ' . $e->getMessage());
             return ['product' => null, 'metrics' => [], 'context' => [], 'actions' => [], 'orders' => [], 'activity' => [], 'empty' => true, 'error' => 'operator.parts.detail.error.load'];

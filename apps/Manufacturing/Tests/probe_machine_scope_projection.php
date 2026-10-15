@@ -104,6 +104,7 @@ $deniedFixture = $fixture;
 $deniedFixture['scope'] = ['scope_machine_ids' => [-1], 'scope_part_ids' => [-1]];
 $denied = MachinesAdapter::projectScopedData($deniedFixture);
 $assert($denied !== null && $denied['run_now'] === [] && $denied['assigned_machines'] === [] && $denied['sections'] === [], 'denied sentinel publishes no operator work or choices');
+$assert($denied !== null && (int)($denied['kpi']['assigned_machines'] ?? -1) === 0 && (int)($denied['kpi']['run_now_jobs'] ?? -1) === 0, 'denied sentinel publishes zero machine KPIs');
 $mixedDeniedFixture = $fixture;
 $mixedDeniedFixture['scope'] = ['scope_machine_ids' => [-1, 2], 'scope_part_ids' => []];
 $assert(MachinesAdapter::projectScopedData($mixedDeniedFixture) === null, 'mixed denied and positive scope fails closed');

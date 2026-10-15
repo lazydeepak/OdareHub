@@ -1,5 +1,19 @@
 # AGENT-COMPLIANCE-CHECKLIST
 
+## Session Summary (2026-10-15) — OH-AUTO1-090 Scope-aware operator Parts workspace
+
+Added a Manufacturing-owned Parts workspace boundary. Authenticated identity,
+active Manufacturing assignment, Products module access, and effective
+`part_ids` are required before list pagination or detail resolution. Direct IDs,
+part numbers, and searches use the same authorization predicate. Unauthorized
+detail requests return empty state before `Part360Service::build()` and its
+schema initialization. Machine denied-scope KPIs now explicitly verify zero.
+
+Validation: Parts scope **14/14**; machine scope **27/27**; role-home **26/26**;
+worker/task **41/41**; responsive navigation **51/51**. No database, browser,
+schema, activation, production, or Core operation. Existing lifecycle logs and
+PHPUnit cache remain uncommitted.
+
 ## Session Summary (2026-10-15) — OH-AUTO1-089 Fail-closed machine scope normalization
 
 Replaced permissive `intval()` scope normalization with strict canonical ID
