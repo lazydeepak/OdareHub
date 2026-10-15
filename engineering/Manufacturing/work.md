@@ -78,8 +78,12 @@ brief's pressure-test workstreams and synthesis complete.
 - [x] OH-AUTO1-096 — Manufacturing scope-safe work/process area summary,
   completed with focused proof; no new area authority fields.
 - [x] OH-AUTO1-097 — contained the broad My Work projection for restricted
-  operational scopes before any limited queue source is queried. Explicit empty
-  scope remains unrestricted; malformed and denied evidence fails closed.
+   operational scopes before any limited queue source is queried. Explicit empty
+   scope remains unrestricted; malformed and denied evidence fails closed.
+- [x] OH-AUTO1-098 — preserved the containment payload and made its unavailable
+   state visible through Shell. Notifications and role links remain suppressed
+   because their current providers perform schema/escalation work or can expose
+   operational entity details. Focused visibility proof: **14/14**.
 - [ ] OH-AUTO1-034 — Reconcile updated integration baseline and source inventory.
 
 ## Blocked
@@ -93,6 +97,12 @@ brief's pressure-test workstreams and synthesis complete.
   no records, counts, notifications, or links before broad queue collection;
   explicit empty scope retains existing unrestricted behavior. No Core,
   database, schema, route, activation, deployment, or production operation.
+
+- OH-AUTO1-098 — containment visibility: **14/14** focused rendered-output and
+  source-invocation assertions. Restricted scopes show explicit unavailable
+  state rather than verified zero work; unrestricted scope renders no notice.
+  No notifications, role links, out-of-scope identities/counts/URLs, schema,
+  database, route, activation, deployment, browser, or Core operation.
 
 - OH-AUTO1-088 — machine projection consistency and runtime-shaped proof:
   **15/15** assertions. No database, SQL, activation, display-route, schema,

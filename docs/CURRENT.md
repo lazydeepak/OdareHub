@@ -67,6 +67,10 @@ Evidence for the completed milestones is recorded in:
   queue collection for restricted operational scopes. Explicit empty scope
   retains its existing owner-defined unrestricted meaning; Core remains
   unchanged.
+- OH-AUTO1-098 — the restricted-scope state is forwarded through Shell `/me`
+  composition and rendered as a localized unavailable state. Notifications and
+  role links remain suppressed because their current providers do not provide
+  an independently proven, non-mutating, scope-safe read contract.
 
 After the release/update cycle is proven, resume the product roadmap focus from
 `README.md`:

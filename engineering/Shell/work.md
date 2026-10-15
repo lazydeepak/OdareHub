@@ -6,6 +6,19 @@ OH-AUTO1-094 Processing authority closure is complete. Shell remains the
 generic operator composition and rendering boundary; Manufacturing owns lane
 authority and data projection.
 
+## 2026-10-16 — OH-AUTO1-098 My Work containment visibility
+
+- [x] Shell forwards the existing Manufacturing `scope_containment` payload
+  without interpreting or weakening its record boundary.
+- [x] The `/me` home renders a localized unavailable notice for restricted,
+  denied, or malformed contained scopes; it does not describe the suppressed
+  queue as verified zero work.
+- [x] Explicit unrestricted payloads preserve ordinary presentation.
+- [x] Notifications and role links remain suppressed because the existing
+  providers are not proven non-mutating/scope-safe.
+- [x] Focused rendered visibility proof: **14/14**. No route, schema, browser,
+  database, activation, deployment, or Core change.
+
 ## 2026-10-15 — OH-AUTO1-094 Processing authority closure
 
 - [x] Shell consumes separate Manufacturing-owned `assembly_allowed` and

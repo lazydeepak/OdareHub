@@ -115,6 +115,9 @@ final class AdminSurfaceComposer
             'notification_summary'             => (array)($data['notification_summary'] ?? []),
             'recent_notifications'             => (array)($data['recent_notifications'] ?? []),
             'unread_notifications'             => (int)($data['unread_notifications'] ?? 0),
+            'scope_containment'                => is_array($data['scope_containment'] ?? null)
+                 ? (array)$data['scope_containment']
+                 : [],
             'cross_functional_access'          => (array)($data['cross_functional_access'] ?? []),
             'primary_work_area'                => (string)($data['primary_work_area'] ?? ''),
             'cross_work_areas'                 => (array)($data['cross_work_areas'] ?? []),
@@ -176,6 +179,7 @@ final class AdminSurfaceComposer
                 'notification_summary' => [],
                 'recent_notifications' => [],
                 'unread_notifications' => 0,
+                'scope_containment' => [],
                 'active_assigned_apps' => array_values((array)($this->ctx['active_assigned_apps'] ?? [])),
             ];
         }

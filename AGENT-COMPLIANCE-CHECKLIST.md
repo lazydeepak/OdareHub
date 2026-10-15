@@ -1,5 +1,27 @@
 # AGENT-COMPLIANCE-CHECKLIST
 
+## Session Summary (2026-10-16) — OH-AUTO1-098 My Work containment visibility
+
+Forwarded Manufacturing's existing `scope_containment` state through
+`AdminSurfaceComposer` into a Shell-owned admin `/me` presentation partial.
+Restricted, denied, and malformed contained scopes now show a localized
+unavailable notice explaining that a scope-safe source is not yet supported;
+they are not represented as verified zero work. Explicit unrestricted scope
+renders the ordinary home without this notice.
+
+Reviewed personal signals. Notifications remain suppressed because the current
+summary/recent readers call schema initialization and escalation sweep and can
+return role-targeted operational entity details/action URLs. Role links remain
+suppressed for the same absence of independent scope-safe evidence. No
+alternate broad query, new authorization field, mutation, schema, route, Core,
+browser, database, activation, deployment, or production operation was added.
+
+Validation: containment visibility **14/14**; restricted containment **21/21**;
+worker/task **41/41**; role-home **26/26**; machine projection **27/27**;
+architecture **49/49**; deletion **28/28**; deployment readiness **PASS**;
+PHP lint and diff hygiene PASS. Lifecycle logs and PHPUnit cache remain
+preserved and uncommitted.
+
 ## Session Summary (2026-10-16) — OH-AUTO1-097 Restricted-scope My Work containment
 
 Contained the existing broad Manufacturing My Work projection before any

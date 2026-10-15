@@ -1,6 +1,8 @@
 <?php
 
 return [
+    'admin.my_work.scope_containment.title' => 'कामको जानकारी उपलब्ध छैन',
+    'admin.my_work.scope_containment.unavailable' => 'स्कोप सुरक्षित रूपमा प्रमाणित गर्ने स्रोत अझै समर्थित नभएकाले कामको जानकारी अस्थायी रूपमा उपलब्ध छैन। कामको संख्या वा सञ्चालन रेकर्ड देखाइएको छैन।',
     'operator.data_exchange.empty_hint' => '',
     'operator.data_exchange.empty_title' => '',
     'operator.data_exchange.governance_note' => '',

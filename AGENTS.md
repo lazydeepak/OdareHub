@@ -1,5 +1,17 @@
 # AGENTS.md
 
+## Session Summary (2026-10-16) — OH-AUTO1-098 My Work containment visibility
+
+Carried the existing Manufacturing `scope_containment` state through the Shell
+`/me` composition boundary and rendered a localized unavailable state for
+restricted, denied, and malformed scopes. Unrestricted behavior is unchanged;
+no contained queue is presented as verified empty. Notifications and role links
+remain suppressed because current providers perform schema/escalation work or
+can expose operational entity details/action URLs without an independent
+scope-safe read contract. Focused proof **14/14**; architecture **49/49**;
+deletion **28/28**; deployment readiness PASS. No Core, database/schema,
+browser, route, activation, deployment, or production operation.
+
 ## Session Summary (2026-10-15) — OH-AUTO1-096 Scope-safe work/process summary
 
 Added a Manufacturing-owned read-only dashboard contribution over the existing

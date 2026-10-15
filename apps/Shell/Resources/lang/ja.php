@@ -1,6 +1,8 @@
 <?php
 
 return [
+    'admin.my_work.scope_containment.title' => '作業情報を利用できません',
+    'admin.my_work.scope_containment.unavailable' => '範囲を安全に確認できる情報源がまだ対応していないため、作業情報は一時的に利用できません。作業件数や業務レコードは表示していません。',
     'operator.data_exchange.empty_hint' => '',
     'operator.data_exchange.empty_title' => '',
     'operator.data_exchange.governance_note' => '',

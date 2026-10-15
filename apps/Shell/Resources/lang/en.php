@@ -1,6 +1,8 @@
 <?php
 
 return [
+    'admin.my_work.scope_containment.title' => 'Work information unavailable',
+    'admin.my_work.scope_containment.unavailable' => 'Work information is temporarily unavailable because a scope-safe source is not yet supported. No work count or operational record is being shown.',
     'operator.data_exchange.empty_hint' => 'Ask an admin to assign apps/modules that publish data exchange adapters.',
     'operator.data_exchange.empty_title' => 'No adapters available',
     'operator.data_exchange.governance_note' => 'All operations are policy-governed and fully audited before execution.',

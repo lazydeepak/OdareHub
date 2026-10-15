@@ -54,6 +54,7 @@ if ($dashboardItems !== []) {
 }
 ?>
 <div class="my-work-polish my-work-dashboard my-work-theme-enterprise">
+  <?php include APP_ROOT . '/apps/Shell/Views/admin/scope_containment.php'; ?>
   <?php include APP_ROOT . '/apps/Shell/Views/admin/upgrade_workbench.php'; ?>
   <?php include APP_ROOT . '/apps/Shell/Views/admin/unified_launcher.php'; ?>
   <?php $renderAdminDashboardPanels = $adminDashboardPanels !== [] && $shouldRenderBlock('admin_dashboard_panels', $enabledDashboardBlocks); ?>

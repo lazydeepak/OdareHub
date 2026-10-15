@@ -2,6 +2,31 @@
 
 ## Decision Log
 
+### 2026-10-16 — OH-AUTO1-098 containment visibility and personal signals
+
+**Status:** Accepted — explicit Shell visibility; no signal restoration
+
+The existing `scope_containment` payload is now carried through the Shell
+admin `/me` composition boundary. A non-unrestricted contained state renders a
+localized unavailable notice; it is never rendered as an empty or verified-zero
+queue. Explicit unrestricted behavior remains unchanged.
+
+Personal notifications and role links remain suppressed. The current
+notification readers call schema initialization and an escalation sweep, and
+notification rows contain role/user targeting plus operational entity
+references and action URLs. The role-inbox path similarly initializes schema
+and fetches broad handoff/entity details. No independently authorized,
+non-mutating, scope-safe signal source was established, so this milestone does
+not restore either signal family or introduce alternate queries.
+
+The existing Base context `ensureSchema()` dependency remains unresolved and
+outside this milestone.
+
+**Evidence:** containment visibility **14/14**; restricted containment
+**21/21**; worker/task **41/41**; role-home **26/26**; machine projection
+**27/27**; architecture **49/49**; deletion **28/28**; deployment readiness
+PASS.
+
 ### 2026-10-16 — OH-AUTO1-097 restricted-scope My Work containment
 
 **Status:** Accepted — fail-closed containment without Core changes
