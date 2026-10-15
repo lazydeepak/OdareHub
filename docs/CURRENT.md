@@ -34,7 +34,9 @@ Completed current product milestone:
   product, module, profile, and transition authority.
 - OH-AUTO1-094 — preserved read-only denial on every Processing POST authority,
   separated existing Assembly/QC module authority, and suppressed unauthorized
-  lane actions before schema initialization or writes.
+  lane actions before Processing record lookup or writes. The existing
+  caller-owned Base context resolver's transitive schema initialization remains
+  unresolved and unchanged.
 
 Approved execution sequence:
 

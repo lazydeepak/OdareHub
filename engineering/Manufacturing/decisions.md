@@ -16,10 +16,15 @@ lane. Unauthorized lanes are not queried or projected, and both lane authority
 flags are handed to Shell for action rendering.
 
 The existing interaction profile remains mutation authority at POST time.
-`read_only` and `display` profiles fail before record lookup, schema
-initialization, or writes for both create and status operations. The existing
-Assembly schema preparation remains after this authority gate and is not moved
-or broadened. No new permission framework or scope dimension was introduced.
+`read_only` and `display` profiles fail inside the Processing authority gate
+before Processing record lookup or writes for both create and status
+operations. The existing Assembly schema preparation remains after this
+authority gate and is not moved or broadened. However, the caller-owned Base
+`UserDashboardAssignmentService::resolveUserContext()` invokes its existing
+`ensureSchema()` before returning context, so this milestone does not claim
+that all transitive schema initialization occurs after authorization. That
+cross-owner dependency remains unresolved and unchanged. No new permission
+framework or scope dimension was introduced.
 
 **Evidence**
 

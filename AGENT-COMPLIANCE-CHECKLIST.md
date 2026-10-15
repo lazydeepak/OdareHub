@@ -6,8 +6,11 @@ Closed the Processing authority gaps without adding routes, permissions, scope
 dimensions, or schema behavior. Manufacturing now uses exact existing Assembly
 and QC module authority independently, suppresses unauthorized lane projection,
 and exposes lane decisions to Shell for rendering. All four existing operator
-POST paths retain Manufacturing authority before mutation; read-only/display
-profiles fail before record lookup, schema initialization, or writes.
+POST paths retain Manufacturing authority before Processing record lookup or
+mutation; read-only/display profiles fail inside that authority gate. The
+caller-owned Base context resolver still invokes its existing ensureSchema()
+before returning context; that transitive schema dependency remains unresolved
+and was not changed.
 
 Validation: Processing isolated proof **27/27**; Parts **14/14**; Part360
 **8/8**; machine **27/27**; role-home **26/26**; worker/task **41/41**;

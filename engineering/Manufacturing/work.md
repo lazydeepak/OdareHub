@@ -50,8 +50,10 @@ brief's pressure-test workstreams and synthesis complete.
   display denial for both status and creation mutations, uses exact existing
   `assembly`/`qc` module authority without mixed-surface aliases, filters each
   lane before projection, and hides unauthorized lane actions in Shell. The
-  isolated proof is **27/27**; no database, schema, activation, production,
-  or Core operation.
+  isolated proof is **27/27**; no database, activation, production, or Core
+  operation. The existing Base context resolver still performs transitive
+  `ensureSchema()` before returning context; that cross-owner dependency is
+  documented, not broadened, and remains unresolved.
 
 - [x] OH-AUTO1-087 — passed authenticated operator identity and effective
   assignment context into `MachinesAdapter`; Manufacturing retains machine,
