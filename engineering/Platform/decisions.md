@@ -1,5 +1,18 @@
 # Platform — Decisions
 
+### 2026-10-15 — OH-AUTO1-080 final disposable release-cycle safety closure
+**Status:** Accepted as complete disposable-only proof; production remains gated
+
+No disposable SQL is permitted before independent process/socket/datadir/
+network/configuration attestation. Transaction completion requires a mandatory
+candidate-bound identity finalizer with on-disk read-back evidence; a verified
+health result alone cannot complete a transaction. Recovery must verify
+substantive baseline database records and the complete replaceable filesystem
+inventory. Runner exception paths must defer exit until owned process,
+credentials, source, and rehearsal resources are cleaned. These controls close
+the non-production proof only and do not authorize installed or production
+execution.
+
 ### 2026-10-15 — OH-AUTO1-079 complete disposable release-cycle proof
 **Status:** Accepted as corrected disposable-only execution proof
 

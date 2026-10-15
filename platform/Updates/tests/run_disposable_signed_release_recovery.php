@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 /**
- * OH-AUTO1-078 disposable execution rehearsal.
+ * OH-AUTO1-080 disposable execution rehearsal.
  *
  * This is the first test entry point allowed to mutate anything: every
  * mutation target is created under one runner-owned temporary root, and a
@@ -94,9 +94,22 @@ $copyTree = static function (string $source, string $target) use (&$copyTree): v
     if (!is_file($source) || file_put_contents($target, (string)file_get_contents($source)) === false) throw new RuntimeException('restore copy failed: ' . $source);
 };
 
+$treeInventory = static function (string $root): array {
+    if (!is_dir($root)) return [];
+    $inventory = [];
+    $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($root, FilesystemIterator::SKIP_DOTS));
+    foreach ($iterator as $file) {
+        if (!$file->isFile() || $file->isLink()) throw new RuntimeException('filesystem inventory encountered unsafe entry: ' . $file->getPathname());
+        $relative = ltrim(str_replace('\\', '/', substr($file->getPathname(), strlen(rtrim($root, '/')))), '/');
+        $inventory[$relative] = ['sha256' => hash_file('sha256', $file->getPathname()), 'bytes' => $file->getSize()];
+    }
+    ksort($inventory);
+    return $inventory;
+};
+
 $temporaryRoot = realpath(sys_get_temp_dir());
 if ($temporaryRoot === false) {
-    fwrite(STDERR, "OH-AUTO1-078 BLOCKED/FAILED: system temporary root is unavailable\n");
+    fwrite(STDERR, "OH-AUTO1-080 BLOCKED/FAILED: system temporary root is unavailable\n");
     exit(2);
 }
 $workspace = rtrim($temporaryRoot, '/') . '/o78-' . bin2hex(random_bytes(5));
@@ -109,14 +122,14 @@ $dbUser = 'oh078u_' . bin2hex(random_bytes(4));
 $dbPass = bin2hex(random_bytes(16));
 $portProbe = stream_socket_server('tcp://127.0.0.1:0', $portError, $portMessage);
 if (!is_resource($portProbe)) {
-    fwrite(STDERR, "OH-AUTO1-079 BLOCKED/FAILED: disposable port allocation failed\n");
+    fwrite(STDERR, "OH-AUTO1-080 BLOCKED/FAILED: disposable port allocation failed\n");
     exit(2);
 }
 $portName = stream_socket_get_name($portProbe, false);
 fclose($portProbe);
 $dbPort = (int)substr(strrchr((string)$portName, ':'), 1);
 if ($dbPort < 1) {
-    fwrite(STDERR, "OH-AUTO1-079 BLOCKED/FAILED: disposable port allocation returned no port\n");
+    fwrite(STDERR, "OH-AUTO1-080 BLOCKED/FAILED: disposable port allocation returned no port\n");
     exit(2);
 }
 $socket = $root . '/mysql.sock';
@@ -126,9 +139,11 @@ $dbLog = $root . '/mysql.log';
 $environment = 'disposable-release-rehearsal-v1';
 
 $executeMysql = null;
-    $signingSecret = null;
+$signingSecret = null;
 $signingPublic = null;
 $trustFingerprint = null;
+$exitCode = 0;
+$successPayload = null;
 
 try {
     if (realpath($repository) === false || str_starts_with(realpath($repository) ?: '', realpath(sys_get_temp_dir()) . DIRECTORY_SEPARATOR)) {
@@ -206,6 +221,13 @@ try {
     fclose($pipes[0]); fclose($pipes[1]); fclose($pipes[2]);
     for ($i = 0; $i < 30 && !is_file($socket); $i++) usleep(100000);
     if (!file_exists($socket)) throw new RuntimeException('disposable MySQL socket did not appear: ' . (is_file($dbLog) ? (string)file_get_contents($dbLog) : 'no MySQL log'));
+    $authorizerRefusal = DisposableDbExecutionAuthorizer::authorize((int)trim((string)file_get_contents($pidFile)), $socket . '.refused', $datadir, $root, $dbPort);
+    $assert($authorizerRefusal['authorized'] === false, 'attestation refusal blocks SQL authorization');
+    if ($authorizerRefusal['authorized'] === true) throw new RuntimeException('negative attestation unexpectedly authorized SQL');
+    $authorizer = DisposableDbExecutionAuthorizer::authorize((int)trim((string)file_get_contents($pidFile)), $socket, $datadir, $root, $dbPort);
+    $assert($authorizer['authorized'] === true, 'independent MySQL process/socket/datadir attestation passes before SQL');
+    if ($authorizer['authorized'] !== true) throw new RuntimeException('disposable database attestation failed before mutation: ' . json_encode($authorizer));
+
     $executeMysql = static function (string $sql, ?string $db = null) use ($run, $socket, $dbUser, $dbPass): void {
         $command = ['/opt/homebrew/bin/mysql', '--no-defaults', '--protocol=SOCKET', '--socket=' . $socket, '--user=' . $dbUser, '--password=' . $dbPass];
         if ($db !== null) $command[] = $db;
@@ -213,10 +235,6 @@ try {
         $run($command);
     };
     $run(['/opt/homebrew/bin/mysql', '--no-defaults', '--protocol=SOCKET', '--socket=' . $socket, '-uroot', '--execute=CREATE DATABASE `' . $database . '`; CREATE USER \'' . $dbUser . '\'@\'localhost\' IDENTIFIED BY \'' . $dbPass . '\'; GRANT ALL ON `' . $database . '`.* TO \'' . $dbUser . '\'@\'localhost\'; GRANT RELOAD, FLUSH_TABLES ON *.* TO \'' . $dbUser . '\'@\'localhost\'; FLUSH PRIVILEGES;']);
-    $authorizer = DisposableDbExecutionAuthorizer::authorize((int)trim((string)file_get_contents($pidFile)), $socket, $datadir, $root, $dbPort);
-    $assert($authorizer['authorized'] === true, 'independent MySQL process/socket/datadir attestation passes');
-    if ($authorizer['authorized'] !== true) throw new RuntimeException('disposable database attestation failed before mutation: ' . json_encode($authorizer));
-
     define('APP_ROOT', $install);
     // The coordinator is already loaded from the repository test harness. Do
     // not load the package's Composer bootstrap into this PHP process: both
@@ -238,9 +256,11 @@ try {
         'tables' => $baselineTables,
         'product_id' => 'susankhya-os',
         'app_version' => '1.0.0',
+        'app_build_id' => 'fixture:oh078-initial',
         'migration_name' => 'baseline.sql',
         'migration_checksum' => hash('sha256', $baselineSql),
         'schema_identity' => 'schema:1.0.0',
+        'schema_checksum' => hash('sha256', $snapshot),
     ];
 
     $initialStatementFields = ['product_id' => 'susankhya-os', 'release_version' => '1.0.0', 'build_id' => 'fixture:oh078-initial', 'lane' => 'app', 'package_sha256' => $initialBuild['package_sha256'], 'package_bytes' => (string)$initialBuild['package_size_bytes'], 'metadata_sha256' => hash_file('sha256', $initialBuild['metadata_path']), 'minimum_supported_schema' => '1.0.0', 'created_at' => gmdate('Y-m-d\TH:i:s\Z')];
@@ -294,12 +314,21 @@ try {
         $expectedTables = $baselineDatabaseExpectation['tables'];
         sort($expectedTables);
         $productId = trim($query("SELECT setting_value FROM core_settings WHERE setting_key='product_id';"));
-        $appVersion = trim($query("SELECT version FROM core_apps WHERE app_key='Platform';"));
-        $migration = trim($query("SELECT migration_name, checksum FROM core_app_migrations WHERE app_key='Platform' AND status='applied' ORDER BY id ASC;"));
-        $schemaIdentity = trim($query("SELECT JSON_UNQUOTE(JSON_EXTRACT(snapshot_json, '$.identity')) FROM core_schema_snapshots WHERE app_key='Platform' ORDER BY id DESC LIMIT 1;"));
-        $expectedMigration = $baselineDatabaseExpectation['migration_name'] . "\t" . $baselineDatabaseExpectation['migration_checksum'];
-        $verified = $tables === $expectedTables && $productId === $baselineDatabaseExpectation['product_id'] && $appVersion === $baselineDatabaseExpectation['app_version'] && $migration === $expectedMigration && $schemaIdentity === $baselineDatabaseExpectation['schema_identity'];
-        return ['ok' => $verified, 'verified' => $verified, 'database' => $restoreDbName, 'identity' => $identity, 'observations' => compact('tables', 'productId', 'appVersion', 'migration', 'schemaIdentity'), 'reset_exit' => $reset['stdout'], 'import_exit' => $import['exit_code'], 'errors' => $verified ? [] : ['restored database observations differ from baseline']];
+        $app = trim($query("SELECT version, manifest_json FROM core_apps WHERE app_key='Platform';"));
+        $migration = trim($query("SELECT app_key, migration_name, status, checksum FROM core_app_migrations ORDER BY id ASC;"));
+        $schema = trim($query("SELECT app_key, app_version, snapshot_json, checksum FROM core_schema_snapshots ORDER BY id ASC;"));
+        $expectedMigration = "Platform\t" . $baselineDatabaseExpectation['migration_name'] . "\tapplied\t" . $baselineDatabaseExpectation['migration_checksum'];
+        $expectedSchema = "Platform\t" . $baselineDatabaseExpectation['app_version'] . "\t" . json_encode(['schema_version' => '1.0.0', 'identity' => $baselineDatabaseExpectation['schema_identity']], JSON_UNESCAPED_SLASHES) . "\t" . $baselineDatabaseExpectation['schema_checksum'];
+        $appParts = explode("\t", $app, 2);
+        $appManifest = json_decode((string)($appParts[1] ?? ''), true);
+        $verified = $tables === $expectedTables
+            && $productId === $baselineDatabaseExpectation['product_id']
+            && (string)($appParts[0] ?? '') === $baselineDatabaseExpectation['app_version']
+            && is_array($appManifest)
+            && (string)($appManifest['build_id'] ?? '') === $baselineDatabaseExpectation['app_build_id']
+            && $migration === $expectedMigration
+            && $schema === $expectedSchema;
+        return ['ok' => $verified, 'verified' => $verified, 'database' => $restoreDbName, 'identity' => $identity, 'observations' => compact('tables', 'productId', 'app', 'migration', 'schema'), 'reset_exit' => $reset['stdout'], 'import_exit' => $import['exit_code'], 'errors' => $verified ? [] : ['restored database baseline records differ']];
     });
     $rehearsal = $restore->rehearse($recoveryResult['metadata'], $recoveryDir, $restoreFiles);
     if (($rehearsal['ok'] ?? false) !== true || ($rehearsal['database']['verified'] ?? false) !== true) throw new RuntimeException('pre-update restore rehearsal did not verify the restored database: ' . json_encode($rehearsal));
@@ -357,6 +386,9 @@ try {
     }
     $candidateZip->close();
     DB::query('UPDATE core_apps SET version=?, install_path=? WHERE app_key=?', ['2.0.0', $install . '/apps/Platform', 'Platform']); $snapshot2 = json_encode(['schema_version' => '2.0.0', 'identity' => 'schema:2.0.0'], JSON_UNESCAPED_SLASHES); DB::query('INSERT INTO core_schema_snapshots (app_key, app_version, snapshot_json, checksum) VALUES (?, ?, ?, ?)', ['Platform', '2.0.0', $snapshot2, hash('sha256', $snapshot2)]); file_put_contents($install . '/storage/runtime-release.json', json_encode(['release_version' => '2.0.0', 'build_id' => 'fixture:oh078-candidate']));
+    if (getenv('OH_AUTO1_080_INJECT_AFTER_SQL') === '1') {
+        throw new RuntimeException('injected exception after SQL mutation and before recovery');
+    }
     $healthRoot = $root . '/health'; mkdir($healthRoot, 0700, true);
     $sources = [
         'release_identity' => static fn(): array => json_decode((string)file_get_contents(APP_ROOT . '/storage/runtime-release.json'), true, 512, JSON_THROW_ON_ERROR),
@@ -418,7 +450,9 @@ try {
     $identityFailureCaught = false;
     try {
         $failureTransactions->complete($failedId, $failedHealth, $environment, static function () use ($failingIdentityStore, $candidateIdentity, $candidateObservation, $identityStore): array {
-            return $failingIdentityStore->replace($candidateIdentity, $candidateObservation, (string)($identityStore->read()['fingerprint'] ?? ''));
+            $result = $failingIdentityStore->replace($candidateIdentity, $candidateObservation, (string)($identityStore->read()['fingerprint'] ?? ''));
+            $readBack = $failingIdentityStore->read();
+            return ['verified' => ($result['ok'] ?? false) === true, 'identity' => $readBack['identity'] ?? [], 'read_back' => $readBack['identity'] ?? [], 'identity_fingerprint' => (string)($readBack['fingerprint'] ?? ''), 'read_back_fingerprint' => (string)($readBack['fingerprint'] ?? '')];
         });
     } catch (Throwable) {
         $identityFailureCaught = true;
@@ -443,8 +477,22 @@ try {
         sort($tables);
         $expectedTables = $baselineDatabaseExpectation['tables'];
         sort($expectedTables);
-        $verified = $tables === $expectedTables;
-        return ['ok' => $verified, 'verified' => $verified, 'database' => $database, 'identity' => $identity, 'observations' => ['tables' => $tables], 'command_exit' => $import['exit_code'], 'stderr' => $import['stderr'], 'errors' => $verified ? [] : ['restored main database tables differ from baseline']];
+        $productId = trim($query("SELECT setting_value FROM core_settings WHERE setting_key='product_id';"));
+        $app = trim($query("SELECT version, manifest_json FROM core_apps WHERE app_key='Platform';"));
+        $migration = trim($query("SELECT app_key, migration_name, status, checksum FROM core_app_migrations ORDER BY id ASC;"));
+        $schema = trim($query("SELECT app_key, app_version, snapshot_json, checksum FROM core_schema_snapshots ORDER BY id ASC;"));
+        $expectedMigration = "Platform\t" . $baselineDatabaseExpectation['migration_name'] . "\tapplied\t" . $baselineDatabaseExpectation['migration_checksum'];
+        $expectedSchema = "Platform\t" . $baselineDatabaseExpectation['app_version'] . "\t" . json_encode(['schema_version' => '1.0.0', 'identity' => $baselineDatabaseExpectation['schema_identity']], JSON_UNESCAPED_SLASHES) . "\t" . $baselineDatabaseExpectation['schema_checksum'];
+        $appParts = explode("\t", $app, 2);
+        $appManifest = json_decode((string)($appParts[1] ?? ''), true);
+        $verified = $tables === $expectedTables
+            && $productId === $baselineDatabaseExpectation['product_id']
+            && (string)($appParts[0] ?? '') === $baselineDatabaseExpectation['app_version']
+            && is_array($appManifest)
+            && (string)($appManifest['build_id'] ?? '') === $baselineDatabaseExpectation['app_build_id']
+            && $migration === $expectedMigration
+            && $schema === $expectedSchema;
+        return ['ok' => $verified, 'verified' => $verified, 'database' => $database, 'identity' => $identity, 'observations' => compact('tables', 'productId', 'app', 'migration', 'schema'), 'command_exit' => $import['exit_code'], 'stderr' => $import['stderr'], 'errors' => $verified ? [] : ['restored main database baseline records differ']];
     });
     $failureRecoveryFiles = $root . '/failure-recovery-files'; mkdir($failureRecoveryFiles, 0700, true);
     $recovered = $restoreMain->rehearse($recoveryResult['metadata'], $recoveryDir, $failureRecoveryFiles);
@@ -454,6 +502,18 @@ try {
         $source = $failureRecoveryFiles . '/' . $replaceablePath;
         if (is_dir($target) || is_file($target)) $rm($target);
         if (is_dir($source) || is_file($source)) $copyTree($source, $target);
+    }
+    foreach (['app', 'apps', 'platform', 'plugins', 'public', 'resources', 'vendor', 'bin'] as $replaceableRoot) {
+        $sourceInventory = $treeInventory($failureRecoveryFiles . '/' . $replaceableRoot);
+        $targetInventory = $treeInventory($install . '/' . $replaceableRoot);
+        $assert($sourceInventory === $targetInventory, 'complete filesystem inventory restored: ' . $replaceableRoot);
+        if ($sourceInventory !== $targetInventory) throw new RuntimeException('filesystem inventory mismatch after restore: ' . $replaceableRoot);
+    }
+    foreach (['composer.json', 'composer.lock'] as $replaceableFile) {
+        $sourceHash = is_file($failureRecoveryFiles . '/' . $replaceableFile) ? hash_file('sha256', $failureRecoveryFiles . '/' . $replaceableFile) : null;
+        $targetHash = is_file($install . '/' . $replaceableFile) ? hash_file('sha256', $install . '/' . $replaceableFile) : null;
+        $assert($sourceHash === $targetHash, 'complete filesystem file restored: ' . $replaceableFile);
+        if ($sourceHash !== $targetHash) throw new RuntimeException('filesystem file mismatch after restore: ' . $replaceableFile);
     }
     $restoredMarker = $install . '/apps/Platform/Resources/oh078-release-marker.txt';
     if (!is_file($restoredMarker)) throw new RuntimeException('complete filesystem recovery marker is missing');
@@ -465,6 +525,16 @@ try {
     $identityRestore = $identityStore->replace($initialIdentity, $identityObservation, $currentIdentityFingerprint);
     $restoredDb = $run(['/opt/homebrew/bin/mysql', '--no-defaults', '--protocol=SOCKET', '--socket=' . $socket, '--user=' . $dbUser, '--password=' . $dbPass, $database, '--batch', '--skip-column-names', '--execute=SHOW TABLES LIKE \'oh078_release_marker\';']);
     $assert(trim($restoredDb['stdout']) === '', 'recovery restores database before injected mutation');
+    $restoredProduct = $run(['/opt/homebrew/bin/mysql', '--no-defaults', '--protocol=SOCKET', '--socket=' . $socket, '--user=' . $dbUser, '--password=' . $dbPass, $database, '--batch', '--skip-column-names', '--execute=SELECT setting_value FROM core_settings WHERE setting_key=\'product_id\';']);
+    $restoredApp = $run(['/opt/homebrew/bin/mysql', '--no-defaults', '--protocol=SOCKET', '--socket=' . $socket, '--user=' . $dbUser, '--password=' . $dbPass, $database, '--batch', '--skip-column-names', '--execute=SELECT version, manifest_json FROM core_apps WHERE app_key=\'Platform\';']);
+    $restoredMigrations = $run(['/opt/homebrew/bin/mysql', '--no-defaults', '--protocol=SOCKET', '--socket=' . $socket, '--user=' . $dbUser, '--password=' . $dbPass, $database, '--batch', '--skip-column-names', '--execute=SELECT app_key, migration_name, status, checksum FROM core_app_migrations ORDER BY id ASC;']);
+    $restoredSchema = $run(['/opt/homebrew/bin/mysql', '--no-defaults', '--protocol=SOCKET', '--socket=' . $socket, '--user=' . $dbUser, '--password=' . $dbPass, $database, '--batch', '--skip-column-names', '--execute=SELECT app_key, app_version, snapshot_json, checksum FROM core_schema_snapshots ORDER BY id ASC;']);
+    $restoredAppParts = explode("\t", trim($restoredApp['stdout']), 2);
+    $restoredAppManifest = json_decode((string)($restoredAppParts[1] ?? ''), true);
+    $assert(trim($restoredProduct['stdout']) === 'susankhya-os', 'recovery restores baseline product setting');
+    $assert((string)($restoredAppParts[0] ?? '') === '1.0.0' && is_array($restoredAppManifest) && ($restoredAppManifest['build_id'] ?? '') === 'fixture:oh078-initial', 'recovery restores baseline application version/build');
+    $assert(trim($restoredMigrations['stdout']) === "Platform\tbaseline.sql\tapplied\t" . hash('sha256', $baselineSql), 'recovery restores migration name/status/checksum');
+    $assert(trim($restoredSchema['stdout']) === "Platform\t1.0.0\t" . $snapshot . "\t" . hash('sha256', $snapshot), 'recovery restores schema identity/checksum');
     $assert(trim((string)file_get_contents($install . '/apps/Platform/Resources/oh078-release-marker.txt')) === 'release-v1', 'recovery restores filesystem before injected mutation');
     $assert(!is_file($install . '/apps/Platform/migrations/oh078_001_release.sql'), 'recovery removes candidate-only filesystem content');
     $assert(is_file($install . '/storage/db_config.php') && $trustStore->read()['fingerprint'] === $trustStorageFingerprint, 'recovery preserves protected configuration and trust');
@@ -494,15 +564,16 @@ try {
         $before = $identityStore->read();
         $result = $candidateIdentityStore->replace($candidateIdentity, $candidateObservation, (string)($before['fingerprint'] ?? ''));
         $after = $candidateIdentityStore->read();
-        return ['verified' => ($result['ok'] ?? false) === true && ($after['identity']['build_id'] ?? null) === 'fixture:oh078-candidate', 'identity' => $after];
+        return ['verified' => ($result['ok'] ?? false) === true && ($after['identity']['build_id'] ?? null) === 'fixture:oh078-candidate', 'identity' => $after['identity'] ?? [], 'read_back' => $after['identity'] ?? [], 'identity_fingerprint' => (string)($after['fingerprint'] ?? ''), 'read_back_fingerprint' => (string)($after['fingerprint'] ?? '')];
     });
     $assert(($identityStore->read()['identity']['build_id'] ?? '') === 'fixture:oh078-candidate', 'installation identity commits only after verified health');
     $assert(is_file($install . '/apps/Platform/Resources/oh078-release-marker.txt') && trim((string)file_get_contents($install . '/apps/Platform/Resources/oh078-release-marker.txt')) === 'release-v2', 'candidate activation contents are present');
     $assert($trustStore->read()['fingerprint'] === $trustStorageFingerprint, 'installation-owned trust remains unchanged');
-    echo json_encode(['transaction_id' => $transactionId, 'initial_package_sha256' => $initialBuild['package_sha256'], 'candidate_package_sha256' => $candidateMetadata['package']['sha256'], 'candidate_signature_verified' => true, 'migration_state' => $migrationResult['state'], 'health_status' => $health->status(), 'identity_build_id' => $identityStore->read()['identity']['build_id'], 'trust_fingerprint' => $trustFingerprint, 'isolated_root' => $root], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n";
+    $successPayload = ['transaction_id' => $transactionId, 'initial_package_sha256' => $initialBuild['package_sha256'], 'candidate_package_sha256' => $candidateMetadata['package']['sha256'], 'candidate_signature_verified' => true, 'migration_state' => $migrationResult['state'], 'health_status' => $health->status(), 'identity_build_id' => $identityStore->read()['identity']['build_id'], 'trust_fingerprint' => $trustFingerprint, 'isolated_root' => $root];
 } catch (Throwable $exception) {
-    fwrite(STDERR, "OH-AUTO1-078 BLOCKED/FAILED: {$exception->getMessage()}\n");
-    exit(2);
+    fwrite(STDERR, "OH-AUTO1-080 BLOCKED/FAILED: {$exception->getMessage()}\n");
+    fwrite(STDERR, "CLEANUP_WORKSPACE={$workspace}\nCLEANUP_SOURCE_WORKSPACE=" . (string)$sourceWorkspace . "\nCLEANUP_MYSQL_PID=" . (string)($pidFile !== '' && is_file($pidFile) ? trim((string)file_get_contents($pidFile)) : '') . "\n");
+    $exitCode = 2;
 } finally {
     if (is_resource($mysqld)) {
         $processStatus = proc_get_status($mysqld);
@@ -521,5 +592,6 @@ try {
     if (is_dir($workspace)) $rm($workspace);
 }
 
+if ($successPayload !== null) echo json_encode($successPayload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n";
 echo "RESULT: {$passed}/" . ($passed + $failed) . " assertions passed\n";
-exit($failed === 0 ? 0 : 1);
+exit($exitCode !== 0 ? $exitCode : ($failed === 0 ? 0 : 1));

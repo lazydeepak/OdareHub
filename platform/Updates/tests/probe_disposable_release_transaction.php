@@ -97,10 +97,12 @@ try {
     $verifier = new PostUpdateHealthVerifier($sources);
     $health = $verifier->verify($transactionId, $preflight->fingerprint(), $expected);
     $check($health->status() === 'verified' && count($health->checks()) === 9, 'health verifier executes all fixed read-only checks');
-    $completed = $transactions->complete($transactionId, $health, $environment, static fn(): array => ['verified' => true, 'read_back' => true]);
+    $finalIdentity = ['installation_id' => 'fixture-installation', 'release_version' => '2.0.0', 'build_id' => 'fixture:release:002', 'package_sha256' => str_repeat('b', 64), 'release_statement_fingerprint' => str_repeat('c', 64), 'schema_state_identity' => 'schema:2.0.0'];
+    $finalizer = static fn(): array => ['verified' => true, 'identity' => $finalIdentity, 'read_back' => $finalIdentity, 'identity_fingerprint' => str_repeat('f', 64), 'read_back_fingerprint' => str_repeat('f', 64)];
+    $completed = $transactions->complete($transactionId, $health, $environment, $finalizer);
     $check(($completed['state'] ?? null) === 'completed', 'verified health completes transaction control state');
-    $check($throws(static fn() => $transactions->complete($transactionId, $health, $environment)), 'completed transaction cannot be replayed');
-    $check($throws(static fn() => $transactions->complete($transactionId, ['status' => 'verified'], $environment)), 'caller-supplied health array cannot authorize completion');
+    $check($throws(static fn() => $transactions->complete($transactionId, $health, $environment, $finalizer)), 'completed transaction cannot be replayed');
+    $check($throws(static fn() => $transactions->complete($transactionId, ['status' => 'verified'], $environment, $finalizer)), 'caller-supplied health array cannot authorize completion');
 
     $write('bootstrap', ['healthy' => true]);
     $failedHealth = $verifier->verify($transactionId, $preflight->fingerprint(), $expected);
@@ -129,6 +131,7 @@ try {
     $transactions->markExecuting($orderingId, $preflight, $environment);
     $transactions->markVerifying($orderingId, $preflight, $environment);
     $orderingHealth = $verifier->verify($orderingId, $preflight->fingerprint(), $orderingExpected);
+    $check($orderingHealth->status() === 'verified' && $throws(static fn() => $transactions->complete($orderingId, $orderingHealth, $environment)), 'completion cannot bypass mandatory identity finalization');
     $check($orderingHealth->status() === 'verified' && $throws(static fn() => $transactions->complete($orderingId, $orderingHealth, $environment, static function (): array { throw new RuntimeException('injected identity finalization failure'); })), 'identity finalization failure blocks completion');
     $check(($transactions->read($orderingId)['state'] ?? null) === 'recovery_required', 'identity finalization failure journals recovery-required before completion');
 

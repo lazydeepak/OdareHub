@@ -6698,3 +6698,18 @@ preserved.
   post-restore health before candidate reapplication.
 - [x] Complete rehearsal: 34/34; transaction probe: 23/23; restore probe:
   10/10; architecture 49/49; deletion 28/28; deployment readiness PASS.
+
+# OH-AUTO1-080 — Final Disposable Release-Cycle Safety Closure
+
+- [x] Moved process/socket/datadir/network/configuration attestation before
+  every SQL command and added executed refusal-before-`CREATE DATABASE` proof.
+- [x] Made identity finalization mandatory for completion and validated
+  candidate build/package/release/schema/installation/read-back evidence.
+- [x] Expanded recovery database checks to baseline records/checksums and
+  compared complete backed-up filesystem inventories after copying.
+- [x] Replaced catch-path `exit(2)` with controlled status plus unconditional
+  cleanup; injected post-SQL exception cleanup passed with all owned resources
+  absent.
+- [x] Complete rehearsal: 49/49; transaction probe: 24/24; restore probe:
+  10/10; exact-step governed suite: 4/4; architecture 49/49; deletion 28/28;
+  deployment readiness PASS.

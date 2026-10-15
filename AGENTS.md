@@ -6496,3 +6496,20 @@ probe 10/10; architecture 49/49; deletion 28/28; deployment readiness PASS;
 Core lock, PHP lint, and diff hygiene PASS. No installed database, production
 SQL, deployment, production signing, or Core change. See
 `docs/architecture/oh-auto1-079-disposable-release-cycle-proof-2026-10-15.md`.
+
+## Session Summary (2026-10-15) — OH-AUTO1-080 Final Disposable Release-Cycle Safety Closure
+
+Closed the four OH-AUTO1-079 acceptance gaps: attestation now precedes every
+SQL command and refusal-before-`CREATE DATABASE` is exercised; transaction
+completion requires candidate-bound identity finalization and verified read-back;
+failure recovery verifies baseline database records/checksums and complete
+replaceable filesystem inventories; and exception handling always performs
+owned-resource cleanup before exit.
+
+Validation: complete disposable cycle 49/49; transaction control 24/24;
+restore 10/10; governed exact-step suite 4/4 with 13/13 assertions;
+architecture 49/49; deletion 28/28; deployment readiness PASS; Core lock,
+PHP lint, and diff hygiene PASS. Fault-injected post-SQL cleanup verified
+workspace/source/MySQL disposal. No installed database, production SQL,
+deployment, production signing, or Core change. See
+`docs/architecture/oh-auto1-080-disposable-release-cycle-safety-closure-2026-10-15.md`.

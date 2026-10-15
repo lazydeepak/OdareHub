@@ -24,8 +24,8 @@ recovery cycle before broader business-feature expansion resumes.
 Primary milestone:
 
 - Release/update foundation — isolated installation, signed update,
-  post-update verification, and recovery proof. OH-AUTO1-079 corrected
-  verification is complete; production apply remains blocked.
+  post-update verification, and recovery proof. OH-AUTO1-080 final disposable
+  safety closure is complete; production apply remains blocked.
 
 Approved execution sequence:
 

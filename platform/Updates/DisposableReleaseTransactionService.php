@@ -114,7 +114,10 @@ final class DisposableReleaseTransactionService
         ]);
     }
 
-    public function complete(string $transactionId, PostUpdateHealthVerificationResult $health, string $environmentToken, ?callable $finalizeIdentity = null): array
+    /**
+     * @param callable():array{verified:bool,identity:array<string,mixed>,read_back:array<string,mixed>,identity_fingerprint:string,read_back_fingerprint:string} $finalizeIdentity
+     */
+    public function complete(string $transactionId, PostUpdateHealthVerificationResult $health, string $environmentToken, callable $finalizeIdentity): array
     {
         $this->assertEnvironment($environmentToken);
         $current = $this->read($transactionId);
@@ -134,26 +137,36 @@ final class DisposableReleaseTransactionService
             || $health->expectationsDigest() !== $expectationsDigest) {
             throw new RuntimeException('health evidence is not bound to this transaction');
         }
-        if ($finalizeIdentity !== null) {
-            try {
-                $identityResult = $finalizeIdentity();
-                if (!is_array($identityResult) || ($identityResult['verified'] ?? false) !== true) {
-                    $this->journal->append($transactionId, 'recovery_required', [
-                        'event' => 'identity_finalization_failed',
-                        'reason' => 'identity finalization did not return verified read-back evidence',
-                    ]);
-                    throw new RuntimeException('identity finalization did not return verified read-back evidence');
-                }
-            } catch (\Throwable $exception) {
-                $currentAfterFailure = $this->read($transactionId);
-                if (($currentAfterFailure['state'] ?? null) !== 'recovery_required') {
-                    $this->journal->append($transactionId, 'recovery_required', [
-                        'event' => 'identity_finalization_failed',
-                        'reason' => $exception->getMessage(),
-                    ]);
-                }
-                throw $exception;
+        try {
+            $identityResult = $finalizeIdentity();
+            $identity = is_array($identityResult['identity'] ?? null) ? $identityResult['identity'] : null;
+            $readBack = is_array($identityResult['read_back'] ?? null) ? $identityResult['read_back'] : null;
+            $identityFingerprint = is_string($identityResult['identity_fingerprint'] ?? null) ? $identityResult['identity_fingerprint'] : '';
+            $readBackFingerprint = is_string($identityResult['read_back_fingerprint'] ?? null) ? $identityResult['read_back_fingerprint'] : '';
+            $identityValid = ($identityResult['verified'] ?? false) === true
+                && $identity !== null
+                && $readBack !== null
+                && $identity === $readBack
+                && $identityFingerprint !== ''
+                && $identityFingerprint === $readBackFingerprint
+                && (string)($identity['installation_id'] ?? '') !== ''
+                && (string)($identity['build_id'] ?? '') === (string)($record['candidate_build_id'] ?? '')
+                && (string)($identity['release_version'] ?? '') === (string)($record['candidate_release_version'] ?? '')
+                && (string)($identity['package_sha256'] ?? '') === (string)($record['candidate_package_sha256'] ?? '')
+                && (string)($identity['release_statement_fingerprint'] ?? '') === (string)($record['release_statement_fingerprint'] ?? '')
+                && (string)($identity['schema_state_identity'] ?? '') === (string)($record['target_schema_identity'] ?? '');
+            if (!$identityValid) {
+                throw new RuntimeException('identity finalization did not return candidate-bound verified read-back evidence');
             }
+        } catch (\Throwable $exception) {
+            $currentAfterFailure = $this->read($transactionId);
+            if (($currentAfterFailure['state'] ?? null) !== 'recovery_required') {
+                $this->journal->append($transactionId, 'recovery_required', [
+                    'event' => 'identity_finalization_failed',
+                    'reason' => $exception->getMessage(),
+                ]);
+            }
+            throw $exception;
         }
         return $this->journal->append($transactionId, 'completed', ['event' => 'health_verified', 'health' => $health->toArray()]);
     }

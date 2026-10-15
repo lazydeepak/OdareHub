@@ -81,6 +81,25 @@ candidate reapplication, and final health-bound identity commit pass **34/34**.
 Transaction controls pass **23/23** and restore rehearsal passes **10/10**.
 Evidence: `docs/architecture/oh-auto1-079-disposable-release-cycle-proof-2026-10-15.md`.
 
+## OH-AUTO1-080 — Completed
+
+Closed the four remaining disposable-cycle safety gaps. MySQL process, socket,
+datadir, network, and configuration attestation now precede every SQL command,
+with an executed refusal-before-`CREATE DATABASE` negative. Transaction
+completion requires a structured candidate-bound identity finalizer and
+verified read-back; missing or failed finalization cannot produce `completed`.
+Failure recovery verifies baseline settings, application build, migration
+status/checksum, schema identity/checksum, complete replaceable filesystem
+inventories, and candidate-only absence. The catch path now records status and
+always reaches cleanup.
+
+Validation: complete disposable cycle **49/49**; transaction controls
+**24/24**; restore **10/10**; exact-step governed suite **4/4** with **13/13**
+assertions; architecture **49/49**; deletion **28/28**; deployment readiness
+PASS. Fault-injected post-SQL cleanup produced exit 2 with workspace, source
+workspace, and MySQL process absent. Evidence:
+`docs/architecture/oh-auto1-080-disposable-release-cycle-safety-closure-2026-10-15.md`.
+
 Current reconciliation: OH-AUTO1-055 corrected the previously open Core ACL
 deny-precedence and plugin route-rollback defects. OH-AUTO1-068 has now
 requalified bounded disposable database testing; installed-database access,
