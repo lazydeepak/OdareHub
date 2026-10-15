@@ -109,6 +109,29 @@ indeterminate. Rollback failure is never success.
 `platform/Updates/tests/probe_installation_identity_store.php`, and
 `docs/architecture/oh-auto1-072-identity-persistence-invariant-hardening-2026-10-15.md`.
 
+### 2026-10-15 — OH-AUTO1-073 installation-owned release trust boundary
+**Status:** Implemented and verified for disposable fixtures; production trust and release authority remain gated
+
+**Decision**
+
+Release public keys are accepted for authenticity verification only from an
+installation-owned, versioned trust envelope. The reader strictly validates
+Ed25519 encoding, fingerprints, lifecycle intervals, duplicates, and source
+identity, and returns the existing verifier-compatible in-memory records. The
+only implemented enrollment seam is temporary-root-only, explicit,
+independent-fingerprint, simulated-approval provisioning.
+
+Package, sidecar, channel, and candidate key material cannot replace the
+installation-owned trust anchor. Signature and exact-artifact verification do
+not grant release, readiness, update, or apply authority.
+
+**Evidence**
+
+`platform/Updates/InstallationOwnedTrustStore.php`,
+`platform/Updates/DisposableTrustProvisioner.php`,
+`platform/Updates/tests/probe_installation_owned_release_trust.php`, and
+`docs/architecture/oh-auto1-073-installation-owned-release-trust-2026-10-15.md`.
+
 ### 2026-10-15 — OH-AUTO1-060 migration execution feasibility reconciliation
 **Status:** Proposed; approval required
 

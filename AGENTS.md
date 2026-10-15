@@ -1,5 +1,14 @@
 # AGENTS.md
 
+## Session Summary (2026-10-15) — OH-AUTO1-073 Installation-Owned Release Trust
+
+Implemented a versioned installation-owned Ed25519 trust reader and
+temporary-root-only provisioning seam requiring independent fingerprint input
+and explicit simulated approval. Existing canonical signature and exact ZIP/
+sidecar verifiers are reused; trust probe: 28/28. No package/channel trust
+fallback, production key custody, release authority, readiness/apply change,
+database, deployment, or Core operation was performed.
+
 ## Session Summary (2026-10-15) — OH-AUTO1-072 Identity Persistence Invariant Hardening
 
 Hardened `InstallationIdentityStore`: replacement now preserves the

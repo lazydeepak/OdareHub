@@ -1,5 +1,22 @@
 # AGENT-COMPLIANCE-CHECKLIST
 
+## Session Summary (2026-10-15) — OH-AUTO1-073 Installation-Owned Release Trust
+
+Added `InstallationOwnedTrustStore`, `DisposableTrustProvisioner`, and a
+disposable signed-artifact integration probe. The reader enforces versioned
+installation-owned source, strict Ed25519/base64/fingerprint/lifecycle rules,
+duplicate rejection, path confinement, and mutation detection. Enrollment is
+temporary-root-only and requires independent fingerprint input plus simulated
+operator approval. No production trust or release authority was added.
+
+Validation: ✅ trust/artifact probe 28/28; signature 24/24; artifact 18/18;
+preview 44/44; apply preparation 7/7; readiness evidence 10/10; identity
+20/20; installed build identity 13/13; PHP lint; architecture gates 49/49;
+deletion family gates 28/28; deployment readiness PASS in read-only verify
+mode; Core lock; and diff hygiene. No real installation trust write,
+database, SQL, migration, readiness, apply, signing, deployment, or Core
+operation.
+
 ## Session Summary (2026-10-15) — OH-AUTO1-072 Identity Persistence Invariant Hardening
 
 Corrected installation-ID mutability, malformed-existing-record overwrite, and
