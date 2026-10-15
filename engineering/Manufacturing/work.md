@@ -20,6 +20,15 @@ areas only as separately bounded milestones.
   containment remains **15/15**. No Core, schema, database, browser,
   activation, deployment, or route operation.
 
+### OH-AUTO2-105R incident correction
+
+The “No Core, schema, database...” sentence above is retained as the original
+OH-AUTO2-105 implementation record. It is not a complete incident statement:
+an existing DB-backed SBAIO probe was accidentally run during the milestone
+against the repository's configured local development target. See
+`AGENT-COMPLIANCE-CHECKLIST.md` and `engineering/SBAIO/work.md`. No cleanup or
+further database operation is authorized; impact remains undetermined.
+
 ## 2026-10-16 — OH-AUTO2-104 Material Management read-only summary boundary
 
 - [x] Added `MaterialManagementService::summaryReadOnly()` for host-surface

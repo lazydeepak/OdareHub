@@ -1,5 +1,42 @@
 # AGENT-COMPLIANCE-CHECKLIST
 
+## Incident Reconciliation (2026-10-16) — OH-AUTO2-105R
+
+The earlier OH-AUTO2-105 entry below incorrectly stated that no database
+operation occurred. That historical claim is preserved unchanged. Read-only
+reconstruction found that `apps/SBAIO/Tests/probe_behavioral_sales_status.php`
+was accidentally executed through its direct bootstrap against the repository
+configuration: local host `127.0.0.1`, database `os.susankhya.com`, user `root`.
+This is a local development target, not an attested disposable database.
+
+The probe source contains `CREATE TABLE IF NOT EXISTS sbaio_sales`, deletion of
+`VALID-%` rows, inserts for `VALID-OPEN-A` and `VALID-OMITTED-B`, and validation
+queries. The exact shell command, invocation timestamp, per-statement outcome,
+prior table contents, and transaction/rollback state were not recoverable from
+available repository evidence. Therefore persistent impact is **undetermined**.
+
+No cleanup, SQL, migration, repair, restart, or DB-backed rerun was performed
+during the reconciliation. Modified lifecycle logs and the untracked PHPUnit
+cache remain preserved. No remediation is claimed. A separately authorized
+database assessment/restoration decision is required before OH-AUTO2-105 can
+be closed or OH-AUTO2-106 can begin.
+
+## Session Summary (2026-10-16) — OH-AUTO2-105S DB-backed probe execution safeguard
+
+Added the existing `DisposableDbTestEntryPointGuard` before application
+autoload/bootstrap in `apps/SBAIO/Tests/probe_behavioral_sales_status.php`.
+The guard requires explicit disposable source-root, configuration, and live
+process/socket/datadir attestation and fails closed for missing, repository,
+installed-like, ambiguous, or contradictory evidence. SBAIO was added to the
+27-entry isolated source-root inventory, the static guard probe, and the
+existing disposable regression runner through an explicit `OH_SBAIO` branch.
+
+Validation: configuration/static guard **65/65**; isolated source-root probe
+**17/17**; PHP lint; shell syntax; architecture gates **PASS**; deletion
+family **28/28**; deployment readiness **PASS**; diff hygiene **PASS**.
+No installed database was accessed, no DB-backed probe was executed, and the
+OH-AUTO2-105 incident remains open with impact undetermined.
+
 ## Session Summary (2026-10-16) — OH-AUTO2-105 Host-provider scope authorization
 
 Manufacturing `/me` summaries and module widget providers now fail closed

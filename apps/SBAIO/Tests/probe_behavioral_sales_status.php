@@ -4,7 +4,9 @@ declare(strict_types=1);
 /**
  * SBAIO Sales — sale_status vocabulary enforcement (DB-backed behavioral).
  */
-define('APP_ROOT', dirname(__DIR__, 3));
+require_once dirname(__DIR__, 3) . '/scripts/testing/DisposableDbTestEntryPointGuard.php';
+$ohTestContext = DisposableDbTestEntryPointGuard::authorize('OH_SBAIO', dirname(__DIR__, 3));
+define('APP_ROOT', $ohTestContext['app_root']);
 require_once APP_ROOT . '/vendor/autoload.php';
 require_once APP_ROOT . '/plugins/Base/bootstrap.php';
 require_once APP_ROOT . '/app/Core/DB.php';

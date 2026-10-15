@@ -22,6 +22,7 @@ final class IsolatedSourceRootTestRunner
             'apps/Procurement/Tests/probe_behavioral_cancellation.php',
             'apps/Procurement/Tests/probe_behavioral_request_cancel.php',
             'apps/Procurement/Tests/probe_behavioral_supplier_update.php',
+            'apps/SBAIO/Tests/probe_behavioral_sales_status.php',
             'apps/Manufacturing/Tests/probe_upstream_supply_transaction.php',
             'apps/Manufacturing/Tests/probe_upstream_supply_concurrency.php',
             'apps/Hospitality/Tests/probe_reservation_create_concurrency.php',

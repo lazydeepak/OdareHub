@@ -97,6 +97,7 @@ try {
         dirname(__DIR__, 2) . '/apps/Procurement/Tests/probe_behavioral_cancellation.php',
         dirname(__DIR__, 2) . '/apps/Procurement/Tests/probe_behavioral_request_cancel.php',
         dirname(__DIR__, 2) . '/apps/Procurement/Tests/probe_behavioral_supplier_update.php',
+        dirname(__DIR__, 2) . '/apps/SBAIO/Tests/probe_behavioral_sales_status.php',
         dirname(__DIR__, 2) . '/apps/Manufacturing/Tests/probe_upstream_supply_transaction.php',
         dirname(__DIR__, 2) . '/apps/Manufacturing/Tests/probe_upstream_supply_concurrency.php',
         dirname(__DIR__, 2) . '/apps/Hospitality/Tests/probe_reservation_create_concurrency.php',
