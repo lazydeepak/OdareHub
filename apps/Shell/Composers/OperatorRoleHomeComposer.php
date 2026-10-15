@@ -76,6 +76,8 @@ final class OperatorRoleHomeComposer
         );
 
         return self::resolveInteractionProfile([
+            'dashboard_type' => (string)($assignmentContext['dashboard_type'] ?? ''), // resolved context authority evidence
+            'interaction_profile' => (string)($assignmentContext['interaction_profile'] ?? ''),
             'access_profiles' => $accessProfiles,
             'duty_codes' => (string)($assignmentContext['duty_codes'] ?? ''),
             'app_roles' => (array)($assignmentContext['app_roles'] ?? []),
@@ -108,7 +110,8 @@ final class OperatorRoleHomeComposer
         // regions. Header actions remain on their existing specialized paths.
         $allowedRegions = ['summary_cards', 'quick_links', 'monitoring_sections'];
         $routeResolver = $context['operator_route_access_resolver'] ?? null;
-        if (!is_callable($routeResolver)) {
+        $contributionAccessResolver = $context['operator_contribution_access_resolver'] ?? null;
+        if (!is_callable($routeResolver) || !is_callable($contributionAccessResolver)) {
             return [];
         }
         $filteredRegions = [];
@@ -134,6 +137,13 @@ final class OperatorRoleHomeComposer
                     continue;
                 }
                 if ($profile === 'read_only' && $viewKind === 'form') {
+                    continue;
+                }
+                try {
+                    if ($contributionAccessResolver($item) !== true) {
+                        continue;
+                    }
+                } catch (\Throwable) {
                     continue;
                 }
 
@@ -162,18 +172,13 @@ final class OperatorRoleHomeComposer
             if (class_exists(\Apps\Shell\Services\OperatorLayerWidgetService::class)) {
                 $url = \Apps\Shell\Services\OperatorLayerWidgetService::normalizeOperatorWidgetUrl($url, $context);
             }
-            $parts = parse_url($url);
-            if (!is_array($parts)
-                || isset($parts['scheme'], $parts['host'], $parts['user'], $parts['pass'], $parts['fragment'])
+            $username = trim((string)($context['operator_username'] ?? ''));
+            if (!class_exists(\Apps\Shell\Services\OperatorLayerWidgetService::class)
+                || !\Apps\Shell\Services\OperatorLayerWidgetService::isSafeOperatorUrl($url, $username)
             ) {
                 return '';
             }
-            $path = trim((string)($parts['path'] ?? ''));
-            $username = trim((string)($context['operator_username'] ?? ''));
-            $expectedPrefix = $username !== '' ? '/u/' . rawurlencode($username) : '';
-            if ($path === '' || $expectedPrefix === '' || ($path !== $expectedPrefix && !str_starts_with($path, $expectedPrefix . '/'))) {
-                return '';
-            }
+            $path = (string)parse_url($url, PHP_URL_PATH);
             if (is_callable($routeResolver) && !$routeResolver($path)) {
                 return '';
             }

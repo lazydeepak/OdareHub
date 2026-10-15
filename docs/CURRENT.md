@@ -16,8 +16,8 @@ The active product direction is:
 
 The disposable release/update foundation is complete through OH-AUTO1-080.
 Production installation, update, and apply remain unauthorized. Product
-development has resumed on the Shell worker surface; OH-AUTO1-085 is the
-current role-shaped operator-home milestone.
+development has resumed on the Shell worker surface; OH-AUTO1-086 is the
+current role-home access-boundary closure milestone.
 
 ## Active Focus
 
@@ -29,9 +29,9 @@ Completed execution milestone:
 
 Current product milestone:
 
-- OH-AUTO1-085 — role-shaped worker, leader, and read-only operator home
-  composition on the existing `/u/{username}/dashboard` surface. OH-AUTO1-084
-  exact task selection and actionable focus is complete.
+- OH-AUTO1-086 — close the role-home URL, profile-resolution, and contribution
+  authority boundary over the existing OH-AUTO1-085 composition. OH-AUTO1-085
+  role-shaped worker/leader/read-only home composition is complete.
 
 Approved execution sequence:
 

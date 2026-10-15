@@ -197,6 +197,62 @@ final class OperatorLayerService
                     return false;
                 }
             },
+            'operator_contribution_access_resolver' => static function (array $item) use ($authenticatedUser, $ctx, $activeAssignedApps, $resolvedInteractionProfile): bool {
+                if ((int)($authenticatedUser['id'] ?? 0) <= 0) {
+                    return false;
+                }
+                $appKey = strtolower(trim((string)($item['app_key'] ?? '')));
+                $assignedApps = array_values(array_filter(array_map(
+                    static fn($value): string => strtolower(trim((string)$value)),
+                    $activeAssignedApps
+                ), static fn(string $value): bool => $value !== ''));
+                if ($appKey === '' || !in_array($appKey, $assignedApps, true)) {
+                    return false;
+                }
+
+                try {
+                    $policy = UserAssignmentContext::accessPolicy();
+                    if (!is_object($policy)) {
+                        return false;
+                    }
+                    $moduleKey = strtolower(trim((string)($item['module_key'] ?? $item['module'] ?? '')));
+                    $visibleModules = array_values(array_filter(array_map(
+                        static fn($value): string => strtolower(trim((string)$value)),
+                        (array)($ctx['module_visibility'] ?? []) // resolved access evidence
+                    ), static fn(string $value): bool => $value !== ''));
+                    if ($moduleKey !== '' && $visibleModules !== [] && !in_array($moduleKey, $visibleModules, true)) {
+                        return false;
+                    }
+                    if ($moduleKey !== '' && !$policy->canAccessModule($authenticatedUser, $moduleKey)) {
+                        return false;
+                    }
+
+                    $evidence = array_merge(
+                        [$resolvedInteractionProfile, (string)($ctx['authority_role'] ?? ''), (string)($ctx['dashboard_type'] ?? '')],
+                        array_values((array)($ctx['access_profiles'] ?? [])),
+                        array_values((array)($ctx['permissions'] ?? [])),
+                        array_values((array)($ctx['app_roles'] ?? []))
+                    );
+                    $evidence = array_values(array_filter(array_map(
+                        static fn($value): string => strtolower(trim((string)$value)),
+                        $evidence
+                    ), static fn(string $value): bool => $value !== ''));
+                    $authorities = array_values(array_filter(array_map(
+                        static fn($value): string => strtolower(trim((string)$value)),
+                        (array)($item['access_authorities'] ?? [])
+                    ), static fn(string $value): bool => $value !== ''));
+                    if ($authorities !== [] && array_intersect($authorities, $evidence) === []) {
+                        return false;
+                    }
+                    $permissionProfile = strtolower(trim((string)($item['permission_profile'] ?? '')));
+                    if ($permissionProfile !== '' && !in_array($permissionProfile, $evidence, true)) {
+                        return false;
+                    }
+                    return true;
+                } catch (\Throwable) {
+                    return false;
+                }
+            },
             'dashboard_type' => (string)($ctx['dashboard_type'] ?? 'operator'),          // step 2
             'assigned_apps' => $assignedApps,                                             // step 3
             'active_assigned_apps' => $activeAssignedApps,

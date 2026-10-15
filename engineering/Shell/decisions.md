@@ -2,6 +2,34 @@
 
 ## Decision Log
 
+### 2026-10-15 — OH-AUTO1-086 role-home effective-access boundary
+
+**Status:** Accepted
+
+**Decision**
+
+Role-home owner contributions are renderable only when the existing Platform
+access-policy contract confirms the authenticated identity, active assigned app,
+optional effective module visibility, module access, and any declared authority
+or permission-profile evidence. The compatibility host registry remains a
+provider/discovery boundary; its output is not treated as authorization when
+policy or evidence is unavailable.
+
+All operator widget and role-home links use one strict relative same-user URL
+shape validator and then the existing GET route-access authority. Assignment
+profile resolution preserves authoritative `dashboard_type` and explicit
+profile fields before applying conservative read-only precedence.
+
+**Consequences**
+
+- External, scheme-relative, cross-user, traversal, malformed, and unsafe-query
+  destinations cannot survive operator rendering.
+- Unassigned, disabled, module-invisible, unauthorized, or unverifiable owner
+  contributions are omitted, including non-clickable widgets.
+- Shell consumes Platform decisions and does not implement business ACL rules.
+- The existing worker, leader, read-only, task, `/me`, admin, and display paths
+  remain unchanged outside this focused boundary closure.
+
 ### 2026-10-15 — OH-AUTO1-085 role-shaped operator home boundary
 
 **Status:** Accepted

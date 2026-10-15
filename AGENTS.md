@@ -1,5 +1,16 @@
 # AGENTS.md
 
+## Session Summary (2026-10-15) — OH-AUTO1-086 Role-home access boundary closure
+
+Closed the OH-AUTO1-085 review gaps without redesigning the dashboard: strict
+same-user operator URL validation now covers widgets and rows; assignment
+profile resolution preserves authoritative `dashboard_type`; and owner
+contributions require fail-closed Platform-backed app/module/authority evidence
+before rendering. Worker, leader, read-only, task mutation, `/me`, admin, and
+display boundaries remain preserved. Isolated role/access coverage is **26/26**;
+worker/task **41/41** and responsive navigation **51/51** pass. No database,
+live browser, production operation, or Core change.
+
 ## Session Summary (2026-10-15) — OH-AUTO1-085 Role-shaped operator home
 
 Completed the Shell role-shaped `/u/{username}/dashboard` slice. Workers retain

@@ -2,9 +2,27 @@
 
 ## Current Focus
 
-OH-AUTO1-085 role-shaped operator home composition is complete. Continue
-decomposing `OperatorSurfaceComposer.php` only within the existing resolved-
-experience and owner-contribution boundaries.
+OH-AUTO1-086 role-home access-boundary closure is complete. Resume broader
+operator capabilities, especially computed-scope-aware machine, part,
+work-area, and process-area presentation; do not expand the dashboard
+foundation without a new bounded objective.
+
+## 2026-10-15 — OH-AUTO1-086 role-home access boundary closure
+
+- [x] Reused one strict Shell URL-shape authority for widget and role-home
+  links: relative same-user `/u/{username}/*` only, no scheme/host/userinfo/
+  port/fragment, traversal, malformed encoding, unsafe query, or control data.
+- [x] Preserved `dashboard_type` and explicit profile evidence through the
+  assignment handoff; display/admin and conflicting evidence remain
+  conservative and cannot grant mutation access.
+- [x] Added a fail-closed owner-contribution eligibility callback using the
+  existing Platform access policy, active assigned apps, effective module
+  visibility, authorities, and permission-profile evidence. Missing policy or
+  evidence suppresses content before rendering.
+- [x] Extended isolated role-home coverage to **26/26**, including negative
+  URL, contribution-authority, dashboard-type, and worker/read-only cases.
+  No database, installed-database, live browser, production operation, or Core
+  change.
 
 ## 2026-10-15 — OH-AUTO1-085 role-shaped operator home
 

@@ -219,6 +219,12 @@ final class OperatorLayerWidgetService
             if (array_key_exists('url', $widget)) {
                 $widget['url'] = self::normalizeOperatorWidgetUrl((string)($widget['url'] ?? ''), $context);
             }
+            foreach ((array)($widget['rows'] ?? []) as $index => $row) {
+                if (is_array($row) && array_key_exists('url', $row)) {
+                    $row['url'] = self::normalizeOperatorWidgetUrl((string)($row['url'] ?? ''), $context);
+                    $widget['rows'][$index] = $row;
+                }
+            }
 
             return $widget;
         }, $widgets));
@@ -232,17 +238,22 @@ final class OperatorLayerWidgetService
     public static function normalizeOperatorWidgetUrl(string $url, array $context = []): string
     {
         $clean = trim($url);
-        if ($clean === '' || !str_starts_with($clean, '/')) {
-            return $clean;
+        if ($clean === '' || !self::isSafeUrlShape($clean)) {
+            return '';
         }
 
         $path = trim((string)parse_url($clean, PHP_URL_PATH));
         if ($path === '') {
-            return $clean;
+            return '';
         }
 
-        if (str_starts_with($path, '/u/') || str_starts_with($path, '/displays/')) {
-            return $clean;
+        if (str_starts_with($path, '/u/')) {
+            $username = trim((string)($context['operator_username'] ?? $context['username'] ?? $context['user_name'] ?? ''));
+            return self::isSafeOperatorUrl($clean, $username) ? $clean : '';
+        }
+
+        if (str_starts_with($path, '/displays/')) {
+            return '';
         }
 
         if (str_starts_with($path, '/apps/sbaio')) {
@@ -258,6 +269,64 @@ final class OperatorLayerWidgetService
         }
 
         return $clean;
+    }
+
+    /** Accept only a same-user relative operator URL and safe query keys. */
+    public static function isSafeOperatorUrl(string $url, string $username): bool
+    {
+        if ($username === '' || !self::isSafeUrlShape($url)) {
+            return false;
+        }
+        $parts = parse_url($url);
+        if (!is_array($parts)) {
+            return false;
+        }
+        $path = trim((string)($parts['path'] ?? ''));
+        $expectedPrefix = '/u/' . rawurlencode($username) . '/';
+        if ($path === '' || !str_starts_with($path, $expectedPrefix) || str_contains($path, '//')) {
+            return false;
+        }
+        if (preg_match('/%(?:2e|2f|5c)/i', $path)) {
+            return false;
+        }
+        foreach (explode('/', trim($path, '/')) as $segment) {
+            if ($segment === '.' || $segment === '..') {
+                return false;
+            }
+        }
+        $query = (string)($parts['query'] ?? '');
+        if ($query === '') {
+            return true;
+        }
+        parse_str($query, $queryValues);
+        foreach ($queryValues as $key => $value) {
+            if (!in_array((string)$key, ['focus', 'tab', 'task_id', 'id'], true)
+                || !is_string($value)
+                || str_starts_with($value, '//')
+                || str_contains($value, '://')
+                || preg_match('/[\x00-\x20]/', $value)
+            ) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static function isSafeUrlShape(string $url): bool
+    {
+        if ($url === '' || !str_starts_with($url, '/') || str_starts_with($url, '//')
+            || str_contains($url, '\\')
+            || preg_match('/[\x00-\x20]/', $url)
+            || preg_match('/%(?![0-9a-fA-F]{2})/', $url)) {
+            return false;
+        }
+        $parts = parse_url($url);
+        foreach (['scheme', 'host', 'user', 'pass', 'port', 'fragment'] as $forbiddenPart) {
+            if (is_array($parts) && array_key_exists($forbiddenPart, $parts)) {
+                return false;
+            }
+        }
+        return is_array($parts);
     }
 
     /**
@@ -344,7 +413,7 @@ final class OperatorLayerWidgetService
     private static function operatorUsername(array $context): string
     {
         $identity = [
-            'username' => (string)($context['username'] ?? $context['user_name'] ?? ''),
+            'username' => (string)($context['operator_username'] ?? $context['username'] ?? $context['user_name'] ?? ''),
             'email' => (string)($context['user_email'] ?? $context['email'] ?? ''),
         ];
         $username = WorkspaceWrapperRegistry::handleFromIdentity($identity);

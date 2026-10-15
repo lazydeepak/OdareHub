@@ -1,5 +1,25 @@
 # AGENT-COMPLIANCE-CHECKLIST
 
+## Session Summary (2026-10-15) — OH-AUTO1-086 role-home access boundary closure
+
+Closed the three OH-AUTO1-085 source-review gaps. Operator widget and role-home
+URLs now require strict relative same-user `/u/{username}/*` shape, reject
+external/scheme-relative/cross-user/traversal/malformed/unsafe-query values,
+and still pass the existing GET route authority. Widget row links use the same
+normalizer.
+
+Assignment profile resolution now preserves `dashboard_type` and explicit
+profile evidence. Role-home contributions require a fail-closed Shell callback
+backed by the existing Platform access-policy contract, active assigned apps,
+effective module visibility, module access, and declared authority/profile
+evidence. Missing policy/evidence, unassigned or disabled apps, and denied
+modules suppress the entire contribution before rendering.
+
+Validation: role-home/access probe **26/26**; worker/task regression **41/41**;
+responsive navigation **51/51**; PHP lint and diff hygiene passed. No database,
+installed-database, live-browser, production release/update, or Core operation.
+Existing lifecycle logs and PHPUnit cache remain untouched.
+
 ## Session Summary (2026-10-15) — OH-AUTO1-085 role-shaped operator home
 
 Added role-shaped `/u/{username}/dashboard` experiences for leader and
