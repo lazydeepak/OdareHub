@@ -255,7 +255,16 @@ final class OfflineReleaseArtifactVerifier
     /** @param array<string,mixed> $package @param array<string,mixed> $metadata @return array<string,mixed> */
     private function artifactEvidence(array $package, array $metadata, array $metadataObject): array
     {
-        return ['package_sha256' => $package['sha256'], 'package_bytes' => (string)$package['size'], 'metadata_sha256' => $metadata['sha256'], 'release_version' => $metadataObject['release_version'], 'build_id' => $metadataObject['build_id'], 'product_id' => $metadataObject['product_id'], 'lane' => $metadataObject['lane']];
+        return [
+            'package_sha256' => $package['sha256'],
+            'package_bytes' => (string)$package['size'],
+            'metadata_sha256' => $metadata['sha256'],
+            'release_version' => $metadataObject['release_version'],
+            'build_id' => $metadataObject['build_id'],
+            'product_id' => $metadataObject['product_id'],
+            'lane' => $metadataObject['lane'],
+            'metadata' => $metadataObject,
+        ];
     }
 
     /** @param array<string,mixed> $details @return array<string,mixed> */

@@ -1,5 +1,20 @@
 # Platform — Decisions
 
+### 2026-10-15 — OH-AUTO1-075 coordinator evidence is diagnostic only
+**Status:** Accepted for non-executing disposable verification
+
+The trusted coordinator must re-read installation-owned trust and identity,
+consume only exact artifact-verifier output, independently validate and bind
+the migration plan, and use the existing compatibility and recovery
+authorities. `ReleaseMigrationPlanEvidence` is structural-only rather than an
+authority token because its public factory remains compatible with the exact
+step executor; the coordinator therefore never accepts the object as proof and
+revalidates the raw plan.
+
+Technical preflight success does not grant release authority. Administrator
+approval, post-install health, and execution authority remain separate missing
+gates, and every eligibility/mutation flag remains false.
+
 ## Decision Log
 
 ### 2026-10-15 — OH-AUTO1-074 exact-step migration evidence boundary

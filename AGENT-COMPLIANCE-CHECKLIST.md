@@ -6605,3 +6605,27 @@ incomplete-record, and inspection-failure attempts. Existing Composer
 portability, REL-004, builder, preview, apply-preparation, readiness, and
 architecture/deployment checks remain passing. No database, SQL, migration,
 installation, publication, deployment, Core, log, or cache changes occurred.
+
+## Session Summary (2026-10-15) — OH-AUTO1-075 Trusted Release Coordinator Preflight
+
+Added `Platform\Updates\TrustedReleaseCoordinatorPreflightService`, a
+non-executing coordinator that independently binds installation-owned trust,
+exact signed ZIP/sidecar evidence, installation identity, compatibility and
+downgrade checks, validated migration plans, recovery/restore evidence, and
+optional readiness-shape evidence. Technical preflight evidence remains
+diagnostic: release authority, update/apply eligibility, execution authority,
+and live mutation are always false.
+
+Clarified `ReleaseMigrationPlanEvidence` as structural-only. The coordinator
+does not accept its public factory as authority; it re-runs the validator and
+binds the raw plan to authenticated release metadata, package hash, statement
+fingerprint, and target schema. The artifact verifier now exposes its already
+bound sidecar metadata to the coordinator.
+
+Coordinator disposable probe: ✅ 20/20. It covers valid non-executing proof,
+missing/revoked trust, invalid signature, identity contradiction, forged plan,
+failed migration history, missing recovery, ZIP/sidecar tampering, unknown
+schema, downgrade, and forged approval/health claims. No installed database,
+SQL, release apply, production trust/identity write, activation, deployment,
+or Core modification occurred. Existing lifecycle logs and PHPUnit cache were
+preserved.
