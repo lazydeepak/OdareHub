@@ -1,5 +1,22 @@
 # AGENT-COMPLIANCE-CHECKLIST
 
+## Session Summary (2026-10-15) — OH-AUTO1-076 Release Evidence Authority Hardening
+
+Bound the trusted release coordinator to an authenticated sidecar migration
+inventory, exact ZIP source-entry SHA-256 values, and an independently injected
+installed-state evidence provider. Added strict schema-identity comparison and
+mandatory recovery product/version/build/schema identity binding. Added
+negative coverage for missing authority, recomputed altered plans, altered
+authenticated inventory, and omitted recovery identity. No approval, health,
+execution, installation, database, SQL, trust/identity mutation, deployment,
+or eligibility enablement was performed.
+
+Validation: ✅ coordinator 24/24; installed evidence 22/22; artifact 18/18;
+migration governance 18/18; installed compatibility 16/16; recovery 9/9;
+offline release/recovery integration 23/23; PHP lint; diff hygiene; architecture
+gates continued through the release-boundary suite. The direct exact-step probe
+remains isolated-runner gated; its accepted 13/13 proof is preserved.
+
 ## Session Summary (2026-10-15) — OH-AUTO1-074 Controlled Exact-Step Migrations
 
 Implemented the existing-executor exact-step migration boundary and opaque

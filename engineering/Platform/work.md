@@ -13,6 +13,20 @@ preflight fixture passed 20/20; trust, artifact, identity, compatibility,
 migration, recovery, and readiness regressions remain fail-closed. Approval,
 post-install health, and execution authority remain blocked and unimplemented.
 
+## OH-AUTO1-076 — Completed
+
+Closing the remaining evidence-authority gaps: authenticated sidecar migration
+inventory commitment, installation-owned installed-state provenance, and
+mandatory complete recovery identity binding. Scope remains non-executing and
+disposable-only; no installed database, SQL, real trust/identity mutation,
+release apply, approval bypass, eligibility enablement, or Core change.
+
+Authenticated migration inventory, exact ZIP source-entry hashes,
+installation-owned installed-state comparison, and mandatory recovery identity
+binding are implemented. The coordinator fixture passes 24/24; the remaining
+approval, health, execution, production trust, and isolated signed-cycle gates
+remain blocked.
+
 ## Current Focus
 
 Release/update foundation governance and controlled-cycle readiness.

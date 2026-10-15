@@ -399,7 +399,9 @@ final class InstalledSystemEvidenceProvider
             return ['version' => ''];
         }
         $candidate = '';
+        $candidateIdentity = '';
         $versions = [];
+        $identities = [];
         foreach ($rows as $row) {
             if (!is_array($row)) {
                 $errors[] = 'installed schema ledger contains a malformed row.';
@@ -424,13 +426,21 @@ final class InstalledSystemEvidenceProvider
                 $candidate = $version;
                 $versions[$version] = true;
             }
+            $identity = trim((string)($snapshot['identity'] ?? ''));
+            if ($identity !== '') {
+                $candidateIdentity = $identity;
+                $identities[$identity] = true;
+            }
         }
         if (count($versions) > 1) {
             $errors[] = 'installed schema baseline is contradictory across authoritative snapshots.';
         }
+        if (count($identities) > 1) {
+            $errors[] = 'installed schema identity is contradictory across authoritative snapshots.';
+        }
         if ($candidate === '') {
             $errors[] = 'installed schema version is unavailable from authoritative snapshots.';
         }
-        return ['version' => $candidate];
+        return ['version' => $candidate, 'identity' => $candidateIdentity];
     }
 }

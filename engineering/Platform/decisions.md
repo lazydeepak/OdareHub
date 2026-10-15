@@ -1,5 +1,16 @@
 # Platform — Decisions
 
+### 2026-10-15 — OH-AUTO1-076 evidence authority hardening
+**Status:** Accepted for non-executing disposable verification
+
+The coordinator must compare caller migration evidence against an authenticated
+sidecar inventory and exact ZIP file-entry hashes; an internally recomputed
+fingerprint is not authority. Installed-state observations require an
+independently injected evidence provider and must bind to installation-owned
+identity. Recovery identity fields are mandatory at the coordinator boundary.
+Missing authority remains blocked, and no approval, health, execution, or
+eligibility flag is enabled.
+
 ### 2026-10-15 — OH-AUTO1-075 coordinator evidence is diagnostic only
 **Status:** Accepted for non-executing disposable verification
 

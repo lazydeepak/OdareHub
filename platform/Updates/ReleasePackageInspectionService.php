@@ -58,6 +58,7 @@ final class ReleasePackageInspectionService
         }
 
         $entries = [];
+        $fileHashes = [];
         $normalizedKeys = [];
         $unsafe = null;
         for ($index = 0; $index < $zip->numFiles; $index++) {
@@ -91,6 +92,14 @@ final class ReleasePackageInspectionService
             }
 
             $entries[] = $normalized;
+            if (!$this->isDirectoryEntry($name)) {
+                $contents = $zip->getFromIndex($index);
+                if (!is_string($contents)) {
+                    $zip->close();
+                    return $this->failure('Release package contains an unreadable file entry: ' . $normalized);
+                }
+                $fileHashes[$normalized] = hash('sha256', $contents);
+            }
         }
         $zip->close();
 
@@ -125,6 +134,7 @@ final class ReleasePackageInspectionService
             'entry_count' => count($entries),
             'entries_sha256' => hash('sha256', implode("\n", $entries)),
             'entries' => $entries,
+            'file_sha256' => $fileHashes,
             'sample_entries' => array_slice($entries, 0, 20),
         ];
     }
