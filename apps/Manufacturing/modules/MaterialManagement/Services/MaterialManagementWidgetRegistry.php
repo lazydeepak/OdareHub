@@ -13,6 +13,12 @@ final class MaterialManagementWidgetRegistry
      */
     public static function contribute(string $region, array $context = []): array
     {
+        // Host-surface summaries must never prepare schema or manufacture a
+        // zero state when their source storage is unavailable.
+        if (self::summary() === null) {
+            return [];
+        }
+
         return ModuleSurfaceWidgetFactory::build($region, $context, [
             'key' => 'materials',
             'title' => 'Materials',
@@ -84,7 +90,7 @@ final class MaterialManagementWidgetRegistry
     /**
      * @return array<string,mixed>
      */
-    private static function summary(): array
+    private static function summary(): ?array
     {
         static $summary = null;
         if (is_array($summary)) {
@@ -92,14 +98,13 @@ final class MaterialManagementWidgetRegistry
         }
 
         try {
-            $summary = MaterialManagementService::summary();
+            $resolved = MaterialManagementService::summaryReadOnly();
+            if ($resolved === []) {
+                return null;
+            }
+            $summary = $resolved;
         } catch (\Throwable $e) {
-            $summary = [
-                'shortage_risk_count' => 0,
-                'incoming_delay_count' => 0,
-                'action_now_count' => 0,
-                'storage_overflow_count' => 0,
-            ];
+            return null;
         }
 
         return $summary;

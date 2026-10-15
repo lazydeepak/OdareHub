@@ -1,5 +1,33 @@
 # AGENT-COMPLIANCE-CHECKLIST
 
+## Session Summary (2026-10-16) — OH-AUTO2-104 Material Management Read Safety
+
+Added `MaterialManagementService::summaryReadOnly()` and routed the
+Manufacturing `/me` Material Management contribution/widget through it. The
+read-only path preflights required storage, skips Material schema
+initialization, skips Demand schema initialization and recalculation, and
+returns unavailable for missing or incompatible storage. The widget registry
+suppresses unavailable summaries rather than presenting verified zero activity.
+
+Existing `summary()` and ordinary Material Management consumers retain their
+schema-backed setup behavior. No host authorization redesign, schema change,
+route, notification/escalation, SBAIO, Core, installed database, browser,
+activation, deployment, or production operation was performed.
+
+Files changed:
+- `apps/Manufacturing/modules/MaterialManagement/Services/MaterialManagementService.php`
+- `apps/Manufacturing/modules/MaterialManagement/Services/MaterialManagementWidgetRegistry.php`
+- `apps/Manufacturing/Services/HostSurfaceContributionService.php`
+- `apps/Manufacturing/Tests/probe_material_management_read_safety.php`
+- `engineering/Manufacturing/work.md`
+- `engineering/Manufacturing/decisions.md`
+- `AGENT-COMPLIANCE-CHECKLIST.md`
+
+Validation: material read safety **18/18**; host containment **15/15**;
+preflight **17/17**; restricted containment **21/21**; visibility **14/14**;
+worker/task **41/41**; Processing **35/35**; Parts **14/14**; machine **27/27**;
+work summary **23/23**; PHP lint and `git diff --check` PASS.
+
 ## Session Summary (2026-10-16) — OH-AUTO2-103 Restricted Host-Surface Containment
 
 Added a bounded Shell composition admission seam using the existing read-only

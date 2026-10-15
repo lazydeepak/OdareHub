@@ -2,6 +2,22 @@
 
 ## Decision Log
 
+### 2026-10-16 — OH-AUTO2-104 Material Management host summary boundary
+
+**Status:** Accepted — explicit non-mutating host summary path
+
+The `/me` Material Management summary uses `summaryReadOnly()`, which checks
+required source tables before reading and disables both Material schema
+preparation and Demand schema/recalculation while the summary is assembled.
+Missing or incompatible storage returns an unavailable empty result to the
+host contribution; the widget registry suppresses its contribution instead of
+rendering fabricated zero activity.
+
+The existing `summary()` and ordinary Material Management consumers retain
+their schema-backed behavior. This decision does not authorize broader
+provider scope reconstruction or change host authorization; unrestricted
+provider record-scope risks remain deferred.
+
 ### 2026-10-16 — OH-AUTO1-098 containment visibility and personal signals
 
 **Status:** Accepted — explicit Shell visibility; no signal restoration

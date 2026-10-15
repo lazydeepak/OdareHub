@@ -7,6 +7,20 @@ Continue
 through the same owner-contract pattern for parts, work areas, and process
 areas only as separately bounded milestones.
 
+## 2026-10-16 — OH-AUTO2-104 Material Management read-only summary boundary
+
+- [x] Added `MaterialManagementService::summaryReadOnly()` for host-surface
+  consumers; it preflights required storage and returns unavailable on missing
+  or incompatible source evidence.
+- [x] Read-only summary mode bypasses both Material schema initialization and
+  Demand schema/recalculation paths while preserving existing calculations when
+  storage is valid.
+- [x] Material host widgets no longer fabricate zero summaries when their source
+  is unavailable; ordinary `summary()`/setup consumers retain schema authority.
+- [x] Isolated read-safety proof: **18/18**; host containment **15/15**;
+  preflight **17/17**; restricted containment **21/21**. No Core, schema,
+  installed database, browser, activation, deployment, or production operation.
+
 ## 2026-10-16 — OH-AUTO2-101 notification read-path safety
 
 - [x] My Work uses notification read results that do not call notification

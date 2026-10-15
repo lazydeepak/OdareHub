@@ -258,7 +258,7 @@ final class HostSurfaceContributionService
             return [];
         }
 
-        return (array)\Plugins\MaterialManagement\Services\MaterialManagementService::summary();
+        return (array)\Plugins\MaterialManagement\Services\MaterialManagementService::summaryReadOnly();
     }
 
     private static function countOpenOrders(string $extraWhere): int

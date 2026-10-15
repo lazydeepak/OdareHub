@@ -1,5 +1,17 @@
 # AGENTS.md
 
+## Session Summary (2026-10-16) — OH-AUTO2-104 Material Management read safety
+
+Added an explicit non-mutating Material Management summary path for `/me` host
+contributions. Required storage is checked read-only; missing/incompatible
+source evidence suppresses the widget, while valid storage preserves existing
+summary calculations. Material and Demand schema initialization and demand
+recalculation are skipped only in this host read path; ordinary setup/mutation
+consumers retain their existing authority. Material proof **18/18**; host
+containment **15/15**; architecture/deletion/deployment checks pending final
+delivery. No Core, schema, route, database, browser, activation, or deployment
+operation.
+
 ## Session Summary (2026-10-16) — OH-AUTO2-103 Restricted host-surface containment
 
 Added a fail-closed Shell admission boundary from the existing read-only

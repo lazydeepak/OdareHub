@@ -29,6 +29,13 @@ final class MaterialManagementService
     private static ?array $demandSummaryCache = null;
 
     /**
+     * True only while the host-surface summary is being assembled. This keeps
+     * the existing schema-backed service methods intact for setup and mutation
+     * callers while making the host read path explicitly non-mutating.
+     */
+    private static bool $readOnlySummaryMode = false;
+
+    /**
      * @var array<string,string>
      */
     private const MOVEMENT_ALIASES = [
@@ -159,11 +166,34 @@ final class MaterialManagementService
     }
 
     /**
+     * Build the host-surface summary without schema preparation or demand
+     * recalculation. An empty result means the required source evidence is not
+     * available; callers must not render it as verified zero activity.
+     *
+     * @return array<string,mixed>
+     */
+    public static function summaryReadOnly(): array
+    {
+        if (!self::readOnlySummaryStorageReady()) {
+            return [];
+        }
+
+        self::$readOnlySummaryMode = true;
+        try {
+            return self::summary();
+        } catch (\Throwable $e) {
+            return [];
+        } finally {
+            self::$readOnlySummaryMode = false;
+        }
+    }
+
+    /**
      * @return array<int,array<string,mixed>>
      */
     public static function materials(): array
     {
-        MaterialSchemaService::ensureSchema();
+        self::ensureSchemaForCurrentOperation();
         return DB::fetchAll(
             "SELECT
                 m.*,
@@ -281,7 +311,7 @@ final class MaterialManagementService
             return self::$planningRowsCache;
         }
 
-        MaterialSchemaService::ensureSchema();
+        self::ensureSchemaForCurrentOperation();
 
         $coverageRows = self::materialCoverageModelRows();
         $stockMap = [];
@@ -418,7 +448,7 @@ final class MaterialManagementService
      */
     public static function orderRows(): array
     {
-        MaterialSchemaService::ensureSchema();
+        self::ensureSchemaForCurrentOperation();
 
         $planningByMaterial = [];
         $delayedInboundOrderIds = [];
@@ -1288,7 +1318,7 @@ final class MaterialManagementService
      */
     private static function baseStockRows(): array
     {
-        MaterialSchemaService::ensureSchema();
+        self::ensureSchemaForCurrentOperation();
 
         return DB::fetchAll(
             "SELECT
@@ -1356,7 +1386,7 @@ final class MaterialManagementService
      */
     private static function capacitySummaryRawRows(): array
     {
-        MaterialSchemaService::ensureSchema();
+        self::ensureSchemaForCurrentOperation();
 
         return DB::fetchAll(
             "SELECT
@@ -1411,7 +1441,7 @@ final class MaterialManagementService
             return self::$coverageModelCache;
         }
 
-        MaterialSchemaService::ensureSchema();
+        self::ensureSchemaForCurrentOperation();
 
         $materials = self::materials();
         $stockMap = [];
@@ -1625,7 +1655,9 @@ final class MaterialManagementService
 
         $today = date('Y-m-d');
         $windowEnd = date('Y-m-d', strtotime('+' . self::DEMAND_HORIZON_DAYS . ' days'));
-        DemandEngineService::ensureSchema();
+        if (!self::$readOnlySummaryMode) {
+            DemandEngineService::ensureSchema();
+        }
 
         if (self::tableExists('mfg_part_demands')) {
             $existingCount = (int)(DB::fetchOne(
@@ -1637,7 +1669,7 @@ final class MaterialManagementService
                 [$today, $windowEnd]
             )['c'] ?? 0);
 
-            if ($existingCount === 0) {
+            if ($existingCount === 0 && !self::$readOnlySummaryMode) {
                 DemandEngineService::recalculateDemands([], $today, $windowEnd);
             }
         }
@@ -2614,6 +2646,35 @@ final class MaterialManagementService
         } catch (\Throwable $e) {
             return false;
         }
+    }
+
+    private static function ensureSchemaForCurrentOperation(): void
+    {
+        if (self::$readOnlySummaryMode) {
+            return;
+        }
+
+        MaterialSchemaService::ensureSchema();
+    }
+
+    private static function readOnlySummaryStorageReady(): bool
+    {
+        foreach ([
+            'materials',
+            'material_ledger',
+            'material_reservations',
+            'material_orders',
+            'material_capacity',
+            'part_material_map',
+            'products',
+            'mfg_part_demands',
+        ] as $table) {
+            if (!self::tableExists($table)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
