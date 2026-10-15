@@ -2,6 +2,34 @@
 
 ## Decision Log
 
+### 2026-10-15 — OH-AUTO1-085 role-shaped operator home boundary
+
+**Status:** Accepted
+
+**Decision**
+
+The existing operator dashboard keeps its worker-first OH-AUTO1-081–084 path.
+Leader and read-only home experiences are shaped by a Shell-owned removable
+composer over the already-resolved assignment context and the existing
+`HostSurfaceRegistryService::build('me', ...)` owner-contribution boundary.
+Shell may filter interaction profiles, order regions, render neutral widgets,
+and enforce same-user `/u/{username}` plus route-authority checks; it must not
+resolve business permissions, query business data, or inherit another user's
+worker assignments.
+
+Read-only evidence is conservative: action and form contributions are omitted
+and the existing `/u/tasks/advance` POST contract rejects read-only mutation.
+Missing or ineligible profile evidence does not activate the role-shaped home.
+
+**Consequences**
+
+- Owner apps/modules retain contribution semantics and data ownership.
+- Workers retain dashboard parity and task-specific action behavior.
+- Leaders receive only authorized owner-provided review/monitoring content.
+- Read-only and display/admin identities cannot gain operator mutation controls.
+- The temporary Base host-surface registry remains an explicit compatibility
+  bridge until the resolved-experience runtime contract replaces it.
+
 ### 2026-10-15 — OH-AUTO1-081 worker dashboard read authority
 
 **Status:** Accepted

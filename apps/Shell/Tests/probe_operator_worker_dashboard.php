@@ -121,7 +121,7 @@ final class OperatorTaskViewProbeRenderer
     }
 
     /** @param array<int,array<string,mixed>> $tasks */
-    public function render(array $tasks, string $query): string
+    public function render(array $tasks, string $query, bool $readOnly = false): string
     {
         $_GET = [];
         parse_str($query, $_GET);
@@ -129,6 +129,7 @@ final class OperatorTaskViewProbeRenderer
         $data = [
             'username' => 'worker',
             'tasks_focus' => ['tasks' => $tasks, 'open_count' => 2, 'error' => ''],
+            'operator_read_only' => $readOnly,
         ];
         ob_start();
         include APP_ROOT . '/apps/Shell/Views/operator/tasks.php';
@@ -162,6 +163,9 @@ $assert(str_contains($doneFocus, 'Completed assigned task') && !str_contains($do
 $invalidHtml = $viewProbe->render($renderTasks, 'task_id=15abc');
 $invalidFocus = $focusFragment($invalidHtml);
 $assert(str_contains($invalidFocus, 'The selected task link is invalid.') && !str_contains($invalidFocus, 'operator-task-15'), 'malformed selector is rejected without selecting another task');
+$readOnlyHtml = $viewProbe->render($renderTasks, 'task_id=15', true);
+$readOnlyFocus = $focusFragment($readOnlyHtml);
+$assert(str_contains($readOnlyFocus, 'Open assigned task') && !str_contains($readOnlyFocus, 'action="/u/worker/tasks/advance"'), 'read-only selected task has no mutation form');
 $duplicateHtml = $viewProbe->render($renderTasks, 'task_id=15&task_id=16');
 $duplicateFocus = $focusFragment($duplicateHtml);
 $assert(str_contains($duplicateFocus, 'The selected task link is invalid.') && !str_contains($duplicateFocus, 'operator-task-16'), 'duplicate selector is rejected');

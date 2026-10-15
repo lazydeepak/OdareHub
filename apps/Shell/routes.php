@@ -10,6 +10,7 @@ use Apps\Platform\Services\UserAssignmentContext;
 use Apps\Shell\Services\AdminLayerService;
 use Apps\Shell\Services\DisplayLayerService;
 use Apps\Shell\Services\OperatorLayerService;
+use Apps\Shell\Composers\OperatorRoleHomeComposer;
 use Apps\Shell\Services\WorkspaceWrapperRegistry;
 use Plugins\Base\Services\NotificationService;
 use Plugins\Base\Services\ResolvedExperienceConsumerService;
@@ -19,6 +20,7 @@ require_once __DIR__ . '/Services/BrandIdentityService.php';
 require_once __DIR__ . '/Services/AdminLayerService.php';
 require_once __DIR__ . '/Services/DisplayLayerService.php';
 require_once __DIR__ . '/Services/OperatorLayerService.php';
+require_once __DIR__ . '/Composers/OperatorRoleHomeComposer.php';
 require_once __DIR__ . '/Services/OperatorLayerSidebarService.php';
 require_once __DIR__ . '/Services/LandingPageService.php';
 require_once __DIR__ . '/Services/WorkspaceWrapperRegistry.php';
@@ -1355,6 +1357,21 @@ $router->post('/u/tasks/advance', function () use ($resolveOperatorPostRoute, $n
     \App\Core\Auth::requireCsrf((string)($_POST['csrf'] ?? ''), $redirectTo);
 
     $userId = (int)(\App\Core\Auth::user()['id'] ?? 0);
+    $operatorProfile = 'read_only';
+    try {
+        $operatorContext = UserAssignmentContext::context()->resolveUserContext((array)\App\Core\Auth::user());
+        $operatorAuthority = strtolower(trim((string)($operatorContext['authority_role'] ?? '')));
+        $operatorHomeEligible = !in_array($operatorAuthority, ['tv_display', 'platform_admin', 'app_admin'], true);
+        if ($operatorHomeEligible) {
+            $operatorProfile = OperatorRoleHomeComposer::fromAssignmentContext($operatorContext);
+        }
+    } catch (\Throwable) {
+        // Missing effective-access evidence must never authorize a mutation.
+    }
+    if ($operatorProfile === 'read_only') {
+        header('Location: ' . $redirectTo . '?error=' . rawurlencode('operator.tasks.error.read_only'), true, 302);
+        exit;
+    }
     $rawTaskId = $_POST['task_id'] ?? null;
     $maxTaskId = (string)PHP_INT_MAX;
     if (!is_string($rawTaskId)

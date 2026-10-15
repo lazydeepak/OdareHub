@@ -1,5 +1,28 @@
 # AGENT-COMPLIANCE-CHECKLIST
 
+## Session Summary (2026-10-15) — OH-AUTO1-085 role-shaped operator home
+
+Added role-shaped `/u/{username}/dashboard` experiences for leader and
+read-only profiles while preserving the existing OH-AUTO1-081–084 worker path.
+Shell consumes the resolved assignment context and existing owner contributions
+through `HostSurfaceRegistryService::build('me', ...)`; it only filters by
+interaction profile, orders neutral regions, renders contributions, and binds
+links to the current same-user `/u/*` route authority.
+
+Leader/read-only homes do not inherit worker assignments. Read-only profiles
+drop action/form contributions, hide task mutation controls, and are rejected
+by the existing `/u/tasks/advance` POST route. Missing, conflicting, display,
+or admin evidence fails closed to the conservative operator path.
+
+Validation: isolated role-shaped probe **17/17**; worker/task regression
+probe **41/41**; responsive navigation probe **51/51**; PHP lint; diff hygiene;
+focused Shell architecture gates PASS; architecture gates **49/49 PASS**;
+deletion-family gates **28/28 PASS**. Portable readiness checks passed except
+generated-asset cleanliness while the intended published Shell CSS remained an
+uncommitted diff. No database, schema, installed database, live browser,
+production release/update, or Core change. Existing lifecycle logs and PHPUnit
+cache remain untouched.
+
 ## Session Summary (2026-10-15) — OH-AUTO1-083 Task-to-action navigation
 
 Added task-specific worker navigation without creating a new task system or

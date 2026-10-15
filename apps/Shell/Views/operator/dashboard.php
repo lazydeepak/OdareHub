@@ -4,7 +4,55 @@
 ?>
                     <section class="dashboard-top" aria-label="<?php echo htmlspecialchars((string)($data['dashboard_title'] ?? 'Dashboard')); ?>">
                         <h2 class="dashboard-top-title"><?php echo htmlspecialchars((string)($data['dashboard_title'] ?? 'Dashboard')); ?></h2>
+                        <?php
+                        $roleHomeEnabled = !empty($data['operator_role_home_enabled']);
+                        $roleHomeMode = strtolower(trim((string)($data['operator_role_home_mode'] ?? '')));
+                        $roleHomeTitle = trim((string)($data['operator_role_home_title'] ?? ''));
+                        $roleRegions = is_array($data['operator_role_regions'] ?? null) ? $data['operator_role_regions'] : [];
+                        $homeRegionLabels = [
+                            'monitoring_sections' => ['operator.home.monitoring', 'Monitoring'],
+                            'summary_cards' => ['operator.home.summary', 'Summary'],
+                            'quick_links' => ['operator.home.supporting', 'Supporting information'],
+                            'header_actions' => ['operator.home.supporting', 'Supporting information'],
+                        ];
+                        ?>
+                        <?php if ($roleHomeEnabled && $roleRegions !== []): ?>
+                            <section class="operator-role-home operator-role-home--<?php echo htmlspecialchars($roleHomeMode); ?>" aria-labelledby="operator-role-home-title">
+                                <h3 id="operator-role-home-title"><?php echo htmlspecialchars($roleHomeTitle); ?></h3>
+                                <?php foreach ($roleRegions as $region => $items): ?>
+                                    <?php $regionLabel = $homeRegionLabels[$region] ?? ['operator.home.supporting', 'Supporting information']; ?>
+                                    <section class="operator-role-region operator-role-region--<?php echo htmlspecialchars((string)$region); ?>" aria-label="<?php echo htmlspecialchars($this->tr($regionLabel[0], $regionLabel[1])); ?>">
+                                        <h4><?php echo htmlspecialchars($this->tr($regionLabel[0], $regionLabel[1])); ?></h4>
+                                        <div class="operator-role-widgets">
+                                            <?php foreach ((array)$items as $widget): ?>
+                                                <?php if (!is_array($widget)) { continue; } ?>
+                                                <?php
+                                                $widgetTitle = trim((string)($widget['title'] ?? $widget['label'] ?? ''));
+                                                $widgetUrl = trim((string)($widget['url'] ?? ''));
+                                                ?>
+                                                <article class="operator-role-widget" data-widget-key="<?php echo htmlspecialchars((string)($widget['widget_key'] ?? '')); ?>">
+                                                    <div class="operator-role-widget__head">
+                                                        <?php if ($widgetUrl !== ''): ?><a href="<?php echo htmlspecialchars($widgetUrl); ?>"><?php echo htmlspecialchars($widgetTitle); ?></a><?php else: ?><strong><?php echo htmlspecialchars($widgetTitle); ?></strong><?php endif; ?>
+                                                        <?php if (array_key_exists('value', $widget)): ?><span class="operator-role-widget__value"><?php echo htmlspecialchars((string)$widget['value']); ?></span><?php endif; ?>
+                                                    </div>
+                                                    <?php if (trim((string)($widget['description'] ?? $widget['meta'] ?? '')) !== ''): ?><p class="operator-role-widget__meta"><?php echo htmlspecialchars((string)($widget['description'] ?? $widget['meta'])); ?></p><?php endif; ?>
+                                                    <?php if (is_array($widget['rows'] ?? null) && $widget['rows'] !== []): ?>
+                                                        <ul class="operator-role-widget__rows">
+                                                            <?php foreach ($widget['rows'] as $row): ?>
+                                                                <?php if (is_array($row)): ?><li><?php echo htmlspecialchars(implode(' · ', array_map('strval', (array)($row['cells'] ?? [$row['label'] ?? '', $row['value'] ?? ''])))); ?></li><?php endif; ?>
+                                                            <?php endforeach; ?>
+                                                        </ul>
+                                                    <?php endif; ?>
+                                                </article>
+                                            <?php endforeach; ?>
+                                        </div>
+                                    </section>
+                                <?php endforeach; ?>
+                            </section>
+                        <?php endif; ?>
+                        <?php $showWorkerWork = !$roleHomeEnabled && !in_array($roleHomeMode, ['leader', 'read_only'], true); ?>
                         <?php $workerWork = is_array($data['worker_work'] ?? null) ? $data['worker_work'] : []; ?>
+                        <?php if ($showWorkerWork): ?>
                         <section class="operator-worker-work" aria-labelledby="operator-worker-work-title">
                             <div class="operator-worker-work__heading">
                                 <h3 id="operator-worker-work-title"><?php echo htmlspecialchars($this->tr('operator.worker_work.title', 'Your Work')); ?></h3>
@@ -45,6 +93,7 @@
                                 <?php endforeach; ?>
                             <?php endif; ?>
                         </section>
+                        <?php endif; ?>
                         <?php if (!empty($data['common_home_tiles']) && is_array($data['common_home_tiles'])): ?>
                         <div class="dashboard-top-grid">
                             <?php foreach ((array)($data['common_home_tiles'] ?? []) as $tile): ?>

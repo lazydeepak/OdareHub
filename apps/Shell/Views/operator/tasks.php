@@ -16,6 +16,7 @@
     $tdDone    = (isset($_GET['done'])   && $_GET['done']   === '1');
     $tdFormErrRaw = trim((string)($_GET['error'] ?? ''));
     $tdFormErr = htmlspecialchars($this->tr($tdFormErrRaw, $tdFormErrRaw));
+    $tdReadOnly = !empty($data['operator_read_only']);
     $tdSelectorState = static function (): array {
         $rawQuery = (string)($_SERVER['QUERY_STRING'] ?? '');
         $rawTaskValue = null;
@@ -130,7 +131,7 @@
                         ? $this->tr('operator.tasks.action.start', 'Start')
                         : $this->tr('operator.tasks.action.done', 'Mark Done');
                     ?>
-                    <?php if ($tdSelectedCanAdvance): ?>
+                    <?php if ($tdSelectedCanAdvance && !$tdReadOnly): ?>
                         <div class="operator-task-card__actions">
                             <form method="post" action="<?php echo htmlspecialchars($tdBase . '/advance'); ?>">
                                 <input type="hidden" name="csrf" value="<?php echo htmlspecialchars((string)\App\Core\Auth::csrfToken()); ?>">
@@ -225,7 +226,7 @@
                             <?php endif; ?>
                         </div>
                     </div>
-                    <?php if ($canAdvance): ?>
+                    <?php if ($canAdvance && !$tdReadOnly): ?>
                         <div class="operator-task-card__actions">
                             <form method="post" action="<?php echo htmlspecialchars($tdBase . '/advance'); ?>">
                                 <input type="hidden" name="csrf"    value="<?php echo htmlspecialchars((string)\App\Core\Auth::csrfToken()); ?>">

@@ -23,10 +23,13 @@ use Apps\Shell\Services\PartsTableService;
 use Apps\Shell\Services\OperatorPreferencesService;
 use Apps\Shell\Services\ThemePreferenceService;
 use Platform\Search\AuthorizedSearchIndexService;
+use Plugins\Base\Services\HostSurfaceRegistryService; // compatibility owner-surface bridge for OH-AUTO1-085
 use Plugins\Base\Services\NotificationService;
 
 require_once __DIR__ . '/../Services/OperatorSurfaceContributionRegistry.php';
 require_once __DIR__ . '/../Services/PlatformWidgetBlueprintRuntimeService.php';
+require_once __DIR__ . '/../Services/OperatorLayerWidgetService.php';
+require_once APP_ROOT . '/plugins/Base/Services/HostSurfaceRegistryService.php'; // compatibility owner-surface bridge
 require_once __DIR__ . '/OperatorAvatarMenuComposer.php';
 require_once __DIR__ . '/OperatorDashboardComposer.php';
 require_once __DIR__ . '/OperatorFocusLabelComposer.php';
@@ -36,6 +39,7 @@ require_once __DIR__ . '/OperatorNotificationPresentationComposer.php';
 require_once __DIR__ . '/OperatorNavigationComposer.php';
 require_once __DIR__ . '/OperatorDashboardInsightsComposer.php';
 require_once __DIR__ . '/OperatorWorkerWorkComposer.php';
+require_once __DIR__ . '/OperatorRoleHomeComposer.php';
 require_once __DIR__ . '/OperatorPartPlanComposer.php';
 require_once __DIR__ . '/OperatorProfileQuickActionComposer.php';
 require_once __DIR__ . '/OperatorSearchComposer.php';
@@ -229,6 +233,11 @@ final class OperatorSurfaceComposer
      */
     private function composeMobileQuickNav(): array
     {
+        $homeProfile = strtolower(trim((string)($this->context['interaction_profile'] ?? 'worker')));
+        if (in_array($homeProfile, ['leader', 'read_only'], true)) {
+            return [];
+        }
+
         // If the workspace_profile defines quick_actions, use those for the mobile bottom bar
         // (up to 4 items; fall back to defaults for any missing entries).
         $wpActions = $this->resolveProfileQuickActions();
@@ -487,6 +496,7 @@ final class OperatorSurfaceComposer
         $messagesFocus = $this->buildMessagesFocusData();
         $tasksFocus = $this->buildTasksFocusData();
         $workerWork = OperatorWorkerWorkComposer::compose($tasksFocus, $this->context, $this->username);
+        $roleHome = $this->buildRoleHomeComposition();
         $recentActivity = $this->buildRecentActivityData();
         $commonHomeTiles = $this->buildCommonHomeTiles($tasksFocus, $notificationsFocus, $messagesFocus, $recentActivity);
         $generatedWidgetTiles = PlatformWidgetBlueprintRuntimeService::resolveDashboardTiles($this->context);
@@ -546,8 +556,48 @@ final class OperatorSurfaceComposer
             'preferences_focus' => $this->buildPreferencesFocusData(),
             'tasks_focus'     => $tasksFocus,
             'worker_work' => $workerWork,
+            'operator_interaction_profile' => $roleHome['profile'],
+            'operator_read_only' => $roleHome['read_only'],
+            'operator_role_regions' => $roleHome['regions'],
+            'operator_role_home_enabled' => $roleHome['regions'] !== [] && in_array($roleHome['profile'], ['leader', 'read_only'], true),
+            'operator_role_home_mode' => $roleHome['profile'],
+            'operator_role_home_title' => $roleHome['profile'] === 'leader'
+                ? $this->tr('operator.home.leader_title', 'Leadership view')
+                : $this->tr('operator.home.read_only_title', 'Read-only view'),
             'account_panel' => $this->buildAccountPanelData(),
         ];
+    }
+
+    /**
+     * Resolve owner-provided home contributions only for explicit leader or
+     * read-only profiles. Workers retain the OH-AUTO1-081..084 composition.
+     *
+     * @return array{profile:string,read_only:bool,regions:array<string,array<int,array<string,mixed>>>}
+     */
+    private function buildRoleHomeComposition(): array
+    {
+        $profile = OperatorRoleHomeComposer::resolveInteractionProfile($this->context);
+        if (!in_array($profile, ['leader', 'read_only'], true)) {
+            return ['profile' => $profile, 'read_only' => false, 'regions' => []];
+        }
+
+        $hasEvidence = (int)($this->context['authenticated_user_id'] ?? 0) > 0
+            && array_key_exists('active_assigned_apps', $this->context)
+            && is_callable($this->context['operator_route_access_resolver'] ?? null);
+        if (!$hasEvidence) {
+            return ['profile' => $profile, 'read_only' => $profile === 'read_only', 'regions' => []];
+        }
+
+        try {
+            $regions = HostSurfaceRegistryService::build('me', [ // compatibility owner-surface bridge
+                'user' => Auth::user(),
+                'context' => $this->context,
+            ]);
+            return OperatorRoleHomeComposer::compose($this->context, $regions);
+        } catch (\Throwable $e) {
+            error_log('OperatorSurfaceComposer::buildRoleHomeComposition: ' . $e->getMessage());
+            return ['profile' => $profile, 'read_only' => $profile === 'read_only', 'regions' => []];
+        }
     }
 
     /**

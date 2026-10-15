@@ -8,12 +8,14 @@ use App\Core\DB;
 use App\Services\LogoUploadService;
 use Apps\Platform\Services\UserAssignmentContext;
 use Apps\Shell\Composers\OperatorSurfaceComposer;
+use Apps\Shell\Composers\OperatorRoleHomeComposer;
 use Apps\Shell\Services\WorkspaceWrapperRegistry;
 use Apps\Shell\Services\OperatorLayerSidebarService;
 use Plugins\Base\Services\ResolvedExperienceConsumerService;
 use Plugins\Organization\Services\OrganizationService;
 
 require_once APP_ROOT . '/plugins/Base/Services/ResolvedExperienceConsumerService.php';
+require_once APP_ROOT . '/apps/Shell/Composers/OperatorRoleHomeComposer.php';
 
 final class OperatorLayerService
 {
@@ -168,6 +170,7 @@ final class OperatorLayerService
         // Step 4 default_app, Step 5 scope, Step 6 workspace_profile are extracted from ctx.
         // Step 7 operational focus is the 'focus' key in $query.
         // Step 8 home surface = OperatorSurfaceComposer::render().
+        $resolvedInteractionProfile = OperatorRoleHomeComposer::fromAssignmentContext($ctx);
         $composer = new OperatorSurfaceComposer($resolvedUsername, [
             'user_email' => $userEmail,
             'company_name' => $companyName,
@@ -179,6 +182,10 @@ final class OperatorLayerService
             'company_fallback_text' => $logoData['fallback_text'],
             'company_fallback_text_compact' => $logoData['fallback_text_compact'],
             'authority_role' => (string)($ctx['authority_role'] ?? 'app_user'),          // step 1
+            'access_profiles' => (array)($ctx['access_profiles'] ?? []),
+            'duty_codes' => (string)($ctx['duty_codes'] ?? ''),
+            'app_roles' => is_array($ctx['app_roles'] ?? null) ? $ctx['app_roles'] : [],
+            'operator_home_eligible' => !in_array(strtolower(trim((string)($ctx['authority_role'] ?? ''))), ['tv_display', 'platform_admin', 'app_admin'], true),
             'authenticated_user_id' => $userId,
             'operator_identity_bound' => $operatorIdentityBound,
             'operator_username' => $resolvedUsername,
@@ -197,6 +204,7 @@ final class OperatorLayerService
             'scope' => is_array($ctx['scope'] ?? null) ? $ctx['scope'] : [],             // step 5
             'module_visibility' => is_array($ctx['module_visibility'] ?? null) ? $ctx['module_visibility'] : [], // step 5
             'workspace_profile' => is_array($ctx['workspace_profile'] ?? null) ? $ctx['workspace_profile'] : null, // step 6
+            'interaction_profile' => $resolvedInteractionProfile,
             'operator_views' => $operatorViews,
             'resolved_operator_view_keys' => $operatorViews,
             'current_query' => $query,                                                    // step 7 (contains focus)

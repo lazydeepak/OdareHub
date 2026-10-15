@@ -1,5 +1,16 @@
 # AGENTS.md
 
+## Session Summary (2026-10-15) — OH-AUTO1-085 Role-shaped operator home
+
+Completed the Shell role-shaped `/u/{username}/dashboard` slice. Workers retain
+the OH-AUTO1-081–084 task path; leaders and read-only profiles receive only
+authorized owner-provided monitoring/summary content through the existing host
+surface boundary. Same-user `/u/*` and route-authority checks remain mandatory,
+read-only actions/forms are suppressed, and the existing task POST rejects
+read-only mutation. Isolated probes, PHP lint, focused architecture checks,
+architecture **49/49**, and deletion-family **28/28** pass. No database, live
+browser, production release/update, or Core change.
+
 ## Session Summary (2026-10-15) — OH-AUTO1-074 Controlled Exact-Step Migrations
 
 Added `AppMigrationService::executePlannedStep()` as the bounded exact-step

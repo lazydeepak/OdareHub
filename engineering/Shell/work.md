@@ -2,7 +2,26 @@
 
 ## Current Focus
 
-Continue safely decomposing `OperatorSurfaceComposer.php` toward orchestration-only facade.
+OH-AUTO1-085 role-shaped operator home composition is complete. Continue
+decomposing `OperatorSurfaceComposer.php` only within the existing resolved-
+experience and owner-contribution boundaries.
+
+## 2026-10-15 — OH-AUTO1-085 role-shaped operator home
+
+- [x] Added a removable Shell role-home composer that consumes the resolved
+  assignment context and existing `HostSurfaceRegistryService::build('me', ...)`
+  owner contributions; Shell owns ordering, visibility, rendering, and link
+  confinement only.
+- [x] Preserved the OH-AUTO1-081–084 worker dashboard path while shaping leader
+  and read-only homes from authorized summary, monitoring, and supporting
+  regions. Missing evidence fails closed without inheriting worker assignments.
+- [x] Bound contributed links to the current `/u/{username}` identity and the
+  existing route-access authority; read-only profiles suppress action/form
+  contributions and the existing task POST route rejects read-only mutation.
+- [x] Added localized EN/JA/NE role-home labels, generic Shell presentation
+  styles, and isolated non-mutating role/worker regression coverage.
+- [x] Published the registered Shell operator CSS asset. No database, schema,
+  live browser, installed database, production release/update, or Core change.
 
 ## 2026-10-15 — OH-AUTO1-081 worker-first operator dashboard
 
