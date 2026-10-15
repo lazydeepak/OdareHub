@@ -31,6 +31,7 @@ $assert(OperatorPartsWorkspaceService::resolveAuthorizedPartIdFromRows(['part_nu
 $assert(OperatorPartsWorkspaceService::resolveAuthorizedPartIdFromRows(['part_id' => 10, 'product_id' => 20], $scopeX, $rows) === 0, 'contradictory direct selectors fail closed');
 $assert(OperatorPartsWorkspaceService::resolveAuthorizedPartIdFromRows(['part_id' => ['10']], $scopeX, $rows) === 0, 'array direct selector fails closed');
 $assert(OperatorPartsWorkspaceService::resolveAuthorizedPartIdFromRows(['q' => 'Part X', 'part_q' => 'Part Y'], $scopeX, $rows) === 0, 'contradictory search selectors fail closed');
+$assert(OperatorPartsWorkspaceService::resolveAuthorizedPartIdFromRows(['part_number' => 'PX-10', 'q' => 'Part X'], $scopeX, $rows) === 0, 'part-number and search selectors fail closed as ambiguous');
 $assert(OperatorPartsWorkspaceService::resolveAuthorizedPartIdFromRows(['part_id' => 10, 'q' => 'Part X'], $scopeX, $rows) === 0, 'mixed direct and search selectors fail closed');
 $assert(OperatorPartsWorkspaceService::resolveAuthorizedPartIdFromRows(['part_id' => 10], ['part_ids' => ['bad']], $rows) === 0, 'malformed scope fails closed');
 $assert(OperatorPartsWorkspaceService::resolveAuthorizedPartIdFromRows(['part_id' => 10], $scopeDenied, $rows) === 0, 'denied scope fails closed');

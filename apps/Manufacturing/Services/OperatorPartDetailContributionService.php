@@ -32,7 +32,7 @@ final class OperatorPartDetailContributionService
                 throw new \RuntimeException('Part 360 service is not available.');
             }
 
-            $payload = Part360Service::build($productId);
+            $payload = Part360Service::buildReadOnly($productId);
             if (!is_array($payload)) {
                 $defaults['error'] = 'operator.parts.detail.not_found';
                 return $defaults;

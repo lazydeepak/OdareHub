@@ -35,7 +35,7 @@ $assert(OperatorPartsWorkspaceService::projectAuthorizedRows($rows, []) === null
 
 $detailService = file_get_contents(APP_ROOT . '/apps/Manufacturing/Services/OperatorPartDetailContributionService.php');
 $assert(is_string($detailService) && strpos($detailService, 'resolveAuthorizedPartId') !== false, 'detail resolves through authorized owner boundary');
-$assert(is_string($detailService) && strpos($detailService, 'Part360Service::build($productId)') !== false, 'Part360 is called only after authorization resolution');
+$assert(is_string($detailService) && strpos($detailService, 'Part360Service::buildReadOnly($productId)') !== false, 'read-only Part360 is called only after authorization resolution');
 $assert(is_string($detailService) && strpos($detailService, 'ensureSchema') === false, 'operator detail adapter does not initialize schema');
 $assert(is_string($detailService) && strpos($detailService, 'DB::') === false, 'operator detail adapter does not query before authorization');
 

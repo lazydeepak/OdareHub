@@ -2,8 +2,7 @@
 
 ## Current Focus
 
-OH-AUTO1-091 Parts detail authority and read-only closure is complete with an
-explicit authorized-read schema blocker. Continue
+OH-AUTO1-092 non-mutating Part360 operator read is complete. Continue
  through the same owner-contract pattern for parts, work areas, and process
  areas only as separately bounded milestones.
 
@@ -33,6 +32,10 @@ brief's pressure-test workstreams and synthesis complete.
   and isolated fake-provider coverage preserve authorized part identity and
   stop unauthorized selection before any Part360 builder. Shell filters detail
   actions through same-user URL and existing Platform GET route authority.
+
+- [x] OH-AUTO1-092 — operator detail now uses `Part360Service::buildReadOnly()`;
+  the shared projection path skips schema repair while preserving admin
+  `build()`. Missing required schema fails unavailable without mutation.
 
 - [x] OH-AUTO1-087 — passed authenticated operator identity and effective
   assignment context into `MachinesAdapter`; Manufacturing retains machine,
@@ -70,6 +73,10 @@ brief's pressure-test workstreams and synthesis complete.
   `Part360Service::build()` calls `MaterialSchemaService::ensureSchema()` and
   `PartEngineeringSchemaService::ensureSchema()`, both of which contain
   CREATE/ALTER initialization. No speculative refactor was made.
+
+- OH-AUTO1-092 — instrumented Part360 read-only proof **8/8**; detail/action
+  and scope regressions **21/21**, **14/14**, and **27/27**. No database,
+  schema, activation, production, or Core operation.
 
 - OH-AUTO1-019 — Manufacturing operator adapters now return a stable localized diagnostic key instead of raw exception text while retaining existing server-side error logging. See `docs/architecture/operational-diagnostics-observability-audit-2026-10-14.md`.
 - OH-AUTO1-020 — Static audit identified unverified target/link atomicity in upstream supply synchronization; no correction made without disposable failure-path evidence. See `docs/architecture/transactional-business-verification-audit-2026-10-14.md`.

@@ -1,5 +1,19 @@
 # AGENT-COMPLIANCE-CHECKLIST
 
+## Session Summary (2026-10-15) — OH-AUTO1-092 Non-mutating Part360 operator read
+
+Added `Part360Service::buildReadOnly()` over the shared projection calculation.
+Admin `build()` behavior remains unchanged. The operator detail contribution
+now uses the read-only entry point, which skips both schema initializers.
+Instrumented isolated DB proof confirms zero mutation calls, select/show-only
+SQL, preserved admin initialization, and safe missing-schema failure.
+Part-number plus search selectors now fail closed as ambiguous.
+
+Validation: Part360 **8/8**; detail authority **21/21**; Parts **14/14**;
+machine **27/27**; role-home **26/26**; worker/task **41/41**; navigation
+**51/51**. No database, browser, schema, activation, production, or Core
+operation.
+
 ## Session Summary (2026-10-15) — OH-AUTO1-091 Parts detail authority and read-only closure
 
 Added Shell filtering for Manufacturing Part-detail actions using same-user

@@ -1,5 +1,13 @@
 # AGENTS.md
 
+## Session Summary (2026-10-15) — OH-AUTO1-092 Non-mutating Part360 operator read
+
+Added the owner-controlled `Part360Service::buildReadOnly()` path and routed
+operator detail through it; admin `build()` retains schema initialization.
+Instrumented isolated proof is **8/8**, with zero mutation calls and safe
+missing-schema failure. Ambiguous part-number/search selectors fail closed.
+No database, browser, production operation, or Core change.
+
 ## Session Summary (2026-10-15) — OH-AUTO1-091 Parts detail authority and read-only closure
 
 Part-detail actions now pass through Shell same-user URL normalization and

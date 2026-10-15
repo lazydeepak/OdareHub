@@ -311,6 +311,9 @@ final class OperatorPartsWorkspaceService
             return null;
         }
         $search = $q !== '' ? $q : $partQ;
+        if ($partNumber !== '' && $search !== '') {
+            return null;
+        }
         $direct = $directValues[0] ?? null;
         if ($direct !== null && ($partNumber !== '' || $search !== '')) {
             return null;

@@ -28,12 +28,34 @@ final class Part360Service
      */
     public static function build(int $productId): ?array
     {
+        return self::buildInternal($productId, true);
+    }
+
+    /**
+     * Build the same Part360 projection without runtime schema repair.
+     * The operator GET path uses this entry point; required schema is a
+     * deployment/migration concern and missing tables fail as unavailable.
+     *
+     * @return array<string,mixed>|null
+     */
+    public static function buildReadOnly(int $productId): ?array
+    {
+        return self::buildInternal($productId, false);
+    }
+
+    /**
+     * @return array<string,mixed>|null
+     */
+    private static function buildInternal(int $productId, bool $initializeSchema): ?array
+    {
         if ($productId <= 0) {
             return null;
         }
 
-        MaterialSchemaService::ensureSchema();
-        PartEngineeringSchemaService::ensureSchema();
+        if ($initializeSchema) {
+            MaterialSchemaService::ensureSchema();
+            PartEngineeringSchemaService::ensureSchema();
+        }
 
         $product = DB::fetchOne(
             "SELECT p.*, COALESCE(lb.stock_balance, 0) AS stock_balance

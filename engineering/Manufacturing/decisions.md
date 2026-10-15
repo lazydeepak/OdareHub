@@ -2,6 +2,24 @@
 
 ## Decision Log
 
+### 2026-10-15 — OH-AUTO1-092 non-mutating Part360 operator read
+
+**Status:** Accepted
+
+**Decision**
+
+`Part360Service::build()` remains the existing admin entry point and retains
+schema initialization. A shared private calculation path now supports the
+owner-controlled `buildReadOnly()` entry point, which skips both schema
+initializers and reuses the existing Part360 projection logic. The operator
+detail contribution calls only this read-only entry point.
+
+The isolated fake DB proves the authorized projection executes no mutation
+method and emits only SELECT/SHOW reads. Missing `part_molds` schema fails as
+an unavailable read and does not invoke repair. The transitive
+`PartExecutionRouteResolver` is pure; no Part360 downstream service contains
+write SQL outside the skipped initializers.
+
 ### 2026-10-15 — OH-AUTO1-091 detail authority and read-only boundary
 
 **Status:** Accepted with blocker
