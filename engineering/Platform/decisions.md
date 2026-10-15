@@ -75,6 +75,17 @@ gates, and every eligibility/mutation flag remains false.
 
 ## Decision Log
 
+### 2026-10-16 — OH-AUTO2-100 read-only assignment/scope preflight
+
+**Status:** Accepted — restricted retrieval gate
+
+The Platform user-context contract exposes a read-only preflight that reads
+existing `users`, `user_dashboard_assignments`, and
+`user_operational_scopes` evidence without calling Base schema bootstrap.
+Identity or scope failure is unavailable/contained; explicit empty scope is
+the only unrestricted result. The optional reader dependency is test-only and
+does not alter production authority.
+
 ### 2026-10-15 — OH-AUTO1-074 exact-step migration evidence boundary
 **Status:** Accepted for bounded non-production execution
 

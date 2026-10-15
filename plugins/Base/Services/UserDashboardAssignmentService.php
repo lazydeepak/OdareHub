@@ -1530,6 +1530,203 @@ final class UserDashboardAssignmentService
     }
 
     /**
+     * Read existing assignment and operational-scope evidence without schema
+     * bootstrap. This is the preflight boundary for contained My Work reads.
+     * Missing tables, missing identity evidence, and malformed scope rows fail
+     * closed. The optional reader exists only for isolated tests; production
+     * uses the existing DB read authority.
+     *
+     * @param array<string,mixed>|null $user
+     * @param null|callable(string,array<int,mixed>,string):array<int,array<string,mixed>> $reader
+     * @return array{state:string,context:array<string,mixed>}
+     */
+    public static function readOnlyPreflight(?array $user, ?callable $reader = null): array
+    {
+        $user = is_array($user) ? $user : [];
+        $userId = (int)($user['id'] ?? 0);
+        $fallback = self::readOnlyPreflightFallback($user, 'unavailable');
+        if ($userId <= 0) {
+            return $fallback;
+        }
+
+        $fetch = $reader ?? static function (string $sql, array $params, string $kind): array {
+            if ($kind === 'one') {
+                $row = DB::fetchOne($sql, $params);
+                return is_array($row) ? [$row] : [];
+            }
+            $rows = DB::fetchAll($sql, $params);
+            return is_array($rows) ? $rows : [];
+        };
+
+        try {
+            $identityRows = $fetch(
+                'SELECT u.id, u.role, a.user_id AS assignment_user_id '
+                . 'FROM users u LEFT JOIN user_dashboard_assignments a ON a.user_id = u.id '
+                . 'WHERE u.id = ? LIMIT 1',
+                [$userId],
+                'one'
+            );
+            $identity = $identityRows[0] ?? null;
+            if (!is_array($identity)
+                || (int)($identity['id'] ?? 0) !== $userId
+                || (int)($identity['assignment_user_id'] ?? 0) !== $userId) {
+                return $fallback;
+            }
+
+            $scopeRows = $fetch(
+                'SELECT machine_id, part_id, task_type, department_code, branch_code, ownership_role '
+                . 'FROM user_operational_scopes WHERE user_id = ? AND is_active = 1',
+                [$userId],
+                'all'
+            );
+            $scope = self::readOnlyScopeFromRows($scopeRows);
+            $authorityRole = self::normalizeAccountType(
+                (string)($user['authority_role'] ?? ''),
+                (string)($identity['role'] ?? ($user['role'] ?? '')),
+                (string)($user['role_tier'] ?? ''),
+                (string)($user['default_app'] ?? '')
+            );
+            $preflightState = self::readOnlyScopeState($scope);
+            return [
+                'state' => $preflightState,
+                'context' => self::readOnlyPreflightContext($user, $authorityRole, $scope, $preflightState),
+            ];
+        } catch (\Throwable) {
+            return $fallback;
+        }
+    }
+
+    /** @param array<string,mixed> $user */
+    private static function readOnlyPreflightFallback(array $user, string $state): array
+    {
+        $authorityRole = self::normalizeAccountType(
+            (string)($user['authority_role'] ?? ''),
+            (string)($user['role'] ?? ''),
+            (string)($user['role_tier'] ?? ''),
+            (string)($user['default_app'] ?? '')
+        );
+        $scope = self::emptyScope();
+        $scope['_preflight_unavailable'] = true;
+        return [
+            'state' => $state,
+            'context' => self::readOnlyPreflightContext($user, $authorityRole, $scope, $state),
+        ];
+    }
+
+    /**
+     * @param array<string,mixed> $user
+     * @param array<string,mixed> $scope
+     * @return array<string,mixed>
+     */
+    private static function readOnlyPreflightContext(
+        array $user,
+        string $authorityRole,
+        array $scope,
+        string $state
+    ): array {
+        return [
+            'authority_role' => $authorityRole,
+            'user_id' => (int)($user['id'] ?? 0),
+            'scope' => $scope,
+            'scopes' => $scope,
+            'cross_functional_access' => [],
+            'access_profiles' => [],
+            'permissions' => '',
+            '_scope_preflight_state' => $state,
+        ];
+    }
+
+    /**
+     * @param array<int,array<string,mixed>> $rows
+     * @return array<string,mixed>
+     */
+    private static function readOnlyScopeFromRows(array $rows): array
+    {
+        $scope = self::emptyScope();
+        foreach ($rows as $row) {
+            foreach (['machine_id' => 'machine_ids', 'part_id' => 'part_ids'] as $column => $key) {
+                $value = $row[$column] ?? null;
+                if ($value === null || $value === '') {
+                    continue;
+                }
+                if (!is_int($value) && !(is_string($value) && preg_match('/^-?[0-9]+$/', trim($value)) === 1)) {
+                    throw new \UnexpectedValueException('Malformed operational scope identifier');
+                }
+                $id = (int)$value;
+                if ($id === -1 || $id > 0) {
+                    $scope[$key][] = $id;
+                } else {
+                    throw new \UnexpectedValueException('Malformed operational scope identifier');
+                }
+            }
+
+            $taskType = $row['task_type'] ?? null;
+            if ($taskType !== null && $taskType !== '') {
+                if (!is_string($taskType) || trim($taskType) === '') {
+                    throw new \UnexpectedValueException('Malformed operational task scope');
+                }
+                $scope['task_types'][] = trim($taskType);
+            }
+
+            foreach (['department_code', 'branch_code', 'ownership_role'] as $key) {
+                $value = $row[$key] ?? null;
+                if ($value === null || $value === '') {
+                    continue;
+                }
+                if (!is_string($value) || trim($value) === '') {
+                    throw new \UnexpectedValueException('Malformed operational scope attribute');
+                }
+                $value = trim($value);
+                if ($scope[$key] !== '' && $scope[$key] !== $value) {
+                    throw new \UnexpectedValueException('Conflicting operational scope evidence');
+                }
+                $scope[$key] = $value;
+            }
+        }
+
+        foreach (['machine_ids', 'part_ids', 'task_types'] as $key) {
+            $scope[$key] = array_values(array_unique($scope[$key], SORT_REGULAR));
+        }
+        return $scope;
+    }
+
+    /** @param array<string,mixed> $scope */
+    private static function readOnlyScopeState(array $scope): string
+    {
+        foreach (['machine_ids', 'part_ids', 'task_types'] as $key) {
+            if (!array_key_exists($key, $scope) || !is_array($scope[$key])) {
+                return 'unavailable';
+            }
+        }
+        foreach (['machine_ids', 'part_ids'] as $key) {
+            foreach ($scope[$key] as $value) {
+                if ((is_int($value) && $value === -1) || (is_string($value) && trim($value) === '-1')) {
+                    return 'restricted';
+                }
+            }
+        }
+        foreach ($scope['task_types'] as $value) {
+            if (trim((string)$value) === '-1') {
+                return 'restricted';
+            }
+        }
+        foreach (['department_code', 'branch_code', 'ownership_role'] as $key) {
+            if (!array_key_exists($key, $scope) || !is_string($scope[$key])) {
+                return 'unavailable';
+            }
+            if (trim($scope[$key]) !== '') {
+                return 'restricted';
+            }
+        }
+        foreach (['machine_ids', 'part_ids', 'task_types'] as $key) {
+            if ($scope[$key] !== []) {
+                return 'restricted';
+            }
+        }
+        return 'unrestricted';
+    }
+
+    /**
      * @return array<int,string>
      */
     public static function canonicalSystemWorkspaceProfileKeys(): array

@@ -53,7 +53,10 @@ final class AdminLayerService
         $userRaw = Auth::user();
         $user = is_array($userRaw) ? $userRaw : (array)$userRaw;
 
-        $ctx = UserAssignmentContext::context()->resolveUserContext($user);
+        // Read scope evidence before the legacy resolver is allowed to perform
+        // compatibility schema/bootstrap work. Restricted or unprovable
+        // contexts are passed through to My Work as a contained preflight.
+        $ctx = UserAssignmentContext::context()->resolveUserContextReadOnly($user);
 
         // The wrapper registry admits administrative account types. Route and
         // capability authorization still filter every destination within it.
@@ -67,9 +70,19 @@ final class AdminLayerService
             exit;
         }
 
+        $preflightContext = null;
+        if ((string)($ctx['_scope_preflight_state'] ?? '') === 'unrestricted') {
+            // Preserve the established unrestricted resolver and its existing
+            // context shape. The preflight only decides whether that path is
+            // safe to enter.
+            $ctx = UserAssignmentContext::context()->resolveUserContext($user);
+        } else {
+            $preflightContext = $ctx;
+        }
+
         $ctx = self::applyResolvedExperienceAdminOverrides($user, $ctx);
 
-        $composer = new AdminSurfaceComposer($view, $user, $ctx, $query);
+        $composer = new AdminSurfaceComposer($view, $user, $ctx, $query, $preflightContext);
         $composer->renderHTML();
     }
 

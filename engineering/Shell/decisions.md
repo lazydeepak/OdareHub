@@ -2,6 +2,23 @@
 
 ## Decision Log
 
+### 2026-10-16 — OH-AUTO2-100 restricted My Work preflight boundary
+
+**Status:** Accepted — bounded non-mutating restricted path
+
+`/me` must evaluate existing assignment and operational-scope evidence through
+the Platform context contract before entering the legacy Base resolver. When
+scope is restricted, malformed, denied, or unavailable, Shell carries the
+preflight context into My Work and Manufacturing returns the existing
+localized unavailable state before schema/bootstrap, queue, notification,
+escalation, or role-link providers. Explicit unrestricted evidence preserves
+the established resolver path.
+
+This is a preflight boundary, not a new authorization model. Missing tables or
+evidence fail closed, no new scope fields are introduced, and the complete
+`/me` request is not claimed to be non-mutating because parallel host and
+admin providers remain outside this correction.
+
 ### 2026-10-15 — OH-AUTO1-091 Part-detail action rendering boundary
 
 **Status:** Accepted

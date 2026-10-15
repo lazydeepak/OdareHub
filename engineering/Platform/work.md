@@ -45,6 +45,17 @@ remain disabled.
 
 Release/update foundation governance and controlled-cycle readiness.
 
+## 2026-10-16 — OH-AUTO2-100 restricted My Work non-mutating preflight
+
+- [x] Added the Platform-facing read-only context contract and Base adapter
+  seam used by `/me` before compatibility schema initialization.
+- [x] The preflight reads existing identity, assignment, and operational-scope
+  evidence only; missing or malformed evidence fails closed and explicit empty
+  scope remains unrestricted.
+- [x] Isolated instrumented proof: **17/17**. No new authorization fields,
+  schema, route, Core, installed database, activation, deployment, or
+  production operation.
+
 ## OH-AUTO1-078 — Completed
 
 Performed the first real disposable signed install/update/recovery rehearsal.

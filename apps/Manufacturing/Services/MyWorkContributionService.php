@@ -57,14 +57,50 @@ final class MyWorkContributionService
      */
     public static function build(?array $user, array $input = []): array
     {
+        $userContext = is_array($user['_scope_preflight_context'] ?? null)
+            ? $user['_scope_preflight_context']
+            : null;
+        return self::buildInternal($user, $input, $userContext);
+    }
+
+    /**
+     * Build from a server-resolved preflight context only.
+     *
+     * @param array<string,mixed>|null $user
+     * @param array<string,string> $input
+     * @param array<string,mixed> $resolvedContext
+     * @return array<string,mixed>
+     */
+    public static function buildRestricted(?array $user, array $input, array $resolvedContext): array
+    {
+        return self::buildInternal($user, $input, $resolvedContext);
+    }
+
+    /**
+     * @param array<string,mixed>|null $user
+     * @param array<string,string> $input
+     * @param array<string,mixed>|null $resolvedContext
+     * @return array<string,mixed>
+     */
+    private static function buildInternal(?array $user, array $input, ?array $resolvedContext): array
+    {
         $user = is_array($user) ? $user : [];
         $authorityRole = strtolower(trim((string)($user['authority_role'] ?? 'app_user')));
 
-        UserDashboardAssignmentService::ensureSchema();
-        WorkflowGovernance::ensureSchema();
-        HandoffEngine::ensureSchema();
-
-        $ctx   = UserDashboardAssignmentService::resolveUserContext($user);
+        if (is_array($resolvedContext) && array_key_exists('_scope_preflight_state', $resolvedContext)) {
+            $ctx = $resolvedContext;
+            $preflightState = (string)($ctx['_scope_preflight_state'] ?? 'unavailable');
+            if ($preflightState !== 'unrestricted') {
+                return self::containedWorkspace($user, $ctx, $preflightState === 'restricted'
+                    ? 'restricted_unavailable'
+                    : 'malformed_unavailable');
+            }
+        } else {
+            UserDashboardAssignmentService::ensureSchema();
+            WorkflowGovernance::ensureSchema();
+            HandoffEngine::ensureSchema();
+            $ctx = UserDashboardAssignmentService::resolveUserContext($user);
+        }
         $scope = (array)($ctx['scope'] ?? []);
 
         // The shared My Work sources do not apply machine/part/task predicates

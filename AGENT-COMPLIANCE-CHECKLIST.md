@@ -1,5 +1,37 @@
 # AGENT-COMPLIANCE-CHECKLIST
 
+## Session Summary (2026-10-16) — OH-AUTO2-100 Restricted My Work non-mutating preflight
+
+Added a bounded read-only assignment/scope preflight before the legacy Base
+context resolver can initialize compatibility schema. `/me` now carries
+restricted, malformed, denied, or unavailable preflight evidence into the
+existing Manufacturing containment result; explicit unrestricted evidence
+continues through the established resolver and My Work path.
+
+The preflight reads only existing `users`, assignment, and operational-scope
+evidence, fails closed when required evidence is absent or malformed, and does
+not add authorization fields. Manufacturing returns before its assignment,
+workflow, handoff, notification, escalation, or queue paths when a contained
+context is supplied. The full `/me` request is not claimed to be non-mutating;
+parallel host/admin providers and unrestricted notification escalation remain
+outside this slice.
+
+Files changed: `apps/Platform/Contracts/UserContextContract.php`,
+`apps/Platform/Services/PlatformUserAssignmentAdapter.php`,
+`apps/Shell/Services/AdminLayerService.php`,
+`apps/Shell/Composers/AdminSurfaceComposer.php`,
+`plugins/Base/Services/UserDashboardAssignmentService.php`,
+`apps/Manufacturing/Services/MyWorkContributionService.php`, focused probe,
+owner workspace records, and this checklist. No Core, route, schema/migration,
+installed database, browser, activation, deployment, or production operation.
+
+Validation: preflight **17/17**; containment visibility **14/14**; restricted
+containment **21/21**; work/process **23/23**; Processing **35/35**; Parts
+**14/14**; machine projection **27/27**; worker/task **41/41**; architecture
+**49/49**; deletion **28/28**; deployment readiness **PASS**; PHP lint and
+`git diff --check` PASS. Lifecycle logs and PHPUnit cache remain preserved and
+uncommitted.
+
 ## Session Summary (2026-10-16) — OH-AUTO1-098 My Work containment visibility
 
 Forwarded Manufacturing's existing `scope_containment` state through

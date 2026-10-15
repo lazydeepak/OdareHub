@@ -2,15 +2,18 @@
 
 ## Current Focus
 
-State the current verified objective.
+OH-AUTO2-100 retains Base as a removable compatibility boundary while exposing
+only the read-only preflight seam required by Shell and Manufacturing.
 
 ## In Progress
 
-- [ ] Record active work here.
+- [x] User assignment preflight reads existing evidence without invoking
+  `ensureSchema()`; full legacy resolution remains available for unrestricted
+  compatibility behavior.
 
 ## Next
 
-- [ ] Record the next confirmed task here.
+- [ ] OH-AUTO2-101 — unrestricted notification/escalation read safety.
 
 ## Blocked
 

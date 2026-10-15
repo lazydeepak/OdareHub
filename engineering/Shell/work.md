@@ -6,6 +6,20 @@ OH-AUTO1-094 Processing authority closure is complete. Shell remains the
 generic operator composition and rendering boundary; Manufacturing owns lane
 authority and data projection.
 
+## 2026-10-16 — OH-AUTO2-100 restricted My Work non-mutating preflight
+
+- [x] `/me` now evaluates read-only assignment/scope evidence through the
+  Platform context contract before the legacy resolver can initialize schema.
+- [x] Restricted, malformed, denied, and unavailable preflight states are
+  passed to My Work as contained context and return before queue, workflow,
+  handoff, notification, escalation, or role-link providers.
+- [x] Explicit unrestricted preflight preserves the established resolver and
+  My Work path; no unrestricted whole-request non-mutation claim is made.
+- [x] Focused preflight proof: **17/17**; containment visibility **14/14**;
+  restricted containment **21/21**; worker/task **41/41**. No Core, route,
+  schema, installed database, browser, activation, deployment, or production
+  operation.
+
 ## 2026-10-16 — OH-AUTO1-098 My Work containment visibility
 
 - [x] Shell forwards the existing Manufacturing `scope_containment` payload

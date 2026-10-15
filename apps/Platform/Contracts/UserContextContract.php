@@ -12,6 +12,14 @@ interface UserContextContract
     public function resolveUserContext(?array $user): array;
 
     /**
+     * Resolve only existing assignment/scope evidence; never initializes schema.
+     *
+     * @param array<string,mixed>|null $user
+     * @return array<string,mixed>
+     */
+    public function resolveUserContextReadOnly(?array $user): array;
+
+    /**
      * @param array<string,mixed>|null $user
      */
     public function dashboardTypeForUser(?array $user): string;

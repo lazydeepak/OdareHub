@@ -4,8 +4,19 @@
 
 OH-AUTO1-093 scope-aware Processing workspace and mutation gates are complete.
 Continue
- through the same owner-contract pattern for parts, work areas, and process
- areas only as separately bounded milestones.
+through the same owner-contract pattern for parts, work areas, and process
+areas only as separately bounded milestones.
+
+## 2026-10-16 — OH-AUTO2-100 restricted My Work non-mutating preflight
+
+- [x] Manufacturing My Work accepts a preflight-resolved context and returns
+  the existing unavailable containment payload before any schema initializer,
+  queue collection, notification reader, escalation sweep, or role-link path.
+- [x] Explicit unrestricted calls retain the existing schema-backed path;
+  unrestricted notification/escalation safety remains deferred to OH-AUTO2-101.
+- [x] Restricted preflight/build proof: **17/17**; existing restricted
+  containment proof: **21/21**. No Core, schema, route, database, activation,
+  deployment, or production operation.
 
 Future Manufacturing work touching identity, Shared/Foundation, extensions, suite ownership,
 or cross-domain authority is subordinate to

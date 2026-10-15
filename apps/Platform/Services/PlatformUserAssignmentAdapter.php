@@ -19,6 +19,11 @@ final class PlatformUserAssignmentAdapter implements UserContextContract, UserAc
         return UserDashboardAssignmentService::resolveUserContext($user);
     }
 
+    public function resolveUserContextReadOnly(?array $user): array
+    {
+        return UserDashboardAssignmentService::readOnlyPreflight($user)['context'];
+    }
+
     public function dashboardTypeForUser(?array $user): string
     {
         return UserDashboardAssignmentService::dashboardTypeForUser($user);

@@ -50,11 +50,15 @@ final class AdminSurfaceComposer
      * @param array<string,mixed> $user  Authenticated user record from Auth::user()
      * @param array<string,mixed> $ctx   Resolved user context from UserAssignmentContext
      * @param array<string,mixed> $query Query parameters from $_GET
+     * @param array<string,mixed>|null $preflightContext Server-resolved contained context
      */
-    public function __construct(View $view, array $user, array $ctx, array $query = [])
+    public function __construct(View $view, array $user, array $ctx, array $query = [], ?array $preflightContext = null)
     {
         $this->view  = $view;
         $this->user  = $user;
+        if ($preflightContext !== null) {
+            $this->user['_scope_preflight_context'] = $preflightContext;
+        }
         $this->ctx   = $ctx;
         $this->query = $query;
     }

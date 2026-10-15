@@ -71,6 +71,11 @@ Evidence for the completed milestones is recorded in:
   composition and rendered as a localized unavailable state. Notifications and
   role links remain suppressed because their current providers do not provide
   an independently proven, non-mutating, scope-safe read contract.
+- OH-AUTO2-100 — restricted My Work now performs a read-only assignment/scope
+  preflight before legacy schema/bootstrap paths. Restricted, malformed,
+  denied, and unavailable evidence remains contained; explicit unrestricted
+  scope preserves the established path. Unrestricted notification/escalation
+  safety and parallel `/me` provider mutation remain deferred.
 
 After the release/update cycle is proven, resume the product roadmap focus from
 `README.md`:
