@@ -429,6 +429,16 @@ authenticity and does not convert a verified signature into readiness or apply
 eligibility. Trust records remain process-local fixtures until a separate
 release-authority decision approves operational provisioning.
 
+### OH-AUTO1-068 disposable database requalification
+
+Approved database-backed testing uses the existing non-Core configuration guard,
+execution authorizer, and isolated source-root runner. The business-integrity
+runner must stage a complete temporary APP_ROOT outside the repository, bind
+its config to the independently attested temporary endpoint, execute staged
+probes only after process/socket/datadir checks, and verify config/source
+fingerprints before teardown. This qualification does not authorize installed
+database access, broad migration execution, production cleanup, or deployment.
+
 **Boundary**
 
 The adapter does not read or persist trust configuration, does not grant

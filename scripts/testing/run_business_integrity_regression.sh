@@ -53,16 +53,32 @@ run_disposable_probe() {
     socket="$root/mysql.sock"
     pidfile="$root/mysql.pid"
     errorlog="$root/mysql.err"
-    app_root="$root/app-root"
-    mkdir -m 700 "$data" "$app_root" "$app_root/storage" || {
+    source_workspace="$root/source-workspace"
+    app_root=''
+    mkdir -m 700 "$data" || {
         echo "SUITE FAIL $label: cannot create isolated directories" >&2
         rm -rf "$root"
         FAILED=$((FAILED + 1))
         return
     }
     chmod 700 "$root"
+
+    prepared_json=$("$PHP_BIN" "$REPO/scripts/testing/prepare_isolated_source_root.php" "$source_workspace") || {
+        echo "SUITE FAIL $label: isolated source-root preparation failed" >&2
+        rm -rf "$root"
+        FAILED=$((FAILED + 1))
+        return
+    }
+    app_root=$(printf '%s' "$prepared_json" | "$PHP_BIN" -r '$v=json_decode(stream_get_contents(STDIN),true); if (!is_array($v) || !is_string($v["source_root"] ?? null)) exit(1); echo $v["source_root"];') || {
+        echo "SUITE FAIL $label: isolated source-root path was not reported" >&2
+        rm -rf "$root"
+        FAILED=$((FAILED + 1))
+        return
+    }
+    mkdir -p "$app_root/storage"
     port=$(python3 -c 'import socket;s=socket.socket();s.bind(("127.0.0.1",0));print(s.getsockname()[1]);s.close()')
-    db="oh_test_033_${label}_$(openssl rand -hex 6)"
+    safe_label=$(printf '%s' "$label" | tr -c 'A-Za-z0-9_' '_')
+    db="oh_test_033_${safe_label}_$(openssl rand -hex 6)"
     user="o33_$(openssl rand -hex 10)"
     pass="ohpass$(openssl rand -hex 16)"
 
@@ -78,6 +94,9 @@ PHP
             "$MYSQLADMIN_BIN" --no-defaults --protocol=SOCKET --socket="$socket" -uroot shutdown >/dev/null 2>&1 || true
             pid_from_file=$(cat "$pidfile" 2>/dev/null || true)
             [ -z "$pid_from_file" ] || kill "$pid_from_file" 2>/dev/null || true
+        fi
+        if [ -d "$source_workspace" ]; then
+            "$PHP_BIN" "$REPO/scripts/testing/cleanup_isolated_source_root.php" "$source_workspace" >/dev/null 2>&1 || true
         fi
         rm -rf "$root"
     }
@@ -145,16 +164,21 @@ SQL
     started=$(date +%s)
     set +e
     if [ "$prefix" = "OH_PROC" ]; then
-        OH_PROC_REPO="$REPO" OH_PROC_APP_ROOT="$app_root" OH_PROC_DB_PID="$pid" OH_PROC_DB_SOCKET="$socket" OH_PROC_DB_DATADIR="$data" OH_PROC_DB_RESOURCE_ROOT="$root" OH_PROC_DB_PORT="$port" OH_PROC_DB_NAME="$db" OH_PROC_DB_USER="$user" "$PHP_BIN" "$REPO/$probe"
+        OH_PROC_REPO="$REPO" OH_PROC_APP_ROOT="$app_root" OH_PROC_DB_PID="$pid" OH_PROC_DB_SOCKET="$socket" OH_PROC_DB_DATADIR="$data" OH_PROC_DB_RESOURCE_ROOT="$root" OH_PROC_DB_PORT="$port" OH_PROC_DB_NAME="$db" OH_PROC_DB_USER="$user" "$PHP_BIN" "$app_root/$probe"
         rc=$?
     else
-        OH_MFG_REPO="$REPO" OH_MFG_APP_ROOT="$app_root" OH_MFG_DB_PID="$pid" OH_MFG_DB_SOCKET="$socket" OH_MFG_DB_DATADIR="$data" OH_MFG_DB_RESOURCE_ROOT="$root" OH_MFG_DB_PORT="$port" OH_MFG_DB_NAME="$db" OH_MFG_DB_USER="$user" "$PHP_BIN" "$REPO/$probe"
+        OH_MFG_REPO="$REPO" OH_MFG_APP_ROOT="$app_root" OH_MFG_DB_PID="$pid" OH_MFG_DB_SOCKET="$socket" OH_MFG_DB_DATADIR="$data" OH_MFG_DB_RESOURCE_ROOT="$root" OH_MFG_DB_PORT="$port" OH_MFG_DB_NAME="$db" OH_MFG_DB_USER="$user" "$PHP_BIN" "$app_root/$probe"
         rc=$?
     fi
     set -e
     config_hash_after=$($PHP_BIN -r 'echo hash_file("sha256", $argv[1]);' "$app_root/storage/db_config.php")
     if [ "$config_hash_before" != "$config_hash_after" ]; then
         echo "SUITE FAIL $label: disposable configuration changed during probe" >&2
+        rc=1
+    fi
+    if ! "$PHP_BIN" -r 'require $argv[1];$m=json_decode((string)file_get_contents($argv[3]),true,512,JSON_THROW_ON_ERROR);IsolatedSourceRootTestRunner::assertManifestUnchanged($argv[2],$m);' \
+        "$REPO/scripts/testing/IsolatedSourceRootTestRunner.php" "$app_root" "$source_workspace/source-manifest.json"; then
+        echo "SUITE FAIL $label: staged source manifest changed during probe" >&2
         rc=1
     fi
     elapsed=$(( $(date +%s) - started ))
@@ -187,9 +211,21 @@ SQL
 run_static "authorizer-safety" "scripts/testing/probe_disposable_db_execution_authorizer.php"
 run_static "procurement-transaction-audit" "apps/Procurement/Tests/probe_transaction_contract_audit.php"
 run_static "procurement-method-boundaries" "apps/Procurement/Tests/probe_order_receipt_method_boundaries.php"
-run_disposable_probe "procurement-concurrency" "OH_PROC" "apps/Procurement/Tests/probe_procurement_concurrency.php"
-run_disposable_probe "manufacturing-transaction" "OH_MFG" "apps/Manufacturing/Tests/probe_upstream_supply_transaction.php"
-run_disposable_probe "manufacturing-concurrency" "OH_MFG" "apps/Manufacturing/Tests/probe_upstream_supply_concurrency.php"
+
+case "${OH_TEST_ONLY:-}" in
+    '')
+        run_disposable_probe "procurement-concurrency" "OH_PROC" "apps/Procurement/Tests/probe_procurement_concurrency.php"
+        run_disposable_probe "manufacturing-transaction" "OH_MFG" "apps/Manufacturing/Tests/probe_upstream_supply_transaction.php"
+        run_disposable_probe "manufacturing-concurrency" "OH_MFG" "apps/Manufacturing/Tests/probe_upstream_supply_concurrency.php"
+        ;;
+    manufacturing-transaction)
+        run_disposable_probe "manufacturing-transaction" "OH_MFG" "apps/Manufacturing/Tests/probe_upstream_supply_transaction.php"
+        ;;
+    *)
+        echo "Unknown OH_TEST_ONLY value: ${OH_TEST_ONLY}" >&2
+        exit 2
+        ;;
+esac
 
 if [ -n "$INSTALLED_PID" ]; then
     kill -0 "$INSTALLED_PID" 2>/dev/null && echo "installed_mysql_pid=$INSTALLED_PID preserved"

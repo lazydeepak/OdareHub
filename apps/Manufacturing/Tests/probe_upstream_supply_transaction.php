@@ -68,9 +68,9 @@ if (!$authorization['authorized']) {
 DisposableDbTestConfigurationGuard::assertUnchanged($configuration);
 
 define('APP_ROOT', $appRoot);
-require $repo . '/vendor/autoload.php';
-require_once $repo . '/apps/Manufacturing/modules/Products/Services/PartExecutionRouteResolver.php';
-require_once $repo . '/apps/Manufacturing/modules/Supply/Services/SupplyModel.php';
+require $appRoot . '/vendor/autoload.php';
+require_once $appRoot . '/apps/Manufacturing/modules/Products/Services/PartExecutionRouteResolver.php';
+require_once $appRoot . '/apps/Manufacturing/modules/Supply/Services/SupplyModel.php';
 
 use App\Core\DB;
 use Apps\Manufacturing\Services\UpstreamSupplyGenerationService;
@@ -100,7 +100,7 @@ $migrationFiles = [
     '/apps/Manufacturing/modules/DispatchEntries/migrations/001_dispatch_entries.sql',
 ];
 foreach ($migrationFiles as $relativePath) {
-    $sql = (string)@file_get_contents($repo . $relativePath);
+    $sql = (string)@file_get_contents($appRoot . $relativePath);
     $check($sql !== '', 'authoritative fixture loaded: ' . ltrim($relativePath, '/'));
     foreach (array_filter(array_map('trim', explode(';', $sql))) as $statement) {
         DB::query($statement);

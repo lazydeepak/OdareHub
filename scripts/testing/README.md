@@ -84,8 +84,12 @@ is intentionally no success exit from this validator.
 - A later independently attested runner must prove commit, rollback, foreign-key rejection, connection
   isolation, and teardown before business probes are authorized.
 
-The current workstation has Docker CLI but no reachable Docker daemon, so no
-provisioner or SQL runner is enabled in this slice.
+The current workstation has Docker CLI but no reachable Docker daemon. For the
+approved OH-AUTO1-068 qualification, the bounded
+`run_business_integrity_regression.sh` runner uses the independently attested
+Homebrew MySQL local-instance path when explicitly invoked; it stages a source
+root, validates the configuration and process identity before SQL, and removes
+only runner-owned disposable resources.
 
 ## Supplementary local authorizer
 

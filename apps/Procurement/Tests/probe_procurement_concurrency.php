@@ -62,7 +62,7 @@ if (!$authorization['authorized']) {
 DisposableDbTestConfigurationGuard::assertUnchanged($configuration);
 
 define('APP_ROOT', $appRoot);
-require $repo . '/vendor/autoload.php';
+require $appRoot . '/vendor/autoload.php';
 
 use App\Core\DB;
 use Apps\Procurement\Services\ProcurementOverviewService;

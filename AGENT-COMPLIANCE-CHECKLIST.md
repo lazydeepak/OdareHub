@@ -40,6 +40,20 @@ signatures remain diagnostic-only and cannot produce `eligible=true` or
 migration, installation, activation, publication, deployment, or Core
 operation occurred.
 
+## Session Summary (2026-10-15) — OH-AUTO1-068 Database Isolation and Requalification
+
+Corrected the non-Core disposable regression runner to use a complete staged
+source root outside the repository, temporary config identity, pre-SQL process
+attestation, post-run config/source fingerprint checks, safe database names, and
+bounded cleanup. Reproduced file-over-environment configuration precedence with
+synthetic values only.
+
+Isolation safety probe: ✅ 11/11. Existing guard/authorizer probes: ✅ 63/63 and
+9/9. Disposable fixture smoke: ✅ database creation, fixture load, commit,
+rollback, foreign-key rejection, shutdown, and teardown. Staged Manufacturing
+transaction regression: ✅ 21/21. ServBay PID 1181 and port 3306 were preserved;
+no installed database or credentials were accessed.
+
 ## Session Summary (2026-10-15) — OH-AUTO1-064 Offline Release Signature Verification
 
 Added pure Platform Updates components for strict canonical release-statement

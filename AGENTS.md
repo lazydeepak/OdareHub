@@ -24,6 +24,15 @@ the exact ZIP/sidecar verifier. Verified signatures remain diagnostic-only;
 readiness eligibility and apply preparation stay fail-closed. Preview
 authenticity regression: 44/44; apply preparation: 7/7.
 
+## Session Summary (2026-10-15) — OH-AUTO1-068 Database Isolation and Requalification
+
+The disposable database runner now stages and executes a complete isolated
+source root outside the repository, with configuration/process attestation and
+post-run fingerprint checks. Synthetic precedence and negative safety checks
+passed 11/11; disposable fixture commit/rollback/foreign-key smoke and staged
+Manufacturing transaction verification passed. Installed ServBay remained
+untouched.
+
 ## Session Summary (2026-10-15) — OH-AUTO1-064 Offline Release Signature Verification
 
 Added pure Platform Updates release-statement canonicalization and offline
