@@ -1,5 +1,20 @@
 # AGENT-COMPLIANCE-CHECKLIST
 
+## Session Summary (2026-10-15) — OH-AUTO1-071 Installation Identity Persistence
+
+Added `platform/Updates/InstallationIdentityStore.php` and its temporary-fixture
+probe. The store requires OH-AUTO1-070 independent evidence, refuses implicit
+overwrite, binds replacement to the observed fingerprint, preserves immutable
+predecessors, coordinates writers exclusively, atomically finalizes same-
+filesystem temporary records, detects interrupted writes, and restores prior
+identity after read-back failure. It exposes no update/apply authority.
+
+Validation: ✅ persistence probe 25/25; identity verifier 20/20; existing
+installed-build probe 13/13; PHP lint; architecture gates 49/49; deletion
+family gates 28/28; deployment readiness PASS in read-only verify mode; and
+diff hygiene. No installed identity, database, SQL, migration, readiness,
+apply, signing, trust, deployment, or Core operation.
+
 ## Session Summary (2026-10-15) — OH-AUTO1-070 Installed Platform Identity Verification
 
 Implemented `platform/Updates/InstalledPlatformIdentityVerifier.php` as a

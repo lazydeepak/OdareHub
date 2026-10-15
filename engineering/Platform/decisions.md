@@ -66,6 +66,30 @@ contract.
 `platform/Updates/tests/probe_installed_platform_identity_verifier.php`, and
 `docs/architecture/oh-auto1-070-installed-platform-identity-verification-2026-10-15.md`.
 
+### 2026-10-15 — OH-AUTO1-071 installation identity persistence boundary
+**Status:** Implemented and verified for disposable filesystem fixtures; trusted coordinator remains gated
+
+**Decision**
+
+The installation-owned identity persistence boundary is a Platform filesystem
+store with explicit initial creation and fingerprint-bound replacement. It uses
+exclusive locking, immutable predecessor evidence, same-filesystem temporary
+write plus atomic finalization, post-write read-back, and fail-closed
+interrupted-write classification. Repository paths, forbidden installation
+roots, traversal, unsafe symlink escapes, and implicit overwrite are rejected.
+
+The store invokes the OH-AUTO1-070 verifier for independent evidence but does
+not treat `verified=true` or any persisted record as release authority. Every
+result keeps update and apply eligibility false. Persistence is not connected
+to readiness, preview, apply, installation, database, migration, signing, or
+trust behavior.
+
+**Evidence**
+
+`platform/Updates/InstallationIdentityStore.php`,
+`platform/Updates/tests/probe_installation_identity_store.php`, and
+`docs/architecture/oh-auto1-071-installation-identity-persistence-2026-10-15.md`.
+
 ### 2026-10-15 — OH-AUTO1-060 migration execution feasibility reconciliation
 **Status:** Proposed; approval required
 

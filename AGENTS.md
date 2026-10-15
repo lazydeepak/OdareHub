@@ -1,5 +1,15 @@
 # AGENTS.md
 
+## Session Summary (2026-10-15) — OH-AUTO1-071 Installation Identity Persistence
+
+Implemented a Platform-owned disposable-filesystem identity store with explicit
+creation/replacement, installation-ID stability, exclusive locking, immutable
+predecessor evidence, same-filesystem atomic finalization, post-write read-back,
+fault-injection coverage, interrupted-write classification, rollback on
+read-back mismatch, and repository/traversal/symlink confinement. Persistence
+probe: 25/25. No installed path, database, readiness, apply, signing, trust,
+installation, deployment, or Core operation was performed.
+
 ## Session Summary (2026-10-15) — OH-AUTO1-070 Installed Platform Identity Verification
 
 Added a Platform-owned, read-only verifier for an explicitly supplied
