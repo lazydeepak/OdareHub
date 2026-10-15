@@ -6,6 +6,20 @@ OH-AUTO1-094 Processing authority closure is complete. Shell remains the
 generic operator composition and rendering boundary; Manufacturing owns lane
 authority and data projection.
 
+## 2026-10-16 — OH-AUTO2-103 restricted host-surface containment
+
+- [x] `AdminLayerService` passes the existing preflight admission decision to
+  `AdminSurfaceComposer`; only an explicit `unrestricted` result admits `/me`
+  host providers.
+- [x] `AdminSurfaceComposer` fails closed before
+  `HostSurfaceRegistryService::build('me', ...)` for restricted, malformed,
+  unavailable, and missing-preflight states.
+- [x] Isolated provider invocation proof: **15/15**. Restricted states load
+  and invoke zero providers; admitted unrestricted execution preserves provider
+  output and exception isolation.
+- [x] No provider, registry, Core, route, schema, installed database, browser,
+  activation, deployment, or production operation was changed or performed.
+
 ## 2026-10-16 — OH-AUTO2-100 restricted My Work non-mutating preflight
 
 - [x] `/me` now evaluates read-only assignment/scope evidence through the

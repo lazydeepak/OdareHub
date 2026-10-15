@@ -47,12 +47,27 @@ final class AdminSurfaceComposer
     private array $query;
 
     /**
+     * Host providers are admitted only after AdminLayerService has produced an
+     * explicit unrestricted preflight result.  The default is fail-closed for
+     * direct composition callers that do not provide that decision.
+     */
+    private bool $hostProvidersAllowed;
+
+    /**
      * @param array<string,mixed> $user  Authenticated user record from Auth::user()
      * @param array<string,mixed> $ctx   Resolved user context from UserAssignmentContext
      * @param array<string,mixed> $query Query parameters from $_GET
      * @param array<string,mixed>|null $preflightContext Server-resolved contained context
+     * @param bool $hostProvidersAllowed Explicit unrestricted preflight admission
      */
-    public function __construct(View $view, array $user, array $ctx, array $query = [], ?array $preflightContext = null)
+    public function __construct(
+        View $view,
+        array $user,
+        array $ctx,
+        array $query = [],
+        ?array $preflightContext = null,
+        bool $hostProvidersAllowed = false
+    )
     {
         $this->view  = $view;
         $this->user  = $user;
@@ -61,6 +76,7 @@ final class AdminSurfaceComposer
         }
         $this->ctx   = $ctx;
         $this->query = $query;
+        $this->hostProvidersAllowed = $hostProvidersAllowed;
     }
 
     /**
@@ -197,6 +213,14 @@ final class AdminSurfaceComposer
      */
     private function safeHostRegions(array $workspaceData): array
     {
+        // The preflight decision is the authorization boundary for the
+        // independently registered /me host surface. Suppress before registry
+        // discovery so restricted or unprovable requests cannot load provider
+        // files, invoke callbacks, or query provider-owned operational data.
+        if (!$this->hostProvidersAllowed) {
+            return [];
+        }
+
         try {
             $regions = HostSurfaceRegistryService::build('me', [
                 'user'      => $this->user,

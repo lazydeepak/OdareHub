@@ -70,8 +70,10 @@ final class AdminLayerService
             exit;
         }
 
+        $preflightState = (string)($ctx['_scope_preflight_state'] ?? '');
+        $hostProvidersAllowed = $preflightState === 'unrestricted';
         $preflightContext = null;
-        if ((string)($ctx['_scope_preflight_state'] ?? '') === 'unrestricted') {
+        if ($hostProvidersAllowed) {
             // Preserve the established unrestricted resolver and its existing
             // context shape. The preflight only decides whether that path is
             // safe to enter.
@@ -82,7 +84,14 @@ final class AdminLayerService
 
         $ctx = self::applyResolvedExperienceAdminOverrides($user, $ctx);
 
-        $composer = new AdminSurfaceComposer($view, $user, $ctx, $query, $preflightContext);
+        $composer = new AdminSurfaceComposer(
+            $view,
+            $user,
+            $ctx,
+            $query,
+            $preflightContext,
+            $hostProvidersAllowed
+        );
         $composer->renderHTML();
     }
 

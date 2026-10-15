@@ -1,5 +1,17 @@
 # AGENTS.md
 
+## Session Summary (2026-10-16) — OH-AUTO2-103 Restricted host-surface containment
+
+Added a fail-closed Shell admission boundary from the existing read-only
+assignment/scope preflight to `/me` host-provider execution. Restricted,
+malformed, unavailable, denied, and missing-preflight states now suppress host
+registry discovery before provider file loading or callback execution; explicit
+unrestricted behavior remains unchanged. Host containment proof **15/15**;
+preflight **17/17**; restricted containment **21/21**; visibility **14/14**;
+architecture **49/49**; deletion **28/28**; deployment readiness PASS. No Core,
+provider, registry, route, schema, installed database, browser, activation,
+deployment, or production operation.
+
 ## Session Summary (2026-10-16) — OH-AUTO1-098 My Work containment visibility
 
 Carried the existing Manufacturing `scope_containment` state through the Shell

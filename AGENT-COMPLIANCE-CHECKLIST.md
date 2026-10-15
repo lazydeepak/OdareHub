@@ -1,5 +1,32 @@
 # AGENT-COMPLIANCE-CHECKLIST
 
+## Session Summary (2026-10-16) — OH-AUTO2-103 Restricted Host-Surface Containment
+
+Added a bounded Shell composition admission seam using the existing read-only
+assignment/scope preflight. `/me` host providers are now invoked only when
+`AdminLayerService` has produced explicit `unrestricted` evidence. Restricted,
+malformed, unavailable, denied, and missing-preflight states return before
+`HostSurfaceRegistryService::build('me', ...)`, so provider files are not
+dynamically loaded and callbacks cannot execute.
+
+Valid unrestricted execution retains the existing host registry path,
+provider ordering, permission-profile filtering, GET route checks, and
+per-provider exception isolation. This does not solve unrestricted provider
+schema initialization or record-scope risks; those remain separately deferred.
+
+Files changed:
+- `apps/Shell/Services/AdminLayerService.php`
+- `apps/Shell/Composers/AdminSurfaceComposer.php`
+- `apps/Shell/Tests/probe_host_surface_restricted_containment.php`
+- `engineering/Shell/work.md`
+- `engineering/Shell/decisions.md`
+- `AGENT-COMPLIANCE-CHECKLIST.md`
+
+Validation: host containment **15/15**; preflight **17/17**; restricted
+containment **21/21**; visibility **14/14**; PHP lint; `git diff --check`.
+No Core, provider, registry, route, schema, installed database, browser,
+activation, deployment, or production operation.
+
 ## Session Summary (2026-10-16) — OH-AUTO2-101 Notification and Escalation Read-Path Safety
 
 Removed schema initialization and implicit escalation execution from

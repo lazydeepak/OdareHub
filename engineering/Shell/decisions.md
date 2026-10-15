@@ -2,6 +2,23 @@
 
 ## Decision Log
 
+### 2026-10-16 — OH-AUTO2-103 host-provider containment boundary
+
+**Status:** Accepted — bounded Shell composition admission
+
+The existing read-only assignment/scope preflight is the sole admission
+decision for `/me` host providers. `AdminLayerService` admits the registry only
+when the preflight state is explicitly `unrestricted`; `AdminSurfaceComposer`
+defaults to deny when no admission decision is supplied. Restricted, malformed,
+denied, unavailable, and missing-evidence requests return before host-provider
+discovery, dynamic file loading, or callback execution.
+
+This is a narrow composition boundary, not a provider capability allowlist or
+record-scope reconstruction. Valid unrestricted behavior, provider ordering,
+permission-profile filtering, GET route checks, and other host surfaces remain
+unchanged. Unrestricted provider mutation and record-scope risks remain open
+for OH-AUTO2-104/105/106.
+
 ### 2026-10-16 — OH-AUTO2-100 restricted My Work preflight boundary
 
 **Status:** Accepted — bounded non-mutating restricted path
