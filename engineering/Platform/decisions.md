@@ -42,6 +42,30 @@ concurrency and Hospitality database suites remain separately unqualified.
 `docs/architecture/oh-auto1-067-read-only-release-authenticity-preview-2026-10-15.md`,
 and `docs/architecture/oh-auto1-068-database-isolation-requalification-2026-10-15.md`.
 
+### 2026-10-15 — OH-AUTO1-070 installed platform identity verification boundary
+**Status:** Implemented and verified; persistence and authority integration remain gated
+
+**Decision**
+
+The first REL-002 implementation is a read-only verifier that accepts exactly
+one explicit installation-owned identity record and independently supplied
+package, signed-release, and schema observations. It validates internal shape,
+immutable build identity, release-statement fingerprint, signing-key identity,
+installation timestamp, and schema-state identity. Application-registry values
+are comparison evidence only and cannot provide fallback authority.
+
+Every result remains `update_eligible=false` and `apply_eligible=false`. The
+verifier does not persist records, change readiness or preview behavior, access
+the database, or introduce an authorization path. A future writer requires a
+separate storage, atomic replacement, recovery, and read-back verification
+contract.
+
+**Evidence**
+
+`platform/Updates/InstalledPlatformIdentityVerifier.php`,
+`platform/Updates/tests/probe_installed_platform_identity_verifier.php`, and
+`docs/architecture/oh-auto1-070-installed-platform-identity-verification-2026-10-15.md`.
+
 ### 2026-10-15 — OH-AUTO1-060 migration execution feasibility reconciliation
 **Status:** Proposed; approval required
 

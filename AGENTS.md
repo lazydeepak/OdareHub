@@ -1,5 +1,15 @@
 # AGENTS.md
 
+## Session Summary (2026-10-15) — OH-AUTO1-070 Installed Platform Identity Verification
+
+Added a Platform-owned, read-only verifier for an explicitly supplied
+installation-owned platform identity record and independent package,
+signed-release, and schema observations. The verifier rejects missing,
+ambiguous, malformed, unsupported, contradictory, and fallback-derived
+identity evidence and always keeps update/apply eligibility false. Deterministic
+identity probe: 20/20. No persistence, database, readiness, preview, apply,
+signing, trust, installation, deployment, or Core operation was performed.
+
 ## Session Summary (2026-10-15) — OH-AUTO1-065 Offline Artifact-Bound Release Verification
 
 Added a read-only exact-byte ZIP/sidecar verification adapter over the offline

@@ -8,7 +8,9 @@ Current reconciliation: OH-AUTO1-055 corrected the previously open Core ACL
 deny-precedence and plugin route-rollback defects. OH-AUTO1-068 has now
 requalified bounded disposable database testing; installed-database access,
 production verification, release authority, installed identity, and runtime
-acceptance remain blocked or human-gated.
+acceptance remain blocked or human-gated. OH-AUTO1-070 now provides a
+read-only installed-platform identity verification boundary; identity
+persistence and authority integration remain separately gated.
 
 OH-AUTO1-057 is complete as a documentation-only proposal for REL-001 and
 REL-002. Its architecture direction is accepted for the next implementation
@@ -53,6 +55,7 @@ remain unauthorized.
 - [x] OH-AUTO1-066 — Removed caller-controlled readiness authenticity from eligibility; readiness now fails closed with `eligible=false` until independently verified authority is integrated. Focused readiness, signature, artifact, preview, and apply regressions pass.
 - [x] OH-AUTO1-067 — Added read-only release-authenticity diagnostics to local channel preview using exact ZIP/sidecar verification and explicit in-memory signature/trust inputs. Valid, unsigned, invalid, unknown, revoked, mutation, missing-input, readiness, compatibility, and apply-blocking cases pass. See `docs/architecture/oh-auto1-067-read-only-release-authenticity-preview-2026-10-15.md`.
 - [x] OH-AUTO1-068 — Requalified bounded disposable MySQL testing. Corrected the runner to stage and execute a complete isolated source root, reproduced configuration precedence safely, passed isolation negatives 11/11, fixture commit/rollback/foreign-key smoke, and staged Manufacturing transaction 21/21. Installed ServBay remained untouched. See `docs/architecture/oh-auto1-068-database-isolation-requalification-2026-10-15.md`.
+- [x] OH-AUTO1-070 — Implemented the read-only installation-owned platform identity verifier. Deterministic identity, package, signed-release, schema, timestamp, contradiction, and registry-fallback fixtures pass 20/20; no persistence or eligibility path was added. See `docs/architecture/oh-auto1-070-installed-platform-identity-verification-2026-10-15.md`.
 - [x] OH-AUTO1-016 — Read-only application/module lifecycle enforcement audit. Corrected the SBAIO legacy fallback loader outside Core; escalated module-surface filtering, universal module route guards, and plugin partial-route rollback for Core/platform owner review. See `docs/architecture/lifecycle-enforcement-audit-2026-10-14.md`.
 - [x] OH-AUTO1-010 — CLI installed-state evidence integration.
 - [x] OH-AUTO1-011 — Migration ordering and schema-target compatibility preflight.
@@ -77,6 +80,7 @@ remain unauthorized.
 
 ## Next
 
+- [ ] Define and approve the installation-owned identity persistence writer contract, including atomic replacement, recovery evidence, stable installation-key provisioning, and post-write read-back verification. Do not implement persistence until this boundary is approved.
 - [ ] Define a versioned local channel manifest with release SHA-256, compatibility, migration warnings, and explicit apply eligibility.
 - [x] Define a complete database backup/recovery provider contract and configuration-preservation rules before any local apply implementation. See `docs/architecture/backup-provider-implementation-plan.md`.
 - [x] Implement read-only MySQL/MariaDB provider preflight plus recovery-point metadata validation tests. See `platform/Recovery/tests/probe_recovery_provider_preflight.php`.

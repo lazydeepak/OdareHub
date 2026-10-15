@@ -1,5 +1,18 @@
 # AGENT-COMPLIANCE-CHECKLIST
 
+## Session Summary (2026-10-15) — OH-AUTO1-070 Installed Platform Identity Verification
+
+Implemented `platform/Updates/InstalledPlatformIdentityVerifier.php` as a
+read-only authority-validation boundary for the future installation-owned
+identity record. Added the exact V1 record contract and deterministic fixture
+probe covering valid, missing, duplicate, malformed, contradictory, checksum,
+signed-release, schema, timestamp, unsupported-version, and application-
+registry-fallback cases.
+
+Validation: ✅ identity verifier probe 20/20; existing installed-build-identity
+probe 13/13; PHP lint; `git diff --check`. No persistence, database, SQL,
+readiness/apply integration, signing/trust changes, deployment, or Core change.
+
 ## Session Summary (2026-10-15) — OH-AUTO1-065 Offline Artifact-Bound Release Verification
 
 Added a read-only Platform Updates adapter that binds exact ZIP and sidecar
