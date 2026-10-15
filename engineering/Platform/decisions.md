@@ -2,6 +2,46 @@
 
 ## Decision Log
 
+### 2026-10-15 — OH-AUTO1-069 release foundation governance reconciliation
+**Status:** Accepted project execution authority; implementation remains separately gated
+
+**Decision**
+
+Make the release/update foundation the primary project milestone. The approved
+V1 direction is:
+
+- Ed25519-based release authentication over the canonical release statement;
+- manual administrator-approved updates rather than unattended application;
+- one authoritative installation-owned current platform build identity;
+- extension of the existing migration authority for controlled exact-step
+  execution, without introducing a second migration runner;
+- production Composer dependency materialization only in isolated release-build
+  copies; and
+- verified disposable database testing through the existing configuration guard,
+  process authorizer, and isolated source-root boundary.
+
+**Boundary**
+
+This records architecture and project priority, not operational enablement.
+Production signing, persistent trust provisioning, installed identity
+persistence, exact-step migration execution, release apply, installer behavior,
+deployment, and installed-database access each require their own implementation
+controls and verification. Readiness eligibility remains fail-closed; diagnostic
+signature verification does not grant apply permission.
+
+The OH-AUTO1-042 incident record and its unresolved historical restoration
+uncertainty remain authoritative. OH-AUTO1-067 and OH-AUTO1-068 prove only their
+documented diagnostic and disposable scopes. Procurement/Manufacturing
+concurrency and Hospitality database suites remain separately unqualified.
+
+**Evidence**
+
+`docs/architecture/oh-auto1-057-release-authority-installed-identity-design-2026-10-15.md`,
+`docs/architecture/oh-auto1-059-release-migration-compatibility-ordering-contract-2026-10-15.md`,
+`docs/architecture/oh-auto1-064-offline-release-signature-verification-2026-10-15.md`,
+`docs/architecture/oh-auto1-067-read-only-release-authenticity-preview-2026-10-15.md`,
+and `docs/architecture/oh-auto1-068-database-isolation-requalification-2026-10-15.md`.
+
 ### 2026-10-15 — OH-AUTO1-060 migration execution feasibility reconciliation
 **Status:** Proposed; approval required
 

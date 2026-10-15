@@ -14,26 +14,51 @@ The active product direction is:
 - app-owned modules and owner-declared capabilities
 - Shell, Platform, Studio, Manufacturing, SBAIO, Procurement, and Plugin boundaries kept explicit
 
+The current project execution authority is the release/update foundation. The
+next product milestone is to prove one isolated, non-production installation,
+signed update, post-update verification, and recovery cycle before broader
+business-feature expansion resumes.
+
 ## Active Focus
 
-Active task:
+Primary milestone:
 
-- `docs/active/hospitality-operator-composition-plan.md`
+- Release/update foundation — isolated installation, signed update,
+  post-update verification, and recovery proof.
 
-The Hospitality App Foundation is complete and validated
-(`docs/architecture/hospitality-foundation-release-readiness.md`). The current active
-work is planning the operator/workspace composition slice that composes Foundation
-surfaces into `/u/{username}/*` via the existing app-contribution mechanism.
+Approved execution sequence:
+
+1. OH-AUTO1-067 — completed read-only release-signature diagnostics;
+2. OH-AUTO1-068 — completed bounded disposable database requalification;
+3. OH-AUTO1-069 — current governance reconciliation;
+4. release authority, trust, installed build identity, and controlled migration
+   integration;
+5. isolated signed update, post-update verification, and recovery proof; then
+6. broader business-feature expansion.
+
+Evidence for the completed milestones is recorded in:
+
+- `docs/architecture/oh-auto1-067-read-only-release-authenticity-preview-2026-10-15.md`
+- `docs/architecture/oh-auto1-068-database-isolation-requalification-2026-10-15.md`
 
 ## Next Product Focus
 
-The current roadmap focus from `README.md` is worker-perspective UI creation:
+After the release/update cycle is proven, resume the product roadmap focus from
+`README.md`:
 
 - worker-focused `/me` composition with current work first and queue next
 - role-shaped execution surfaces for worker, leader, admin, read-only, and display modes
 - computed-scope aware worker UI for machines, parts, work areas, and process areas
 - display-safe read-only surfaces
 - dynamic worker navigation from effective access
+
+## Deferred Product Work
+
+The Hospitality App Foundation remains complete and validated
+(`docs/architecture/hospitality-foundation-release-readiness.md`), and its
+operator/workspace composition plan remains preserved at
+`docs/active/hospitality-operator-composition-plan.md`. It is deferred product
+work, not the current project execution milestone.
 
 Before implementation, verify whether a more recent active task exists under `docs/active/` or the relevant Engineering Workspace `work.md`.
 

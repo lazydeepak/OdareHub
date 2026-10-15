@@ -54,6 +54,20 @@ rollback, foreign-key rejection, shutdown, and teardown. Staged Manufacturing
 transaction regression: ✅ 21/21. ServBay PID 1181 and port 3306 were preserved;
 no installed database or credentials were accessed.
 
+## Session Summary (2026-10-15) — OH-AUTO1-069 Release Foundation Governance Reconciliation
+
+Updated `docs/CURRENT.md` to make the release/update foundation the primary
+project milestone and OH-AUTO1-069 the current governance task. Preserved the
+Hospitality operator-composition plan as deferred product work. Reconciled
+Platform work and decisions to distinguish qualified disposable database
+testing from unqualified suites, installed-database prohibition, production
+gates, and separately gated release-control implementation. Historical incident
+and proposal records were preserved; no runtime, database, Core, or historical
+artifact changes were made.
+
+Validation: ✅ targeted authoritative references, `git diff --check`, and Core
+lock scope review. Lifecycle logs and PHPUnit cache remain excluded.
+
 ## Session Summary (2026-10-15) — OH-AUTO1-064 Offline Release Signature Verification
 
 Added pure Platform Updates components for strict canonical release-statement

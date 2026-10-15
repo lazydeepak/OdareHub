@@ -2,7 +2,7 @@
 
 ## Current Focus
 
-Local deployment and update channel baseline.
+Release/update foundation governance and controlled-cycle readiness.
 
 Current reconciliation: OH-AUTO1-055 corrected the previously open Core ACL
 deny-precedence and plugin route-rollback defects. OH-AUTO1-068 has now
@@ -11,8 +11,10 @@ production verification, release authority, installed identity, and runtime
 acceptance remain blocked or human-gated.
 
 OH-AUTO1-057 is complete as a documentation-only proposal for REL-001 and
-REL-002. Signing, identity persistence, database, release apply, and deployment
-implementation remain unauthorized.
+REL-002. Its architecture direction is accepted for the next implementation
+sequence, but signing, persistent trust, identity persistence, database
+integration, release apply, and deployment implementation still require their
+own controls and authorization.
 
 OH-AUTO1-058 is complete as a bounded REL-004 package-path correction. The
 work was limited to disposable ZIP fixtures and package-builder policy; no
@@ -39,10 +41,10 @@ remain unauthorized.
 - [x] OH-AUTO1-053 — Diagnosed and corrected redundant Studio deletion-family gate traversal. The complete architecture suite passed 49/49; deletion-family certification remains 28/28 and dropped from approximately 320 seconds to approximately 43 seconds without removing assertions. See `docs/architecture/oh-auto1-053-aggregate-gate-reliability-2026-10-15.md`.
 - [x] OH-AUTO1-054 — Separated non-mutating deployment-readiness verification from explicit CSS publication. Default readiness now uses strict `--verify`; publication remains explicit via `--apply`. Fixture probe 10/10 and full readiness pass. See `docs/architecture/oh-auto1-054-non-mutating-deployment-readiness-2026-10-15.md`.
 - [x] OH-AUTO1-055 — Applied authorized Core ACL deny-precedence and plugin route-registration rollback corrections. In-memory regressions pass 12/12 and 15/15; architecture gates pass 49/49 with the scoped Core exception. See `docs/architecture/oh-auto1-055-core-security-lifecycle-remediation-2026-10-15.md`.
-- [x] OH-AUTO1-057 — Release authority and installed identity V1 design proposal. Pending architecture/release-authority decisions; no runtime implementation. See `docs/architecture/oh-auto1-057-release-authority-installed-identity-design-2026-10-15.md`.
+- [x] OH-AUTO1-057 — Release authority and installed identity V1 design proposal. Architecture direction accepted by the OH-AUTO1-069 superseding decision; no runtime implementation or trust provisioning. See `docs/architecture/oh-auto1-057-release-authority-installed-identity-design-2026-10-15.md`.
 - [x] OH-AUTO1-058 — Resolved vendor development metadata conflict at the release-builder boundary without weakening strict package inspection. REL-004 fixture 15/15; existing builder 13/13, preview 30/30, apply preparation 7/7, and readiness evidence 10/10. See `docs/architecture/oh-auto1-058-release-package-protected-path-compatibility-2026-10-15.md`.
-- [x] OH-AUTO1-059 — Release migration compatibility, target-schema identity, ordering, failure, and downgrade V1 contract proposal. Pending architecture/release-authority decisions; no migration execution or schema mutation. See `docs/architecture/oh-auto1-059-release-migration-compatibility-ordering-contract-2026-10-15.md`.
-- [x] OH-AUTO1-060 — Reconciled REL-003 execution feasibility: owner-batched runner limitation, exact planned-step contract, and failed-row evidence preservation. Pure fixture 18/18; existing migration probes unchanged. No runtime implementation or database execution. See the OH-AUTO1-059 contract and Platform decision log.
+- [x] OH-AUTO1-059 — Release migration compatibility, target-schema identity, ordering, failure, and downgrade V1 contract proposal. Architecture direction accepted by the OH-AUTO1-069 superseding decision; exact-step implementation and execution remain gated. See `docs/architecture/oh-auto1-059-release-migration-compatibility-ordering-contract-2026-10-15.md`.
+- [x] OH-AUTO1-060 — Reconciled REL-003 execution feasibility: owner-batched runner limitation, exact planned-step contract, and failed-row evidence preservation. Pure fixture 18/18; exact-step implementation and migration execution remain gated. See the OH-AUTO1-059 contract and Platform decision log.
 - [x] OH-AUTO1-061 — Produced and inspected an actual-source disposable package; identified the broken Composer autoload boundary caused by filtered development targets.
 - [x] OH-AUTO1-062 — Regenerated production Composer autoload metadata in runner-owned staging with `--no-dev --no-scripts --no-plugins`, verified zero missing production targets, and added a focused portability probe. Full development-package pruning remains policy-gated because Composer install/metadata rewriting is not authorized.
 - [x] OH-AUTO1-063 — Protected release identity-derived ZIP/sidecar/channel artifacts from overwrite and normalized build-ID collisions using temporary finalization and fail-closed collision checks. Immutability probe 13/13.
@@ -88,7 +90,7 @@ remain unauthorized.
 
 ## Blocked
 
-- Database-backed production verification remains blocked because OH-AUTO1-056 is explicitly deferred.
+- Qualified disposable database testing is permitted only through the attested isolated runner. Unqualified database-backed suites and all installed-database access remain blocked.
 - Release authority/attestation, installed build identity, migration semantics, and live runtime acceptance remain unresolved or human-gated.
 - Full production dependency pruning remains unresolved pending an approved Composer installation/metadata materialization policy; autoload portability itself is corrected and verified.
 

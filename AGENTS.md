@@ -33,6 +33,16 @@ passed 11/11; disposable fixture commit/rollback/foreign-key smoke and staged
 Manufacturing transaction verification passed. Installed ServBay remained
 untouched.
 
+## Session Summary (2026-10-15) — OH-AUTO1-069 Release Foundation Governance Reconciliation
+
+Reconciled `docs/CURRENT.md` and Platform workspace records so the release/update
+foundation is the authoritative project milestone. OH-AUTO1-067 and OH-AUTO1-068
+are recorded as completed; release authority, trust provisioning, installed
+build identity, controlled migration integration, and isolated signed update /
+recovery proof are the remaining sequence. Hospitality operator composition is
+preserved as deferred product work. No runtime, database, Core, or historical
+document rewrite occurred.
+
 ## Session Summary (2026-10-15) — OH-AUTO1-064 Offline Release Signature Verification
 
 Added pure Platform Updates release-statement canonicalization and offline
