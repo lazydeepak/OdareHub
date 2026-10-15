@@ -1,5 +1,28 @@
 # AGENTS.md
 
+## Session Summary (2026-10-16) — OH-AUTO2-105R Database probe incident reconciliation
+
+Read-only reconstruction found that the existing DB-backed
+`apps/SBAIO/Tests/probe_behavioral_sales_status.php` was accidentally executed
+during OH-AUTO2-105 through the repository's direct DB bootstrap. The target
+was the local development configuration (`127.0.0.1`, database
+`os.susankhya.com`, user `root`), not an independently attested disposable
+database. The probe source contains table creation, deletion of `VALID-%`
+rows, two test inserts, and validation queries.
+
+The exact command, timestamp, statement outcomes, prior table state, and
+rollback state could not be recovered. No cleanup, SQL, migration, repair,
+restart, or DB-backed rerun was performed. Impact is **undetermined**; the
+incident remains open and OH-AUTO2-106 is deferred. See the incident
+reconciliation in `AGENT-COMPLIANCE-CHECKLIST.md` and `engineering/SBAIO/work.md`.
+
+OH-AUTO2-105S then added the existing disposable entry-point guard before
+autoload/bootstrap for the SBAIO sales probe. Static inventory also found and
+guarded the SBAIO lifecycle and Manufacturing BOM DB probes. The governed
+inventory now contains 29 DB entry points with explicit disposable-runner
+branches. Static/configuration-only verification passed; no DB-backed probe
+was run.
+
 ## Session Summary (2026-10-16) — OH-AUTO2-105 Provider scope authorization
 
 Manufacturing `/me` summary/module providers now require existing Platform

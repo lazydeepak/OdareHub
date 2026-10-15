@@ -166,6 +166,12 @@ SQL
     if [ "$prefix" = "OH_PROC" ]; then
         OH_PROC_REPO="$REPO" OH_PROC_APP_ROOT="$app_root" OH_PROC_DB_PID="$pid" OH_PROC_DB_SOCKET="$socket" OH_PROC_DB_DATADIR="$data" OH_PROC_DB_RESOURCE_ROOT="$root" OH_PROC_DB_PORT="$port" OH_PROC_DB_NAME="$db" OH_PROC_DB_USER="$user" "$PHP_BIN" "$app_root/$probe"
         rc=$?
+    elif [ "$prefix" = "OH_SBAIO" ]; then
+        OH_SBAIO_REPO="$REPO" OH_SBAIO_APP_ROOT="$app_root" OH_SBAIO_DB_PID="$pid" OH_SBAIO_DB_SOCKET="$socket" OH_SBAIO_DB_DATADIR="$data" OH_SBAIO_DB_RESOURCE_ROOT="$root" OH_SBAIO_DB_PORT="$port" OH_SBAIO_DB_NAME="$db" OH_SBAIO_DB_USER="$user" "$PHP_BIN" "$app_root/$probe"
+        rc=$?
+    elif [ "$prefix" = "OH_MFG_BOM" ]; then
+        OH_MFG_BOM_REPO="$REPO" OH_MFG_BOM_APP_ROOT="$app_root" OH_MFG_BOM_DB_PID="$pid" OH_MFG_BOM_DB_SOCKET="$socket" OH_MFG_BOM_DB_DATADIR="$data" OH_MFG_BOM_DB_RESOURCE_ROOT="$root" OH_MFG_BOM_DB_PORT="$port" OH_MFG_BOM_DB_NAME="$db" OH_MFG_BOM_DB_USER="$user" "$PHP_BIN" "$app_root/$probe"
+        rc=$?
     elif [ "$prefix" = "OH_EXACT" ]; then
         OH_EXACT_REPO="$REPO" OH_EXACT_APP_ROOT="$app_root" OH_EXACT_DB_PID="$pid" OH_EXACT_DB_SOCKET="$socket" OH_EXACT_DB_DATADIR="$data" OH_EXACT_DB_RESOURCE_ROOT="$root" OH_EXACT_DB_PORT="$port" OH_EXACT_DB_NAME="$db" OH_EXACT_DB_USER="$user" "$PHP_BIN" "$app_root/$probe"
         rc=$?
@@ -218,11 +224,21 @@ run_static "procurement-method-boundaries" "apps/Procurement/Tests/probe_order_r
 case "${OH_TEST_ONLY:-}" in
     '')
         run_disposable_probe "procurement-concurrency" "OH_PROC" "apps/Procurement/Tests/probe_procurement_concurrency.php"
+        run_disposable_probe "sbaio-sales-status" "OH_SBAIO" "apps/SBAIO/Tests/probe_behavioral_sales_status.php"
         run_disposable_probe "manufacturing-transaction" "OH_MFG" "apps/Manufacturing/Tests/probe_upstream_supply_transaction.php"
         run_disposable_probe "manufacturing-concurrency" "OH_MFG" "apps/Manufacturing/Tests/probe_upstream_supply_concurrency.php"
         ;;
     manufacturing-transaction)
         run_disposable_probe "manufacturing-transaction" "OH_MFG" "apps/Manufacturing/Tests/probe_upstream_supply_transaction.php"
+        ;;
+    sbaio-sales-status)
+        run_disposable_probe "sbaio-sales-status" "OH_SBAIO" "apps/SBAIO/Tests/probe_behavioral_sales_status.php"
+        ;;
+    sbaio-lifecycle)
+        run_disposable_probe "sbaio-lifecycle" "OH_SBAIO" "apps/SBAIO/Tests/probe_lifecycle_execution_boundary.php"
+        ;;
+    manufacturing-bom)
+        run_disposable_probe "manufacturing-bom" "OH_MFG_BOM" "apps/Manufacturing/modules/Bom/Tests/probe_bom_contract.php"
         ;;
     exact-step-migrations)
         run_disposable_probe "exact-step-migrations" "OH_EXACT" "platform/Updates/tests/probe_controlled_exact_step_migrations.php"

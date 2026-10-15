@@ -59,8 +59,8 @@ $prepared = null;
 try {
     $prepared = IsolatedSourceRootTestRunner::prepare($repo);
     $manifest = $prepared['manifest'];
-    $check(count($manifest['entry_points']) === 26, 'all 26 guarded entry points declared');
-    $check(count(array_intersect($manifest['entry_points'], IsolatedSourceRootTestRunner::databaseEntryPoints())) === 26, 'entry-point manifest matches authority list');
+    $check(count($manifest['entry_points']) === 29, 'all 29 guarded entry points declared');
+    $check(count(array_intersect($manifest['entry_points'], IsolatedSourceRootTestRunner::databaseEntryPoints())) === 29, 'entry-point manifest matches authority list');
     $check(!is_file($prepared['source_root'] . '/storage/db_config.php'), 'installed database config excluded');
     $check(!is_file($prepared['source_root'] . '/app/.env') && !is_file($prepared['source_root'] . '/app/credentials.txt'), 'credential-bearing files excluded');
     $check(is_file($prepared['source_root'] . '/vendor/acme/runtime/src/Runtime.php') && !is_file($prepared['source_root'] . '/vendor/acme/runtime/tests/RuntimeTest.php'), 'vendor runtime retained while test tree excluded');

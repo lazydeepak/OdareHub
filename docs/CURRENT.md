@@ -88,6 +88,13 @@ Evidence for the completed milestones is recorded in:
   app/module authority before operational collection. SBAIO personnel/payroll
   summaries and watchlists remain suppressed because no record-level
   authorization contract is available; route-authorized navigation remains.
+  Implementation acceptance is provisional: OH-AUTO2-105R is open because an
+  existing DB-backed SBAIO probe was accidentally run against the repository's
+  configured local development target. No cleanup or further DB operation is
+  authorized until the target and impact are independently assessed.
+- OH-AUTO2-105S — the unguarded SBAIO DB-backed probe now requires the existing
+  disposable entry-point attestation before any application autoload/bootstrap;
+  the isolated source-root inventory contains 29 governed DB entry points.
 
 After the release/update cycle is proven, resume the product roadmap focus from
 `README.md`:

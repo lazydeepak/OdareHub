@@ -10,7 +10,9 @@ declare(strict_types=1);
  * skipped cleanly otherwise (mirrors the Hospitality probe guard).
  */
 
-define('APP_ROOT', dirname(__DIR__, 5));
+require_once dirname(__DIR__, 5) . '/scripts/testing/DisposableDbTestEntryPointGuard.php';
+$ohTestContext = DisposableDbTestEntryPointGuard::authorize('OH_MFG_BOM', dirname(__DIR__, 5));
+define('APP_ROOT', $ohTestContext['app_root']);
 
 require_once APP_ROOT . '/vendor/autoload.php';
 require_once APP_ROOT . '/plugins/Base/bootstrap.php';
