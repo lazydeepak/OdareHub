@@ -22,8 +22,11 @@ brief's pressure-test workstreams and synthesis complete.
   My Work queue is not uniformly scope-safe. See
   `docs/architecture/oh-auto1-095-work-process-area-authority-inventory.md`.
 
-- [ ] OH-AUTO1-096 — implement only the separately approved Manufacturing-owned
-  scope-safe work/process presentation projection; no new area authority fields.
+- [x] OH-AUTO1-096 — implemented the bounded Manufacturing-owned scope-safe
+  work/process presentation projection with Assembly/QC only. The broad My
+  Work queue, machine/production sources without equivalent pre-limit scope
+  proof, and product-stage derivation without product attributes remain
+  excluded. See `docs/architecture/oh-auto1-096-scope-safe-work-process-summary-2026-10-15.md`.
 
 - [x] OH-AUTO1-088 — normalized the owner-shaped runtime scope at the adapter
   boundary, aligned top-level sections with scoped filters, intersected
@@ -72,8 +75,8 @@ brief's pressure-test workstreams and synthesis complete.
 
 ## Next
 
-- [ ] OH-AUTO1-096 — Manufacturing scope-safe work/process area summary,
-  subject to separate authorization and focused proof.
+- [x] OH-AUTO1-096 — Manufacturing scope-safe work/process area summary,
+  completed with focused proof; no new area authority fields.
 - [ ] OH-AUTO1-034 — Reconcile updated integration baseline and source inventory.
 
 ## Blocked

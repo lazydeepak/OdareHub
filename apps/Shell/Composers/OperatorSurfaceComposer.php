@@ -15,6 +15,7 @@ use Apps\Manufacturing\Services\OperatorLayerAdapters\DispatchAdapter;
 use Apps\Manufacturing\Services\OperatorLayerAdapters\MachinesAdapter;
 use Apps\Manufacturing\Services\OperatorPartsWorkspaceService;
 use Apps\Manufacturing\Services\OperatorLayerAdapters\ProcessingAdapter;
+use Apps\Manufacturing\Services\OperatorLayerAdapters\WorkProcessSummaryAdapter;
 use Apps\Manufacturing\Services\OperatorLayerAdapters\MaterialsAdapter;
 use Apps\Shell\Services\OperatorLayerAdapters\PartDetailAdapter;
 use Apps\Manufacturing\Services\OperatorLayerAdapters\QcAdapter;
@@ -30,6 +31,7 @@ use Plugins\Base\Services\NotificationService;
 
 require_once __DIR__ . '/../Services/OperatorSurfaceContributionRegistry.php';
 require_once APP_ROOT . '/apps/Manufacturing/Services/OperatorLayerAdapters/ProcessingAdapter.php';
+require_once APP_ROOT . '/apps/Manufacturing/Services/OperatorLayerAdapters/WorkProcessSummaryAdapter.php';
 require_once __DIR__ . '/../Services/PlatformWidgetBlueprintRuntimeService.php';
 require_once __DIR__ . '/../Services/OperatorLayerWidgetService.php';
 require_once __DIR__ . '/../Services/OperatorPartDetailActionAuthority.php';
@@ -496,6 +498,9 @@ final class OperatorSurfaceComposer
     public function buildContent(): array
     {
         $hasManufacturing = $this->hasAssignedApp('manufacturing');
+        $currentQuery = (array)($this->context['current_query'] ?? []);
+        $requestedFocus = strtolower(trim((string)($currentQuery['focus'] ?? '')));
+        $isDashboardSurface = $requestedFocus === '' || in_array($requestedFocus, ['dashboard', 'overview'], true);
         $notificationsFocus = $this->buildNotificationsFocusData();
         $messagesFocus = $this->buildMessagesFocusData();
         $tasksFocus = $this->buildTasksFocusData();
@@ -524,6 +529,21 @@ final class OperatorSurfaceComposer
         $tiles = $hasManufacturing ? $this->selectMustHaveDashboardTiles($allTiles) : [];
         if ($generatedSecondaryTiles !== []) {
             $tiles = array_merge($generatedSecondaryTiles, $tiles);
+        }
+
+        $workProcessSummary = [];
+        if ($hasManufacturing && $isDashboardSurface) {
+            $summaryDate = trim((string)($currentQuery['processing_date'] ?? date('Y-m-d')));
+            $operatorUser = is_array($this->context['operator_user'] ?? null)
+                ? $this->context['operator_user']
+                : null;
+            $workProcessSummary = WorkProcessSummaryAdapter::getData(
+                $summaryDate,
+                $operatorUser,
+                $this->context,
+                $this->username,
+                $this->context['operator_route_access_resolver'] ?? null
+            );
         }
 
         return [
@@ -562,6 +582,7 @@ final class OperatorSurfaceComposer
             'preferences_focus' => $this->buildPreferencesFocusData(),
             'tasks_focus'     => $tasksFocus,
             'worker_work' => $workerWork,
+            'work_process_summary' => $workProcessSummary,
             'operator_interaction_profile' => $roleHome['profile'],
             'operator_read_only' => $roleHome['read_only'],
             'operator_role_regions' => $roleHome['regions'],

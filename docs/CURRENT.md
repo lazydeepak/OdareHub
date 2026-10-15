@@ -16,8 +16,8 @@ The active product direction is:
 
 The disposable release/update foundation is complete through OH-AUTO1-080.
 Production installation, update, and apply remain unauthorized. Product
-development has resumed on the Shell worker surface; OH-AUTO1-094 is the
-completed Processing authority-closure milestone.
+development has resumed on the Shell worker surface; OH-AUTO1-096 is the
+completed scope-safe work/process summary milestone.
 
 ## Active Focus
 
@@ -57,9 +57,11 @@ Evidence for the completed milestones is recorded in:
 ## Next Product Focus
 
 - OH-AUTO1-095 — the read-only work/process-area authority inventory is
-  complete. It found no independent area authorization dimension. The proposed
-  next bounded milestone is OH-AUTO1-096: a Manufacturing-owned scope-safe
-  work/process presentation projection using existing authority only.
+  complete. It found no independent area authorization dimension.
+- OH-AUTO1-096 — the bounded Manufacturing-owned scope-safe work/process
+  presentation projection is complete for existing Assembly/QC Processing
+  lanes. Machine/production and broad My Work sources remain excluded pending
+  equivalent scope evidence.
 
 After the release/update cycle is proven, resume the product roadmap focus from
 `README.md`:

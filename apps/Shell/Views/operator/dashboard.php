@@ -94,6 +94,57 @@
                             <?php endif; ?>
                         </section>
                         <?php endif; ?>
+                        <?php $workProcessSummary = is_array($data['work_process_summary'] ?? null) ? $data['work_process_summary'] : []; ?>
+                        <?php if ($workProcessSummary !== []): ?>
+                            <section class="operator-role-home operator-work-process-summary" aria-labelledby="operator-work-process-summary-title">
+                                <div class="operator-role-home__head">
+                                    <h3 id="operator-work-process-summary-title"><?php echo htmlspecialchars($this->tr('operator.work_process.title', 'Work and process summary')); ?></h3>
+                                    <span class="operator-role-widget__meta"><?php echo htmlspecialchars($this->tr('operator.work_process.source', 'Authorized Processing records')); ?></span>
+                                </div>
+                                <?php if (($workProcessSummary['available'] ?? false) !== true): ?>
+                                    <p class="operator-worker-work__empty">
+                                        <?php echo htmlspecialchars($this->tr('operator.work_process.unavailable', 'Work and process information is unavailable.')); ?>
+                                    </p>
+                                <?php else: ?>
+                                    <div class="operator-role-widgets">
+                                        <?php foreach ((array)($workProcessSummary['lanes'] ?? []) as $lane): ?>
+                                            <?php if (!is_array($lane)) { continue; } ?>
+                                            <article class="operator-role-widget" data-work-process-lane="<?php echo htmlspecialchars((string)($lane['key'] ?? '')); ?>">
+                                                <div class="operator-role-widget__head">
+                                                    <strong><?php echo htmlspecialchars((string)($lane['label'] ?? '')); ?></strong>
+                                                    <span class="operator-role-widget__value"><?php echo htmlspecialchars((string)((int)($lane['count'] ?? 0))); ?></span>
+                                                </div>
+                                                <p class="operator-role-widget__meta">
+                                                    <?php echo htmlspecialchars($this->tr('operator.work_process.records', 'Authorized records')); ?>
+                                                    <?php if (trim((string)($lane['presentation_area'] ?? '')) !== ''): ?>
+                                                        · <?php echo htmlspecialchars((string)$lane['presentation_area']); ?>
+                                                    <?php endif; ?>
+                                                </p>
+                                                <?php if ((array)($lane['records'] ?? []) === []): ?>
+                                                    <p class="operator-worker-work__empty"><?php echo htmlspecialchars($this->tr('operator.work_process.empty', 'No activity in this authorized lane.')); ?></p>
+                                                <?php else: ?>
+                                                    <ul class="operator-role-widget__rows">
+                                                        <?php foreach ((array)($lane['records'] ?? []) as $record): ?>
+                                                            <?php if (!is_array($record)) { continue; } ?>
+                                                            <li>
+                                                                <?php $recordPartName = trim((string)($record['part_name'] ?? '')); ?>
+                                                                <?php echo htmlspecialchars($recordPartName !== '' ? $recordPartName : (string)($record['part_number'] ?? '')); ?>
+                                                                <?php if (trim((string)($record['status'] ?? '')) !== ''): ?>
+                                                                    · <?php echo htmlspecialchars((string)$record['status']); ?>
+                                                                <?php endif; ?>
+                                                            </li>
+                                                        <?php endforeach; ?>
+                                                    </ul>
+                                                <?php endif; ?>
+                                                <?php if (trim((string)($lane['destination'] ?? '')) !== ''): ?>
+                                                    <a href="<?php echo htmlspecialchars((string)$lane['destination']); ?>"><?php echo htmlspecialchars($this->tr('operator.work_process.open', 'Open Processing')); ?></a>
+                                                <?php endif; ?>
+                                            </article>
+                                        <?php endforeach; ?>
+                                    </div>
+                                <?php endif; ?>
+                            </section>
+                        <?php endif; ?>
                         <?php if (!empty($data['common_home_tiles']) && is_array($data['common_home_tiles'])): ?>
                         <div class="dashboard-top-grid">
                             <?php foreach ((array)($data['common_home_tiles'] ?? []) as $tile): ?>

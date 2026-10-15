@@ -2,6 +2,33 @@
 
 ## Decision Log
 
+### 2026-10-15 — OH-AUTO1-096 scope-safe work/process summary
+
+**Status:** Accepted — bounded Assembly/QC dashboard contribution
+
+**Decision**
+
+The operator dashboard may show a compact Manufacturing work/process summary
+only from the existing `ProcessingAdapter` projection. Assembly and QC lanes
+are included only from that projection's exact authority flags and already
+scope-filtered rows. The summary does not consume the broad My Work queue,
+query broader records, or treat area labels as authorization.
+
+Same-user Processing links are checked through the existing operator GET route
+authority; a missing or denied resolver omits the link. An authorized empty
+lane remains visible as empty, while denied or unavailable evidence produces no
+lane or count. Area labels remain presentation-only.
+
+Process-stage descriptions, machine/production summaries, new area fields,
+permissions, routes, migrations, Core changes, and database/browser operations
+remain outside this milestone because their required authority or product
+attribute contracts were not established.
+
+**Evidence**
+
+The isolated summary/render proof passes **23/23**. Existing Processing,
+worker-task, and role-home proofs pass **35/35**, **41/41**, and **26/26**.
+
 ### 2026-10-15 — OH-AUTO1-095 work/process-area authority inventory
 
 **Status:** Accepted as inventory and implementation boundary
