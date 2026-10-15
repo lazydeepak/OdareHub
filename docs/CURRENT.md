@@ -56,8 +56,10 @@ Evidence for the completed milestones is recorded in:
 
 ## Next Product Focus
 
-- Identify authoritative existing work-area/process-area scope dimensions before
-  adding any new presentation or scope fields; keep that work separately bounded.
+- OH-AUTO1-095 — the read-only work/process-area authority inventory is
+  complete. It found no independent area authorization dimension. The proposed
+  next bounded milestone is OH-AUTO1-096: a Manufacturing-owned scope-safe
+  work/process presentation projection using existing authority only.
 
 After the release/update cycle is proven, resume the product roadmap focus from
 `README.md`:

@@ -2,6 +2,43 @@
 
 ## Decision Log
 
+### 2026-10-15 — OH-AUTO1-095 work/process-area authority inventory
+
+**Status:** Accepted as inventory and implementation boundary
+
+**Decision**
+
+Manufacturing does not currently have an independent authoritative
+`work_area` or `process_area` scope dimension. Existing authorization is based
+on resolved assignment evidence, active app/module authority, machine/part/task
+operational scope, existing permissions/duties, and owner-specific record and
+transition checks.
+
+`MyWorkContributionService::primaryWorkArea()`, `crossWorkAreas()`, and
+`workAreaForItem()` remain presentation classifications. They must not grant
+record visibility, action access, or mutation authority. Product stage paths
+and handoff stages remain workflow classification, not user scope.
+
+The broad shared My Work queue is not accepted as a scope-safe source for a
+future area/process projection because its current runtime-backed and legacy
+queries do not consistently apply resolved machine/part predicates before
+limits. The Core query path remains unchanged and outside this milestone.
+
+**Consequence**
+
+The next bounded milestone may expose computed area/process presentation only
+from already-authorized Manufacturing projections and existing route authority.
+It must not add new area fields, permission catalogs, migrations, Core changes,
+or infer authority from labels. The proposed boundary is recorded as
+OH-AUTO1-096 in
+`docs/architecture/oh-auto1-095-work-process-area-authority-inventory.md`.
+
+**Evidence**
+
+The inventory cites the Base assignment/scope resolver, operational-scope
+migration, Manufacturing Processing/Production/Machines boundaries, operator
+contribution service, stage transition contract, and shared My Work query paths.
+
 ### 2026-10-15 — OH-AUTO1-094 Processing authority closure
 
 **Status:** Accepted

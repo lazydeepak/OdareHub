@@ -1,5 +1,23 @@
 # AGENT-COMPLIANCE-CHECKLIST
 
+## Session Summary (2026-10-15) — OH-AUTO1-095 Work/process-area authority inventory
+
+Completed the requested read-only authority inventory. Existing authoritative
+dimensions are resolved assignment evidence, active app/module access,
+machine/part/task operational scope, permissions, duties, and owner-specific
+record/action checks. `primaryWorkArea()`, `crossWorkAreas()`, and
+`workAreaForItem()` are presentation grouping helpers, not authorization.
+Product stage paths and handoff stages are workflow classification, not user
+scope. The shared My Work queue is not uniformly scope-safe because its query
+paths do not consistently apply machine/part predicates before limits.
+
+Created `docs/architecture/oh-auto1-095-work-process-area-authority-inventory.md`
+with owner mapping, evidence paths, unsupported dimensions, interaction rules,
+and a bounded OH-AUTO1-096 recommendation. Updated `docs/CURRENT.md` and the
+Manufacturing workspace records. No runtime, schema, database, browser,
+production, deployment, activation, or Core operation occurred. Existing
+lifecycle logs and PHPUnit cache were preserved and remain uncommitted.
+
 ## Session Summary (2026-10-15) — OH-AUTO1-094 Processing authority closure
 
 Closed the Processing authority gaps without adding routes, permissions, scope

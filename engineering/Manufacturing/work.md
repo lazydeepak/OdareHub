@@ -16,8 +16,14 @@ brief's pressure-test workstreams and synthesis complete.
 
 ## In Progress
 
-- [ ] Identify authoritative existing work-area/process-area scope dimensions
-  before introducing any new fields or UI.
+- [x] OH-AUTO1-095 — completed the read-only work-area/process-area authority
+  inventory. Existing machine/part/task and assignment evidence is authoritative;
+  `MyWorkContributionService` area values are presentation-only, and the broad
+  My Work queue is not uniformly scope-safe. See
+  `docs/architecture/oh-auto1-095-work-process-area-authority-inventory.md`.
+
+- [ ] OH-AUTO1-096 — implement only the separately approved Manufacturing-owned
+  scope-safe work/process presentation projection; no new area authority fields.
 
 - [x] OH-AUTO1-088 — normalized the owner-shaped runtime scope at the adapter
   boundary, aligned top-level sections with scoped filters, intersected
@@ -66,6 +72,8 @@ brief's pressure-test workstreams and synthesis complete.
 
 ## Next
 
+- [ ] OH-AUTO1-096 — Manufacturing scope-safe work/process area summary,
+  subject to separate authorization and focused proof.
 - [ ] OH-AUTO1-034 — Reconcile updated integration baseline and source inventory.
 
 ## Blocked
