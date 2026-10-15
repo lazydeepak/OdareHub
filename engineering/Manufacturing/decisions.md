@@ -2,6 +2,32 @@
 
 ## Decision Log
 
+### 2026-10-15 — OH-AUTO1-094 Processing authority closure
+
+**Status:** Accepted
+
+**Decision**
+
+Processing remains a mixed operator surface, but Assembly and QC are separate
+existing module authorities. Manufacturing now grants the Assembly lane only
+from the exact `assembly` module token and the QC lane only from the exact
+`qc` token; `processing` and `processing_operation` are not aliases for either
+lane. Unauthorized lanes are not queried or projected, and both lane authority
+flags are handed to Shell for action rendering.
+
+The existing interaction profile remains mutation authority at POST time.
+`read_only` and `display` profiles fail before record lookup, schema
+initialization, or writes for both create and status operations. The existing
+Assembly schema preparation remains after this authority gate and is not moved
+or broadened. No new permission framework or scope dimension was introduced.
+
+**Evidence**
+
+The isolated Processing proof passes **27/27**, including Assembly-only,
+QC-only, neither-module, mixed-record, both read-only status denials, exact
+lane authority, all four POST authority calls, and authority-before-schema/
+mutation checks.
+
 ### 2026-10-15 — OH-AUTO1-093 scope-aware Processing workspace and mutation gates
 
 **Status:** Accepted

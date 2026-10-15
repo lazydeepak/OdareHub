@@ -2,9 +2,18 @@
 
 ## Current Focus
 
-OH-AUTO1-093 scope-aware Processing workspace and mutation gates are complete.
-Shell remains the generic operator composition and route-dispatch boundary;
-Manufacturing owns Processing data and authority.
+OH-AUTO1-094 Processing authority closure is complete. Shell remains the
+generic operator composition and rendering boundary; Manufacturing owns lane
+authority and data projection.
+
+## 2026-10-15 — OH-AUTO1-094 Processing authority closure
+
+- [x] Shell consumes separate Manufacturing-owned `assembly_allowed` and
+  `qc_allowed` flags and suppresses unauthorized lane links, forms, and row
+  actions while preserving the read-only/display mutation boundary.
+- [x] No Shell permission or business authority was added; the view only
+  renders the owner-provided lane decisions.
+- [x] Existing `/u/*` routes and schema-initialization ordering remain intact.
 
 ## 2026-10-15 — OH-AUTO1-093 Processing composition boundary
 

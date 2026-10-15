@@ -11,11 +11,13 @@
                     <?php $processingFlash = trim((string)($processing['flash'] ?? '')); ?>
 <?php $processingError = trim((string)($processing['error'] ?? '')); ?>
 <?php $processingCanMutate = (bool)($processing['can_mutate'] ?? false); ?>
+<?php $processingAssemblyAllowed = (bool)($processing['assembly_allowed'] ?? false); ?>
+<?php $processingQcAllowed = (bool)($processing['qc_allowed'] ?? false); ?>
                     <?php $_procSubUser = htmlspecialchars(rawurlencode((string)($data['username'] ?? ''))); ?>
                     <nav class="operator-subnav" aria-label="<?php echo htmlspecialchars($this->tr('operator.processing.subnav.label', 'Processing sections')); ?>">
                         <a class="operator-subnav-item operator-subnav-item--active" href="/u/<?php echo $_procSubUser; ?>/processing" aria-current="page"><?php echo htmlspecialchars($this->tr('operator.processing.subnav.hub', 'Overview')); ?></a>
-                        <a class="operator-subnav-item" href="/u/<?php echo $_procSubUser; ?>/assembly"><?php echo htmlspecialchars($this->tr('operator.processing.subnav.assembly', 'Assembly')); ?></a>
-                        <a class="operator-subnav-item" href="/u/<?php echo $_procSubUser; ?>/qc"><?php echo htmlspecialchars($this->tr('operator.processing.subnav.qc', 'QC')); ?></a>
+                        <?php if ($processingAssemblyAllowed): ?><a class="operator-subnav-item" href="/u/<?php echo $_procSubUser; ?>/assembly"><?php echo htmlspecialchars($this->tr('operator.processing.subnav.assembly', 'Assembly')); ?></a><?php endif; ?>
+                        <?php if ($processingQcAllowed): ?><a class="operator-subnav-item" href="/u/<?php echo $_procSubUser; ?>/qc"><?php echo htmlspecialchars($this->tr('operator.processing.subnav.qc', 'QC')); ?></a><?php endif; ?>
                     </nav>
                     <section class="recent-focus" aria-label="<?php echo htmlspecialchars((string)($processing['title'] ?? $this->tr('operator.processing.title', 'Processing'))); ?>">
                         <h2 class="dashboard-top-title"><?php echo htmlspecialchars((string)($processing['title'] ?? $this->tr('operator.processing.title', 'Processing'))); ?></h2>
@@ -30,7 +32,7 @@
 
                         <section class="surface-card" aria-label="<?php echo htmlspecialchars($this->tr('operator.processing.assembly.title', 'Assembly Plan')); ?>">
                             <h3 class="work-entry-embed-title"><?php echo htmlspecialchars($this->tr('operator.processing.assembly.title', 'Assembly Plan')); ?></h3>
-                            <?php if ($processingCanMutate): ?><div class="production-focus-actions u-mb-10">
+                            <?php if ($processingAssemblyAllowed && $processingCanMutate): ?><div class="production-focus-actions u-mb-10">
                                 <button
                                     class="btn ok"
                                     type="button"
@@ -99,7 +101,7 @@
                                                     <td><?php echo htmlspecialchars((string)($row['planned_qty'] ?? '0')); ?></td>
                                                     <td><?php echo htmlspecialchars((string)($row['status'] ?? '-')); ?></td>
                                                     <td>
-                                                        <?php if ($processingCanMutate && in_array($assemblyStatus, ['calculated', 'adjusted'], true) && $demandId > 0): ?>
+                                                        <?php if ($processingAssemblyAllowed && $processingCanMutate && in_array($assemblyStatus, ['calculated', 'adjusted'], true) && $demandId > 0): ?>
                                                             <form method="post" action="/u/<?php echo urlencode((string)($data['username'] ?? '')); ?>/processing/assembly/status" class="u-inline-form">
                                                                 <input type="hidden" name="csrf" value="<?php echo htmlspecialchars((string)\App\Core\Auth::csrfToken()); ?>">
                                                                 <input type="hidden" name="demand_id" value="<?php echo $demandId; ?>">
@@ -121,7 +123,7 @@
 
                         <section class="surface-card" aria-label="<?php echo htmlspecialchars($this->tr('operator.processing.qc.title', 'QC Plan')); ?>">
                             <h3 class="work-entry-embed-title"><?php echo htmlspecialchars($this->tr('operator.processing.qc.title', 'QC Plan')); ?></h3>
-                            <?php if ($processingCanMutate): ?><div class="production-focus-actions u-mb-10">
+                            <?php if ($processingQcAllowed && $processingCanMutate): ?><div class="production-focus-actions u-mb-10">
                                 <button
                                     class="btn ok"
                                     type="button"
@@ -202,7 +204,7 @@
                                                     <td><?php echo htmlspecialchars((string)($row['priority'] ?? '-')); ?></td>
                                                     <td><?php echo htmlspecialchars((string)($row['status'] ?? '-')); ?></td>
                                                     <td>
-                                                        <?php if ($processingCanMutate && $qcStatus === 'system generated' && $qcPlanId > 0): ?>
+                                                        <?php if ($processingQcAllowed && $processingCanMutate && $qcStatus === 'system generated' && $qcPlanId > 0): ?>
                                                             <form method="post" action="/u/<?php echo urlencode((string)($data['username'] ?? '')); ?>/processing/qc/status" class="u-inline-form">
                                                                 <input type="hidden" name="csrf" value="<?php echo htmlspecialchars((string)\App\Core\Auth::csrfToken()); ?>">
                                                                 <input type="hidden" name="qc_plan_id" value="<?php echo $qcPlanId; ?>">
@@ -210,7 +212,7 @@
                                                                 <input type="hidden" name="redirect_to" value="<?php echo htmlspecialchars($qcReturnUrl); ?>">
                                                                 <button class="btn ok" type="submit"><?php echo htmlspecialchars($this->tr('operator.processing.action.verify', 'Verify')); ?></button>
                                                             </form>
-                                                        <?php elseif ($processingCanMutate && in_array($qcStatus, ['verified by qc', 'adjusted by qc'], true) && $qcPlanId > 0): ?>
+                                                        <?php elseif ($processingQcAllowed && $processingCanMutate && in_array($qcStatus, ['verified by qc', 'adjusted by qc'], true) && $qcPlanId > 0): ?>
                                                             <form method="post" action="/u/<?php echo urlencode((string)($data['username'] ?? '')); ?>/processing/qc/status" class="u-inline-form">
                                                                 <input type="hidden" name="csrf" value="<?php echo htmlspecialchars((string)\App\Core\Auth::csrfToken()); ?>">
                                                                 <input type="hidden" name="qc_plan_id" value="<?php echo $qcPlanId; ?>">

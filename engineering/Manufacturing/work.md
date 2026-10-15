@@ -16,6 +16,9 @@ brief's pressure-test workstreams and synthesis complete.
 
 ## In Progress
 
+- [ ] Identify authoritative existing work-area/process-area scope dimensions
+  before introducing any new fields or UI.
+
 - [x] OH-AUTO1-088 — normalized the owner-shaped runtime scope at the adapter
   boundary, aligned top-level sections with scoped filters, intersected
   part-only machine choices with scoped records, and suppressed unproven
@@ -42,6 +45,13 @@ brief's pressure-test workstreams and synthesis complete.
   Manufacturing-owned adapter and strict existing part/module authority; all
   four existing operator POST handlers authorize before mutation or schema
   setup, with read-only/display and invalid scope/transition requests denied.
+
+- [x] OH-AUTO1-094 — Processing POST authority now preserves read-only and
+  display denial for both status and creation mutations, uses exact existing
+  `assembly`/`qc` module authority without mixed-surface aliases, filters each
+  lane before projection, and hides unauthorized lane actions in Shell. The
+  isolated proof is **27/27**; no database, schema, activation, production,
+  or Core operation.
 
 - [x] OH-AUTO1-087 — passed authenticated operator identity and effective
   assignment context into `MachinesAdapter`; Manufacturing retains machine,

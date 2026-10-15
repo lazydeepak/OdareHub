@@ -1216,6 +1216,8 @@ final class OperatorSurfaceComposer
             'qc_rows' => (array)($projection['qc_rows'] ?? []),
             'authorized' => (bool)($projection['authorized'] ?? false),
             'can_mutate' => (bool)($projection['can_mutate'] ?? false),
+            'assembly_allowed' => (bool)($projection['assembly_allowed'] ?? false),
+            'qc_allowed' => (bool)($projection['qc_allowed'] ?? false),
             'flash' => $flash,
             'error' => $error,
         ];
@@ -1472,6 +1474,8 @@ final class OperatorSurfaceComposer
             'qc_rows' => (array)($projection['qc_rows'] ?? []),
             'authorized' => (bool)($projection['authorized'] ?? false),
             'can_mutate' => (bool)($projection['can_mutate'] ?? false),
+            'assembly_allowed' => (bool)($projection['assembly_allowed'] ?? false),
+            'qc_allowed' => (bool)($projection['qc_allowed'] ?? false),
             'flash' => $flash,
             'error' => $error,
         ];

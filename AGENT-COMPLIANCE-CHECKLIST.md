@@ -1,5 +1,21 @@
 # AGENT-COMPLIANCE-CHECKLIST
 
+## Session Summary (2026-10-15) — OH-AUTO1-094 Processing authority closure
+
+Closed the Processing authority gaps without adding routes, permissions, scope
+dimensions, or schema behavior. Manufacturing now uses exact existing Assembly
+and QC module authority independently, suppresses unauthorized lane projection,
+and exposes lane decisions to Shell for rendering. All four existing operator
+POST paths retain Manufacturing authority before mutation; read-only/display
+profiles fail before record lookup, schema initialization, or writes.
+
+Validation: Processing isolated proof **27/27**; Parts **14/14**; Part360
+**8/8**; machine **27/27**; role-home **26/26**; worker/task **41/41**;
+navigation **51/51**; architecture **49/49**; deletion **28/28**; deployment
+readiness **PASS**. No installed database, schema mutation, browser,
+activation, production, deployment, or Core operation. Existing lifecycle logs
+and PHPUnit cache were preserved.
+
 ## Session Summary (2026-10-15) — OH-AUTO1-093 Scope-aware Processing workspace
 
 Moved the active operator Processing read projection behind the

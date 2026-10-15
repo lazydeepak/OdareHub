@@ -16,8 +16,8 @@ The active product direction is:
 
 The disposable release/update foundation is complete through OH-AUTO1-080.
 Production installation, update, and apply remain unauthorized. Product
-development has resumed on the Shell worker surface; OH-AUTO1-093 is the
-current scope-aware Processing workspace milestone.
+development has resumed on the Shell worker surface; OH-AUTO1-094 is the
+completed Processing authority-closure milestone.
 
 ## Active Focus
 
@@ -27,11 +27,14 @@ Completed execution milestone:
   post-update verification, and recovery proof. OH-AUTO1-080 final disposable
   safety closure is complete; production apply remains blocked.
 
-Current product milestone:
+Completed current product milestone:
 
-- OH-AUTO1-093 — scope the operator Processing projection to authorized parts
-  and gate all four existing Processing mutations through Manufacturing-owned
+- OH-AUTO1-093 — scoped the operator Processing projection to authorized parts
+  and gated all four existing Processing mutations through Manufacturing-owned
   product, module, profile, and transition authority.
+- OH-AUTO1-094 — preserved read-only denial on every Processing POST authority,
+  separated existing Assembly/QC module authority, and suppressed unauthorized
+  lane actions before schema initialization or writes.
 
 Approved execution sequence:
 
@@ -50,6 +53,9 @@ Evidence for the completed milestones is recorded in:
 - `docs/architecture/oh-auto1-068-database-isolation-requalification-2026-10-15.md`
 
 ## Next Product Focus
+
+- Identify authoritative existing work-area/process-area scope dimensions before
+  adding any new presentation or scope fields; keep that work separately bounded.
 
 After the release/update cycle is proven, resume the product roadmap focus from
 `README.md`:

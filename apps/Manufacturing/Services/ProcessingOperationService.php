@@ -31,8 +31,17 @@ final class ProcessingOperationService
             'products' => [],
             'assembly_rows' => [],
             'qc_rows' => [],
+            'assembly_allowed' => false,
+            'qc_allowed' => false,
         ];
         if ($scope === null || $scope['denied']) {
+            return $empty;
+        }
+
+        // Processing is a mixed surface. A user may be authorized for one
+        // lane without being authorized for the other; never project either
+        // lane when its existing module authority is absent.
+        if (!$scope['assembly_allowed'] && !$scope['qc_allowed']) {
             return $empty;
         }
 
@@ -51,59 +60,69 @@ final class ProcessingOperationService
                 $selectedProductId = 0;
             }
 
-            $assemblySql =
-                "SELECT d.id, d.product_id, d.demand_date, d.status,
-                        COALESCE(d.approved_qty, d.adjusted_qty, d.system_qty, 0) AS planned_qty,
-                        COALESCE(NULLIF(TRIM(p.parts_name), ''), CONCAT('Part #', d.product_id)) AS part_name,
-                        COALESCE(NULLIF(TRIM(p.parts_number), ''), '-') AS part_number,
-                        CASE WHEN ? = 'assembly_leader' THEN
-                            CASE LOWER(COALESCE(d.status, 'calculated')) WHEN 'approved' THEN 0 WHEN 'adjusted' THEN 1 ELSE 2 END
-                        ELSE CASE LOWER(COALESCE(d.status, 'calculated')) WHEN 'adjusted' THEN 0 WHEN 'approved' THEN 1 ELSE 2 END END AS role_sort
-                 FROM mfg_part_demands d INNER JOIN products p ON p.id = d.product_id
-                 WHERE d.demand_type = 'assembly' AND d.demand_date BETWEEN ? AND ?";
-            // Apply the scope predicate before ordering and the result limit.
-            $assemblyParams = [$dashboardType, $date, $toDate];
-            if ($scope['part_ids'] !== []) {
-                $ph = implode(',', array_fill(0, count($scope['part_ids']), '?'));
-                $assemblySql .= " AND d.product_id IN ({$ph})";
-                array_push($assemblyParams, ...$scope['part_ids']);
+            $assemblyRows = [];
+            if ($scope['assembly_allowed']) {
+                $assemblySql =
+                    "SELECT d.id, d.product_id, d.demand_date, d.status,
+                            COALESCE(d.approved_qty, d.adjusted_qty, d.system_qty, 0) AS planned_qty,
+                            COALESCE(NULLIF(TRIM(p.parts_name), ''), CONCAT('Part #', d.product_id)) AS part_name,
+                            COALESCE(NULLIF(TRIM(p.parts_number), ''), '-') AS part_number,
+                            CASE WHEN ? = 'assembly_leader' THEN
+                                CASE LOWER(COALESCE(d.status, 'calculated')) WHEN 'approved' THEN 0 WHEN 'adjusted' THEN 1 ELSE 2 END
+                            ELSE CASE LOWER(COALESCE(d.status, 'calculated')) WHEN 'adjusted' THEN 0 WHEN 'approved' THEN 1 ELSE 2 END END AS role_sort
+                     FROM mfg_part_demands d INNER JOIN products p ON p.id = d.product_id
+                     WHERE d.demand_type = 'assembly' AND d.demand_date BETWEEN ? AND ?";
+                // Apply the scope predicate before ordering and the result limit.
+                $assemblyParams = [$dashboardType, $date, $toDate];
+                if ($scope['part_ids'] !== []) {
+                    $ph = implode(',', array_fill(0, count($scope['part_ids']), '?'));
+                    $assemblySql .= " AND d.product_id IN ({$ph})";
+                    array_push($assemblyParams, ...$scope['part_ids']);
+                }
+                if ($selectedProductId > 0) {
+                    $assemblySql .= ' AND d.product_id = ?';
+                    $assemblyParams[] = $selectedProductId;
+                }
+                $assemblySql .= ' ORDER BY role_sort ASC, d.demand_date ASC, d.id DESC LIMIT 40';
+                $assemblyRows = DB::fetchAll($assemblySql, $assemblyParams);
             }
-            if ($selectedProductId > 0) {
-                $assemblySql .= ' AND d.product_id = ?';
-                $assemblyParams[] = $selectedProductId;
-            }
-            $assemblySql .= ' ORDER BY role_sort ASC, d.demand_date ASC, d.id DESC LIMIT 40';
-            $assemblyRows = DB::fetchAll($assemblySql, $assemblyParams);
 
-            $qcParams = [$dashboardType, $date, $toDate];
-            $qcSql =
-                "SELECT q.id, q.product_id, q.plan_date, q.status, q.priority,
-                        COALESCE(q.planned_qty, 0) AS planned_qty,
-                        COALESCE(NULLIF(TRIM(p.parts_name), ''), CONCAT('Part #', q.product_id)) AS part_name,
-                        COALESCE(NULLIF(TRIM(p.parts_number), ''), '-') AS part_number,
-                        CASE WHEN ? = 'qc_leader' THEN
-                            CASE LOWER(COALESCE(q.status, 'system generated')) WHEN 'system generated' THEN 0 WHEN 'verified by qc' THEN 1 WHEN 'adjusted by qc' THEN 2 ELSE 3 END
-                        ELSE CASE LOWER(COALESCE(q.priority, 'normal')) WHEN 'critical' THEN 0 WHEN 'high' THEN 1 WHEN 'medium' THEN 2 WHEN 'normal' THEN 3 ELSE 4 END END AS role_sort
-                 FROM qc_plans q INNER JOIN products p ON p.id = q.product_id
-                 WHERE q.plan_date BETWEEN ? AND ?";
-            if ($scope['part_ids'] !== []) {
-                $ph = implode(',', array_fill(0, count($scope['part_ids']), '?'));
-                $qcSql .= " AND q.product_id IN ({$ph})";
-                array_push($qcParams, ...$scope['part_ids']);
+            $qcRows = [];
+            if ($scope['qc_allowed']) {
+                $qcParams = [$dashboardType, $date, $toDate];
+                $qcSql =
+                    "SELECT q.id, q.product_id, q.plan_date, q.status, q.priority,
+                            COALESCE(q.planned_qty, 0) AS planned_qty,
+                            COALESCE(NULLIF(TRIM(p.parts_name), ''), CONCAT('Part #', q.product_id)) AS part_name,
+                            COALESCE(NULLIF(TRIM(p.parts_number), ''), '-') AS part_number,
+                            CASE WHEN ? = 'qc_leader' THEN
+                                CASE LOWER(COALESCE(q.status, 'system generated')) WHEN 'system generated' THEN 0 WHEN 'verified by qc' THEN 1 WHEN 'adjusted by qc' THEN 2 ELSE 3 END
+                            ELSE CASE LOWER(COALESCE(q.priority, 'normal')) WHEN 'critical' THEN 0 WHEN 'high' THEN 1 WHEN 'medium' THEN 2 WHEN 'normal' THEN 3 ELSE 4 END END AS role_sort
+                     FROM qc_plans q INNER JOIN products p ON p.id = q.product_id
+                     WHERE q.plan_date BETWEEN ? AND ?";
+                if ($scope['part_ids'] !== []) {
+                    $ph = implode(',', array_fill(0, count($scope['part_ids']), '?'));
+                    $qcSql .= " AND q.product_id IN ({$ph})";
+                    array_push($qcParams, ...$scope['part_ids']);
+                }
+                if ($selectedProductId > 0) {
+                    $qcSql .= ' AND q.product_id = ?';
+                    $qcParams[] = $selectedProductId;
+                }
+                $qcSql .= ' ORDER BY role_sort ASC, q.plan_date ASC, q.id DESC LIMIT 40';
+                $qcRows = DB::fetchAll($qcSql, $qcParams);
             }
-            if ($selectedProductId > 0) {
-                $qcSql .= ' AND q.product_id = ?';
-                $qcParams[] = $selectedProductId;
-            }
-            $qcSql .= ' ORDER BY role_sort ASC, q.plan_date ASC, q.id DESC LIMIT 40';
+
             return [
                 'authorized' => true,
                 'can_mutate' => $scope['can_mutate'],
+                'assembly_allowed' => $scope['assembly_allowed'],
+                'qc_allowed' => $scope['qc_allowed'],
                 'selected_date' => $date,
                 'selected_product_id' => $selectedProductId,
                 'products' => $products,
                 'assembly_rows' => $assemblyRows,
-                'qc_rows' => DB::fetchAll($qcSql, $qcParams),
+                'qc_rows' => $qcRows,
             ];
         } catch (\Throwable) {
             return $empty;
@@ -742,8 +761,11 @@ final class ProcessingOperationService
                 'part_ids' => $partIds,
                 'denied' => $denied,
                 'can_mutate' => !in_array($profile, ['read_only', 'display'], true),
-                'assembly_allowed' => $moduleAllowed(['assembly_plans', 'assembly', 'processing_operation', 'processing']),
-                'qc_allowed' => $moduleAllowed(['qc_plans', 'qc', 'processing_operation', 'processing']),
+                // These are deliberately exact lane authorities. The mixed
+                // Processing surface must not grant Assembly or QC access by
+                // aliasing a broader token to both lanes.
+                'assembly_allowed' => $moduleAllowed(['assembly']),
+                'qc_allowed' => $moduleAllowed(['qc']),
             ];
         } catch (\Throwable) { return null; }
     }
