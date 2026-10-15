@@ -92,7 +92,12 @@ namespace {
     $user = ['id' => 7, 'email' => 'worker@example.test'];
     ProcessingProbe::$context = [
         'active_assigned_apps' => ['manufacturing'],
-        'interaction_profile' => 'worker',
+        'access_profiles' => ['assembly_operations', 'qc_operations'],
+        'duty_codes' => [],
+        'dashboard_type' => 'my_work', // resolved assignment evidence
+        'authority_role' => 'app_user',
+        'account_class' => 'app_user',
+        'app_roles' => [],
         'scope' => ['part_ids' => [10]],
     ];
 
@@ -100,6 +105,7 @@ namespace {
     $assert($focus['authorized'] === true && count($focus['products']) === 1 && (int)$focus['products'][0]['id'] === 10, 'GET projection exposes only scoped Part X');
     $assert($focus['assembly_rows'][0]['product_id'] === 10 && $focus['qc_rows'][0]['product_id'] === 10, 'assembly and QC queues are scoped before result delivery');
     $assert($focus['assembly_allowed'] === true && $focus['qc_allowed'] === true, 'GET projection exposes separate Assembly and QC authority');
+    $assert($focus['can_mutate'] === true, 'authoritative worker assignment retains mutation eligibility');
     $assert(DB::$mutations === [], 'scoped Processing GET makes no mutation calls');
 
     \ProcessingProbe\PolicyContract::$allowedModules = ['qc'];
@@ -144,19 +150,91 @@ namespace {
     $mixedQcStatus = ProcessingOperationService::authorizeOperatorMutation('qc_status', 42, 0, 'verified by qc', $user);
     $assert(!$mixedAssemblyStatus['allowed'] && !$mixedQcStatus['allowed'], 'mixed authorized and unauthorized records fail closed by part scope');
 
-    ProcessingProbe::$context['interaction_profile'] = 'read_only';
-    $readOnly = ProcessingOperationService::authorizeOperatorMutation('qc_create', 0, 10, '', $user);
-    $assert($readOnly['allowed'] === false && DB::$mutations === [], 'read-only profile cannot authorize processing mutation');
-    $readOnlyAssemblyStatus = ProcessingOperationService::authorizeOperatorMutation('assembly_status', 31, 0, 'approved', $user);
-    $readOnlyQcStatus = ProcessingOperationService::authorizeOperatorMutation('qc_status', 41, 0, 'verified by qc', $user);
-    $assert(!$readOnlyAssemblyStatus['allowed'] && !$readOnlyQcStatus['allowed'], 'read-only profile denies both status POST authorities');
-    ProcessingProbe::$context['interaction_profile'] = 'display';
-    $displayAssembly = ProcessingOperationService::authorizeOperatorMutation('assembly_create', 0, 10, '', $user);
-    $displayQc = ProcessingOperationService::authorizeOperatorMutation('qc_create', 0, 10, '', $user);
-    $assert(!$displayAssembly['allowed'] && !$displayQc['allowed'], 'display profile denies both creation POST authorities');
+    $mutations = static function () use ($user): array {
+        return [
+            ProcessingOperationService::authorizeOperatorMutation('assembly_create', 0, 10, '', $user),
+            ProcessingOperationService::authorizeOperatorMutation('assembly_status', 31, 0, 'approved', $user),
+            ProcessingOperationService::authorizeOperatorMutation('qc_create', 0, 10, '', $user),
+            ProcessingOperationService::authorizeOperatorMutation('qc_status', 41, 0, 'verified by qc', $user),
+        ];
+    };
+    $readOnlyContext = [
+        'active_assigned_apps' => ['manufacturing'],
+        'access_profiles' => ['readonly_observer'],
+        'duty_codes' => [],
+        'dashboard_type' => 'my_work', // resolved assignment evidence
+        'authority_role' => 'app_user',
+        'account_class' => 'app_user',
+        'app_roles' => [],
+        'scope' => ['part_ids' => [10]],
+    ];
+    ProcessingProbe::$context = $readOnlyContext;
+    $readOnlyFocus = ProcessingOperationService::operatorFocus('2026-10-15', $user);
+    $readOnlyMutations = $mutations();
+    $assert($readOnlyFocus['can_mutate'] === false && array_filter($readOnlyMutations, static fn(array $decision): bool => $decision['allowed']) === [], 'readonly_observer denies GET mutation eligibility and all four POST authorities without interaction_profile');
 
-    ProcessingProbe::$context['interaction_profile'] = 'worker';
-    ProcessingProbe::$context['scope'] = ['part_ids' => ['10junk']];
+    ProcessingProbe::$context['access_profiles'] = ['materials_readonly'];
+    $materialsMutations = $mutations();
+    $assert(array_filter($materialsMutations, static fn(array $decision): bool => $decision['allowed']) === [], 'materials_readonly denies all four Processing mutations');
+
+    ProcessingProbe::$context = $readOnlyContext;
+    ProcessingProbe::$context['access_profiles'] = ['assembly_operations', 'qc_operations'];
+    ProcessingProbe::$context['duty_codes'] = ['read_only'];
+    $dutyReadOnlyMutations = $mutations();
+    $assert(array_filter($dutyReadOnlyMutations, static fn(array $decision): bool => $decision['allowed']) === [], 'read_only duty evidence overrides worker operation profiles');
+
+    ProcessingProbe::$context = $readOnlyContext;
+    ProcessingProbe::$context['access_profiles'] = ['assembly_operations', 'qc_operations'];
+    ProcessingProbe::$context['dashboard_type'] = 'display'; // resolved assignment evidence
+    $displayMutations = $mutations();
+    $assert(array_filter($displayMutations, static fn(array $decision): bool => $decision['allowed']) === [], 'display dashboard authority denies all four Processing mutations');
+
+    ProcessingProbe::$context = $readOnlyContext;
+    ProcessingProbe::$context['access_profiles'] = ['assembly_operations', 'readonly_observer'];
+    $mixedProfileMutations = $mutations();
+    $assert(array_filter($mixedProfileMutations, static fn(array $decision): bool => $decision['allowed']) === [], 'mixed worker and read-only evidence fails closed');
+
+    ProcessingProbe::$context = $readOnlyContext;
+    unset(ProcessingProbe::$context['access_profiles']);
+    $missingProfileMutations = $mutations();
+    $assert(array_filter($missingProfileMutations, static fn(array $decision): bool => $decision['allowed']) === [], 'missing profile evidence cannot grant mutation');
+
+    ProcessingProbe::$context['dashboard_type'] = 'assembly_leader'; // resolved assignment evidence
+    ProcessingProbe::$context['app_roles'] = ['assembly_leader'];
+    $missingProfileWithPositiveHints = $mutations();
+    $assert(array_filter($missingProfileWithPositiveHints, static fn(array $decision): bool => $decision['allowed']) === [], 'missing profiles cannot be overridden by dashboard or app-role hints');
+
+    ProcessingProbe::$context = $readOnlyContext;
+    ProcessingProbe::$context['access_profiles'] = 'assembly_operations';
+    $malformedProfileMutations = $mutations();
+    $assert(array_filter($malformedProfileMutations, static fn(array $decision): bool => $decision['allowed']) === [], 'malformed profile evidence cannot grant mutation');
+
+    ProcessingProbe::$context = $readOnlyContext;
+    ProcessingProbe::$context['access_profiles'] = ['assembly_operations'];
+    \ProcessingProbe\PolicyContract::$allowedModules = ['assembly'];
+    $assemblyWorkerMutations = $mutations();
+    $assert($assemblyWorkerMutations[0]['allowed'] === true && $assemblyWorkerMutations[1]['allowed'] === true
+        && !$assemblyWorkerMutations[2]['allowed'] && !$assemblyWorkerMutations[3]['allowed'],
+        'legitimate Assembly worker retains only Assembly mutation authority');
+
+    ProcessingProbe::$context['access_profiles'] = ['qc_operations'];
+    \ProcessingProbe\PolicyContract::$allowedModules = ['qc'];
+    $qcWorkerMutations = $mutations();
+    $assert(!$qcWorkerMutations[0]['allowed'] && !$qcWorkerMutations[1]['allowed']
+        && $qcWorkerMutations[2]['allowed'] === true && $qcWorkerMutations[3]['allowed'] === true,
+        'legitimate QC worker retains only QC mutation authority');
+    \ProcessingProbe\PolicyContract::$allowedModules = null;
+
+    ProcessingProbe::$context = [
+        'active_assigned_apps' => ['manufacturing'],
+        'access_profiles' => ['assembly_operations', 'qc_operations'],
+        'duty_codes' => [],
+        'dashboard_type' => 'my_work', // resolved assignment evidence
+        'authority_role' => 'app_user',
+        'account_class' => 'app_user',
+        'app_roles' => [],
+        'scope' => ['part_ids' => ['10junk']],
+    ];
     $malformed = ProcessingOperationService::operatorFocus('2026-10-15', $user);
     $assert($malformed['authorized'] === false && $malformed['products'] === [], 'malformed scope fails closed');
     ProcessingProbe::$context['scope'] = ['part_ids' => [-1, 10]];

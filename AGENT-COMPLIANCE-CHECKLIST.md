@@ -12,7 +12,7 @@ caller-owned Base context resolver still invokes its existing ensureSchema()
 before returning context; that transitive schema dependency remains unresolved
 and was not changed.
 
-Validation: Processing isolated proof **27/27**; Parts **14/14**; Part360
+Validation: Processing isolated proof **35/35**; Parts **14/14**; Part360
 **8/8**; machine **27/27**; role-home **26/26**; worker/task **41/41**;
 navigation **51/51**; architecture **49/49**; deletion **28/28**; deployment
 readiness **PASS**. No installed database, schema mutation, browser,

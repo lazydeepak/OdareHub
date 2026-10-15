@@ -28,10 +28,14 @@ framework or scope dimension was introduced.
 
 **Evidence**
 
-The isolated Processing proof passes **27/27**, including Assembly-only,
-QC-only, neither-module, mixed-record, both read-only status denials, exact
-lane authority, all four POST authority calls, and authority-before-schema/
-mutation checks.
+The isolated Processing proof passes **35/35**, including authoritative
+`readonly_observer`, `materials_readonly`, `read_only` duty, display, mixed,
+missing, and malformed evidence; Assembly-only/QC-only workers; neither-
+module, mixed-record, both read-only status denials, exact lane authority, all
+four POST authority calls, and GET/POST mutation-eligibility consistency. The
+proof does not inject `interaction_profile`; Processing derives mutation
+eligibility from the existing resolved assignment evidence and fails closed
+when positive authority evidence is absent or malformed.
 
 ### 2026-10-15 — OH-AUTO1-093 scope-aware Processing workspace and mutation gates
 

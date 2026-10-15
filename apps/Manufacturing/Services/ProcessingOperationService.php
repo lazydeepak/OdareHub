@@ -736,7 +736,6 @@ final class ProcessingOperationService
                 }
                 return false;
             };
-            $profile = strtolower(trim((string)($context['interaction_profile'] ?? 'worker')));
             $rawScope = (array)($context['scope'] ?? []);
             if (!array_key_exists('part_ids', $rawScope) || !is_array($rawScope['part_ids'])) return null;
             $rawPartIds = $rawScope['part_ids'];
@@ -760,7 +759,7 @@ final class ProcessingOperationService
             return [
                 'part_ids' => $partIds,
                 'denied' => $denied,
-                'can_mutate' => !in_array($profile, ['read_only', 'display'], true),
+                'can_mutate' => self::canMutateFromAssignmentContext($context),
                 // These are deliberately exact lane authorities. The mixed
                 // Processing surface must not grant Assembly or QC access by
                 // aliasing a broader token to both lanes.
@@ -768,6 +767,77 @@ final class ProcessingOperationService
                 'qc_allowed' => $moduleAllowed(['qc']),
             ];
         } catch (\Throwable) { return null; }
+    }
+
+    /**
+     * Resolve Processing mutation eligibility from the existing assignment
+     * evidence. Shell's derived presentation profile is intentionally not a
+     * mutation authority, and a missing field must never default to worker.
+     *
+     * @param array<string,mixed> $context
+     */
+    private static function canMutateFromAssignmentContext(array $context): bool
+    {
+        $rawProfiles = $context['access_profiles'] ?? null;
+        if (!is_array($rawProfiles)) {
+            return false;
+        }
+        $rawDuties = $context['duty_codes'] ?? [];
+        if (!is_string($rawDuties) && !is_array($rawDuties)) {
+            return false;
+        }
+        $rawAppRoles = $context['app_roles'] ?? [];
+        if (!is_array($rawAppRoles)) {
+            return false;
+        }
+
+        $profiles = array_values(array_filter(array_map(
+            static fn($value): string => strtolower(trim((string)$value)),
+            $rawProfiles
+        ), static fn(string $value): bool => $value !== ''));
+        $duties = is_string($rawDuties)
+            ? (preg_split('/\s*,\s*/', strtolower(trim($rawDuties))) ?: [])
+            : array_map(static fn($value): string => strtolower(trim((string)$value)), $rawDuties);
+        $duties = array_values(array_filter($duties, static fn(string $value): bool => $value !== ''));
+        $appRoles = array_values(array_filter(array_map(
+            static fn($value): string => strtolower(trim((string)$value)),
+            $rawAppRoles
+        ), static fn(string $value): bool => $value !== ''));
+
+        $readOnly = ['readonly_observer', 'materials_readonly', 'read_only', 'display'];
+        if (array_intersect($readOnly, array_merge($profiles, $duties, $appRoles)) !== []) {
+            return false;
+        }
+
+        foreach (['dashboard_type', 'authority_role', 'account_class'] as $field) { // validate resolved assignment evidence
+            if (array_key_exists($field, $context) && !is_string($context[$field])) {
+                return false;
+            }
+        }
+        $resolvedDashboardType = strtolower(trim((string)($context['dashboard_type'] ?? ''))); // resolved assignment evidence
+        $authorityRole = strtolower(trim((string)($context['authority_role'] ?? '')));
+        $accountClass = strtolower(trim((string)($context['account_class'] ?? '')));
+        if (in_array($resolvedDashboardType, ['display', 'tv_display'], true)
+            || $authorityRole === 'tv_display'
+            || $accountClass === 'tv_display') {
+            return false;
+        }
+
+        if ($profiles === []) {
+            return false;
+        }
+
+        $mutationProfiles = [
+            'production_operations', 'assembly_operations', 'assembly_coordination',
+            'qc_operations', 'qc_coordination', 'manufacturing_planning',
+            'production_coordination', 'manufacturing_admin',
+        ];
+        $mutationRoles = ['production_leader', 'assembly_leader', 'qc_leader', 'dispatch_leader'];
+        $mutationDashboards = ['production_leader', 'assembly_leader', 'qc_leader', 'dispatch_leader'];
+
+        return array_intersect($mutationProfiles, $profiles) !== []
+            || array_intersect($mutationRoles, $appRoles) !== []
+            || in_array($resolvedDashboardType, $mutationDashboards, true);
     }
 
     /** @return array{0:string,1:array<int,int>} */
