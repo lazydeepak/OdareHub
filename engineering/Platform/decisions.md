@@ -90,6 +90,25 @@ trust behavior.
 `platform/Updates/tests/probe_installation_identity_store.php`, and
 `docs/architecture/oh-auto1-071-installation-identity-persistence-2026-10-15.md`.
 
+### 2026-10-15 — OH-AUTO1-072 identity persistence invariant hardening
+**Status:** Implemented and verified for disposable filesystem fixtures; release authority remains gated
+
+**Decision**
+
+Identity replacement must preserve the current installation ID, and every
+existing current-record state other than genuine absence blocks writes. The
+store tracks whether atomic finalization occurred and reconciles any later
+exception against authoritative on-disk bytes. A matching candidate is reported
+as committed and verified; a successfully restored predecessor is reported as
+read-back mismatch with recovery metadata; otherwise the result is explicitly
+indeterminate. Rollback failure is never success.
+
+**Evidence**
+
+`platform/Updates/InstallationIdentityStore.php`,
+`platform/Updates/tests/probe_installation_identity_store.php`, and
+`docs/architecture/oh-auto1-072-identity-persistence-invariant-hardening-2026-10-15.md`.
+
 ### 2026-10-15 — OH-AUTO1-060 migration execution feasibility reconciliation
 **Status:** Proposed; approval required
 

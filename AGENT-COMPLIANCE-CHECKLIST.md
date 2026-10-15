@@ -1,5 +1,18 @@
 # AGENT-COMPLIANCE-CHECKLIST
 
+## Session Summary (2026-10-15) — OH-AUTO1-072 Identity Persistence Invariant Hardening
+
+Corrected installation-ID mutability, malformed-existing-record overwrite, and
+post-finalization exception ambiguity in `InstallationIdentityStore`. Added
+negative and fault-injection coverage for changed IDs, original-byte
+preservation, candidate reconciliation, and rollback failure.
+
+Validation: ✅ persistence probe 33/33; identity verifier 20/20; existing
+installed-build probe 13/13; PHP lint; architecture gates 49/49; deletion
+family gates 28/28; deployment readiness PASS in read-only verify mode; and
+diff hygiene. No installed identity, database, SQL, migration, readiness,
+apply, signing, trust, deployment, or Core operation.
+
 ## Session Summary (2026-10-15) — OH-AUTO1-071 Installation Identity Persistence
 
 Added `platform/Updates/InstallationIdentityStore.php` and its temporary-fixture

@@ -88,6 +88,12 @@ try {
     $assert(is_array($afterReplace['predecessor'] ?? null), 'replacement exposes predecessor evidence');
     $assert(is_file($root . '/predecessors/' . $read['fingerprint'] . '.json'), 'predecessor record is preserved immutably');
 
+    $differentInstallation = $second;
+    $differentInstallation['installation_id'] = 'install:fixture-002';
+    $differentInstallationResult = $store->replace($differentInstallation, $secondEvidence, (string)$afterReplace['fingerprint']);
+    $assert($differentInstallationResult['state'] === InstallationIdentityStore::IDENTITY_INSTALLATION_MISMATCH, 'replacement rejects changed installation ID before writing');
+    $assert(($store->read()['identity']['installation_id'] ?? '') === 'install:fixture-001', 'installation ID mismatch preserves authoritative bytes');
+
     $stale = $store->replace($first, $firstEvidence, (string)$read['fingerprint']);
     $assert($stale['state'] === InstallationIdentityStore::IDENTITY_CONFLICT, 'stale expected fingerprint rejects conflicting replacement');
 
@@ -137,6 +143,27 @@ try {
     $assert(($preserveStore->read()['identity']['build_id'] ?? '') === 'build:fixture-001', 'replacement failure preserves the original identity');
     $remove($preserveRoot);
 
+    $malformedRoot = $root . '-malformed';
+    @mkdir($malformedRoot, 0700, true);
+    $malformedBytes = "{\"identity\":\"not-a-record\"}\n";
+    file_put_contents($malformedRoot . '/identity.json', $malformedBytes);
+    $malformedStore = new InstallationIdentityStore($malformedRoot);
+    $malformedExistingResult = $malformedStore->create($first, $firstEvidence);
+    $assert($malformedExistingResult['state'] === InstallationIdentityStore::IDENTITY_UNAVAILABLE, 'create blocks malformed existing identity state');
+    $assert(file_get_contents($malformedRoot . '/identity.json') === $malformedBytes, 'malformed existing identity bytes remain unchanged');
+    $remove($malformedRoot);
+
+    $postFinalizeRoot = $root . '-post-finalize';
+    $postFinalizeStore = new InstallationIdentityStore($postFinalizeRoot, [], static function (string $stage): void {
+        if ($stage === 'after_finalize') {
+            throw new RuntimeException('injected post-finalization interruption');
+        }
+    });
+    $postFinalizeResult = $postFinalizeStore->create($first, $firstEvidence);
+    $assert($postFinalizeResult['state'] === InstallationIdentityStore::IDENTITY_CANDIDATE_COMMITTED, 'post-finalization exception reconciles committed candidate truthfully');
+    $assert(($postFinalizeStore->read()['identity']['build_id'] ?? '') === 'build:fixture-001', 'post-finalization candidate remains authoritative after reconciliation');
+    $remove($postFinalizeRoot);
+
     $rollbackRoot = $root . '-rollback';
     $rollbackStore = new InstallationIdentityStore($rollbackRoot);
     $rollbackCreate = $rollbackStore->create($first, $firstEvidence);
@@ -150,6 +177,23 @@ try {
     $assert($rollbackResult['state'] === InstallationIdentityStore::IDENTITY_READBACK_MISMATCH, 'read-back mismatch fails closed');
     $assert(($rollbackStore->read()['identity']['build_id'] ?? '') === 'build:fixture-001', 'read-back failure restores original identity');
     $remove($rollbackRoot);
+
+    $indeterminateRoot = $root . '-indeterminate';
+    $indeterminateStore = new InstallationIdentityStore($indeterminateRoot);
+    $indeterminateStore->create($first, $firstEvidence);
+    $indeterminateBefore = $indeterminateStore->read();
+    $indeterminateFaultStore = new InstallationIdentityStore($indeterminateRoot, [], static function (string $stage, string $path): void {
+        if ($stage === 'after_finalize') {
+            file_put_contents($path . '/identity.json', '{"malformed":true}' . "\n");
+        }
+        if ($stage === 'before_rollback') {
+            throw new RuntimeException('injected rollback failure');
+        }
+    });
+    $indeterminateResult = $indeterminateFaultStore->replace($second, $secondEvidence, (string)$indeterminateBefore['fingerprint']);
+    $assert($indeterminateResult['state'] === InstallationIdentityStore::IDENTITY_INDETERMINATE, 'rollback failure is classified as indeterminate, never successful');
+    $assert(is_file($indeterminateRoot . '/predecessors/' . $indeterminateBefore['fingerprint'] . '.json'), 'predecessor evidence survives indeterminate recovery');
+    $remove($indeterminateRoot);
 
     $unsafeTraversal = new InstallationIdentityStore($root . '/../escape');
     $assert($unsafeTraversal->read()['state'] === InstallationIdentityStore::IDENTITY_PATH_UNSAFE, 'traversal destination is rejected');
@@ -170,6 +214,9 @@ try {
     $remove($root);
     $remove($root . '-fault');
     $remove($root . '-rollback');
+    $remove($root . '-malformed');
+    $remove($root . '-post-finalize');
+    $remove($root . '-indeterminate');
 }
 
 echo "Installation identity store: {$passed} passed, {$failed} failed\n";

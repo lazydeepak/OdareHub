@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Platform\Updates;
 
-use RuntimeException;
 use Throwable;
 
 /**
@@ -26,6 +25,10 @@ final class InstallationIdentityStore
     public const IDENTITY_INTERRUPTED_WRITE = 'identity_interrupted_write';
     public const IDENTITY_READBACK_MISMATCH = 'identity_readback_mismatch';
     public const IDENTITY_UNAVAILABLE = 'identity_unavailable';
+    public const IDENTITY_INSTALLATION_MISMATCH = 'identity_installation_mismatch';
+    public const IDENTITY_PREVIOUS_RETAINED = 'previous_identity_retained';
+    public const IDENTITY_CANDIDATE_COMMITTED = 'candidate_identity_committed';
+    public const IDENTITY_INDETERMINATE = 'identity_state_indeterminate';
 
     private const CURRENT_FILE = 'identity.json';
     private const LOCK_FILE = '.identity.lock';
@@ -154,11 +157,17 @@ final class InstallationIdentityStore
             return $this->failure(self::IDENTITY_LOCK_UNAVAILABLE, 'Identity storage is currently locked by another writer.');
         }
 
+        $finalizationOccurred = false;
         try {
             $current = $this->read();
             $currentExists = ($current['state'] ?? null) === 'identity_available';
             if (($current['state'] ?? null) === self::IDENTITY_INTERRUPTED_WRITE) {
                 return $this->failure(self::IDENTITY_INTERRUPTED_WRITE, 'Incomplete identity write requires controlled recovery before another write.');
+            }
+            if (!$currentExists && ($current['state'] ?? null) !== self::IDENTITY_MISSING) {
+                return $this->failure((string)($current['state'] ?? self::IDENTITY_UNAVAILABLE), 'Existing identity state is not safely interpretable; no write was attempted.', [
+                    'current_state' => $current['state'] ?? null,
+                ]);
             }
             if (!$replacement && $currentExists) {
                 return $this->failure(self::IDENTITY_CONFLICT, 'Initial identity creation refuses to overwrite the current record.', [
@@ -170,6 +179,9 @@ final class InstallationIdentityStore
             }
             if ($replacement && ($current['fingerprint'] ?? null) !== $expectedFingerprint) {
                 return $this->failure(self::IDENTITY_CONFLICT, 'Current identity changed before controlled replacement.');
+            }
+            if ($replacement && ($current['identity']['installation_id'] ?? null) !== ($identity['installation_id'] ?? null)) {
+                return $this->failure(self::IDENTITY_INSTALLATION_MISMATCH, 'Replacement cannot change the authoritative installation ID.');
             }
 
             $previousPayload = $currentExists ? $this->readJsonFile($this->storageRoot . '/' . self::CURRENT_FILE) : null;
@@ -200,13 +212,22 @@ final class InstallationIdentityStore
             if (!@rename($temporaryPath, $this->storageRoot . '/' . self::CURRENT_FILE)) {
                 return $this->failure(self::IDENTITY_WRITE_FAILED, 'Unable to atomically finalize the identity record.', ['temporary_path' => $temporaryPath]);
             }
+            $finalizationOccurred = true;
             $this->fault('after_finalize');
 
             $readback = $this->readJsonFile($this->storageRoot . '/' . self::CURRENT_FILE);
             if (!is_array($readback) || ($readback['identity'] ?? null) !== $identity) {
+                $this->fault('before_rollback');
                 $rollback = $this->rollback($previousPayload, $currentExists);
+                if (!$rollback) {
+                    return $this->failure(self::IDENTITY_INDETERMINATE, 'Read-back mismatch could not be rolled back; controlled recovery is required.', [
+                        'rollback' => false,
+                        'finalization_occurred' => true,
+                    ]);
+                }
                 return $this->failure(self::IDENTITY_READBACK_MISMATCH, 'Post-write identity read-back did not match the requested record.', [
-                    'rollback' => $rollback,
+                    'rollback' => true,
+                    'state_after_recovery' => $currentExists ? self::IDENTITY_PREVIOUS_RETAINED : self::IDENTITY_MISSING,
                 ]);
             }
             $this->fault('after_readback');
@@ -224,11 +245,35 @@ final class InstallationIdentityStore
                 ],
             ];
         } catch (Throwable $exception) {
+            if ($finalizationOccurred) {
+                return $this->reconcileFinalization($identity, $exception->getMessage());
+            }
             return $this->failure(self::IDENTITY_WRITE_FAILED, 'Identity persistence stopped before controlled completion: ' . $exception->getMessage());
         } finally {
             flock($lock, LOCK_UN);
             fclose($lock);
         }
+    }
+
+    /** @param array<string,mixed> $candidate */
+    private function reconcileFinalization(array $candidate, string $cause): array
+    {
+        $onDisk = $this->readJsonFile($this->storageRoot . '/' . self::CURRENT_FILE);
+        if (is_array($onDisk)
+            && ($onDisk['storage_record_version'] ?? null) === self::STORAGE_VERSION
+            && ($onDisk['identity'] ?? null) === $candidate
+        ) {
+            return $this->failure(self::IDENTITY_CANDIDATE_COMMITTED, 'Candidate identity was atomically committed and verified after a post-finalization interruption.', [
+                'finalization_occurred' => true,
+                'cause' => $cause,
+                'identity' => $candidate,
+            ]);
+        }
+
+        return $this->failure(self::IDENTITY_INDETERMINATE, 'Finalization occurred but authoritative identity state could not be reconciled; controlled recovery is required.', [
+            'finalization_occurred' => true,
+            'cause' => $cause,
+        ]);
     }
 
     /** @return resource|null */

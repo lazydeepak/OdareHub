@@ -1,5 +1,14 @@
 # AGENTS.md
 
+## Session Summary (2026-10-15) — OH-AUTO1-072 Identity Persistence Invariant Hardening
+
+Hardened `InstallationIdentityStore`: replacement now preserves the
+installation ID, all malformed or unsupported existing identity states block
+writes, and post-finalization exceptions reconcile to candidate-committed or
+indeterminate states. Rollback failure cannot be reported as success. Regression
+probe: 33/33. No installed path, database, readiness, apply, signing, trust,
+installation, deployment, or Core operation was performed.
+
 ## Session Summary (2026-10-15) — OH-AUTO1-071 Installation Identity Persistence
 
 Implemented a Platform-owned disposable-filesystem identity store with explicit
