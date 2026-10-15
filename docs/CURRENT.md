@@ -14,18 +14,23 @@ The active product direction is:
 - app-owned modules and owner-declared capabilities
 - Shell, Platform, Studio, Manufacturing, SBAIO, Procurement, and Plugin boundaries kept explicit
 
-The current project execution authority is the release/update foundation. The
-next product milestone is to retain the corrected proof of one isolated,
-non-production installation, signed update, post-update verification, and
-recovery cycle before broader business-feature expansion resumes.
+The disposable release/update foundation is complete through OH-AUTO1-080.
+Production installation, update, and apply remain unauthorized. Product
+development has resumed on the Shell worker surface; OH-AUTO1-083 is the
+current task-to-action navigation milestone.
 
 ## Active Focus
 
-Primary milestone:
+Completed execution milestone:
 
 - Release/update foundation — isolated installation, signed update,
   post-update verification, and recovery proof. OH-AUTO1-080 final disposable
   safety closure is complete; production apply remains blocked.
+
+Current product milestone:
+
+- OH-AUTO1-083 — task-to-action navigation from the worker-first dashboard to
+  the existing assigned-task surface.
 
 Approved execution sequence:
 
@@ -35,7 +40,8 @@ Approved execution sequence:
 4. release authority, trust, installed build identity, and controlled migration
    integration;
 5. isolated signed update, post-update verification, and recovery proof; then
-6. broader business-feature expansion.
+6. broader business-feature expansion — now resumed with the worker surface;
+   production installation/update remains blocked.
 
 Evidence for the completed milestones is recorded in:
 
@@ -52,6 +58,7 @@ After the release/update cycle is proven, resume the product roadmap focus from
 - computed-scope aware worker UI for machines, parts, work areas, and process areas
 - display-safe read-only surfaces
 - dynamic worker navigation from effective access
+- task-to-action navigation for specific assigned work on `/u/*`
 
 ## Deferred Product Work
 

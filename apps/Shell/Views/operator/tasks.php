@@ -15,6 +15,8 @@
     $tdSaved   = (isset($_GET['saved'])  && $_GET['saved']  === '1');
     $tdDone    = (isset($_GET['done'])   && $_GET['done']   === '1');
     $tdFormErr = htmlspecialchars(trim((string)($_GET['error'] ?? '')));
+    $tdSelectedId = max(0, (int)($_GET['task_id'] ?? 0));
+    $tdSelected = null;
 
     // Group by status for display
     $grouped = ['open' => [], 'in_progress' => [], 'done' => [], 'cancelled' => []];
@@ -22,6 +24,9 @@
         $s = (string)($t['status'] ?? 'open');
         if (isset($grouped[$s])) {
             $grouped[$s][] = $t;
+        }
+        if ($tdSelectedId > 0 && (int)($t['id'] ?? 0) === $tdSelectedId) {
+            $tdSelected = $t;
         }
     }
 
@@ -52,6 +57,30 @@
     <?php endif; ?>
     <?php if ($tdError !== '' && $tdFormErr === ''): ?>
         <p class="coverage-focus-error"><?php echo htmlspecialchars($this->tr($tdError, 'Unable to load this data right now.')); ?></p>
+    <?php endif; ?>
+
+    <?php if ($tdSelectedId > 0): ?>
+        <section class="coverage-orders-section operator-task-focus" id="operator-task-focus" data-task-focus-id="<?php echo $tdSelectedId; ?>">
+            <h3 class="coverage-orders-title"><?php echo htmlspecialchars($this->tr('operator.tasks.selected.title', 'Selected task')); ?></h3>
+            <?php if (!is_array($tdSelected)): ?>
+                <p class="coverage-focus-error"><?php echo htmlspecialchars($this->tr('operator.tasks.selected.not_found', 'This assigned task is no longer available.')); ?></p>
+            <?php else: ?>
+                <article class="operator-task-card operator-task-card--selected" id="operator-task-<?php echo (int)$tdSelected['id']; ?>">
+                    <div class="operator-task-card__body">
+                        <p class="operator-task-title"><?php echo htmlspecialchars((string)$tdSelected['title']); ?></p>
+                        <?php if (!empty($tdSelected['description'])): ?>
+                            <div class="operator-task-desc"><?php echo (string)($tdSelected['description_safe'] ?? htmlspecialchars((string)$tdSelected['description'])); ?></div>
+                        <?php endif; ?>
+                        <div class="operator-task-meta">
+                            <span class="operator-task-meta-item"><?php echo htmlspecialchars($this->tr('operator.tasks.selected.status', 'Status:')); ?> <?php echo htmlspecialchars((string)$tdSelected['status']); ?></span>
+                            <span class="operator-task-meta-item"><?php echo htmlspecialchars($this->tr('operator.tasks.selected.priority', 'Priority:')); ?> <?php echo htmlspecialchars((string)$tdSelected['priority']); ?></span>
+                            <?php if (!empty($tdSelected['due_date'])): ?><span class="operator-task-meta-item"><?php echo htmlspecialchars($this->tr('operator.tasks.meta.due', 'Due:')); ?> <?php echo htmlspecialchars((string)$tdSelected['due_date']); ?></span><?php endif; ?>
+                        </div>
+                    </div>
+                </article>
+            <?php endif; ?>
+            <a class="operator-task-focus__back" href="<?php echo htmlspecialchars($tdBase); ?>"><?php echo htmlspecialchars($this->tr('operator.tasks.selected.back', 'View all assigned tasks')); ?></a>
+        </section>
     <?php endif; ?>
 
     <!-- KPI strip -->
@@ -96,7 +125,7 @@
                     ? $this->tr('operator.tasks.status.open', 'Open')
                     : $this->tr('operator.tasks.status.in_progress', 'In Progress');
                 ?>
-                <div class="operator-task-card<?php echo $isOverdue ? ' operator-task-card--overdue' : ''; ?>"
+                <div class="operator-task-card<?php echo $isOverdue ? ' operator-task-card--overdue' : ''; ?><?php echo $tdSelectedId === $taskId ? ' operator-task-card--selected' : ''; ?>"
                      data-task-id="<?php echo $taskId; ?>">
                     <div class="operator-task-card__header">
                         <span class="operator-task-priority <?php echo htmlspecialchars($priorityClass($priority)); ?>">

@@ -55,6 +55,31 @@ from optional task item scope; missing item scope is not synthesized.
 - The route-access resolver remains the existing authority, while the Shell
   retains only presentation and conservative URL-shape validation.
 
+### 2026-10-15 — OH-AUTO1-083 task-to-action navigation
+
+**Status:** Accepted
+
+**Decision**
+
+Task-to-action navigation uses the existing operator task route with an
+allowlisted `task_id` query parameter. When the provider does not supply a
+task-specific destination, Shell derives `/u/{username}/tasks?task_id={id}`
+only after the OH-AUTO1-082 same-user URL and route-authority checks. Existing
+valid owner destinations remain unchanged.
+
+The task page resolves the selected record from the same assigned-task read
+projection already loaded for the authenticated user. It renders a focused
+summary and a return-to-list link; it does not add a detail endpoint, database
+query, mutation, or new task capability.
+
+**Consequences**
+
+- Workers land on the assigned task they selected rather than a generic list.
+- Assignment identity, status, scope evidence, and route authorization remain
+  governed by existing providers and authorities.
+- Specialized operator views, `/me` compatibility routing, and production
+  release/update controls remain unchanged.
+
 ### 2026-07-20 — Runtime catalogs and owner providers are search discovery authority
 **Status:** Accepted
 

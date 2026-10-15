@@ -37,6 +37,19 @@ Continue safely decomposing `OperatorSurfaceComposer.php` toward orchestration-o
   focused probe to **21/21** assertions. No database, schema, live browser, or
   Core change.
 
+## 2026-10-15 — OH-AUTO1-083 task-to-action navigation
+
+- [x] Made worker dashboard fallback destinations task-specific through the
+  existing authorized `/u/{username}/tasks?task_id={id}` route.
+- [x] Preserved valid owner destinations while rejecting external, cross-user,
+  fragment, malformed, traversal, and unsafe-query destinations through the
+  OH-AUTO1-082 authority/confinement boundary.
+- [x] Added selected-task focus rendering to the existing assigned-task page;
+  it reuses the already-loaded `OperatorTaskService::getForUser()` projection
+  and adds no route, schema, or task data source.
+- [x] Added EN/JA/NE labels and expanded isolated worker coverage to **25/25**.
+  No database, production installation/update, live browser, or Core change.
+
 ## In Progress
 
 - [ ] Decompose next `OperatorSurfaceComposer.php` non-rendering business-data block into focused composer/service class without changing runtime output.

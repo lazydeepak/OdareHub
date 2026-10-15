@@ -1,5 +1,24 @@
 # AGENT-COMPLIANCE-CHECKLIST
 
+## Session Summary (2026-10-15) — OH-AUTO1-083 Task-to-action navigation
+
+Added task-specific worker navigation without creating a new task system or
+route. Worker dashboard items now use the existing authorized
+`/u/{username}/tasks?task_id={id}` destination when no valid owner destination
+exists. The OH-AUTO1-082 same-user relative URL, query allowlist, identity,
+confinement, and route-authority checks remain in force.
+
+The existing assigned-task page now resolves `task_id` from its already-loaded
+`OperatorTaskService::getForUser()` projection and renders a localized selected
+task focus state with a return-to-list link. No detail endpoint, schema,
+database query, mutation, production installation/update, live browser, or Core
+change was introduced.
+
+Validation: focused worker dashboard probe **25/25**; PHP lint; localization
+catalog checks; diff hygiene; architecture gates PASS; deletion family gates
+**28/28 PASS**; deployment readiness PASS. Existing lifecycle logs and PHPUnit
+cache remain untouched.
+
 ## Session Summary (2026-10-15) — OH-AUTO1-082 Worker access and evidence hardening
 
 Corrected OH-AUTO1-081 without changing its worker-first dashboard structure.

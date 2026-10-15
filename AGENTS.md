@@ -6545,3 +6545,17 @@ provider's open/in-progress active contract, and distinguished effective user
 scope from optional provider item scope. Focused probe coverage is **21/21**;
 architecture, deletion, and deployment readiness checks pass. No database,
 schema, live browser, Core, `/me` routing, or specialized operator-view change.
+
+## Session Summary (2026-10-15) — OH-AUTO1-083 Task-to-action navigation
+
+Added task-specific navigation from the worker-first dashboard using the
+existing authorized `/u/{username}/tasks?task_id={id}` route. Valid owner
+destinations remain preserved; unsafe or unavailable destinations continue to
+fall back through the OH-AUTO1-082 confinement and route-authority checks.
+The existing assigned-task page now renders a selected-task focus state from
+the read-only `OperatorTaskService::getForUser()` projection, with localized
+EN/JA/NE labels and no new route, schema, query, or mutation authority.
+
+Focused coverage is **25/25**; architecture, deletion, and deployment
+readiness checks pass. No production installation/update, database, live
+browser, Core, `/me` routing, or specialized operator-view change.

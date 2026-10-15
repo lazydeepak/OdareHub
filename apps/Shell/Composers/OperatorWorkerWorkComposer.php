@@ -64,7 +64,7 @@ final class OperatorWorkerWorkComposer
 
             $dueDate = trim((string)($task['due_date'] ?? ''));
             $sourceDestination = trim((string)($task['destination'] ?? ''));
-            $operatorDestination = self::resolveDestination($sourceDestination, $username, $context);
+            $operatorDestination = self::resolveDestination($sourceDestination, $username, $context, $taskId);
             $isOverdue = !empty($task['is_overdue']) || ($dueDate !== '' && $dueDate < $today);
             $item = [
                 'source_owner' => 'operator_tasks',
@@ -115,9 +115,9 @@ final class OperatorWorkerWorkComposer
      *
      * @param array<string,mixed> $context
      */
-    private static function resolveDestination(string $source, string $username, array $context): string
+    private static function resolveDestination(string $source, string $username, array $context, int $taskId): string
     {
-        $fallback = '/u/' . rawurlencode($username) . '/tasks';
+        $fallback = '/u/' . rawurlencode($username) . '/tasks?task_id=' . $taskId;
         $resolver = $context['operator_route_access_resolver'] ?? null;
         if (!is_callable($resolver)) {
             return '';
@@ -126,6 +126,15 @@ final class OperatorWorkerWorkComposer
         $candidate = $source !== '' ? str_replace('{user}', rawurlencode($username), $source) : $fallback;
         if (!self::isSafeOperatorUrl($candidate, $username)) {
             $candidate = $fallback;
+        }
+
+        $candidateParts = parse_url($candidate);
+        $fallbackPath = '/u/' . rawurlencode($username) . '/tasks';
+        if (is_array($candidateParts)
+            && (string)($candidateParts['path'] ?? '') === $fallbackPath
+            && trim((string)($candidateParts['query'] ?? '')) === ''
+        ) {
+            $candidate .= '?task_id=' . $taskId;
         }
 
         $path = (string)parse_url($candidate, PHP_URL_PATH);
