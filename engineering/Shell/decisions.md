@@ -28,6 +28,33 @@ the `/u/{user}/*` route boundary before rendering.
 - The existing specialized operator views and `/me` compatibility routing are
   unchanged.
 
+### 2026-10-15 — OH-AUTO1-082 worker access and evidence hardening
+
+**Status:** Accepted
+
+**Decision**
+
+Worker task presentation requires a positive authenticated user ID, an
+identity-bound workspace, and an injected resolver backed by the existing
+route-access authority. Shell performs strict same-user relative URL and query
+validation before asking that authority; it does not create a new access model.
+Workspace Profile destinations use the same final route check after resolved
+view and assigned-app shaping.
+
+The current `OperatorTaskService` contract is authoritative for active statuses:
+`open` and `in_progress`. Unsupported states such as `blocked` are ignored until
+an owner contract provides them. Effective user scope is labeled separately
+from optional task item scope; missing item scope is not synthesized.
+
+**Consequences**
+
+- Identity and destination failures fail closed without changing dashboard
+  composition or specialized routes.
+- Profile navigation cannot grant access, cross users, escape `/u/*`, or use
+  unsafe query destinations; desktop/mobile consumers share the filtered set.
+- The route-access resolver remains the existing authority, while the Shell
+  retains only presentation and conservative URL-shape validation.
+
 ### 2026-07-20 — Runtime catalogs and owner providers are search discovery authority
 **Status:** Accepted
 

@@ -16,7 +16,26 @@ Continue safely decomposing `OperatorSurfaceComposer.php` toward orchestration-o
 - [x] Hardened workspace-profile sidebar sections so profile shaping cannot expose
   views outside resolved operator access, assigned apps, or `/u/{user}/*`.
 - [x] Added localized EN/JA/NE worker dashboard labels and isolated non-mutating
-  fixture coverage (`13/13`). No database, schema, live browser, or Core change.
+  fixture coverage. No database, schema, live browser, or Core change.
+
+## 2026-10-15 — OH-AUTO1-082 worker access and evidence hardening
+
+- [x] Made the worker composer fail closed for missing/zero authenticated IDs,
+  mismatched workspace identity, missing route authority, and provider errors.
+- [x] Strictly validated task destinations as same-user relative `/u/*` routes;
+  external, cross-user, fragment, malformed, and unsafe-query values fall back
+  only to an authority-checked tasks route.
+- [x] Delegated profile destination checks to the existing route-access authority
+  after resolved-view, assigned-app, query, and `/u/*` validation; filtered
+  results are shared by desktop/mobile navigation rendering.
+- [x] Removed unsupported blocked/on-hold status handling. Only the provider's
+  `open` and `in_progress` records are rendered; overdue evidence drives the
+  attention lane.
+- [x] Distinguished effective user scope from optional provider item scope;
+  absent item scope is represented as unavailable rather than fabricated.
+- [x] Reconciled the stale fixture-count report by expanding the committed
+  focused probe to **21/21** assertions. No database, schema, live browser, or
+  Core change.
 
 ## In Progress
 

@@ -386,7 +386,23 @@ final class OperatorLayerSidebarService
                 if (!$hasResolvedViews) {
                     continue;
                 }
-                $view = strtolower(trim((string)(explode('/', trim(substr($path, strlen('/u/{user}/')), '/'))[0] ?? 'dashboard')));
+                $username = rawurlencode(trim((string)($this->context['operator_username'] ?? '')));
+                $candidateRoute = strtr($route, ['/u/{user}/' => '/u/' . $username . '/']);
+                if (!$this->isSafeProfileRoute($candidateRoute, $username)) {
+                    continue;
+                }
+                $candidatePath = trim((string)parse_url($candidateRoute, PHP_URL_PATH));
+                $routeResolver = $this->context['operator_route_access_resolver'] ?? null;
+                $routeAllowed = false;
+                try {
+                    $routeAllowed = is_callable($routeResolver) && $routeResolver($candidatePath) === true;
+                } catch (\Throwable) {
+                    $routeAllowed = false;
+                }
+                if (!$routeAllowed) {
+                    continue;
+                }
+                $view = strtolower(trim((string)(explode('/', trim(substr($candidatePath, strlen('/u/' . $username . '/')), '/'))[0] ?? 'dashboard')));
                 $query = (string)parse_url($route, PHP_URL_QUERY);
                 parse_str($query, $queryValues);
                 $focus = strtolower(trim((string)($queryValues['focus'] ?? $view)));
@@ -409,6 +425,50 @@ final class OperatorLayerSidebarService
             }
         }
         return $allowedSections;
+    }
+
+    private function isSafeProfileRoute(string $route, string $username): bool
+    {
+        if ($username === '' || $route === '' || str_contains($route, '\\') || preg_match('/[\x00-\x20]/', $route)) {
+            return false;
+        }
+        if (preg_match('/%(?![0-9a-fA-F]{2})/', $route)) {
+            return false;
+        }
+        $parts = parse_url($route);
+        foreach (['scheme', 'host', 'user', 'pass', 'port', 'fragment'] as $forbiddenPart) {
+            if (is_array($parts) && array_key_exists($forbiddenPart, $parts)) {
+                return false;
+            }
+        }
+        if (!is_array($parts)) {
+            return false;
+        }
+        $path = trim((string)($parts['path'] ?? ''));
+        $expectedPrefix = '/u/' . $username . '/';
+        if ($path === '' || !str_starts_with($path, $expectedPrefix) || str_contains($path, '//')) {
+            return false;
+        }
+        if (preg_match('/%(?:2e|2f|5c)/i', $path)) {
+            return false;
+        }
+        foreach (explode('/', trim($path, '/')) as $segment) {
+            if ($segment === '.' || $segment === '..') {
+                return false;
+            }
+        }
+        $query = (string)($parts['query'] ?? '');
+        if ($query === '') {
+            return true;
+        }
+        parse_str($query, $queryValues);
+        foreach ($queryValues as $key => $value) {
+            $valueString = (string)$value;
+            if (!in_array((string)$key, ['focus', 'tab', 'task_id', 'id'], true) || is_array($value) || str_starts_with($valueString, '//') || str_contains($valueString, '://') || preg_match('/[\x00-\x20]/', $valueString)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**

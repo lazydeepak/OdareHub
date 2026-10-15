@@ -1,12 +1,35 @@
 # AGENT-COMPLIANCE-CHECKLIST
 
+## Session Summary (2026-10-15) — OH-AUTO1-082 Worker access and evidence hardening
+
+Corrected OH-AUTO1-081 without changing its worker-first dashboard structure.
+The task composer now fails closed for missing/zero identity, mismatched
+workspace identity, missing route authority, and provider failure. Task links
+accept only same-user relative `/u/*` destinations with allowlisted query keys
+and existing route-access approval; external, cross-user, fragment, malformed,
+and unsafe-query inputs fall back safely or produce no link.
+
+Profile navigation now validates final destinations through the existing
+route-access resolver after resolved view, assigned-app, query, and operator
+confinement checks. Desktop/mobile formatting consumes the same filtered set.
+Unsupported `blocked`/`on_hold` states are no longer treated as product data;
+only provider-supported `open`/`in_progress` records render, with verified
+overdue evidence driving attention. Effective user scope is distinct from
+optional provider item scope, which is `null` when absent.
+
+Validation: focused worker dashboard probe **21/21**; PHP lint; diff hygiene;
+operator confinement PASS; surface contribution contract PASS; resolved-
+experience truth PASS; architecture PASS; deletion family PASS; deployment
+readiness PASS. No database/schema mutation, installed database, live browser,
+Core change, or `/me`/specialized-route change.
+
 ## Session Summary (2026-10-15) — OH-AUTO1-081 Worker-first operator dashboard
 
 Added a worker-first `/u/{username}/dashboard` work surface using the existing
 read-only `OperatorTaskService::getForUser()` projection. Current, upcoming,
 and attention lanes preserve provider identifiers, statuses, priorities, due
-evidence, destinations, and operational scopes. Overdue and explicitly blocked
-records are surfaced as attention without changing their owner-provided status.
+evidence, destinations, and effective scope evidence. Overdue records are
+surfaced as attention without changing their owner-provided status.
 
 Profile-provided operator navigation is now filtered through resolved operator
 views, assigned applications, and `/u/{user}/*` confinement before rendering.

@@ -20,6 +20,7 @@ final class OperatorWorkerWorkComposer
     public static function compose(array $taskResult, array $context, string $username): array
     {
         $error = trim((string)($taskResult['error'] ?? ''));
+        $authenticatedUserId = (int)($context['authenticated_user_id'] ?? $context['user_id'] ?? 0);
         $empty = [
             'available' => $error === '',
             'error' => $error,
@@ -28,7 +29,7 @@ final class OperatorWorkerWorkComposer
             'attention' => [],
             'summary' => ['current' => 0, 'upcoming' => 0, 'attention' => 0],
         ];
-        if (($context['operator_identity_bound'] ?? true) !== true) {
+        if ($authenticatedUserId <= 0 || ($context['operator_identity_bound'] ?? false) !== true) {
             $empty['available'] = false;
             $empty['error'] = 'operator.worker_work.identity_unavailable';
             return $empty;
@@ -37,7 +38,6 @@ final class OperatorWorkerWorkComposer
             return $empty;
         }
 
-        $authenticatedUserId = (int)($context['authenticated_user_id'] ?? $context['user_id'] ?? 0);
         $scope = is_array($context['scope'] ?? null) ? $context['scope'] : [];
         $today = (new \DateTimeImmutable('today'))->format('Y-m-d');
         $current = [];
@@ -58,23 +58,14 @@ final class OperatorWorkerWorkComposer
             if ($authenticatedUserId > 0 && $assignedTo !== $authenticatedUserId) {
                 continue;
             }
-            $isBlocked = in_array($status, ['blocked', 'on_hold', 'hold'], true);
-            if (!$isBlocked && !in_array($status, ['open', 'in_progress'], true)) {
+            if (!in_array($status, ['open', 'in_progress'], true)) {
                 continue;
             }
 
             $dueDate = trim((string)($task['due_date'] ?? ''));
             $sourceDestination = trim((string)($task['destination'] ?? ''));
-            $operatorDestination = '/u/' . rawurlencode($username) . '/tasks';
-            if ($sourceDestination !== '') {
-                $candidateDestination = str_replace('{user}', rawurlencode($username), $sourceDestination);
-                $candidatePath = trim((string)parse_url($candidateDestination, PHP_URL_PATH));
-                $expectedPrefix = '/u/' . rawurlencode($username) . '/';
-                if (str_starts_with($candidatePath, $expectedPrefix)) {
-                    $operatorDestination = $candidateDestination;
-                }
-            }
-            $isOverdue = !$isBlocked && (!empty($task['is_overdue']) || ($dueDate !== '' && $dueDate < $today));
+            $operatorDestination = self::resolveDestination($sourceDestination, $username, $context);
+            $isOverdue = !empty($task['is_overdue']) || ($dueDate !== '' && $dueDate < $today);
             $item = [
                 'source_owner' => 'operator_tasks',
                 'item_id' => $taskId,
@@ -87,14 +78,14 @@ final class OperatorWorkerWorkComposer
                 'due_shift' => (string)($task['due_shift'] ?? ''),
                 'assigned_to' => $assignedTo,
                 'assigned_by' => (int)($task['assigned_by'] ?? 0),
-                'operational_scope' => $scope,
-                'item_scope' => is_array($task['scope'] ?? null) ? $task['scope'] : [],
+                'effective_operational_scope' => $scope,
+                'item_scope' => is_array($task['scope'] ?? null) ? $task['scope'] : null,
                 'source_destination' => $sourceDestination,
                 'destination' => $operatorDestination,
-                'attention_reason' => $isBlocked ? 'blocked' : ($isOverdue ? 'overdue' : ''),
+                'attention_reason' => $isOverdue ? 'overdue' : '',
             ];
 
-            if ($isBlocked || $isOverdue) {
+            if ($isOverdue) {
                 $attention[] = $item;
             } elseif ($dueDate !== '' && $dueDate > $today) {
                 $upcoming[] = $item;
@@ -115,5 +106,77 @@ final class OperatorWorkerWorkComposer
                 'attention' => count($attention),
             ],
         ];
+    }
+
+    /**
+     * Accept only an owner destination that is a same-user relative operator
+     * route and has passed the existing route-access authority. The fallback
+     * is also authority checked; an unavailable authority produces no link.
+     *
+     * @param array<string,mixed> $context
+     */
+    private static function resolveDestination(string $source, string $username, array $context): string
+    {
+        $fallback = '/u/' . rawurlencode($username) . '/tasks';
+        $resolver = $context['operator_route_access_resolver'] ?? null;
+        if (!is_callable($resolver)) {
+            return '';
+        }
+
+        $candidate = $source !== '' ? str_replace('{user}', rawurlencode($username), $source) : $fallback;
+        if (!self::isSafeOperatorUrl($candidate, $username)) {
+            $candidate = $fallback;
+        }
+
+        $path = (string)parse_url($candidate, PHP_URL_PATH);
+        try {
+            return $resolver($path) === true ? $candidate : '';
+        } catch (\Throwable) {
+            return '';
+        }
+    }
+
+    private static function isSafeOperatorUrl(string $url, string $username): bool
+    {
+        if ($url === '' || str_contains($url, '\\') || preg_match('/[\x00-\x20]/', $url)) {
+            return false;
+        }
+        if (preg_match('/%(?![0-9a-fA-F]{2})/', $url)) {
+            return false;
+        }
+        $parts = parse_url($url);
+        foreach (['scheme', 'host', 'user', 'pass', 'port', 'fragment'] as $forbiddenPart) {
+            if (is_array($parts) && array_key_exists($forbiddenPart, $parts)) {
+                return false;
+            }
+        }
+        if (!is_array($parts)) {
+            return false;
+        }
+        $path = trim((string)($parts['path'] ?? ''));
+        $expectedPrefix = '/u/' . rawurlencode($username) . '/';
+        if ($path === '' || !str_starts_with($path, $expectedPrefix) || str_contains($path, '//')) {
+            return false;
+        }
+        if (preg_match('/%(?:2e|2f|5c)/i', $path)) {
+            return false;
+        }
+        foreach (explode('/', trim($path, '/')) as $segment) {
+            if ($segment === '.' || $segment === '..') {
+                return false;
+            }
+        }
+        $query = (string)($parts['query'] ?? '');
+        if ($query === '') {
+            return true;
+        }
+        parse_str($query, $queryValues);
+        foreach ($queryValues as $key => $value) {
+            $valueString = (string)$value;
+            if (!in_array((string)$key, ['focus', 'tab', 'task_id', 'id'], true) || is_array($value) || str_starts_with($valueString, '//') || str_contains($valueString, '://') || preg_match('/[\x00-\x20]/', $valueString)) {
+                return false;
+            }
+        }
+        return true;
     }
 }

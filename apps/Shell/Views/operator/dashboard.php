@@ -36,7 +36,7 @@
                                                             <div><dt><?php echo htmlspecialchars($this->tr('operator.worker_work.priority', 'Priority')); ?></dt><dd><?php echo htmlspecialchars((string)($item['priority'] ?? '')); ?></dd></div>
                                                             <?php if (trim((string)($item['due_date'] ?? '')) !== ''): ?><div><dt><?php echo htmlspecialchars($this->tr('operator.worker_work.due', 'Due')); ?></dt><dd><?php echo htmlspecialchars((string)$item['due_date']); ?></dd></div><?php endif; ?>
                                                         </dl>
-                                                        <a class="operator-worker-item__link" href="<?php echo htmlspecialchars((string)($item['destination'] ?? '#')); ?>"><?php echo htmlspecialchars($this->tr('operator.worker_work.open', 'Open assigned work')); ?></a>
+                                                        <?php if (trim((string)($item['destination'] ?? '')) !== ''): ?><a class="operator-worker-item__link" href="<?php echo htmlspecialchars((string)$item['destination']); ?>"><?php echo htmlspecialchars($this->tr('operator.worker_work.open', 'Open assigned work')); ?></a><?php endif; ?>
                                                     </article>
                                                 <?php endforeach; ?>
                                             </div>

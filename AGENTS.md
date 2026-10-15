@@ -6529,3 +6529,19 @@ Validation: worker dashboard fixture **13/13**; PHP lint; diff hygiene;
 operator confinement PASS; Shell CSS ownership PASS with existing compatibility
 debt warning; Shell rendering PASS; resolved-experience truth PASS. No database,
 schema, live browser, Core, `/me` routing, or specialized operator view change.
+
+## Session Summary (2026-10-15) — OH-AUTO1-082 Worker access and evidence hardening
+
+Hardened the OH-AUTO1-081 worker dashboard without introducing a new access or
+task system. Worker data now requires a positive authenticated identity and an
+identity-bound workspace. Task destinations are strictly same-user relative
+`/u/*` URLs with safe query keys and approval from the existing route-access
+authority; unsafe or unauthorized destinations fall back safely or disappear.
+Workspace Profile navigation applies the same final route authority after
+resolved-view, assigned-app, query, and confinement filtering.
+
+Removed unsupported blocked/on-hold status handling, preserved only the
+provider's open/in-progress active contract, and distinguished effective user
+scope from optional provider item scope. Focused probe coverage is **21/21**;
+architecture, deletion, and deployment readiness checks pass. No database,
+schema, live browser, Core, `/me` routing, or specialized operator-view change.

@@ -181,6 +181,15 @@ final class OperatorLayerService
             'authority_role' => (string)($ctx['authority_role'] ?? 'app_user'),          // step 1
             'authenticated_user_id' => $userId,
             'operator_identity_bound' => $operatorIdentityBound,
+            'operator_username' => $resolvedUsername,
+            'operator_route_access_resolver' => static function (string $path) use ($authenticatedUser): bool {
+                try {
+                    $decision = UserAssignmentContext::accessPolicy()->routeAccessDecision($authenticatedUser, $path, 'GET');
+                    return is_array($decision) && ($decision['allowed'] ?? false) === true;
+                } catch (\Throwable) {
+                    return false;
+                }
+            },
             'dashboard_type' => (string)($ctx['dashboard_type'] ?? 'operator'),          // step 2
             'assigned_apps' => $assignedApps,                                             // step 3
             'active_assigned_apps' => $activeAssignedApps,
