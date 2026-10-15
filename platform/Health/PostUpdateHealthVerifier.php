@@ -59,7 +59,18 @@ final class PostUpdateHealthVerifier
             }
         }
         $status = $hasIndeterminate ? 'indeterminate' : ($hasFailure ? 'failed' : 'verified');
-        return PostUpdateHealthVerificationResult::fromVerification($transactionId, $preflightFingerprint, $status, $checks, self::digest($checks), self::digest($binding), self::digest($expected));
+        /** @var callable(string,string,string,array<int,array<string,mixed>>,string,string,string):PostUpdateHealthVerificationResult $issue */
+        $issue = \Closure::bind(
+            static function (string $id, string $fingerprint, string $resultStatus, array $resultChecks, string $evidenceDigest, string $bindingDigest, string $expectationsDigest): PostUpdateHealthVerificationResult {
+                return new PostUpdateHealthVerificationResult($id, $fingerprint, $resultStatus, $resultChecks, $evidenceDigest, $bindingDigest, $expectationsDigest);
+            },
+            null,
+            PostUpdateHealthVerificationResult::class
+        );
+        if (!is_callable($issue)) {
+            throw new RuntimeException('health result issuer is unavailable');
+        }
+        return $issue($transactionId, $preflightFingerprint, $status, $checks, self::digest($checks), self::digest($binding), self::digest($expected));
     }
 
     /** @param array<string,mixed> $observed @param array<string,mixed> $expected @return array{ok:bool,errors:array<int,string>} */

@@ -34,7 +34,7 @@ try {
     $preflight = [
         'state' => 'preflight_verified', 'execution_prohibited' => true,
         'release_authority_granted' => false, 'update_eligible' => false,
-        'apply_eligible' => false, 'execution_authorized' => false,
+        'apply_eligible' => false, 'execution_authorized' => false, 'live_mutation_performed' => false,
         'installation_identity_fingerprint' => str_repeat('a', 64),
         'candidate_release_version' => '2.0.0', 'candidate_build_id' => 'fixture:release:002', 'candidate_package_sha256' => str_repeat('b', 64),
         'release_statement_fingerprint' => str_repeat('c', 64), 'trust_store_fingerprint' => str_repeat('d', 64),
@@ -43,6 +43,9 @@ try {
         'diagnostics' => [['gate' => 'coordinator', 'ok' => true]], 'evidence_provenance' => ['coordinator' => ['state' => 'preflight_verified']],
     ];
     $environment = 'disposable-release-rehearsal-v1';
+    $preflightValues = $preflight;
+    $preflight = Platform\Updates\TrustedReleasePreflightEvidence::fromCoordinatorResult($preflightValues);
+    $check($throws(static fn() => $transactions->prepare($preflightValues, $environment)), 'caller-supplied preflight array cannot prepare a transaction');
     $prepared = $transactions->prepare($preflight, $environment);
     $transactionId = (string)$prepared['record']['transaction_id'];
     $check(($prepared['state'] ?? null) === 'awaiting_approval', 'verified preflight prepares awaiting-approval transaction');
@@ -50,8 +53,9 @@ try {
     $check($throws(static fn() => $transactions->prepare($preflight, $environment)), 'second active transaction for installation is blocked');
     $challenge = $approvals->issue($transactionId, new DateTimeImmutable('+10 minutes', new DateTimeZone('UTC')));
     $check($throws(static fn() => $approvals->approve($transactionId, 'real-admin', (string)$challenge['token'], $preflight, new DateTimeImmutable('now', new DateTimeZone('UTC')))), 'real administrator identity is not claimed by simulator');
-    $changed = $preflight;
-    $changed['candidate_package_sha256'] = str_repeat('f', 64);
+    $changedValues = $preflightValues;
+    $changedValues['candidate_package_sha256'] = str_repeat('f', 64);
+    $changed = Platform\Updates\TrustedReleasePreflightEvidence::fromCoordinatorResult($changedValues);
     $check($throws(static fn() => $approvals->approve($transactionId, 'simulated:fixture-admin', (string)$challenge['token'], $changed, new DateTimeImmutable('now', new DateTimeZone('UTC')))), 'changed candidate evidence invalidates approval');
     $approval = $approvals->approve($transactionId, 'simulated:fixture-admin', (string)$challenge['token'], $preflight, new DateTimeImmutable('now', new DateTimeZone('UTC')));
     $check(($approval['state'] ?? null) === 'approved_for_disposable_rehearsal', 'explicit simulated approval advances exactly one transaction');
@@ -91,7 +95,7 @@ try {
     $sources = [];
     foreach (['release_identity', 'target_schema', 'migration_ledger', 'bootstrap', 'application_discovery', 'critical_connectivity', 'configuration_trust', 'protected_paths', 'unresolved_state'] as $name) $sources[$name] = static function () use ($healthRoot, $name): array { return json_decode((string)file_get_contents($healthRoot . '/' . $name . '.json'), true, 512, JSON_THROW_ON_ERROR); };
     $verifier = new PostUpdateHealthVerifier($sources);
-    $health = $verifier->verify($transactionId, DisposableReleaseTransactionService::fingerprint($preflight), $expected);
+    $health = $verifier->verify($transactionId, $preflight->fingerprint(), $expected);
     $check($health->status() === 'verified' && count($health->checks()) === 9, 'health verifier executes all fixed read-only checks');
     $completed = $transactions->complete($transactionId, $health, $environment);
     $check(($completed['state'] ?? null) === 'completed', 'verified health completes transaction control state');
@@ -99,7 +103,7 @@ try {
     $check($throws(static fn() => $transactions->complete($transactionId, ['status' => 'verified'], $environment)), 'caller-supplied health array cannot authorize completion');
 
     $write('bootstrap', ['healthy' => true]);
-    $failedHealth = $verifier->verify($transactionId, DisposableReleaseTransactionService::fingerprint($preflight), $expected);
+    $failedHealth = $verifier->verify($transactionId, $preflight->fingerprint(), $expected);
     $check($failedHealth->status() === 'failed', 'healthy=true claim is not accepted as bootstrap proof');
     $check(count(array_filter($failedHealth->checks(), static fn(array $item): bool => $item['execution_result'] === 'failed')) >= 1, 'failed health records identify the failed executed check');
 
@@ -110,7 +114,7 @@ try {
     $transactions->bindHealthExpectations($failedTransactionId, $expected, $environment);
     $transactions->markExecuting($failedTransactionId, $preflight, $environment);
     $transactions->markVerifying($failedTransactionId, $preflight, $environment);
-    $failedHealthForTransaction = $verifier->verify($failedTransactionId, DisposableReleaseTransactionService::fingerprint($preflight), $expected);
+    $failedHealthForTransaction = $verifier->verify($failedTransactionId, $preflight->fingerprint(), $expected);
     $check($failedHealthForTransaction->status() === 'failed' && $throws(static fn() => $transactions->complete($failedTransactionId, $failedHealthForTransaction, $environment)), 'failed health blocks transaction completion');
     $transactions->markRecoveryRequired($failedTransactionId, 'health_failed', $environment);
 

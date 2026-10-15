@@ -45,6 +45,24 @@ remain disabled.
 
 Release/update foundation governance and controlled-cycle readiness.
 
+## OH-AUTO1-078 — Completed
+
+Performed the first real disposable signed install/update/recovery rehearsal.
+The runner stages source outside the repository, starts and independently
+attests a fresh loopback-only MySQL process, provisions ephemeral trust and
+identity under the temporary root, verifies a signed candidate through fresh
+coordinator evidence, executes one exact migration, activates package-owned
+fixture bytes, verifies fixed-source post-update health, and commits identity
+only after health passes.
+
+A separately journaled transaction injects a post-mutation failure, records
+`recovery_required`, restores the actual disposable database dump and
+filesystem archive, restores the prior identity, and verifies the restored
+state. The execution proof passes 25/25 and the transaction control regression
+passes 21/21. No installed database, production
+SQL, deployment, production signing, or Core change occurred. Evidence:
+`docs/architecture/oh-auto1-078-disposable-signed-install-update-recovery-2026-10-15.md`.
+
 Current reconciliation: OH-AUTO1-055 corrected the previously open Core ACL
 deny-precedence and plugin route-rollback defects. OH-AUTO1-068 has now
 requalified bounded disposable database testing; installed-database access,

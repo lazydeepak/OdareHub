@@ -6662,3 +6662,20 @@ schema, downgrade, and forged approval/health claims. No installed database,
 SQL, release apply, production trust/identity write, activation, deployment,
 or Core modification occurred. Existing lifecycle logs and PHPUnit cache were
 preserved.
+# OH-AUTO1-078 — Disposable Signed Install/Update/Recovery
+
+- [x] Read root and Platform workspace instructions before implementation.
+- [x] Preserved Core lock; no `/app` files changed.
+- [x] Hardened transaction transitions to require coordinator-issued opaque
+  preflight evidence rather than caller arrays.
+- [x] Removed public construction authority from post-update health results.
+- [x] Staged source outside the repository and independently attested the
+  temporary MySQL process/socket/datadir before fixture mutation.
+- [x] Proved signed candidate verification, exact-step migration, activation,
+  health-bound identity commit, injected post-mutation failure, real database
+  and filesystem recovery, identity restoration, and journal classification.
+- [x] Disposable rehearsal: 25/25; transaction probe: 21/21.
+- [x] Architecture gates: 49/49; deletion gates: 28/28; deployment readiness:
+  PASS; Core lock: PASS; diff hygiene: PASS.
+- [x] Preserved unrelated pre-existing `storage/logs/*` and
+  `vendor/bin/.phpunit.result.cache` working-tree changes.

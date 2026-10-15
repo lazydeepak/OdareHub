@@ -39,7 +39,7 @@ final class DisposableAdministratorApprovalAuthority
     }
 
     /** @return array<string,mixed> */
-    public function approve(string $transactionId, string $approverId, string $token, array $currentPreflight, DateTimeImmutable $now): array
+    public function approve(string $transactionId, string $approverId, string $token, TrustedReleasePreflightEvidence $currentPreflight, DateTimeImmutable $now): array
     {
         if (!str_starts_with($approverId, 'simulated:') || trim(substr($approverId, 9)) === '') {
             throw new RuntimeException('only explicitly simulated approvers are allowed');
@@ -70,7 +70,7 @@ final class DisposableAdministratorApprovalAuthority
             throw new RuntimeException('approval token is expired');
         }
         $record = $events['events'][0]['payload']['record'] ?? null;
-        if (!is_array($record) || !hash_equals((string)($record['preflight_evidence_fingerprint'] ?? ''), DisposableReleaseTransactionService::fingerprint($currentPreflight))) {
+        if (!is_array($record) || !hash_equals((string)($record['preflight_evidence_fingerprint'] ?? ''), $currentPreflight->fingerprint())) {
             throw new RuntimeException('approval evidence is stale');
         }
         return $this->journal->append($transactionId, 'approved_for_disposable_rehearsal', [

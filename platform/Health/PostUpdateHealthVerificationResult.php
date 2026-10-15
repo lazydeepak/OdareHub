@@ -16,12 +16,6 @@ final class PostUpdateHealthVerificationResult
         private readonly string $expectationsDigest
     ) {}
 
-    /** @param array<int,array<string,mixed>> $checks */
-    public static function fromVerification(string $transactionId, string $preflightFingerprint, string $status, array $checks, string $evidenceDigest, string $bindingDigest, string $expectationsDigest): self
-    {
-        return new self($transactionId, $preflightFingerprint, $status, $checks, $evidenceDigest, $bindingDigest, $expectationsDigest);
-    }
-
     public function transactionId(): string { return $this->transactionId; }
     public function preflightFingerprint(): string { return $this->preflightFingerprint; }
     public function status(): string { return $this->status; }

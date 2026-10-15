@@ -6463,3 +6463,20 @@ package and sidecar succeed. The 13/13 immutability probe proves preservation
 across repeated identities, normalized build-ID collisions, incomplete records,
 and inspection failures. No database, SQL, migration, installation,
 publication, deployment, or Core operation occurred.
+## Session Summary (2026-10-15) — OH-AUTO1-078 Disposable Signed Install/Update/Recovery
+
+Completed the first real disposable signed install/update/recovery rehearsal.
+Added opaque coordinator preflight evidence for transaction authority, removed
+public health-result construction, and added a runner-owned proof that stages
+source outside the repository, independently attests a fresh loopback-only
+MySQL process, verifies an ephemeral Ed25519-signed candidate, executes one
+exact migration, activates candidate bytes, verifies post-update health, and
+commits disposable identity only after health passes. A separately journaled
+failure injects database/filesystem corruption, records `recovery_required`,
+restores the actual dump/archive, restores identity, and verifies recovery.
+
+Validation: disposable rehearsal 25/25; transaction control 21/21;
+architecture 49/49; deletion 28/28; deployment readiness PASS; Core lock PASS;
+PHP lint and diff hygiene PASS. No installed database, production SQL,
+deployment, production signing, or Core change. See
+`docs/architecture/oh-auto1-078-disposable-signed-install-update-recovery-2026-10-15.md`.

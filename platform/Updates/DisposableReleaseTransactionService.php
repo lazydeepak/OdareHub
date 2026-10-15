@@ -18,23 +18,15 @@ final class DisposableReleaseTransactionService
 
     public function __construct(private readonly DisposableReleaseTransactionJournal $journal) {}
 
-    /** @param array<string,mixed> $preflight @return array<string,mixed> */
-    public function prepare(array $preflight, string $environmentToken): array
+    public function prepare(TrustedReleasePreflightEvidence $preflight, string $environmentToken): array
     {
+        $preflightValues = $preflight->toArray();
         if ($environmentToken !== 'disposable-release-rehearsal-v1') {
             throw new RuntimeException('explicit disposable environment authority is required');
         }
-        if (($preflight['state'] ?? null) !== TrustedReleaseCoordinatorPreflightService::PREFLIGHT_VERIFIED
-            || ($preflight['execution_prohibited'] ?? false) !== true
-            || ($preflight['release_authority_granted'] ?? true) !== false
-            || ($preflight['update_eligible'] ?? true) !== false
-            || ($preflight['apply_eligible'] ?? true) !== false
-            || ($preflight['execution_authorized'] ?? true) !== false) {
-            throw new RuntimeException('verified non-executing preflight is required');
-        }
-        $installation = (string)($preflight['installation_identity_fingerprint'] ?? '');
+        $installation = $preflightValues['installation_identity_fingerprint'];
         foreach (['candidate_package_sha256', 'release_statement_fingerprint', 'trust_store_fingerprint', 'migration_plan_fingerprint', 'target_schema_identity', 'recovery_point_identity'] as $field) {
-            if (trim((string)($preflight[$field] ?? '')) === '') {
+            if (trim((string)($preflightValues[$field] ?? '')) === '') {
                 throw new RuntimeException('preflight is missing transaction binding: ' . $field);
             }
         }
@@ -56,25 +48,25 @@ final class DisposableReleaseTransactionService
             'transaction_id' => bin2hex(random_bytes(16)),
             'environment' => 'disposable',
             'installation_identity_fingerprint' => $installation,
-            'candidate_build_id' => (string)($preflight['candidate_build_id'] ?? ''),
-            'candidate_release_version' => (string)($preflight['candidate_release_version'] ?? ''),
-            'candidate_package_sha256' => $preflight['candidate_package_sha256'],
-            'release_statement_fingerprint' => $preflight['release_statement_fingerprint'],
-            'trust_store_fingerprint' => $preflight['trust_store_fingerprint'],
-            'migration_plan_fingerprint' => $preflight['migration_plan_fingerprint'],
-            'source_schema_identity' => (string)($preflight['source_schema_identity'] ?? 'unknown'),
-            'target_schema_identity' => $preflight['target_schema_identity'],
-            'recovery_point_id' => $preflight['recovery_point_identity'],
-            'preflight_evidence_fingerprint' => self::fingerprint($preflight),
+            'candidate_build_id' => (string)($preflightValues['candidate_build_id'] ?? ''),
+            'candidate_release_version' => (string)($preflightValues['candidate_release_version'] ?? ''),
+            'candidate_package_sha256' => $preflightValues['candidate_package_sha256'],
+            'release_statement_fingerprint' => $preflightValues['release_statement_fingerprint'],
+            'trust_store_fingerprint' => $preflightValues['trust_store_fingerprint'],
+            'migration_plan_fingerprint' => $preflightValues['migration_plan_fingerprint'],
+            'source_schema_identity' => (string)($preflightValues['source_schema_identity'] ?? 'unknown'),
+            'target_schema_identity' => $preflightValues['target_schema_identity'],
+            'recovery_point_id' => $preflightValues['recovery_point_identity'],
+            'preflight_evidence_fingerprint' => $preflight->fingerprint(),
             'health_binding' => [
-                'candidate_build_id' => (string)($preflight['candidate_build_id'] ?? ''),
-                'candidate_release_version' => (string)($preflight['candidate_release_version'] ?? ''),
-                'candidate_package_sha256' => $preflight['candidate_package_sha256'],
+                'candidate_build_id' => (string)($preflightValues['candidate_build_id'] ?? ''),
+                'candidate_release_version' => (string)($preflightValues['candidate_release_version'] ?? ''),
+                'candidate_package_sha256' => $preflightValues['candidate_package_sha256'],
                 'installation_identity_fingerprint' => $installation,
-                'trust_store_fingerprint' => $preflight['trust_store_fingerprint'],
-                'migration_plan_fingerprint' => $preflight['migration_plan_fingerprint'],
-                'target_schema_identity' => $preflight['target_schema_identity'],
-                'recovery_point_identity' => $preflight['recovery_point_identity'],
+                'trust_store_fingerprint' => $preflightValues['trust_store_fingerprint'],
+                'migration_plan_fingerprint' => $preflightValues['migration_plan_fingerprint'],
+                'target_schema_identity' => $preflightValues['target_schema_identity'],
+                'recovery_point_identity' => $preflightValues['recovery_point_identity'],
             ],
             'execution_authorized' => false,
             'live_mutation_performed' => false,
@@ -98,14 +90,12 @@ final class DisposableReleaseTransactionService
         return ['ok' => true, 'state' => $events[count($events) - 1]['state'], 'record' => $events[0]['payload']['record'] ?? [], 'events' => $events];
     }
 
-    /** @param array<string,mixed> $currentPreflight */
-    public function markExecuting(string $transactionId, array $currentPreflight, string $environmentToken): array
+    public function markExecuting(string $transactionId, TrustedReleasePreflightEvidence $currentPreflight, string $environmentToken): array
     {
         return $this->advance($transactionId, 'executing', $currentPreflight, $environmentToken);
     }
 
-    /** @param array<string,mixed> $currentPreflight */
-    public function markVerifying(string $transactionId, array $currentPreflight, string $environmentToken): array
+    public function markVerifying(string $transactionId, TrustedReleasePreflightEvidence $currentPreflight, string $environmentToken): array
     {
         return $this->advance($transactionId, 'verifying', $currentPreflight, $environmentToken);
     }
@@ -172,8 +162,7 @@ final class DisposableReleaseTransactionService
         return hash('sha256', json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR));
     }
 
-    /** @param array<string,mixed> $preflight */
-    private function advance(string $transactionId, string $target, array $preflight, string $environmentToken): array
+    private function advance(string $transactionId, string $target, TrustedReleasePreflightEvidence $preflight, string $environmentToken): array
     {
         $this->assertEnvironment($environmentToken);
         $current = $this->read($transactionId);
@@ -182,7 +171,7 @@ final class DisposableReleaseTransactionService
             || ($target === 'verifying' && $current['state'] !== 'executing')) {
             throw new RuntimeException('invalid transaction state transition');
         }
-        if (($current['record']['preflight_evidence_fingerprint'] ?? null) !== self::fingerprint($preflight)) {
+        if (($current['record']['preflight_evidence_fingerprint'] ?? null) !== $preflight->fingerprint()) {
             throw new RuntimeException('fresh preflight binding is required');
         }
         $expectationsBound = false;

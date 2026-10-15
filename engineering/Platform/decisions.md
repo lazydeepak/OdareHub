@@ -1,5 +1,16 @@
 # Platform — Decisions
 
+### 2026-10-15 — OH-AUTO1-078 disposable signed cycle
+**Status:** Accepted as disposable-only execution proof
+
+The first actual mutation rehearsal must use a runner-owned source root,
+temporary filesystem roots, an independently attested `--no-defaults`
+MySQL process, installation-owned disposable trust/identity stores, fresh
+coordinator evidence, exact-step migration authority, fixed-source health,
+and append-only transaction evidence. A successful health-bound identity
+commit and a separately journaled injected failure/recovery are both required.
+The proof does not authorize installed or production execution.
+
 ### 2026-10-15 — OH-AUTO1-077 disposable transaction controls
 **Status:** Accepted for bounded non-production rehearsal control
 
