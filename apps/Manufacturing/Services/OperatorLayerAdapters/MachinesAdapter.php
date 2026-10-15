@@ -15,7 +15,7 @@ final class MachinesAdapter
 {
     /**
      * @return array{
-     *   kpi: array<string,int|float>,
+     *   kpi: array<string,int|float|null>,
      *   run_now: array<int,array<string,mixed>>,
      *   next_queue: array<int,array<string,mixed>>,
      *   delayed_jobs: array<int,array<string,mixed>>,
@@ -58,7 +58,11 @@ final class MachinesAdapter
                 $surface === 'display' ? null : $user
             );
             if ($surface !== 'display') {
-                $result = self::projectScopedData($result, (array)($result['scope'] ?? []));
+                $result = self::projectScopedData($result);
+                if ($result === null) {
+                    $defaults['error'] = 'operator.common.data_unavailable';
+                    return $defaults;
+                }
             }
             $defaults['run_now']      = (array)($result['run_now'] ?? []);
             $defaults['next_queue']   = (array)($result['next_queue'] ?? []);
@@ -71,8 +75,8 @@ final class MachinesAdapter
                 'next_queue'   => count($defaults['next_queue']),
                 'delayed_jobs' => count($defaults['delayed_jobs']),
                 'waiting_qc'   => count($defaults['waiting_qc']),
-                'planned_qty'  => (float)($result['kpi']['today_planned_qty'] ?? $result['today_planned_qty'] ?? 0),
-                'produced_qty' => (float)($result['kpi']['today_produced_qty'] ?? $result['today_produced_qty'] ?? 0),
+                'planned_qty'  => self::quantityValue($result['kpi'] ?? [], 'today_planned_qty'),
+                'produced_qty' => self::quantityValue($result['kpi'] ?? [], 'today_produced_qty'),
             ];
             $total = $defaults['kpi']['run_now'] + $defaults['kpi']['next_queue'] + $defaults['kpi']['delayed_jobs'];
             $defaults['empty'] = ($total === 0);
@@ -128,13 +132,17 @@ final class MachinesAdapter
      * provider returns an over-broad projection.
      *
      * @param array<string,mixed> $result
-     * @param array<string,mixed> $scope
-     * @return array<string,mixed>
+     * @return array<string,mixed>|null
      */
-    public static function projectScopedData(array $result, array $scope): array
+    public static function projectScopedData(array $result): ?array
     {
-        $machineIds = array_values(array_filter(array_map('intval', (array)($scope['machine_ids'] ?? [])), static fn(int $id): bool => $id > 0));
-        $partIds = array_values(array_filter(array_map('intval', (array)($scope['part_ids'] ?? [])), static fn(int $id): bool => $id > 0));
+        $scope = is_array($result['scope'] ?? null) ? $result['scope'] : null;
+        if ($scope === null || !array_key_exists('scope_machine_ids', $scope) || !array_key_exists('scope_part_ids', $scope)
+            || !is_array($scope['scope_machine_ids']) || !is_array($scope['scope_part_ids'])) {
+            return null;
+        }
+        $machineIds = array_values(array_filter(array_map('intval', $scope['scope_machine_ids']), static fn(int $id): bool => $id > 0));
+        $partIds = array_values(array_filter(array_map('intval', $scope['scope_part_ids']), static fn(int $id): bool => $id > 0));
         $filterRows = static function (array $rows) use ($machineIds, $partIds): array {
             return array_values(array_filter($rows, static function ($row) use ($machineIds, $partIds): bool {
                 if (!is_array($row)) {
@@ -154,11 +162,26 @@ final class MachinesAdapter
         $machines = array_values(array_filter((array)($result['assigned_machines'] ?? []), static function ($machine) use ($machineIds): bool {
             return is_array($machine) && ($machineIds === [] || in_array((int)($machine['id'] ?? 0), $machineIds, true));
         }));
+
+        if ($partIds !== []) {
+            $recordMachineIds = [];
+            foreach (['run_now', 'next_queue', 'delayed_jobs', 'waiting_qc', 'risk_jobs'] as $key) {
+                foreach ((array)($result[$key] ?? []) as $row) {
+                    if (is_array($row) && (int)($row['machine_id'] ?? 0) > 0) {
+                        $recordMachineIds[(int)$row['machine_id']] = true;
+                    }
+                }
+            }
+            $machines = array_values(array_filter($machines, static fn(array $machine): bool => isset($recordMachineIds[(int)($machine['id'] ?? 0)])));
+        }
         $result['assigned_machines'] = $machines;
 
         $filters = is_array($result['filters'] ?? null) ? $result['filters'] : [];
         if (isset($filters['machines']) && is_array($filters['machines']) && $machineIds !== []) {
             $filters['machines'] = array_values(array_filter($filters['machines'], static fn($machine): bool => is_array($machine) && in_array((int)($machine['id'] ?? 0), $machineIds, true)));
+        }
+        if ($partIds !== []) {
+            $filters['machines'] = $machines;
         }
         $filters['sections'] = array_values(array_unique(array_filter(array_map(
             static fn($machine): string => is_array($machine) ? trim((string)($machine['section'] ?? '')) : '',
@@ -166,6 +189,7 @@ final class MachinesAdapter
         ), static fn(string $section): bool => $section !== '')));
         sort($filters['sections']);
         $result['filters'] = $filters;
+        $result['sections'] = $filters['sections'];
 
         $kpi = is_array($result['kpi'] ?? null) ? $result['kpi'] : [];
         $kpi['assigned_machines'] = count($machines);
@@ -174,7 +198,27 @@ final class MachinesAdapter
         $kpi['delayed_jobs'] = count((array)$result['delayed_jobs']);
         $kpi['waiting_qc_jobs'] = count((array)$result['waiting_qc']);
         $kpi['risk_jobs'] = count((array)$result['risk_jobs']);
+        $provenance = is_array($result['quantity_provenance'] ?? null) ? $result['quantity_provenance'] : [];
+        $provenanceMachineIds = array_values(array_filter(array_map('intval', (array)($provenance['scope_machine_ids'] ?? [])), static fn(int $id): bool => $id > 0));
+        $provenancePartIds = array_values(array_filter(array_map('intval', (array)($provenance['scope_part_ids'] ?? [])), static fn(int $id): bool => $id > 0));
+        $quantitiesAreScoped = ($provenance['source'] ?? '') === 'MachineLeaderDashboardService::fetchPlanRows'
+            && ($provenance['complete_window'] ?? false) === true
+            && $provenanceMachineIds === $machineIds
+            && $provenancePartIds === $partIds;
+        if (!$quantitiesAreScoped) {
+            $kpi['today_planned_qty'] = null;
+            $kpi['today_produced_qty'] = null;
+        }
         $result['kpi'] = $kpi;
         return $result;
+    }
+
+    /** @param array<string,mixed> $kpi */
+    private static function quantityValue(array $kpi, string $key): ?float
+    {
+        if (!array_key_exists($key, $kpi) || !is_numeric($kpi[$key])) {
+            return null;
+        }
+        return (float)$kpi[$key];
     }
 }

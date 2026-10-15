@@ -1,5 +1,13 @@
 # AGENTS.md
 
+## Session Summary (2026-10-15) — OH-AUTO1-088 Machine projection consistency
+
+Corrected machine projection scope-key, section/filter, part-only choice, and
+quantity-provenance mismatches. Runtime-shaped fixture coverage is **15/15**;
+role-home **26/26**, worker/task **41/41**, and responsive navigation **51/51**
+remain passing. Malformed scope fails closed; unproven quantities are
+suppressed. No database, browser, production operation, or Core change.
+
 ## Session Summary (2026-10-15) — OH-AUTO1-087 Scope-aware machine work
 
 Bound the operator machine view to authenticated identity and existing

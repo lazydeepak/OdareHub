@@ -2,10 +2,19 @@
 
 ## Current Focus
 
-OH-AUTO1-087 scope-aware machine handoff is complete. Resume broader
+OH-AUTO1-088 machine projection consistency is complete. Resume broader
 operator capabilities, especially computed-scope-aware machine, part,
 work-area, and process-area presentation; do not expand the dashboard
 foundation without a new bounded objective.
+
+## 2026-10-15 — OH-AUTO1-088 machine projection consistency
+
+- [x] Shell integration remains limited to authenticated user handoff and
+  explicit display mode; projection scope normalization remains Manufacturing-
+  owned.
+- [x] Runtime-shaped fixture coverage verifies owner scope keys, aligned
+  sections/filters, combined restrictions, malformed-scope refusal, and
+  quantity provenance: **15/15**.
 
 ## 2026-10-15 — OH-AUTO1-087 scope-aware machine handoff
 

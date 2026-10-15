@@ -50,11 +50,11 @@
                         </div>
                         <div class="coverage-kpi-card">
                             <span class="coverage-kpi-label"><?php echo htmlspecialchars($this->tr('operator.machines.kpi.planned_qty', 'Planned Qty')); ?></span>
-                            <span class="coverage-kpi-value"><?php echo number_format((float)($mchKpi['planned_qty'] ?? 0)); ?></span>
+                            <span class="coverage-kpi-value"><?php echo is_numeric($mchKpi['planned_qty'] ?? null) ? number_format((float)$mchKpi['planned_qty']) : '-'; ?></span>
                         </div>
                         <div class="coverage-kpi-card">
                             <span class="coverage-kpi-label"><?php echo htmlspecialchars($this->tr('operator.machines.kpi.produced_qty', 'Produced')); ?></span>
-                            <span class="coverage-kpi-value"><?php echo number_format((float)($mchKpi['produced_qty'] ?? 0)); ?></span>
+                            <span class="coverage-kpi-value"><?php echo is_numeric($mchKpi['produced_qty'] ?? null) ? number_format((float)$mchKpi['produced_qty']) : '-'; ?></span>
                         </div>
                     </div>
                     <?php if (!empty($mchRunNow)): ?>

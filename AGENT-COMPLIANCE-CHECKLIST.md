@@ -1,5 +1,18 @@
 # AGENT-COMPLIANCE-CHECKLIST
 
+## Session Summary (2026-10-15) — OH-AUTO1-088 Machine projection consistency
+
+Corrected the three OH-AUTO1-087 projection mismatches. The defensive adapter
+now consumes the actual owner-shaped `scope_machine_ids`/`scope_part_ids`, keeps
+top-level sections aligned with filters and records, narrows part-only machine
+choices to scoped records, and suppresses quantity totals without explicit
+complete-window owner provenance. Malformed scope fails closed.
+
+Validation: runtime-shaped machine projection **15/15**; role-home **26/26**;
+worker/task **41/41**; responsive navigation **51/51**. No database, browser,
+production, activation, schema, or Core operation. Existing lifecycle logs and
+PHPUnit cache remain uncommitted.
+
 ## Session Summary (2026-10-15) — OH-AUTO1-087 Scope-aware machine work
 
 Bound the `/u/{username}/machines` path to authenticated operator identity and

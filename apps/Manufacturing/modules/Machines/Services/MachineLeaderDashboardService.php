@@ -183,6 +183,12 @@ final class MachineLeaderDashboardService
             'waiting_qc' => array_slice($waitingQc, 0, 20),
             'risk_jobs' => array_slice($riskJobs, 0, 20),
             'kpi' => $kpi,
+            'quantity_provenance' => [
+                'source' => 'MachineLeaderDashboardService::fetchPlanRows',
+                'scope_machine_ids' => $scopeMachineIds,
+                'scope_part_ids' => $scopePartIds,
+                'complete_window' => true,
+            ],
             'ownership_board' => HandoffEngine::workboardForOwner('Machine Leader'),
         ];
     }

@@ -2,6 +2,24 @@
 
 ## Decision Log
 
+### 2026-10-15 — OH-AUTO1-088 machine projection consistency
+
+**Status:** Accepted
+
+**Decision**
+
+`MachinesAdapter::projectScopedData()` consumes the actual owner response
+shape: `scope.scope_machine_ids` and `scope.scope_part_ids`. Missing or
+malformed scope is rejected rather than interpreted as unrestricted. The
+normalized scope is used consistently for job rows, assigned machines,
+filters, top-level sections, and count KPIs. Part-only restrictions narrow
+machine choices to machines represented by authorized scoped records.
+
+Quantity totals are published only when the owner response includes matching
+`MachineLeaderDashboardService::fetchPlanRows` complete-window provenance.
+Otherwise the adapter suppresses them as unavailable; it never sums truncated
+queue slices as totals.
+
 ### 2026-10-15 — OH-AUTO1-087 machine scope handoff
 
 **Status:** Accepted

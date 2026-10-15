@@ -16,8 +16,8 @@ The active product direction is:
 
 The disposable release/update foundation is complete through OH-AUTO1-080.
 Production installation, update, and apply remain unauthorized. Product
-development has resumed on the Shell worker surface; OH-AUTO1-087 is the
-current scope-aware machine work milestone.
+development has resumed on the Shell worker surface; OH-AUTO1-088 is the
+current machine-scope projection consistency milestone.
 
 ## Active Focus
 
@@ -29,10 +29,9 @@ Completed execution milestone:
 
 Current product milestone:
 
-- OH-AUTO1-087 — bind the existing `/u/{username}/machines` projection to the
-  authenticated user's effective Manufacturing machine/part scope while
-  preserving the authorized read-only display path. OH-AUTO1-086 role-home
-  access-boundary closure is complete.
+- OH-AUTO1-088 — close the machine projection scope-key, filter/section, and
+  quantity-provenance inconsistencies over the OH-AUTO1-087 identity handoff.
+  OH-AUTO1-087 scope-aware machine integration is complete.
 
 Approved execution sequence:
 
