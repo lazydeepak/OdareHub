@@ -82,10 +82,43 @@ $unrestrictedFixture['quantity_provenance']['scope_part_ids'] = [];
 $unrestricted = MachinesAdapter::projectScopedData($unrestrictedFixture);
 $assert(count($unrestricted['run_now']) === 2 && count($unrestricted['assigned_machines']) === 2, 'explicit empty scope preserves authorized unrestricted projection');
 $assert(MachinesAdapter::projectScopedData(['scope' => ['scope_machine_ids' => null, 'scope_part_ids' => []]]) === null, 'malformed runtime scope fails closed');
+$invalidScopeCases = [
+    ['not-a-machine'],
+    ['12junk'],
+    [0],
+    [-2],
+    [-1, 1],
+];
+foreach ($invalidScopeCases as $index => $invalidIds) {
+    $invalidFixture = $fixture;
+    $invalidFixture['scope'] = ['scope_machine_ids' => $invalidIds, 'scope_part_ids' => []];
+    $assert(MachinesAdapter::projectScopedData($invalidFixture) === null, 'invalid machine scope case ' . ($index + 1) . ' fails closed');
+}
+$invalidPartFixture = $fixture;
+$invalidPartFixture['scope'] = ['scope_machine_ids' => [], 'scope_part_ids' => ['not-a-part']];
+$assert(MachinesAdapter::projectScopedData($invalidPartFixture) === null, 'invalid part scope fails closed');
+$missingFieldFixture = $fixture;
+$missingFieldFixture['scope'] = ['scope_machine_ids' => [1]];
+$assert(MachinesAdapter::projectScopedData($missingFieldFixture) === null, 'missing part restriction field fails closed');
+$deniedFixture = $fixture;
+$deniedFixture['scope'] = ['scope_machine_ids' => [-1], 'scope_part_ids' => [-1]];
+$denied = MachinesAdapter::projectScopedData($deniedFixture);
+$assert($denied !== null && $denied['run_now'] === [] && $denied['assigned_machines'] === [] && $denied['sections'] === [], 'denied sentinel publishes no operator work or choices');
+$mixedDeniedFixture = $fixture;
+$mixedDeniedFixture['scope'] = ['scope_machine_ids' => [-1, 2], 'scope_part_ids' => []];
+$assert(MachinesAdapter::projectScopedData($mixedDeniedFixture) === null, 'mixed denied and positive scope fails closed');
 $unverifiable = $fixture;
 unset($unverifiable['quantity_provenance']);
 $unverifiable = MachinesAdapter::projectScopedData($unverifiable);
 $assert($unverifiable['kpi']['today_planned_qty'] === null && $unverifiable['kpi']['today_produced_qty'] === null, 'unverifiable quantity totals are suppressed');
+$malformedProvenance = $fixture;
+$malformedProvenance['quantity_provenance']['scope_machine_ids'] = ['12junk'];
+$malformedProvenance = MachinesAdapter::projectScopedData($malformedProvenance);
+$assert($malformedProvenance['kpi']['today_planned_qty'] === null && $malformedProvenance['kpi']['today_produced_qty'] === null, 'malformed quantity provenance is not trusted');
+$deniedProvenance = $fixture;
+$deniedProvenance['quantity_provenance']['scope_machine_ids'] = [-1];
+$deniedProvenance = MachinesAdapter::projectScopedData($deniedProvenance);
+$assert($deniedProvenance['kpi']['today_planned_qty'] === null && $deniedProvenance['kpi']['today_produced_qty'] === null, 'denied quantity provenance is not trusted');
 $assert(!MachinesAdapter::operatorContextIsAuthorized(null), 'missing operator identity fails closed');
 
 if ($failed > 0) {

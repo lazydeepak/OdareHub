@@ -141,8 +141,14 @@ final class MachinesAdapter
             || !is_array($scope['scope_machine_ids']) || !is_array($scope['scope_part_ids'])) {
             return null;
         }
-        $machineIds = array_values(array_filter(array_map('intval', $scope['scope_machine_ids']), static fn(int $id): bool => $id > 0));
-        $partIds = array_values(array_filter(array_map('intval', $scope['scope_part_ids']), static fn(int $id): bool => $id > 0));
+        $machineRestriction = self::normalizeRestriction($scope['scope_machine_ids']);
+        $partRestriction = self::normalizeRestriction($scope['scope_part_ids']);
+        if ($machineRestriction === null || $partRestriction === null) {
+            return null;
+        }
+        $scopeDenied = $machineRestriction['denied'] || $partRestriction['denied'];
+        $machineIds = $machineRestriction['ids'];
+        $partIds = $partRestriction['ids'];
         $filterRows = static function (array $rows) use ($machineIds, $partIds): array {
             return array_values(array_filter($rows, static function ($row) use ($machineIds, $partIds): bool {
                 if (!is_array($row)) {
@@ -191,6 +197,14 @@ final class MachinesAdapter
         $result['filters'] = $filters;
         $result['sections'] = $filters['sections'];
 
+        if ($scopeDenied) {
+            foreach (['run_now', 'next_queue', 'delayed_jobs', 'waiting_qc', 'risk_jobs', 'assigned_machines'] as $key) {
+                $result[$key] = [];
+            }
+            $result['filters'] = ['machines' => [], 'sections' => []];
+            $result['sections'] = [];
+        }
+
         $kpi = is_array($result['kpi'] ?? null) ? $result['kpi'] : [];
         $kpi['assigned_machines'] = count($machines);
         $kpi['run_now_jobs'] = count((array)$result['run_now']);
@@ -199,10 +213,19 @@ final class MachinesAdapter
         $kpi['waiting_qc_jobs'] = count((array)$result['waiting_qc']);
         $kpi['risk_jobs'] = count((array)$result['risk_jobs']);
         $provenance = is_array($result['quantity_provenance'] ?? null) ? $result['quantity_provenance'] : [];
-        $provenanceMachineIds = array_values(array_filter(array_map('intval', (array)($provenance['scope_machine_ids'] ?? [])), static fn(int $id): bool => $id > 0));
-        $provenancePartIds = array_values(array_filter(array_map('intval', (array)($provenance['scope_part_ids'] ?? [])), static fn(int $id): bool => $id > 0));
+        $provenanceMachineRestriction = isset($provenance['scope_machine_ids']) && is_array($provenance['scope_machine_ids'])
+            ? self::normalizeRestriction($provenance['scope_machine_ids']) : null;
+        $provenancePartRestriction = isset($provenance['scope_part_ids']) && is_array($provenance['scope_part_ids'])
+            ? self::normalizeRestriction($provenance['scope_part_ids']) : null;
+        $provenanceMachineIds = $provenanceMachineRestriction['ids'] ?? null;
+        $provenancePartIds = $provenancePartRestriction['ids'] ?? null;
         $quantitiesAreScoped = ($provenance['source'] ?? '') === 'MachineLeaderDashboardService::fetchPlanRows'
             && ($provenance['complete_window'] ?? false) === true
+            && !$scopeDenied
+            && $provenanceMachineRestriction !== null
+            && $provenancePartRestriction !== null
+            && !$provenanceMachineRestriction['denied']
+            && !$provenancePartRestriction['denied']
             && $provenanceMachineIds === $machineIds
             && $provenancePartIds === $partIds;
         if (!$quantitiesAreScoped) {
@@ -211,6 +234,49 @@ final class MachinesAdapter
         }
         $result['kpi'] = $kpi;
         return $result;
+    }
+
+    /**
+     * Normalize the existing scope contract without converting invalid values
+     * into the explicit-empty unrestricted representation. The owner uses
+     * [-1] as a denial sentinel when production task types are unavailable.
+     *
+     * @param array<int,mixed> $values
+     * @return array{ids:array<int,int>,denied:bool}|null
+     */
+    private static function normalizeRestriction(array $values): ?array
+    {
+        if ($values !== [] && array_keys($values) !== range(0, count($values) - 1)) {
+            return null;
+        }
+        if ($values === []) {
+            return ['ids' => [], 'denied' => false];
+        }
+        if (count($values) === 1 && ($values[0] === -1 || $values[0] === '-1')) {
+            return ['ids' => [], 'denied' => true];
+        }
+
+        $ids = [];
+        foreach ($values as $value) {
+            if (is_int($value)) {
+                if ($value <= 0) {
+                    return null;
+                }
+                $id = $value;
+            } elseif (is_string($value) && preg_match('/^[1-9][0-9]*$/', $value) === 1) {
+                $id = filter_var($value, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+                if ($id === false) {
+                    return null;
+                }
+            } else {
+                return null;
+            }
+            $ids[$id] = $id;
+        }
+
+        $ids = array_values($ids);
+        sort($ids);
+        return ['ids' => $ids, 'denied' => false];
     }
 
     /** @param array<string,mixed> $kpi */

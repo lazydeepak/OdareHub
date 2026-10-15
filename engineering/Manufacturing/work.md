@@ -2,7 +2,7 @@
 
 ## Current Focus
 
-OH-AUTO1-088 machine projection consistency is complete. Continue
+OH-AUTO1-089 fail-closed machine-scope normalization is complete. Continue
  through the same owner-contract pattern for parts, work areas, and process
  areas only as separately bounded milestones.
 
@@ -19,6 +19,10 @@ brief's pressure-test workstreams and synthesis complete.
   boundary, aligned top-level sections with scoped filters, intersected
   part-only machine choices with scoped records, and suppressed unproven
   quantity totals.
+
+- [x] OH-AUTO1-089 — strictly validates canonical scope IDs, preserves the
+  owner `[-1]` denial sentinel, rejects malformed/mixed restrictions, and
+  applies the same validation to quantity provenance.
 
 - [x] OH-AUTO1-087 — passed authenticated operator identity and effective
   assignment context into `MachinesAdapter`; Manufacturing retains machine,
@@ -41,6 +45,10 @@ brief's pressure-test workstreams and synthesis complete.
 
 - OH-AUTO1-088 — machine projection consistency and runtime-shaped proof:
   **15/15** assertions. No database, SQL, activation, display-route, schema,
+  production, or Core operation.
+
+- OH-AUTO1-089 — fail-closed scope normalization and negative fixture proof:
+  **24/24** assertions. No database, SQL, activation, display-route, schema,
   production, or Core operation.
 
 - OH-AUTO1-019 — Manufacturing operator adapters now return a stable localized diagnostic key instead of raw exception text while retaining existing server-side error logging. See `docs/architecture/operational-diagnostics-observability-audit-2026-10-14.md`.

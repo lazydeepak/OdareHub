@@ -1,5 +1,12 @@
 # AGENTS.md
 
+## Session Summary (2026-10-15) — OH-AUTO1-089 Fail-closed machine scope normalization
+
+Strictly validates machine/part scope IDs, preserves the `[-1]` denial
+sentinel, rejects malformed and mixed restrictions, and applies the same rules
+to quantity provenance. Runtime-shaped fixture coverage is **24/24**. No
+database, browser, production operation, or Core change.
+
 ## Session Summary (2026-10-15) — OH-AUTO1-088 Machine projection consistency
 
 Corrected machine projection scope-key, section/filter, part-only choice, and

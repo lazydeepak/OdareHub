@@ -2,6 +2,24 @@
 
 ## Decision Log
 
+### 2026-10-15 — OH-AUTO1-089 fail-closed scope normalization
+
+**Status:** Accepted
+
+**Decision**
+
+`MachinesAdapter` accepts only explicit empty arrays or canonical positive
+machine/part IDs in the owner scope response. Integer casts are not used to
+interpret scope tokens: alphabetic, suffixed, zero, negative, mixed, and
+contradictory values fail closed. The existing owner `[-1]` sentinel is
+recognized as denied scope; denied scope publishes no operator rows, machine
+choices, sections, or derived work KPIs.
+
+Quantity provenance uses the same strict normalization. A provenance record
+with malformed or denied restrictions cannot authorize quantity totals, even
+when the main scope is valid. Explicit empty restrictions remain the existing
+authorized-unrestricted case only when the owner provides them as valid arrays.
+
 ### 2026-10-15 — OH-AUTO1-088 machine projection consistency
 
 **Status:** Accepted

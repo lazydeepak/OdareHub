@@ -1,5 +1,18 @@
 # AGENT-COMPLIANCE-CHECKLIST
 
+## Session Summary (2026-10-15) — OH-AUTO1-089 Fail-closed machine scope normalization
+
+Replaced permissive `intval()` scope normalization with strict canonical ID
+validation. Explicit empty arrays remain authorized-unrestricted scope;
+positive IDs remain bounded scope; `[-1]` remains the Manufacturing denial
+sentinel; malformed, zero, negative, mixed, or contradictory restrictions fail
+closed. Quantity provenance uses the same validation and cannot authorize
+unproven totals.
+
+Validation: machine projection probe **24/24**; no database, browser,
+production, activation, schema, or Core operation. Existing lifecycle logs and
+PHPUnit cache remain uncommitted.
+
 ## Session Summary (2026-10-15) — OH-AUTO1-088 Machine projection consistency
 
 Corrected the three OH-AUTO1-087 projection mismatches. The defensive adapter
