@@ -1,5 +1,25 @@
 # AGENT-COMPLIANCE-CHECKLIST
 
+## Session Summary (2026-10-15) — OH-AUTO1-081 Worker-first operator dashboard
+
+Added a worker-first `/u/{username}/dashboard` work surface using the existing
+read-only `OperatorTaskService::getForUser()` projection. Current, upcoming,
+and attention lanes preserve provider identifiers, statuses, priorities, due
+evidence, destinations, and operational scopes. Overdue and explicitly blocked
+records are surfaced as attention without changing their owner-provided status.
+
+Profile-provided operator navigation is now filtered through resolved operator
+views, assigned applications, and `/u/{user}/*` confinement before rendering.
+Cross-workspace privileged inspection does not expose authenticated-user task
+assignments under another identity. The schema-ensuring `OperatorWorkboardService`
+path remains unused.
+
+Validation: isolated worker dashboard fixture **13/13**; PHP lint; `git diff
+--check`; operator confinement PASS; Shell CSS ownership PASS (existing 128
+selector compatibility warnings); Shell rendering PASS; resolved-experience
+truth PASS. No database/schema mutation, installed/live browser acceptance,
+Core change, or specialized-view/routing change was performed.
+
 ## Session Summary (2026-10-15) — OH-AUTO1-077 Disposable Release Transaction and Health Gates
 
 Added a Platform-owned append-only hash-chained disposable transaction journal,

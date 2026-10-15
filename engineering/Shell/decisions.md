@@ -2,6 +2,32 @@
 
 ## Decision Log
 
+### 2026-10-15 — OH-AUTO1-081 worker dashboard read authority
+
+**Status:** Accepted
+
+**Decision**
+
+The worker-first operator dashboard consumes only the existing assigned-task
+read projection, `OperatorTaskService::getForUser()`. Shell composes that data
+into presentation lanes but does not call `OperatorWorkboardService::build()`
+because that compatibility path ensures schema and is not safe for dashboard
+rendering.
+
+Workspace Profile navigation remains shaping-only: profile sections are
+filtered through the resolved operator-view set, assigned applications, and
+the `/u/{user}/*` route boundary before rendering.
+
+**Consequences**
+
+- Dashboard rendering is read-only and does not introduce schema authority.
+- Empty, provider-failure, and identity-mismatch states remain explicit.
+- Task meaning, identifiers, statuses, priorities, destinations, and scopes
+  remain provider-owned; Shell only classifies verified active records by due
+  evidence and blocked/overdue attention state.
+- The existing specialized operator views and `/me` compatibility routing are
+  unchanged.
+
 ### 2026-07-20 — Runtime catalogs and owner providers are search discovery authority
 **Status:** Accepted
 

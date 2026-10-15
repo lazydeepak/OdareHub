@@ -4,6 +4,47 @@
 ?>
                     <section class="dashboard-top" aria-label="<?php echo htmlspecialchars((string)($data['dashboard_title'] ?? 'Dashboard')); ?>">
                         <h2 class="dashboard-top-title"><?php echo htmlspecialchars((string)($data['dashboard_title'] ?? 'Dashboard')); ?></h2>
+                        <?php $workerWork = is_array($data['worker_work'] ?? null) ? $data['worker_work'] : []; ?>
+                        <section class="operator-worker-work" aria-labelledby="operator-worker-work-title">
+                            <div class="operator-worker-work__heading">
+                                <h3 id="operator-worker-work-title"><?php echo htmlspecialchars($this->tr('operator.worker_work.title', 'Your Work')); ?></h3>
+                                <span class="operator-worker-work__source"><?php echo htmlspecialchars($this->tr('operator.worker_work.source', 'Assigned work')); ?></span>
+                            </div>
+                            <?php if (($workerWork['available'] ?? true) === false): ?>
+                                <p class="operator-worker-work__empty"><?php echo htmlspecialchars($this->tr('operator.worker_work.unavailable', 'Assigned work is temporarily unavailable.')); ?></p>
+                            <?php else: ?>
+                                <?php foreach ([
+                                    ['key' => 'current', 'title' => 'operator.worker_work.current', 'fallback' => 'Current work'],
+                                    ['key' => 'upcoming', 'title' => 'operator.worker_work.upcoming', 'fallback' => 'Upcoming work'],
+                                    ['key' => 'attention', 'title' => 'operator.worker_work.attention', 'fallback' => 'Needs attention'],
+                                ] as $lane): ?>
+                                    <?php $laneItems = is_array($workerWork[$lane['key']] ?? null) ? $workerWork[$lane['key']] : []; ?>
+                                    <section class="operator-worker-lane operator-worker-lane--<?php echo htmlspecialchars($lane['key']); ?>" aria-labelledby="operator-worker-<?php echo htmlspecialchars($lane['key']); ?>-title">
+                                        <h4 id="operator-worker-<?php echo htmlspecialchars($lane['key']); ?>-title"><?php echo htmlspecialchars($this->tr($lane['title'], $lane['fallback'])); ?></h4>
+                                        <?php if ($laneItems === []): ?>
+                                            <p class="operator-worker-work__empty"><?php echo htmlspecialchars($this->tr('operator.worker_work.empty', 'No verified items in this lane.')); ?></p>
+                                        <?php else: ?>
+                                            <div class="operator-worker-items">
+                                                <?php foreach ($laneItems as $item): ?>
+                                                    <article class="operator-worker-item" data-work-ref="<?php echo htmlspecialchars((string)($item['item_ref'] ?? '')); ?>">
+                                                        <div class="operator-worker-item__topline">
+                                                            <h5><?php echo htmlspecialchars((string)($item['title'] ?? '')); ?></h5>
+                                                            <span class="operator-worker-item__status"><?php echo htmlspecialchars((string)($item['status'] ?? '')); ?></span>
+                                                        </div>
+                                                        <dl class="operator-worker-item__meta">
+                                                            <div><dt><?php echo htmlspecialchars($this->tr('operator.worker_work.id', 'ID')); ?></dt><dd><?php echo htmlspecialchars((string)($item['item_ref'] ?? '')); ?></dd></div>
+                                                            <div><dt><?php echo htmlspecialchars($this->tr('operator.worker_work.priority', 'Priority')); ?></dt><dd><?php echo htmlspecialchars((string)($item['priority'] ?? '')); ?></dd></div>
+                                                            <?php if (trim((string)($item['due_date'] ?? '')) !== ''): ?><div><dt><?php echo htmlspecialchars($this->tr('operator.worker_work.due', 'Due')); ?></dt><dd><?php echo htmlspecialchars((string)$item['due_date']); ?></dd></div><?php endif; ?>
+                                                        </dl>
+                                                        <a class="operator-worker-item__link" href="<?php echo htmlspecialchars((string)($item['destination'] ?? '#')); ?>"><?php echo htmlspecialchars($this->tr('operator.worker_work.open', 'Open assigned work')); ?></a>
+                                                    </article>
+                                                <?php endforeach; ?>
+                                            </div>
+                                        <?php endif; ?>
+                                    </section>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </section>
                         <?php if (!empty($data['common_home_tiles']) && is_array($data['common_home_tiles'])): ?>
                         <div class="dashboard-top-grid">
                             <?php foreach ((array)($data['common_home_tiles'] ?? []) as $tile): ?>

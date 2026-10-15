@@ -194,11 +194,14 @@ final class OperatorLayerSidebarService
         // use them verbatim (profile author is responsible for assignment-aware content).
         $profileNavSections = ($this->context['workspace_profile'] ?? [])['nav_sections'] ?? null;
         if (is_array($profileNavSections) && $profileNavSections !== []) {
-            return [
-                'app_id'    => 'my-work',
-                'app_label' => $this->tr('operator.surface.workspace', 'Workspace'),
-                'sections'  => $profileNavSections,
-            ];
+            $filteredProfileSections = $this->filterProfileNavSections($profileNavSections);
+            if ($filteredProfileSections !== []) {
+                return [
+                    'app_id'    => 'my-work',
+                    'app_label' => $this->tr('operator.surface.workspace', 'Workspace'),
+                    'sections'  => $filteredProfileSections,
+                ];
+            }
         }
 
         // Step 3: app assignment — resolve which apps are explicitly assigned.
@@ -346,6 +349,66 @@ final class OperatorLayerSidebarService
             'app_label' => $this->tr('operator.surface.workspace', 'Workspace'),
             'sections' => $sections,
         ];
+    }
+
+    /**
+     * Profile shaping may remove or reorder authorized navigation, but cannot
+     * grant it. Keep only known operator routes accepted by resolved access.
+     * @param array<int,mixed> $sections
+     * @return array<int,array<string,mixed>>
+     */
+    private function filterProfileNavSections(array $sections): array
+    {
+        $assignedApps = array_map(
+            static fn ($value): string => strtolower(trim((string)$value)),
+            (array)($this->context['active_assigned_apps'] ?? $this->context['assigned_apps'] ?? [])
+        );
+        $resolvedViews = self::normalizeOperatorViews((string)($this->context['resolved_operator_view_keys'] ?? ''));
+        $hasResolvedViews = trim((string)($this->context['resolved_operator_view_keys'] ?? '')) !== '';
+        $manufacturingViews = ['critical', 'production', 'demand', 'orders', 'parts', 'coverage', 'machines', 'processing', 'assembly', 'qc', 'fulfillment', 'preparation', 'dispatch', 'materials', 'handoff'];
+        $allowedSections = [];
+
+        foreach ($sections as $section) {
+            if (!is_array($section)) {
+                continue;
+            }
+            $title = trim((string)($section['title'] ?? ''));
+            $items = [];
+            foreach ((array)($section['items'] ?? []) as $item) {
+                if (!is_array($item)) {
+                    continue;
+                }
+                $route = trim((string)($item['route'] ?? ''));
+                $path = trim((string)parse_url($route, PHP_URL_PATH));
+                if ($route === '' || !str_starts_with($path, '/u/{user}/')) {
+                    continue;
+                }
+                if (!$hasResolvedViews) {
+                    continue;
+                }
+                $view = strtolower(trim((string)(explode('/', trim(substr($path, strlen('/u/{user}/')), '/'))[0] ?? 'dashboard')));
+                $query = (string)parse_url($route, PHP_URL_QUERY);
+                parse_str($query, $queryValues);
+                $focus = strtolower(trim((string)($queryValues['focus'] ?? $view)));
+                if (!in_array($focus, self::OPERATOR_VIEW_KEYS, true)) {
+                    continue;
+                }
+                if ($hasResolvedViews && !in_array($focus, $resolvedViews, true)) {
+                    continue;
+                }
+                if (in_array($focus, $manufacturingViews, true) && !in_array('manufacturing', $assignedApps, true)) {
+                    continue;
+                }
+                if ($focus === 'sbaio' && !in_array('sbaio', $assignedApps, true)) {
+                    continue;
+                }
+                $items[] = $item;
+            }
+            if ($title !== '' && $items !== []) {
+                $allowedSections[] = ['title' => $title, 'items' => $items];
+            }
+        }
+        return $allowedSections;
     }
 
     /**

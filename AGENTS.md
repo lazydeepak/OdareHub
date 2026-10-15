@@ -6513,3 +6513,19 @@ PHP lint, and diff hygiene PASS. Fault-injected post-SQL cleanup verified
 workspace/source/MySQL disposal. No installed database, production SQL,
 deployment, production signing, or Core change. See
 `docs/architecture/oh-auto1-080-disposable-release-cycle-safety-closure-2026-10-15.md`.
+
+## Session Summary (2026-10-15) — OH-AUTO1-081 Worker-first operator dashboard
+
+Implemented the worker-first operator dashboard slice on the existing
+`/u/{username}/dashboard` surface. The Shell renderer consumes only the
+read-only `OperatorTaskService::getForUser()` projection, classifies active
+records into current/upcoming/attention lanes, preserves owner-provided task
+fields, and blocks mismatched privileged workspace identities from exposing
+authenticated-user assignments. Workspace-profile navigation is filtered by
+resolved operator views, assigned apps, and `/u/*` confinement. EN/JA/NE
+localization and isolated fixture coverage were added.
+
+Validation: worker dashboard fixture **13/13**; PHP lint; diff hygiene;
+operator confinement PASS; Shell CSS ownership PASS with existing compatibility
+debt warning; Shell rendering PASS; resolved-experience truth PASS. No database,
+schema, live browser, Core, `/me` routing, or specialized operator view change.

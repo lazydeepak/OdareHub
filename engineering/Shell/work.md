@@ -4,6 +4,20 @@
 
 Continue safely decomposing `OperatorSurfaceComposer.php` toward orchestration-only facade.
 
+## 2026-10-15 — OH-AUTO1-081 worker-first operator dashboard
+
+- [x] Added a Shell-owned worker work composer that consumes the existing
+  `OperatorTaskService::getForUser()` read projection only. The schema-ensuring
+  `OperatorWorkboardService::build()` path remains excluded.
+- [x] Added current, upcoming, and attention lanes while preserving provider
+  identifiers, statuses, priorities, due evidence, destination, and scope data.
+- [x] Added identity-bound assignment filtering and an explicit unavailable state
+  for provider failure or privileged cross-workspace identity mismatch.
+- [x] Hardened workspace-profile sidebar sections so profile shaping cannot expose
+  views outside resolved operator access, assigned apps, or `/u/{user}/*`.
+- [x] Added localized EN/JA/NE worker dashboard labels and isolated non-mutating
+  fixture coverage (`13/13`). No database, schema, live browser, or Core change.
+
 ## In Progress
 
 - [ ] Decompose next `OperatorSurfaceComposer.php` non-rendering business-data block into focused composer/service class without changing runtime output.

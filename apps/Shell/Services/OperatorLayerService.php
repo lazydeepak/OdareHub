@@ -137,6 +137,7 @@ final class OperatorLayerService
         // Authorization: a user may only view their own operator workspace unless they hold
         // a platform-admin or app-admin account type (e.g. supervisors reviewing operator data).
         $requestedHandle = WorkspaceWrapperRegistry::normalizeHandle($username);
+        $operatorIdentityBound = $requestedHandle === '' || $requestedHandle === $resolvedUsername;
         if ($requestedHandle !== '' && $requestedHandle !== $resolvedUsername) {
             $authorityRole = (string)($authenticatedUser['authority_role'] ?? $ctx['authority_role'] ?? '');
             $isPrivileged = in_array($authorityRole, ['platform_admin', 'app_admin', 'sys_admin'], true);
@@ -178,6 +179,8 @@ final class OperatorLayerService
             'company_fallback_text' => $logoData['fallback_text'],
             'company_fallback_text_compact' => $logoData['fallback_text_compact'],
             'authority_role' => (string)($ctx['authority_role'] ?? 'app_user'),          // step 1
+            'authenticated_user_id' => $userId,
+            'operator_identity_bound' => $operatorIdentityBound,
             'dashboard_type' => (string)($ctx['dashboard_type'] ?? 'operator'),          // step 2
             'assigned_apps' => $assignedApps,                                             // step 3
             'active_assigned_apps' => $activeAssignedApps,
@@ -186,6 +189,7 @@ final class OperatorLayerService
             'module_visibility' => is_array($ctx['module_visibility'] ?? null) ? $ctx['module_visibility'] : [], // step 5
             'workspace_profile' => is_array($ctx['workspace_profile'] ?? null) ? $ctx['workspace_profile'] : null, // step 6
             'operator_views' => $operatorViews,
+            'resolved_operator_view_keys' => $operatorViews,
             'current_query' => $query,                                                    // step 7 (contains focus)
         ]);
 

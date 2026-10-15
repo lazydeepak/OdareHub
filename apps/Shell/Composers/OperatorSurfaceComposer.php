@@ -35,6 +35,7 @@ require_once __DIR__ . '/OperatorInteractionScriptComposer.php';
 require_once __DIR__ . '/OperatorNotificationPresentationComposer.php';
 require_once __DIR__ . '/OperatorNavigationComposer.php';
 require_once __DIR__ . '/OperatorDashboardInsightsComposer.php';
+require_once __DIR__ . '/OperatorWorkerWorkComposer.php';
 require_once __DIR__ . '/OperatorPartPlanComposer.php';
 require_once __DIR__ . '/OperatorProfileQuickActionComposer.php';
 require_once __DIR__ . '/OperatorSearchComposer.php';
@@ -485,6 +486,7 @@ final class OperatorSurfaceComposer
         $notificationsFocus = $this->buildNotificationsFocusData();
         $messagesFocus = $this->buildMessagesFocusData();
         $tasksFocus = $this->buildTasksFocusData();
+        $workerWork = OperatorWorkerWorkComposer::compose($tasksFocus, $this->context, $this->username);
         $recentActivity = $this->buildRecentActivityData();
         $commonHomeTiles = $this->buildCommonHomeTiles($tasksFocus, $notificationsFocus, $messagesFocus, $recentActivity);
         $generatedWidgetTiles = PlatformWidgetBlueprintRuntimeService::resolveDashboardTiles($this->context);
@@ -543,6 +545,7 @@ final class OperatorSurfaceComposer
             'handoff_focus' => $hasManufacturing ? $this->buildHandoffFocusData() : [],
             'preferences_focus' => $this->buildPreferencesFocusData(),
             'tasks_focus'     => $tasksFocus,
+            'worker_work' => $workerWork,
             'account_panel' => $this->buildAccountPanelData(),
         ];
     }
