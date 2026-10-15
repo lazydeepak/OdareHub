@@ -17,7 +17,8 @@ The active product direction is:
 The disposable release/update foundation is complete through OH-AUTO1-080.
 Production installation, update, and apply remain unauthorized. Product
 development has resumed on the Shell worker surface; OH-AUTO1-096 is the
-completed scope-safe work/process summary milestone.
+completed scope-safe work/process summary milestone and OH-AUTO1-097 is the
+completed restricted-scope My Work containment milestone.
 
 ## Active Focus
 
@@ -62,6 +63,10 @@ Evidence for the completed milestones is recorded in:
   presentation projection is complete for existing Assembly/QC Processing
   lanes. Machine/production and broad My Work sources remain excluded pending
   equivalent scope evidence.
+- OH-AUTO1-097 — the broad My Work projection now fails closed before limited
+  queue collection for restricted operational scopes. Explicit empty scope
+  retains its existing owner-defined unrestricted meaning; Core remains
+  unchanged.
 
 After the release/update cycle is proven, resume the product roadmap focus from
 `README.md`:

@@ -1,5 +1,26 @@
 # AGENT-COMPLIANCE-CHECKLIST
 
+## Session Summary (2026-10-16) — OH-AUTO1-097 Restricted-scope My Work containment
+
+Contained the existing broad Manufacturing My Work projection before any
+handoff, approval, or operational queue collection when resolved operational
+scope is restricted, denied, or malformed. Because the shared sources apply
+limits before machine/part/task predicates and the enrichment adapter does not
+enforce those predicates, post-limit filtering was deliberately not used.
+Explicitly empty, structurally valid scope retains the existing unrestricted
+owner meaning. Contained results preserve the My Work payload shape but expose
+no records, counts, notifications, or role links.
+
+Changed only `apps/Manufacturing/Services/MyWorkContributionService.php`, its
+focused probe, Manufacturing engineering records, `docs/CURRENT.md`, and the
+OH-AUTO1-097 architecture record. No Core, Base, route, schema, permission,
+database, browser, activation, deployment, production, or Shell change.
+
+Validation: restricted-scope containment **21/21**; work/process summary
+**23/23**; Processing **35/35**; Parts **14/14**; machine projection **27/27**;
+PHP lint and `git diff --check` PASS. The existing Base
+`resolveUserContext() -> ensureSchema()` dependency remains unchanged.
+
 ## Session Summary (2026-10-15) — OH-AUTO1-096 Scope-safe work/process summary
 
 Implemented a bounded Manufacturing-owned read-only work/process summary on

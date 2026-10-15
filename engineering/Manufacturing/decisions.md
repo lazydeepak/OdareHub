@@ -2,6 +2,30 @@
 
 ## Decision Log
 
+### 2026-10-16 — OH-AUTO1-097 restricted-scope My Work containment
+
+**Status:** Accepted — fail-closed containment without Core changes
+
+The broad My Work projection must not expose records or derived counts to a
+user with non-empty machine, part, task-type, department, branch, or ownership
+scope because the selected shared sources do not apply those predicates before
+their limits. Manufacturing now contains those scopes before handoff,
+approval, or operational queue collection and returns the existing payload
+shape with explicit unavailable containment state.
+
+Malformed scope and the established denied sentinel also fail closed. An
+explicitly empty, structurally valid scope retains its existing owner-defined
+unrestricted meaning. This is containment, not a replacement authorization
+system and not post-limit filtering.
+
+The fix remains in `apps/Manufacturing`; Core `MyWorkEntityQuery`, the shared
+adapter, Base context resolution, routes, schema, and scope fields are
+unchanged. The existing transitive Base `ensureSchema()` dependency remains
+outside this milestone.
+
+**Evidence:** restricted-scope probe **21/21**; work/process summary **23/23**;
+Processing **35/35**; Parts **14/14**; machine projection **27/27**.
+
 ### 2026-10-15 — OH-AUTO1-096 scope-safe work/process summary
 
 **Status:** Accepted — bounded Assembly/QC dashboard contribution

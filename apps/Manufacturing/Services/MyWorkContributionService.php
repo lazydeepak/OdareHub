@@ -66,6 +66,17 @@ final class MyWorkContributionService
 
         $ctx   = UserDashboardAssignmentService::resolveUserContext($user);
         $scope = (array)($ctx['scope'] ?? []);
+
+        // The shared My Work sources do not apply machine/part/task predicates
+        // before their own limits.  Never fetch those limited rows for a user
+        // whose effective operational scope would require such predicates.
+        // An explicitly empty, structurally valid scope retains the existing
+        // owner-defined unrestricted behavior.
+        $scopeContainmentState = self::scopeContainmentState($scope);
+        if ($scopeContainmentState !== 'unrestricted') {
+            return self::containedWorkspace($user, $ctx, $scopeContainmentState);
+        }
+
         $allowedModules = UserDashboardAssignmentService::enabledModulesForUser($user);
         $activeAssignedApps = array_values((array)($ctx['active_assigned_apps'] ?? []));
         $manufacturingActive = in_array('manufacturing', $activeAssignedApps, true) && UserDashboardAssignmentService::isAppEnabled('manufacturing');
@@ -174,6 +185,126 @@ final class MyWorkContributionService
             'recent_notifications' => $recentNotifications,
             'unread_notifications' => $unreadNotifications,
             'active_assigned_apps' => $activeAssignedApps,
+        ];
+    }
+
+    /**
+     * Classify the resolved operational scope for the unscoped My Work queue.
+     *
+     * This is deliberately a containment decision, not an authorization
+     * resolver.  Non-empty restrictions are not applied by the legacy queue
+     * before LIMIT, so they must not receive queue records or derived counts.
+     *
+     * @param array<string,mixed> $scope
+     */
+    public static function scopeContainmentState(array $scope): string
+    {
+        foreach (['machine_ids', 'part_ids', 'task_types'] as $key) {
+            if (!array_key_exists($key, $scope) || !is_array($scope[$key])) {
+                return 'malformed_unavailable';
+            }
+        }
+
+        foreach (['machine_ids', 'part_ids'] as $key) {
+            foreach ($scope[$key] as $value) {
+                if (is_int($value)) {
+                    if ($value === -1) {
+                        return 'denied_unavailable';
+                    }
+                    if ($value <= 0) {
+                        return 'malformed_unavailable';
+                    }
+                    continue;
+                }
+                if (is_string($value) && preg_match('/^[1-9][0-9]*$/', trim($value)) === 1) {
+                    continue;
+                }
+                if ((is_int($value) || is_string($value)) && (string)$value === '-1') {
+                    return 'denied_unavailable';
+                }
+                return 'malformed_unavailable';
+            }
+        }
+
+        foreach ($scope['task_types'] as $value) {
+            if (!is_string($value) || trim($value) === '') {
+                return 'malformed_unavailable';
+            }
+            if (trim($value) === '-1') {
+                return 'denied_unavailable';
+            }
+        }
+
+        foreach (['department_code', 'branch_code', 'ownership_role'] as $key) {
+            if (!array_key_exists($key, $scope) || !is_string($scope[$key])) {
+                return 'malformed_unavailable';
+            }
+            if (trim($scope[$key]) !== '') {
+                return 'restricted_unavailable';
+            }
+        }
+
+        foreach (['machine_ids', 'part_ids', 'task_types'] as $key) {
+            if ($scope[$key] !== []) {
+                return 'restricted_unavailable';
+            }
+        }
+
+        return 'unrestricted';
+    }
+
+    /**
+     * Return a shape-compatible, record-free My Work result for contained
+     * scopes. This keeps the legacy presentation contract intact while making
+     * the unavailable state explicit to callers and diagnostics.
+     *
+     * @param array<string,mixed> $user
+     * @param array<string,mixed> $ctx
+     * @return array<string,mixed>
+     */
+    public static function containedWorkspace(array $user, array $ctx, string $state): array
+    {
+        return [
+            'user_name' => self::displayName($user),
+            'user_role' => self::displayRole($user),
+            'authority_role' => strtolower(trim((string)($ctx['authority_role'] ?? ($user['authority_role'] ?? 'app_user')))),
+            'kpi' => [
+                'total' => 0,
+                'needs_action' => 0,
+                'awaiting_approval' => 0,
+                'overdue_escalated' => 0,
+                'blocked' => 0,
+                'sla_breached' => 0,
+            ],
+            'sections' => [
+                self::SECTION_NEEDS_ACTION => [],
+                self::SECTION_AWAITING_APPROVAL => [],
+                self::SECTION_OVERDUE => [],
+                self::SECTION_BLOCKED => [],
+            ],
+            'grouped_sections' => [
+                'primary_work' => [],
+                'cross_functional_work' => [],
+                'visibility_monitoring' => [],
+            ],
+            'all_items' => [],
+            'has_approvals' => false,
+            'has_overdue' => false,
+            'has_blocked' => false,
+            'role_links' => [],
+            'cross_functional_access' => (array)($ctx['cross_functional_access'] ?? []),
+            'primary_work_area' => '',
+            'cross_work_areas' => [],
+            'approval_modules' => [],
+            'notification_summary' => [],
+            'recent_notifications' => [],
+            'unread_notifications' => 0,
+            'active_assigned_apps' => array_values((array)($ctx['active_assigned_apps'] ?? [])),
+            'scope_containment' => [
+                'state' => $state,
+                'records_visible' => false,
+                'reason' => 'manufacturing_my_work_scope_not_proven_before_limit',
+            ],
         ];
     }
 
