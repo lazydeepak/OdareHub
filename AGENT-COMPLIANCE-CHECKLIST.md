@@ -1,5 +1,22 @@
 # AGENT-COMPLIANCE-CHECKLIST
 
+## Session Summary (2026-10-15) — OH-AUTO1-093 Scope-aware Processing workspace
+
+Moved the active operator Processing read projection behind the
+Manufacturing-owned `ProcessingAdapter` and strict `ProcessingOperationService`
+scope authority. Products, assembly demands, and QC plans are filtered before
+sorting/limits. Existing `/u/processing` assembly/QC create and status handlers
+now authorize product/plan scope, module access, interaction profile, and
+allowed current-to-target transitions before mutation or schema initialization.
+Read-only/display profiles and malformed, mixed, denied, or out-of-scope input
+fail closed. No new scope fields or permission framework were added.
+
+Validation: Processing isolated proof **16/16**; detail authority **21/21**;
+Parts **14/14**; machine **27/27**; role-home **26/26**; worker/task **41/41**;
+navigation **51/51**; PHPUnit **4/4**; architecture **49/49**; deletion
+**28/28**; deployment readiness **PASS**. No installed database, schema,
+browser, activation, production, or Core operation.
+
 ## Session Summary (2026-10-15) — OH-AUTO1-092 Non-mutating Part360 operator read
 
 Added `Part360Service::buildReadOnly()` over the shared projection calculation.

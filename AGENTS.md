@@ -1,5 +1,15 @@
 # AGENTS.md
 
+## Session Summary (2026-10-15) — OH-AUTO1-093 Scope-aware Processing workspace
+
+The active `/u/{username}/processing` projection now uses a Manufacturing-owned
+adapter with strict existing part scope and Platform module authority. All four
+existing Processing POST handlers authorize before mutation/schema setup;
+read-only/display profiles and invalid/out-of-scope transitions fail closed.
+Processing proof is **16/16**; architecture/deletion/readiness pass. No new
+scope fields, database/schema operation, browser, production operation, or Core
+change.
+
 ## Session Summary (2026-10-15) — OH-AUTO1-092 Non-mutating Part360 operator read
 
 Added the owner-controlled `Part360Service::buildReadOnly()` path and routed

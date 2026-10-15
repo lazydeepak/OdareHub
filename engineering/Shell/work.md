@@ -2,10 +2,18 @@
 
 ## Current Focus
 
-OH-AUTO1-091 Parts detail authority and read-only closure is complete. Resume
-operator capabilities, especially computed-scope-aware machine, part,
-work-area, and process-area presentation; do not expand the dashboard
-foundation without a new bounded objective.
+OH-AUTO1-093 scope-aware Processing workspace and mutation gates are complete.
+Shell remains the generic operator composition and route-dispatch boundary;
+Manufacturing owns Processing data and authority.
+
+## 2026-10-15 — OH-AUTO1-093 Processing composition boundary
+
+- [x] Shell consumes the Manufacturing-owned `ProcessingAdapter` projection.
+- [x] Shell renders no Processing mutation controls for read-only/display
+  profiles; existing `/u/*` routes and responsive structure remain unchanged.
+- [x] Shell dispatches the four existing POST handlers through Manufacturing
+  authority before their existing mutation logic.
+- [x] No Shell business scope or new permission policy was added.
 
 ## 2026-10-15 — OH-AUTO1-091 Parts detail action authority
 

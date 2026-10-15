@@ -14,6 +14,7 @@ use Apps\Manufacturing\Services\OperatorLayerAdapters\DemandAdapter;
 use Apps\Manufacturing\Services\OperatorLayerAdapters\DispatchAdapter;
 use Apps\Manufacturing\Services\OperatorLayerAdapters\MachinesAdapter;
 use Apps\Manufacturing\Services\OperatorPartsWorkspaceService;
+use Apps\Manufacturing\Services\OperatorLayerAdapters\ProcessingAdapter;
 use Apps\Manufacturing\Services\OperatorLayerAdapters\MaterialsAdapter;
 use Apps\Shell\Services\OperatorLayerAdapters\PartDetailAdapter;
 use Apps\Manufacturing\Services\OperatorLayerAdapters\QcAdapter;
@@ -28,6 +29,7 @@ use Plugins\Base\Services\HostSurfaceRegistryService; // compatibility owner-sur
 use Plugins\Base\Services\NotificationService;
 
 require_once __DIR__ . '/../Services/OperatorSurfaceContributionRegistry.php';
+require_once APP_ROOT . '/apps/Manufacturing/Services/OperatorLayerAdapters/ProcessingAdapter.php';
 require_once __DIR__ . '/../Services/PlatformWidgetBlueprintRuntimeService.php';
 require_once __DIR__ . '/../Services/OperatorLayerWidgetService.php';
 require_once __DIR__ . '/../Services/OperatorPartDetailActionAuthority.php';
@@ -1194,6 +1196,33 @@ final class OperatorSurfaceComposer
         $user = Auth::user();
         $userId = (int)($user['id'] ?? 0);
 
+        $projection = ProcessingAdapter::getData(
+            $selectedDate,
+            is_array($user) ? $user : (array)$user,
+            $selectedProductId,
+            $dashboardType
+        );
+        $flash = (string)($_SESSION['operator_processing_flash_ok'] ?? '');
+        $error = (string)($_SESSION['operator_processing_flash_err'] ?? '');
+        unset($_SESSION['operator_processing_flash_ok'], $_SESSION['operator_processing_flash_err']);
+
+        return [
+            'title' => $this->tr('operator.processing.title', 'Processing'),
+            'subtitle' => $this->tr('operator.processing.subtitle', 'Minimal workbench for assembly and QC planning queues.'),
+            'selected_date' => (string)($projection['selected_date'] ?? $selectedDate),
+            'selected_product_id' => (int)($projection['selected_product_id'] ?? 0),
+            'products' => (array)($projection['products'] ?? []),
+            'assembly_rows' => (array)($projection['assembly_rows'] ?? []),
+            'qc_rows' => (array)($projection['qc_rows'] ?? []),
+            'authorized' => (bool)($projection['authorized'] ?? false),
+            'can_mutate' => (bool)($projection['can_mutate'] ?? false),
+            'flash' => $flash,
+            'error' => $error,
+        ];
+
+        // Legacy inline projection retained below only as historical context;
+        // the operator runtime returns through the owner adapter above.
+
         $products = [];
         $readyRows = [];
         $bundleRows = [];
@@ -1420,144 +1449,14 @@ final class OperatorSurfaceComposer
         }
 
         $selectedProductId = (int)($query['product_id'] ?? 0);
-        $toDate = (new \DateTimeImmutable($selectedDate))->modify('+14 days')->format('Y-m-d');
         $dashboardType = strtolower(trim((string)($this->context['dashboard_type'] ?? 'operator')));
         $user = Auth::user();
-        $userId = (int)($user['id'] ?? 0);
-        $assemblyRows = [];
-        $qcRows = [];
-        $products = [];
-        $assignedPartIds = [];
-
-        try {
-            $products = DB::fetchAll(
-                "SELECT id, parts_name, parts_number
-                 FROM products
-                 ORDER BY parts_name ASC, id ASC
-                 LIMIT 300"
-            );
-
-            if ($userId > 0) {
-                try {
-                    $assignmentRows = DB::fetchAll(
-                        "SELECT DISTINCT part_id
-                         FROM user_operational_scopes
-                         WHERE user_id = ?
-                           AND is_active = 1
-                           AND COALESCE(part_id, 0) > 0",
-                        [$userId]
-                    );
-                    foreach ($assignmentRows as $assignmentRow) {
-                        $partId = (int)($assignmentRow['part_id'] ?? 0);
-                        if ($partId > 0) {
-                            $assignedPartIds[] = $partId;
-                        }
-                    }
-                    $assignedPartIds = array_values(array_unique($assignedPartIds));
-                } catch (\Throwable $e) {
-                    error_log('OperatorSurfaceComposer::buildProcessingFocusData (scope query): ' . $e->getMessage());
-                    $assignedPartIds = [];
-                }
-            }
-
-            $assemblyAssignedOrder = '1';
-            $assemblyAssignedParams = [];
-            if ($assignedPartIds !== []) {
-                $assemblyAssignedPlaceholders = implode(',', array_fill(0, count($assignedPartIds), '?'));
-                $assemblyAssignedOrder = "CASE WHEN d.product_id IN ({$assemblyAssignedPlaceholders}) THEN 0 ELSE 1 END";
-                $assemblyAssignedParams = $assignedPartIds;
-            }
-
-            $assemblySql =
-                "SELECT
-                    d.id,
-                    d.demand_date,
-                    d.status,
-                    COALESCE(d.approved_qty, d.adjusted_qty, d.system_qty, 0) AS planned_qty,
-                    COALESCE(NULLIF(TRIM(p.parts_name), ''), CONCAT('Part #', d.product_id)) AS part_name,
-                    COALESCE(NULLIF(TRIM(p.parts_number), ''), '-') AS part_number,
-                    CASE
-                        WHEN ? = 'assembly_leader' THEN
-                            CASE LOWER(COALESCE(d.status, 'calculated'))
-                                WHEN 'approved' THEN 0
-                                WHEN 'adjusted' THEN 1
-                                ELSE 2
-                            END
-                        WHEN ? = 'production_leader' THEN
-                            CASE LOWER(COALESCE(d.status, 'calculated'))
-                                WHEN 'adjusted' THEN 0
-                                WHEN 'approved' THEN 1
-                                ELSE 2
-                            END
-                        ELSE
-                            CASE LOWER(COALESCE(d.status, 'calculated'))
-                                WHEN 'adjusted' THEN 0
-                                WHEN 'approved' THEN 1
-                                ELSE 2
-                            END
-                    END AS role_sort
-                 FROM mfg_part_demands d
-                 INNER JOIN products p ON p.id = d.product_id
-                 WHERE d.demand_type = 'assembly'
-                   AND d.demand_date BETWEEN ? AND ?";
-            $assemblyParams = [$dashboardType, $dashboardType, $selectedDate, $toDate];
-            if ($selectedProductId > 0) {
-                $assemblySql .= " AND d.product_id = ?";
-                $assemblyParams[] = $selectedProductId;
-            }
-            $assemblySql .= " ORDER BY role_sort ASC, {$assemblyAssignedOrder} ASC, d.demand_date ASC, d.id DESC LIMIT 40";
-            $assemblyParams = array_merge($assemblyParams, $assemblyAssignedParams);
-            $assemblyRows = DB::fetchAll($assemblySql, $assemblyParams);
-
-            $qcAssignedOrder = '1';
-            $qcAssignedParams = [];
-            if ($assignedPartIds !== []) {
-                $qcAssignedPlaceholders = implode(',', array_fill(0, count($assignedPartIds), '?'));
-                $qcAssignedOrder = "CASE WHEN q.product_id IN ({$qcAssignedPlaceholders}) THEN 0 ELSE 1 END";
-                $qcAssignedParams = $assignedPartIds;
-            }
-
-            $qcSql =
-                "SELECT
-                    q.id,
-                    q.plan_date,
-                    q.status,
-                    q.priority,
-                    COALESCE(q.planned_qty, 0) AS planned_qty,
-                    COALESCE(NULLIF(TRIM(p.parts_name), ''), CONCAT('Part #', q.product_id)) AS part_name,
-                    COALESCE(NULLIF(TRIM(p.parts_number), ''), '-') AS part_number,
-                    CASE
-                        WHEN ? = 'qc_leader' THEN
-                            CASE LOWER(COALESCE(q.status, 'system generated'))
-                                WHEN 'system generated' THEN 0
-                                WHEN 'verified by qc' THEN 1
-                                WHEN 'adjusted by qc' THEN 2
-                                WHEN 'approved by authority' THEN 3
-                                ELSE 4
-                            END
-                        ELSE
-                            CASE LOWER(COALESCE(q.priority, 'normal'))
-                                WHEN 'critical' THEN 0
-                                WHEN 'high' THEN 1
-                                WHEN 'medium' THEN 2
-                                WHEN 'normal' THEN 3
-                                ELSE 4
-                            END
-                    END AS role_sort
-                 FROM qc_plans q
-                 INNER JOIN products p ON p.id = q.product_id
-                 WHERE q.plan_date BETWEEN ? AND ?";
-            $qcParams = [$dashboardType, $selectedDate, $toDate];
-            if ($selectedProductId > 0) {
-                $qcSql .= " AND q.product_id = ?";
-                $qcParams[] = $selectedProductId;
-            }
-            $qcSql .= " ORDER BY role_sort ASC, {$qcAssignedOrder} ASC, q.plan_date ASC, q.id DESC LIMIT 40";
-            $qcParams = array_merge($qcParams, $qcAssignedParams);
-            $qcRows = DB::fetchAll($qcSql, $qcParams);
-        } catch (\Throwable $e) {
-            error_log('OperatorSurfaceComposer::buildProcessingFocusData: ' . $e->getMessage());
-        }
+        $projection = ProcessingAdapter::getData(
+            $selectedDate,
+            is_array($user) ? $user : (array)$user,
+            $selectedProductId,
+            $dashboardType
+        );
 
         $flash = (string)($_SESSION['operator_processing_flash_ok'] ?? '');
         $error = (string)($_SESSION['operator_processing_flash_err'] ?? '');
@@ -1566,11 +1465,13 @@ final class OperatorSurfaceComposer
         return [
             'title' => $this->tr('operator.processing.title', 'Processing'),
             'subtitle' => $this->tr('operator.processing.subtitle', 'Minimal workbench for assembly and QC planning queues.'),
-            'selected_date' => $selectedDate,
-            'selected_product_id' => $selectedProductId,
-            'products' => $products,
-            'assembly_rows' => $assemblyRows,
-            'qc_rows' => $qcRows,
+            'selected_date' => (string)($projection['selected_date'] ?? $selectedDate),
+            'selected_product_id' => (int)($projection['selected_product_id'] ?? 0),
+            'products' => (array)($projection['products'] ?? []),
+            'assembly_rows' => (array)($projection['assembly_rows'] ?? []),
+            'qc_rows' => (array)($projection['qc_rows'] ?? []),
+            'authorized' => (bool)($projection['authorized'] ?? false),
+            'can_mutate' => (bool)($projection['can_mutate'] ?? false),
             'flash' => $flash,
             'error' => $error,
         ];

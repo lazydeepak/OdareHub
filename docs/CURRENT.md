@@ -16,8 +16,8 @@ The active product direction is:
 
 The disposable release/update foundation is complete through OH-AUTO1-080.
 Production installation, update, and apply remain unauthorized. Product
-development has resumed on the Shell worker surface; OH-AUTO1-092 is the
-current non-mutating Part360 operator-read milestone.
+development has resumed on the Shell worker surface; OH-AUTO1-093 is the
+current scope-aware Processing workspace milestone.
 
 ## Active Focus
 
@@ -29,9 +29,9 @@ Completed execution milestone:
 
 Current product milestone:
 
-- OH-AUTO1-092 — provide a shared non-mutating Part360 operator entry point,
-  preserve the admin initializer contract, and verify missing-schema failure
-  without repair attempts.
+- OH-AUTO1-093 — scope the operator Processing projection to authorized parts
+  and gate all four existing Processing mutations through Manufacturing-owned
+  product, module, profile, and transition authority.
 
 Approved execution sequence:
 

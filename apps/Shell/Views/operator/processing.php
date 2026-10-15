@@ -9,7 +9,8 @@
                     <?php $processingDate = (string)($processing['selected_date'] ?? date('Y-m-d')); ?>
                     <?php $processingProductId = (int)($processing['selected_product_id'] ?? 0); ?>
                     <?php $processingFlash = trim((string)($processing['flash'] ?? '')); ?>
-                    <?php $processingError = trim((string)($processing['error'] ?? '')); ?>
+<?php $processingError = trim((string)($processing['error'] ?? '')); ?>
+<?php $processingCanMutate = (bool)($processing['can_mutate'] ?? false); ?>
                     <?php $_procSubUser = htmlspecialchars(rawurlencode((string)($data['username'] ?? ''))); ?>
                     <nav class="operator-subnav" aria-label="<?php echo htmlspecialchars($this->tr('operator.processing.subnav.label', 'Processing sections')); ?>">
                         <a class="operator-subnav-item operator-subnav-item--active" href="/u/<?php echo $_procSubUser; ?>/processing" aria-current="page"><?php echo htmlspecialchars($this->tr('operator.processing.subnav.hub', 'Overview')); ?></a>
@@ -29,7 +30,7 @@
 
                         <section class="surface-card" aria-label="<?php echo htmlspecialchars($this->tr('operator.processing.assembly.title', 'Assembly Plan')); ?>">
                             <h3 class="work-entry-embed-title"><?php echo htmlspecialchars($this->tr('operator.processing.assembly.title', 'Assembly Plan')); ?></h3>
-                            <div class="production-focus-actions u-mb-10">
+                            <?php if ($processingCanMutate): ?><div class="production-focus-actions u-mb-10">
                                 <button
                                     class="btn ok"
                                     type="button"
@@ -67,7 +68,7 @@
                                         <button class="btn ok" type="submit"><?php echo htmlspecialchars($this->tr('operator.processing.assembly.save', 'Save Assembly Plan')); ?></button>
                                     </div>
                                 </form>
-                            </div>
+                            </div><?php endif; ?>
 
                             <div class="recent-focus-table-wrap">
                                 <table class="recent-focus-table">
@@ -98,7 +99,7 @@
                                                     <td><?php echo htmlspecialchars((string)($row['planned_qty'] ?? '0')); ?></td>
                                                     <td><?php echo htmlspecialchars((string)($row['status'] ?? '-')); ?></td>
                                                     <td>
-                                                        <?php if (in_array($assemblyStatus, ['calculated', 'adjusted'], true) && $demandId > 0): ?>
+                                                        <?php if ($processingCanMutate && in_array($assemblyStatus, ['calculated', 'adjusted'], true) && $demandId > 0): ?>
                                                             <form method="post" action="/u/<?php echo urlencode((string)($data['username'] ?? '')); ?>/processing/assembly/status" class="u-inline-form">
                                                                 <input type="hidden" name="csrf" value="<?php echo htmlspecialchars((string)\App\Core\Auth::csrfToken()); ?>">
                                                                 <input type="hidden" name="demand_id" value="<?php echo $demandId; ?>">
@@ -120,7 +121,7 @@
 
                         <section class="surface-card" aria-label="<?php echo htmlspecialchars($this->tr('operator.processing.qc.title', 'QC Plan')); ?>">
                             <h3 class="work-entry-embed-title"><?php echo htmlspecialchars($this->tr('operator.processing.qc.title', 'QC Plan')); ?></h3>
-                            <div class="production-focus-actions u-mb-10">
+                            <?php if ($processingCanMutate): ?><div class="production-focus-actions u-mb-10">
                                 <button
                                     class="btn ok"
                                     type="button"
@@ -168,7 +169,7 @@
                                         <button class="btn ok" type="submit"><?php echo htmlspecialchars($this->tr('operator.processing.qc.save', 'Save QC Plan')); ?></button>
                                     </div>
                                 </form>
-                            </div>
+                            </div><?php endif; ?>
 
                             <div class="recent-focus-table-wrap">
                                 <table class="recent-focus-table">
@@ -201,7 +202,7 @@
                                                     <td><?php echo htmlspecialchars((string)($row['priority'] ?? '-')); ?></td>
                                                     <td><?php echo htmlspecialchars((string)($row['status'] ?? '-')); ?></td>
                                                     <td>
-                                                        <?php if ($qcStatus === 'system generated' && $qcPlanId > 0): ?>
+                                                        <?php if ($processingCanMutate && $qcStatus === 'system generated' && $qcPlanId > 0): ?>
                                                             <form method="post" action="/u/<?php echo urlencode((string)($data['username'] ?? '')); ?>/processing/qc/status" class="u-inline-form">
                                                                 <input type="hidden" name="csrf" value="<?php echo htmlspecialchars((string)\App\Core\Auth::csrfToken()); ?>">
                                                                 <input type="hidden" name="qc_plan_id" value="<?php echo $qcPlanId; ?>">
@@ -209,7 +210,7 @@
                                                                 <input type="hidden" name="redirect_to" value="<?php echo htmlspecialchars($qcReturnUrl); ?>">
                                                                 <button class="btn ok" type="submit"><?php echo htmlspecialchars($this->tr('operator.processing.action.verify', 'Verify')); ?></button>
                                                             </form>
-                                                        <?php elseif (in_array($qcStatus, ['verified by qc', 'adjusted by qc'], true) && $qcPlanId > 0): ?>
+                                                        <?php elseif ($processingCanMutate && in_array($qcStatus, ['verified by qc', 'adjusted by qc'], true) && $qcPlanId > 0): ?>
                                                             <form method="post" action="/u/<?php echo urlencode((string)($data['username'] ?? '')); ?>/processing/qc/status" class="u-inline-form">
                                                                 <input type="hidden" name="csrf" value="<?php echo htmlspecialchars((string)\App\Core\Auth::csrfToken()); ?>">
                                                                 <input type="hidden" name="qc_plan_id" value="<?php echo $qcPlanId; ?>">

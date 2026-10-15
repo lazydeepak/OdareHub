@@ -2,6 +2,26 @@
 
 ## Decision Log
 
+### 2026-10-15 — OH-AUTO1-093 scope-aware Processing workspace and mutation gates
+
+**Status:** Accepted
+
+**Decision**
+
+Manufacturing owns the operator Processing projection and authority. The
+operator adapter delegates to `ProcessingOperationService::operatorFocus()`;
+it requires authenticated Manufacturing assignment, existing Platform module
+access, and strict positive `part_ids` scope before querying products, assembly
+demands, or QC plans. Scope predicates are applied before ordering and limits.
+
+The four existing operator POST handlers call
+`authorizeOperatorMutation()` before any schema initializer or write. Creation
+checks the requested product; status changes resolve the target plan's product
+and current status, then preserve only the existing assembly and QC
+transitions. `read_only`/`display` profiles, denied/malformed/mixed scopes,
+out-of-scope products, and unauthorized modules fail closed. No new scope
+dimension or permission framework was introduced.
+
 ### 2026-10-15 — OH-AUTO1-092 non-mutating Part360 operator read
 
 **Status:** Accepted

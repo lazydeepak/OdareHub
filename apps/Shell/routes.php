@@ -7,6 +7,7 @@ use App\Services\MyAccountService;
 use Apps\Manufacturing\Services\DemandEngineService;
 use Apps\Manufacturing\Services\DispatchOpsService;
 use Apps\Platform\Services\UserAssignmentContext;
+use Apps\Manufacturing\Services\ProcessingOperationService;
 use Apps\Shell\Services\AdminLayerService;
 use Apps\Shell\Services\DisplayLayerService;
 use Apps\Shell\Services\OperatorLayerService;
@@ -33,6 +34,7 @@ require_once __DIR__ . '/Composers/DisplaySurfaceComposer.php';
 require_once __DIR__ . '/Composers/WorkEntryComposer.php';
 require_once __DIR__ . '/Composers/DataExchangeComposer.php';
 require_once __DIR__ . '/Services/DataExchangeService.php';
+require_once APP_ROOT . '/apps/Manufacturing/Services/ProcessingOperationService.php';
 
 $buildEmbeddedOperatorFragmentContext = static function ($user): array {
     $userArray = is_array($user) ? $user : (array)$user;
@@ -1522,6 +1524,10 @@ $router->post('/u/processing/assembly/status', function () use ($resolveOperator
         if ($demandId <= 0 || !in_array(strtolower($newStatus), $allowed, true)) {
             throw new \RuntimeException($operatorRouteTr('operator.processing.error.invalid_status', 'Invalid demand or status.'));
         }
+        $authority = ProcessingOperationService::authorizeOperatorMutation('assembly_status', $demandId, 0, $newStatus, (array)$operatorRoute['user']);
+        if (!$authority['allowed']) {
+            throw new \RuntimeException($operatorRouteTr('operator.processing.error.invalid_status', 'Invalid demand or status.'));
+        }
 
         DB::query(
             'UPDATE mfg_part_demands SET status = ? WHERE id = ? LIMIT 1',
@@ -1552,6 +1558,10 @@ $router->post('/u/processing/qc/status', function () use ($resolveOperatorPostRo
         if ($qcPlanId <= 0 || !in_array(strtolower($newStatus), $allowed, true)) {
             throw new \RuntimeException($operatorRouteTr('operator.processing.error.invalid_qc_status', 'Invalid QC plan or status.'));
         }
+        $authority = ProcessingOperationService::authorizeOperatorMutation('qc_status', $qcPlanId, 0, $newStatus, (array)$operatorRoute['user']);
+        if (!$authority['allowed']) {
+            throw new \RuntimeException($operatorRouteTr('operator.processing.error.invalid_qc_status', 'Invalid QC plan or status.'));
+        }
 
         DB::query(
             'UPDATE qc_plans SET status = ? WHERE id = ? LIMIT 1',
@@ -1579,6 +1589,11 @@ $router->post('/u/processing/assembly/create', function () use ($resolveOperator
 
         $plannedQty = (float)($_POST['planned_qty'] ?? 0);
         if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $planDate) || $productId <= 0 || $plannedQty <= 0) {
+            throw new \RuntimeException($operatorRouteTr('operator.processing.error.required', 'Plan date, part, and planned quantity are required.'));
+        }
+
+        $authority = ProcessingOperationService::authorizeOperatorMutation('assembly_create', 0, $productId, '', (array)$operatorRoute['user']);
+        if (!$authority['allowed']) {
             throw new \RuntimeException($operatorRouteTr('operator.processing.error.required', 'Plan date, part, and planned quantity are required.'));
         }
 
@@ -1634,6 +1649,11 @@ $router->post('/u/processing/qc/create', function () use ($resolveOperatorPostRo
 
         $plannedQty = (float)($_POST['planned_qty'] ?? 0);
         if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $planDate) || $productId <= 0 || $plannedQty <= 0) {
+            throw new \RuntimeException($operatorRouteTr('operator.processing.error.required', 'Plan date, part, and planned quantity are required.'));
+        }
+
+        $authority = ProcessingOperationService::authorizeOperatorMutation('qc_create', 0, $productId, '', (array)$operatorRoute['user']);
+        if (!$authority['allowed']) {
             throw new \RuntimeException($operatorRouteTr('operator.processing.error.required', 'Plan date, part, and planned quantity are required.'));
         }
 

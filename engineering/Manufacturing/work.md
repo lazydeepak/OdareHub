@@ -2,7 +2,8 @@
 
 ## Current Focus
 
-OH-AUTO1-092 non-mutating Part360 operator read is complete. Continue
+OH-AUTO1-093 scope-aware Processing workspace and mutation gates are complete.
+Continue
  through the same owner-contract pattern for parts, work areas, and process
  areas only as separately bounded milestones.
 
@@ -36,6 +37,11 @@ brief's pressure-test workstreams and synthesis complete.
 - [x] OH-AUTO1-092 — operator detail now uses `Part360Service::buildReadOnly()`;
   the shared projection path skips schema repair while preserving admin
   `build()`. Missing required schema fails unavailable without mutation.
+
+- [x] OH-AUTO1-093 — the operator Processing projection uses the
+  Manufacturing-owned adapter and strict existing part/module authority; all
+  four existing operator POST handlers authorize before mutation or schema
+  setup, with read-only/display and invalid scope/transition requests denied.
 
 - [x] OH-AUTO1-087 — passed authenticated operator identity and effective
   assignment context into `MachinesAdapter`; Manufacturing retains machine,
@@ -77,6 +83,10 @@ brief's pressure-test workstreams and synthesis complete.
 - OH-AUTO1-092 — instrumented Part360 read-only proof **8/8**; detail/action
   and scope regressions **21/21**, **14/14**, and **27/27**. No database,
   schema, activation, production, or Core operation.
+
+- OH-AUTO1-093 — isolated Processing scope/mutation proof **16/16**. No
+  installed database, schema change, activation, production operation, or Core
+  change.
 
 - OH-AUTO1-019 — Manufacturing operator adapters now return a stable localized diagnostic key instead of raw exception text while retaining existing server-side error logging. See `docs/architecture/operational-diagnostics-observability-audit-2026-10-14.md`.
 - OH-AUTO1-020 — Static audit identified unverified target/link atomicity in upstream supply synchronization; no correction made without disposable failure-path evidence. See `docs/architecture/transactional-business-verification-audit-2026-10-14.md`.

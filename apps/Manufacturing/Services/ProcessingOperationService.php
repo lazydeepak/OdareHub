@@ -12,6 +12,145 @@ require_once APP_ROOT . '/apps/Manufacturing/modules/MaterialManagement/Services
 final class ProcessingOperationService
 {
     /**
+     * Read-only operator projection. Scope is resolved before any query and
+     * the projection deliberately does not call schema initializers.
+     *
+     * @return array<string,mixed>
+     */
+    public static function operatorFocus(string $date, ?array $user, int $selectedProductId = 0, string $dashboardType = 'operator'): array
+    {
+        $today = date('Y-m-d');
+        $date = preg_match('/^\d{4}-\d{2}-\d{2}$/', $date) ? $date : $today;
+        $toDate = date('Y-m-d', strtotime($date . ' +14 days'));
+        $scope = self::operatorScope($user);
+        $empty = [
+            'authorized' => false,
+            'can_mutate' => false,
+            'selected_date' => $date,
+            'selected_product_id' => 0,
+            'products' => [],
+            'assembly_rows' => [],
+            'qc_rows' => [],
+        ];
+        if ($scope === null || $scope['denied']) {
+            return $empty;
+        }
+
+        try {
+            [$productWhere, $productParams] = self::productScopeSql($scope['part_ids']);
+            $products = DB::fetchAll(
+                "SELECT id, parts_name, parts_number
+                 FROM products
+                 WHERE {$productWhere}
+                 ORDER BY parts_name ASC, id ASC
+                 LIMIT 300",
+                $productParams
+            );
+            $allowedProductIds = array_values(array_filter(array_map(static fn(array $row): int => (int)($row['id'] ?? 0), $products), static fn(int $id): bool => $id > 0));
+            if ($selectedProductId > 0 && !in_array($selectedProductId, $allowedProductIds, true)) {
+                $selectedProductId = 0;
+            }
+
+            $assemblySql =
+                "SELECT d.id, d.product_id, d.demand_date, d.status,
+                        COALESCE(d.approved_qty, d.adjusted_qty, d.system_qty, 0) AS planned_qty,
+                        COALESCE(NULLIF(TRIM(p.parts_name), ''), CONCAT('Part #', d.product_id)) AS part_name,
+                        COALESCE(NULLIF(TRIM(p.parts_number), ''), '-') AS part_number,
+                        CASE WHEN ? = 'assembly_leader' THEN
+                            CASE LOWER(COALESCE(d.status, 'calculated')) WHEN 'approved' THEN 0 WHEN 'adjusted' THEN 1 ELSE 2 END
+                        ELSE CASE LOWER(COALESCE(d.status, 'calculated')) WHEN 'adjusted' THEN 0 WHEN 'approved' THEN 1 ELSE 2 END END AS role_sort
+                 FROM mfg_part_demands d INNER JOIN products p ON p.id = d.product_id
+                 WHERE d.demand_type = 'assembly' AND d.demand_date BETWEEN ? AND ?";
+            // Apply the scope predicate before ordering and the result limit.
+            $assemblyParams = [$dashboardType, $date, $toDate];
+            if ($scope['part_ids'] !== []) {
+                $ph = implode(',', array_fill(0, count($scope['part_ids']), '?'));
+                $assemblySql .= " AND d.product_id IN ({$ph})";
+                array_push($assemblyParams, ...$scope['part_ids']);
+            }
+            if ($selectedProductId > 0) {
+                $assemblySql .= ' AND d.product_id = ?';
+                $assemblyParams[] = $selectedProductId;
+            }
+            $assemblySql .= ' ORDER BY role_sort ASC, d.demand_date ASC, d.id DESC LIMIT 40';
+            $assemblyRows = DB::fetchAll($assemblySql, $assemblyParams);
+
+            $qcParams = [$dashboardType, $date, $toDate];
+            $qcSql =
+                "SELECT q.id, q.product_id, q.plan_date, q.status, q.priority,
+                        COALESCE(q.planned_qty, 0) AS planned_qty,
+                        COALESCE(NULLIF(TRIM(p.parts_name), ''), CONCAT('Part #', q.product_id)) AS part_name,
+                        COALESCE(NULLIF(TRIM(p.parts_number), ''), '-') AS part_number,
+                        CASE WHEN ? = 'qc_leader' THEN
+                            CASE LOWER(COALESCE(q.status, 'system generated')) WHEN 'system generated' THEN 0 WHEN 'verified by qc' THEN 1 WHEN 'adjusted by qc' THEN 2 ELSE 3 END
+                        ELSE CASE LOWER(COALESCE(q.priority, 'normal')) WHEN 'critical' THEN 0 WHEN 'high' THEN 1 WHEN 'medium' THEN 2 WHEN 'normal' THEN 3 ELSE 4 END END AS role_sort
+                 FROM qc_plans q INNER JOIN products p ON p.id = q.product_id
+                 WHERE q.plan_date BETWEEN ? AND ?";
+            if ($scope['part_ids'] !== []) {
+                $ph = implode(',', array_fill(0, count($scope['part_ids']), '?'));
+                $qcSql .= " AND q.product_id IN ({$ph})";
+                array_push($qcParams, ...$scope['part_ids']);
+            }
+            if ($selectedProductId > 0) {
+                $qcSql .= ' AND q.product_id = ?';
+                $qcParams[] = $selectedProductId;
+            }
+            $qcSql .= ' ORDER BY role_sort ASC, q.plan_date ASC, q.id DESC LIMIT 40';
+            return [
+                'authorized' => true,
+                'can_mutate' => $scope['can_mutate'],
+                'selected_date' => $date,
+                'selected_product_id' => $selectedProductId,
+                'products' => $products,
+                'assembly_rows' => $assemblyRows,
+                'qc_rows' => DB::fetchAll($qcSql, $qcParams),
+            ];
+        } catch (\Throwable) {
+            return $empty;
+        }
+    }
+
+    /** @return array{allowed:bool,reason:string} */
+    public static function authorizeOperatorMutation(string $operation, int $recordId, int $productId, string $newStatus, ?array $user): array
+    {
+        $scope = self::operatorScope($user);
+        if ($scope === null || $scope['denied'] || !$scope['can_mutate']) {
+            return ['allowed' => false, 'reason' => 'operator_processing_unauthorized'];
+        }
+        $operation = strtolower(trim($operation));
+        if (in_array($operation, ['assembly_create', 'qc_create'], true)) {
+            $moduleAllowed = $operation === 'assembly_create' ? $scope['assembly_allowed'] : $scope['qc_allowed'];
+            if (!$moduleAllowed || $productId <= 0 || !self::productInScope($productId, $scope['part_ids'])) {
+                return ['allowed' => false, 'reason' => 'operator_processing_product_denied'];
+            }
+            $exists = DB::fetchOne('SELECT id FROM products WHERE id = ? LIMIT 1', [$productId]);
+            return ['allowed' => is_array($exists), 'reason' => is_array($exists) ? '' : 'operator_processing_product_missing'];
+        }
+        if ($recordId <= 0) {
+            return ['allowed' => false, 'reason' => 'operator_processing_record_required'];
+        }
+        if ($operation === 'assembly_status') {
+            if (!$scope['assembly_allowed']) return ['allowed' => false, 'reason' => 'operator_processing_module_denied'];
+            $row = DB::fetchOne('SELECT product_id, status FROM mfg_part_demands WHERE id = ? AND demand_type = ? LIMIT 1', [$recordId, 'assembly']);
+            $allowed = is_array($row) && self::productInScope((int)($row['product_id'] ?? 0), $scope['part_ids'])
+                && strtolower(trim($newStatus)) === 'approved'
+                && in_array(strtolower(trim((string)($row['status'] ?? ''))), ['calculated', 'adjusted'], true);
+            return ['allowed' => $allowed, 'reason' => $allowed ? '' : 'operator_processing_transition_denied'];
+        }
+        if ($operation === 'qc_status') {
+            if (!$scope['qc_allowed']) return ['allowed' => false, 'reason' => 'operator_processing_module_denied'];
+            $row = DB::fetchOne('SELECT product_id, status FROM qc_plans WHERE id = ? LIMIT 1', [$recordId]);
+            $current = strtolower(trim((string)($row['status'] ?? '')));
+            $target = strtolower(trim($newStatus));
+            $allowed = is_array($row) && self::productInScope((int)($row['product_id'] ?? 0), $scope['part_ids'])
+                && (($current === 'system generated' && $target === 'verified by qc')
+                    || (in_array($current, ['verified by qc', 'adjusted by qc'], true) && $target === 'approved by authority'));
+            return ['allowed' => $allowed, 'reason' => $allowed ? '' : 'operator_processing_transition_denied'];
+        }
+        return ['allowed' => false, 'reason' => 'operator_processing_operation_unknown'];
+    }
+
+    /**
      * @return array<string,mixed>
      */
     public static function build(string $date, ?array $user = null): array
@@ -54,7 +193,6 @@ final class ProcessingOperationService
         if ($planId <= 0) {
             throw new \RuntimeException('Assembly plan is required.');
         }
-
         $plan = DB::fetchOne(
             "SELECT id, product_id, demand_date,
                     COALESCE(approved_qty, adjusted_qty, system_qty, 0) AS effective_qty
@@ -561,6 +699,66 @@ final class ProcessingOperationService
         return [
             'part_ids' => array_values(array_filter(array_map('intval', (array)($context['scope']['part_ids'] ?? [])), static fn (int $id): bool => $id > 0)),
         ];
+    }
+
+    /** @return array{part_ids:array<int,int>,denied:bool,can_mutate:bool,assembly_allowed:bool,qc_allowed:bool}|null */
+    private static function operatorScope(?array $user): ?array
+    {
+        if (!is_array($user) || (int)($user['id'] ?? 0) <= 0 || !function_exists('platform_user_context_contract') || !function_exists('platform_user_access_policy_contract')) return null;
+        try {
+            $context = platform_user_context_contract()->resolveUserContext($user);
+            $apps = array_map(static fn($v): string => strtolower(trim((string)$v)), (array)($context['active_assigned_apps'] ?? $context['assigned_apps'] ?? []));
+            $policy = platform_user_access_policy_contract();
+            if (!in_array('manufacturing', $apps, true) || !$policy->isAppEnabled('manufacturing')) return null;
+            $moduleAllowed = static function (array $keys) use ($policy, $user): bool {
+                foreach ($keys as $key) {
+                    $key = strtolower($key);
+                    if ($policy->canAccessModule($user, $key)) return true;
+                }
+                return false;
+            };
+            $profile = strtolower(trim((string)($context['interaction_profile'] ?? 'worker')));
+            $rawScope = (array)($context['scope'] ?? []);
+            if (!array_key_exists('part_ids', $rawScope) || !is_array($rawScope['part_ids'])) return null;
+            $rawPartIds = $rawScope['part_ids'];
+            $denied = count($rawPartIds) === 1 && (($rawPartIds[0] ?? null) === -1 || (string)($rawPartIds[0] ?? '') === '-1');
+            if (!$denied && in_array(-1, $rawPartIds, true)) return null;
+            if (!$denied && in_array('-1', array_map('strval', $rawPartIds), true)) return null;
+            $partIds = [];
+            foreach ($rawPartIds as $rawPartId) {
+                if (is_int($rawPartId) && $rawPartId > 0) {
+                    $partIds[] = $rawPartId;
+                } elseif (is_string($rawPartId) && preg_match('/^[1-9][0-9]*$/', $rawPartId) === 1) {
+                    $parsed = filter_var($rawPartId, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+                    if ($parsed === false) return null;
+                    $partIds[] = (int)$parsed;
+                } else {
+                    return null;
+                }
+            }
+            $partIds = array_values(array_unique($partIds));
+            sort($partIds);
+            return [
+                'part_ids' => $partIds,
+                'denied' => $denied,
+                'can_mutate' => !in_array($profile, ['read_only', 'display'], true),
+                'assembly_allowed' => $moduleAllowed(['assembly_plans', 'assembly', 'processing_operation', 'processing']),
+                'qc_allowed' => $moduleAllowed(['qc_plans', 'qc', 'processing_operation', 'processing']),
+            ];
+        } catch (\Throwable) { return null; }
+    }
+
+    /** @return array{0:string,1:array<int,int>} */
+    private static function productScopeSql(array $partIds): array
+    {
+        if ($partIds === []) return ['1=1', []];
+        return ['id IN (' . implode(',', array_fill(0, count($partIds), '?')) . ')', $partIds];
+    }
+
+    /** @param array<int,int> $partIds */
+    private static function productInScope(int $productId, array $partIds): bool
+    {
+        return $productId > 0 && ($partIds === [] || in_array($productId, $partIds, true));
     }
 
     private static function currentUserLabel(?array $user): string
