@@ -300,7 +300,7 @@ final class OperatorLayerWidgetService
         }
         parse_str($query, $queryValues);
         foreach ($queryValues as $key => $value) {
-            if (!in_array((string)$key, ['focus', 'tab', 'task_id', 'id'], true)
+            if (!in_array((string)$key, ['focus', 'tab', 'task_id', 'id', 'prefill_product_id', 'product_id', 'q'], true)
                 || !is_string($value)
                 || str_starts_with($value, '//')
                 || str_contains($value, '://')

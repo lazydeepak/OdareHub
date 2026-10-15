@@ -2,6 +2,28 @@
 
 ## Decision Log
 
+### 2026-10-15 — OH-AUTO1-091 detail authority and read-only boundary
+
+**Status:** Accepted with blocker
+
+**Decision**
+
+Manufacturing continues to declare Part-detail business actions, while Shell
+filters those actions before rendering through same-user `/u/{username}/*`
+normalization and the existing Platform GET route authority. Inaccessible,
+cross-user, malformed, or read-only-profile actions are omitted; part access
+does not imply mutation permission.
+
+The isolated fake-row provider shares strict selector reconciliation with the
+runtime boundary. Conflicting direct IDs, mixed direct/text selectors, array or
+malformed selectors, unauthorized search/part-number matches, and denied scope
+all fail closed.
+
+The authorized Part360 path remains explicitly non-certified as read-only:
+`Part360Service::build()` calls both schema initializers before its reads, and
+those initializers can execute CREATE TABLE and ALTER TABLE operations. This
+milestone does not modify that broad service or introduce a second data engine.
+
 ### 2026-10-15 — OH-AUTO1-090 operator Parts scope boundary
 
 **Status:** Accepted

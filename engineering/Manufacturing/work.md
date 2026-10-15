@@ -2,7 +2,8 @@
 
 ## Current Focus
 
-OH-AUTO1-090 scope-aware operator Parts workspace is complete. Continue
+OH-AUTO1-091 Parts detail authority and read-only closure is complete with an
+explicit authorized-read schema blocker. Continue
  through the same owner-contract pattern for parts, work areas, and process
  areas only as separately bounded milestones.
 
@@ -27,6 +28,11 @@ brief's pressure-test workstreams and synthesis complete.
 - [x] OH-AUTO1-090 — Manufacturing-owned Parts list and detail selection
   requires authenticated identity, active Manufacturing assignment, Products
   module access, and effective part scope before pagination or Part360 build.
+
+- [x] OH-AUTO1-091 — strict direct/search/part-number selector reconciliation
+  and isolated fake-provider coverage preserve authorized part identity and
+  stop unauthorized selection before any Part360 builder. Shell filters detail
+  actions through same-user URL and existing Platform GET route authority.
 
 - [x] OH-AUTO1-087 — passed authenticated operator identity and effective
   assignment context into `MachinesAdapter`; Manufacturing retains machine,
@@ -58,6 +64,12 @@ brief's pressure-test workstreams and synthesis complete.
 - OH-AUTO1-090 — operator Parts authorization and list/detail consistency:
   **14/14** assertions; machine regression **27/27**. No database, schema
   initialization, activation, display-route, production, or Core operation.
+
+- OH-AUTO1-091 — detail authority and isolation proof: **20/20** assertions.
+  Authorized Part360 reads remain blocked from read-only certification because
+  `Part360Service::build()` calls `MaterialSchemaService::ensureSchema()` and
+  `PartEngineeringSchemaService::ensureSchema()`, both of which contain
+  CREATE/ALTER initialization. No speculative refactor was made.
 
 - OH-AUTO1-019 — Manufacturing operator adapters now return a stable localized diagnostic key instead of raw exception text while retaining existing server-side error logging. See `docs/architecture/operational-diagnostics-observability-audit-2026-10-14.md`.
 - OH-AUTO1-020 — Static audit identified unverified target/link atomicity in upstream supply synchronization; no correction made without disposable failure-path evidence. See `docs/architecture/transactional-business-verification-audit-2026-10-14.md`.

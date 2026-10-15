@@ -2,6 +2,19 @@
 
 ## Decision Log
 
+### 2026-10-15 — OH-AUTO1-091 Part-detail action rendering boundary
+
+**Status:** Accepted
+
+**Decision**
+
+Manufacturing owns the semantic Part-detail action list. Shell owns the final
+rendering safety boundary: each action must normalize to the authenticated
+operator's same-user `/u/{username}/*` address and pass the existing Platform
+GET route authority. Missing authority, unsafe URLs, denied routes, and
+read-only interaction profiles suppress the action rather than rendering an
+unusable link. This does not grant or infer POST/mutation permission.
+
 ### 2026-10-15 — OH-AUTO1-086 role-home effective-access boundary
 
 **Status:** Accepted

@@ -1,5 +1,13 @@
 # AGENTS.md
 
+## Session Summary (2026-10-15) — OH-AUTO1-091 Parts detail authority and read-only closure
+
+Part-detail actions now pass through Shell same-user URL normalization and
+existing Platform GET route authority; denied and read-only actions are omitted.
+Isolated fake-provider coverage is **20/20**. Authorized Part360 remains
+explicitly non-read-only because its two schema initializers can CREATE/ALTER.
+No database, browser, production operation, or Core change.
+
 ## Session Summary (2026-10-15) — OH-AUTO1-090 Scope-aware operator Parts workspace
 
 Manufacturing now authorizes Parts list/detail selection before pagination or

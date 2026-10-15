@@ -1,5 +1,18 @@
 # AGENT-COMPLIANCE-CHECKLIST
 
+## Session Summary (2026-10-15) — OH-AUTO1-091 Parts detail authority and read-only closure
+
+Added Shell filtering for Manufacturing Part-detail actions using same-user
+operator URL normalization and existing Platform GET route authority. Added
+strict selector reconciliation and isolated fake-row/fake-builder coverage.
+The authorized Part360 path remains explicitly blocked from read-only
+certification because it invokes Material and Part Engineering schema
+initializers containing CREATE/ALTER operations.
+
+Validation: detail authority **20/20**; Parts **14/14**; machine **27/27**;
+role-home **26/26**; worker/task **41/41**; navigation **51/51**. No database,
+browser, schema, activation, production, or Core operation.
+
 ## Session Summary (2026-10-15) — OH-AUTO1-090 Scope-aware operator Parts workspace
 
 Added a Manufacturing-owned Parts workspace boundary. Authenticated identity,

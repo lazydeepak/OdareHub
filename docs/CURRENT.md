@@ -16,8 +16,8 @@ The active product direction is:
 
 The disposable release/update foundation is complete through OH-AUTO1-080.
 Production installation, update, and apply remain unauthorized. Product
-development has resumed on the Shell worker surface; OH-AUTO1-090 is the
-current scope-aware operator Parts workspace milestone.
+development has resumed on the Shell worker surface; OH-AUTO1-091 is the
+current Parts detail authority and read-only closure milestone.
 
 ## Active Focus
 
@@ -29,9 +29,9 @@ Completed execution milestone:
 
 Current product milestone:
 
-- OH-AUTO1-090 — scope the operator Parts list and detail selection to the
-  authenticated user's effective Manufacturing part permissions, preserving
-  list/detail consistency and preventing unauthorized Part360 schema access.
+- OH-AUTO1-091 — enforce Part-detail action route authority and verify isolated
+  list/detail selection; retain the explicit blocker that authorized Part360
+  builds still invoke mutation-capable schema initializers.
 
 Approved execution sequence:
 

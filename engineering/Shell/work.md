@@ -2,10 +2,19 @@
 
 ## Current Focus
 
-OH-AUTO1-090 scope-aware Parts workspace is complete. Resume broader
+OH-AUTO1-091 Parts detail authority and read-only closure is complete. Resume
 operator capabilities, especially computed-scope-aware machine, part,
 work-area, and process-area presentation; do not expand the dashboard
 foundation without a new bounded objective.
+
+## 2026-10-15 — OH-AUTO1-091 Parts detail action authority
+
+- [x] Shell filters Manufacturing-provided detail actions through same-user
+  operator URL normalization and the existing Platform GET route authority.
+- [x] Inaccessible actions are omitted, authorized actions remain functional,
+  and read-only interaction profiles render no detail actions.
+- [x] Existing operator, worker/task, role-home, machine, and display
+  composition boundaries remain unchanged. Action authority probe: **20/20**.
 
 ## 2026-10-15 — OH-AUTO1-090 scope-aware operator Parts workspace
 

@@ -18,6 +18,7 @@ use Apps\Manufacturing\Services\OperatorLayerAdapters\MaterialsAdapter;
 use Apps\Shell\Services\OperatorLayerAdapters\PartDetailAdapter;
 use Apps\Manufacturing\Services\OperatorLayerAdapters\QcAdapter;
 use Apps\Shell\Services\OperatorLayerSidebarService;
+use Apps\Shell\Services\OperatorPartDetailActionAuthority;
 use Apps\Shell\Services\OperatorSurfaceContributionRegistry;
 use Apps\Shell\Services\PlatformWidgetBlueprintRuntimeService;
 use Apps\Shell\Services\OperatorPreferencesService;
@@ -29,6 +30,7 @@ use Plugins\Base\Services\NotificationService;
 require_once __DIR__ . '/../Services/OperatorSurfaceContributionRegistry.php';
 require_once __DIR__ . '/../Services/PlatformWidgetBlueprintRuntimeService.php';
 require_once __DIR__ . '/../Services/OperatorLayerWidgetService.php';
+require_once __DIR__ . '/../Services/OperatorPartDetailActionAuthority.php';
 require_once APP_ROOT . '/plugins/Base/Services/HostSurfaceRegistryService.php'; // compatibility owner-surface bridge
 require_once __DIR__ . '/OperatorAvatarMenuComposer.php';
 require_once __DIR__ . '/OperatorDashboardComposer.php';
@@ -608,11 +610,22 @@ final class OperatorSurfaceComposer
     private function buildPartDetailFocusData(): array
     {
         try {
-            return PartDetailAdapter::getData(
+            $data = PartDetailAdapter::getData(
                 (array)($this->context['current_query'] ?? []),
                 $this->username,
                 is_array($this->context['operator_user'] ?? null) ? $this->context['operator_user'] : null
             );
+            $routeResolver = $this->context['operator_route_access_resolver'] ?? null;
+            $readOnly = OperatorRoleHomeComposer::resolveInteractionProfile($this->context) === 'read_only';
+            $data['actions'] = is_callable($routeResolver)
+                ? OperatorPartDetailActionAuthority::filter(
+                    (array)($data['actions'] ?? []),
+                    $this->username,
+                    $routeResolver,
+                    $readOnly
+                )
+                : [];
+            return $data;
         } catch (\Throwable $e) {
             error_log('OperatorSurfaceComposer::buildPartDetailFocusData: ' . $e->getMessage());
             return ['product' => null, 'metrics' => [], 'context' => [], 'actions' => [], 'orders' => [], 'activity' => [], 'empty' => true, 'error' => 'operator.parts.detail.error.load'];

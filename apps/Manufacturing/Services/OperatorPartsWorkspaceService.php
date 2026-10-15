@@ -69,15 +69,8 @@ final class OperatorPartsWorkspaceService
             return 0;
         }
 
-        $direct = self::positiveId($query['part_id'] ?? $query['product_id'] ?? $query['id'] ?? null);
-        $partNumber = is_string($query['part_number'] ?? null) ? trim((string)$query['part_number']) : '';
-        $search = is_string($query['q'] ?? null)
-            ? trim((string)$query['q'])
-            : (is_string($query['part_q'] ?? null) ? trim((string)$query['part_q']) : '');
-        if ($direct === null && (($query['part_id'] ?? $query['product_id'] ?? $query['id'] ?? null) !== null)) {
-            return 0;
-        }
-        if ($direct === null && $partNumber === '' && $search === '') {
+        $selection = self::normalizeSelection($query);
+        if ($selection === null) {
             return 0;
         }
 
@@ -85,14 +78,14 @@ final class OperatorPartsWorkspaceService
             [$scopeWhere, $scopeParams] = self::partRestrictionSql($scope['part_ids'], 'p.');
             $where = [$scopeWhere];
             $params = $scopeParams;
-            if ($direct !== null) {
+            if ($selection['direct'] !== null) {
                 $where[] = 'p.id = ?';
-                $params[] = $direct;
-            } elseif ($partNumber !== '') {
+                $params[] = $selection['direct'];
+            } elseif ($selection['part_number'] !== '') {
                 $where[] = 'TRIM(p.parts_number) = ?';
-                $params[] = $partNumber;
+                $params[] = $selection['part_number'];
             } else {
-                $like = '%' . substr($search, 0, 80) . '%';
+                $like = '%' . substr($selection['search'], 0, 80) . '%';
                 $where[] = '(p.parts_name LIKE ? OR p.parts_number LIKE ? OR COALESCE(p.model, \'\') LIKE ?)';
                 array_push($params, $like, $like, $like);
             }
@@ -104,6 +97,55 @@ final class OperatorPartsWorkspaceService
         } catch (\Throwable) {
             return 0;
         }
+    }
+
+    /**
+     * Isolated fake-provider harness for the same strict selector semantics
+     * used by the runtime boundary. No database or schema authority is used.
+     *
+     * @param array<string,mixed> $query
+     * @param array<string,mixed> $scope
+     * @param array<int,array<string,mixed>> $rows
+     */
+    public static function resolveAuthorizedPartIdFromRows(array $query, array $scope, array $rows): int
+    {
+        $normalized = self::normalizeScope($scope);
+        $selection = self::normalizeSelection($query);
+        if ($normalized === null || $normalized['denied'] || $selection === null) {
+            return 0;
+        }
+
+        $candidates = self::projectAuthorizedRows($rows, $scope) ?? [];
+        if ($selection['direct'] !== null) {
+            foreach ($candidates as $row) {
+                if ((int)($row['id'] ?? $row['part_id'] ?? 0) === $selection['direct']) {
+                    return $selection['direct'];
+                }
+            }
+            return 0;
+        }
+
+        usort($candidates, static function (array $left, array $right): int {
+            $active = ((int)($right['is_active'] ?? 1)) <=> ((int)($left['is_active'] ?? 1));
+            if ($active !== 0) {
+                return $active;
+            }
+            $name = strcasecmp((string)($left['parts_name'] ?? ''), (string)($right['parts_name'] ?? ''));
+            return $name !== 0 ? $name : ((int)($left['id'] ?? 0) <=> (int)($right['id'] ?? 0));
+        });
+        foreach ($candidates as $row) {
+            $id = (int)($row['id'] ?? $row['part_id'] ?? 0);
+            if ($selection['part_number'] !== '' && trim((string)($row['parts_number'] ?? '')) === $selection['part_number']) {
+                return $id;
+            }
+            if ($selection['search'] !== '') {
+                $haystack = strtolower(trim((string)($row['parts_name'] ?? '') . ' ' . (string)($row['parts_number'] ?? '') . ' ' . (string)($row['model'] ?? '')));
+                if (str_contains($haystack, strtolower($selection['search']))) {
+                    return $id;
+                }
+            }
+        }
+        return 0;
     }
 
     /**
@@ -237,6 +279,54 @@ final class OperatorPartsWorkspaceService
             return $id === false ? null : $id;
         }
         return null;
+    }
+
+    /**
+     * @param array<string,mixed> $query
+     * @return array{direct:?int,part_number:string,search:string}|null
+     */
+    private static function normalizeSelection(array $query): ?array
+    {
+        $directValues = [];
+        foreach (['part_id', 'product_id', 'id'] as $key) {
+            if (!array_key_exists($key, $query)) {
+                continue;
+            }
+            $value = self::positiveId($query[$key]);
+            if ($value === null) {
+                return null;
+            }
+            $directValues[] = $value;
+        }
+        if ($directValues !== [] && count(array_unique($directValues)) !== 1) {
+            return null;
+        }
+        $partNumber = array_key_exists('part_number', $query) ? self::textSelector($query['part_number']) : '';
+        $q = array_key_exists('q', $query) ? self::textSelector($query['q']) : '';
+        $partQ = array_key_exists('part_q', $query) ? self::textSelector($query['part_q']) : '';
+        if (($partNumber === null) || ($q === null) || ($partQ === null)) {
+            return null;
+        }
+        if ($q !== '' && $partQ !== '' && $q !== $partQ) {
+            return null;
+        }
+        $search = $q !== '' ? $q : $partQ;
+        $direct = $directValues[0] ?? null;
+        if ($direct !== null && ($partNumber !== '' || $search !== '')) {
+            return null;
+        }
+        if ($direct === null && $partNumber === '' && $search === '') {
+            return null;
+        }
+        return ['direct' => $direct, 'part_number' => $partNumber, 'search' => $search];
+    }
+
+    private static function textSelector(mixed $value): ?string
+    {
+        if (!is_string($value)) {
+            return null;
+        }
+        return trim(substr($value, 0, 120));
     }
 
     /** @return array<string,mixed> */
