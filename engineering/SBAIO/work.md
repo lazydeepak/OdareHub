@@ -1,5 +1,25 @@
 # SBAIO — Work
 
+## 2026-10-16 — OH-AUTO2-105B authorized assessment prerequisite result
+
+- [x] Verified target identity non-destructively from the existing configuration
+  and incident record: `127.0.0.1:3306 / os.susankhya.com`; the configured
+  application identity is `root` and was not used for an assessment.
+- [x] Checked the preserved `storage/manual-recovery-test-001` recovery-point
+  payloads without database access: database and filesystem payloads exist,
+  recorded SHA-256/size evidence matches, gzip integrity passes, and ZIP
+  integrity passes. This is evidence of payload integrity only, not independent
+  proof of complete scope, transactional consistency, or restorable target
+  state.
+- [!] Assessment is **BLOCKED before connection**: no genuine least-privilege
+  read-only database account with independently verified privileges is
+  available. The recovery metadata also lacks the independent completeness /
+  consistency / restore evidence required by the recovery contract.
+- [x] No application-root credential, database connection, SQL, cleanup,
+  restoration, deletion, schema operation, migration, or preparation was
+  performed. Lifecycle logs, PHPUnit cache, and incident evidence remain
+  preserved.
+
 ## 2026-10-16 — OH-AUTO2-105R unauthorized database probe incident
 
 - [!] The committed OH-AUTO2-105 record's “no installed database” statement is
