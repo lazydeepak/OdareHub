@@ -5,6 +5,21 @@
 
 State the current verified objective.
 
+## 2026-10-16 — OH-AUTO2-119 supplier eligibility integrity
+
+- [x] Confirmed the existing supplier lifecycle contract: `active` is eligible;
+  `inactive`, `disabled`, and `blocked` are rejected by approved-request
+  conversion. The manual order form requires a supplier, while the existing
+  service contract preserves nullable/automatic supplier behavior.
+- [x] Centralized that existing rule in `assertSupplierEligible()` and applied
+  it to manual order creation before schema access, transaction opening, PO
+  insertion, linked-request closure, or audit creation. Approved-request
+  conversion uses the same rule.
+- [x] Isolated fake-reader and source-order proof passes **22/22**; no database,
+  SQL, browser, activation, or deployment operation was used.
+- [x] Existing route app-access/CSRF authority and transaction boundaries remain
+  unchanged. Historical orders are untouched.
+
 ## In Progress
 
 - [x] OH-AUTO1-018 — Corrected misplaced receipt-line validation in `ProcurementOverviewService::createOrder()` and added `probe_order_receipt_method_boundaries.php`.

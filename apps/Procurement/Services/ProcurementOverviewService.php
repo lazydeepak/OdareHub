@@ -164,23 +164,7 @@ final class ProcurementOverviewService
         }
 
         $supplierId = $supplierId !== null && $supplierId > 0 ? (int)$supplierId : null;
-        if ($supplierId !== null) {
-            $supplier = DB::fetchOne(
-                'SELECT id, supplier_name, supplier_status
-                 FROM procurement_suppliers
-                 WHERE id=?
-                 LIMIT 1',
-                [$supplierId]
-            );
-            if (!is_array($supplier)) {
-                throw new \RuntimeException('Selected supplier was not found. Pick a valid supplier or use Auto supplier.');
-            }
-
-            $supplierStatus = strtolower(trim((string)($supplier['supplier_status'] ?? 'active')));
-            if (in_array($supplierStatus, ['inactive', 'disabled', 'blocked'], true)) {
-                throw new \RuntimeException('Selected supplier is inactive. Choose an active supplier.');
-            }
-        }
+        self::assertSupplierEligible($supplierId);
 
         AuditLogService::ensureSchema();
         $db = DB::conn();
@@ -633,6 +617,10 @@ final class ProcurementOverviewService
             $poRef = self::nextRef('PO');
         }
 
+        // Validate the selected supplier before schema access, transaction
+        // opening, or any order/request/audit mutation. A null supplier keeps
+        // the established automatic/omitted supplier behavior.
+        self::assertSupplierEligible(self::toPositiveInt($input['supplier_id'] ?? null));
         AuditLogService::ensureSchema();
         $db = DB::conn();
         $db->begin_transaction();
@@ -696,6 +684,39 @@ final class ProcurementOverviewService
         } catch (\Throwable $e) {
             $db->rollback();
             throw $e;
+        }
+    }
+
+    /**
+     * Enforce the existing supplier lifecycle rule for new order creation.
+     *
+     * The optional reader exists only for isolated non-database verification;
+     * production uses the existing DB authority. Null preserves the established
+     * automatic-supplier path.
+     *
+     * @param null|callable(int):array<string,mixed>|false|null $supplierReader
+     */
+    public static function assertSupplierEligible(?int $supplierId, ?callable $supplierReader = null): void
+    {
+        if ($supplierId === null || $supplierId <= 0) {
+            return;
+        }
+
+        $reader = $supplierReader ?? static fn(int $id) => DB::fetchOne(
+            'SELECT id, supplier_name, supplier_status
+             FROM procurement_suppliers
+             WHERE id=?
+             LIMIT 1',
+            [$id]
+        );
+        $supplier = $reader($supplierId);
+        if (!is_array($supplier)) {
+            throw new \RuntimeException('Selected supplier was not found. Pick a valid supplier or use Auto supplier.');
+        }
+
+        $supplierStatus = strtolower(trim((string)($supplier['supplier_status'] ?? 'active')));
+        if (in_array($supplierStatus, ['inactive', 'disabled', 'blocked'], true)) {
+            throw new \RuntimeException('Selected supplier is inactive. Choose an active supplier.');
         }
     }
 

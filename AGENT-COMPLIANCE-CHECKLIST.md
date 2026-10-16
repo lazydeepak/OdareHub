@@ -1,5 +1,20 @@
 # AGENT-COMPLIANCE-CHECKLIST
 
+## Session Summary (2026-10-16) — OH-AUTO2-119 Procurement supplier eligibility
+
+Confirmed the existing Procurement rule: active suppliers are eligible;
+inactive, disabled, blocked, and missing selected suppliers are rejected.
+Nullable supplier IDs retain the established automatic/omitted service path.
+
+Centralized the rule in `ProcurementOverviewService::assertSupplierEligible()`
+and applied it before schema access, transaction opening, purchase-order
+insertion, linked-request closure, or audit creation for both manual orders and
+approved-request conversion. Added an isolated fake-reader/source-order probe;
+**22/22** assertions pass. No database, SQL, schema, browser, Core, route,
+authorization-model, activation, deployment, Material, SBAIO, or OH-AUTO2-105B
+operation occurred. Existing logs, PHPUnit cache, and incident evidence remain
+preserved.
+
 ## Session Summary (2026-10-16) — OH-AUTO2-118 runtime authorization and safe presentation
 
 Verified the production call path invokes recent activity without an owner
