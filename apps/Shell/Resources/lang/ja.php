@@ -126,6 +126,7 @@ return [
     'operator.recent.empty' => '',
     'operator.recent.entity.daily_order_with_part_date' => '',
     'operator.recent.entity.generic_with_id' => '',
+    'operator.recent.entity.unavailable' => 'レコードの詳細は利用できません。',
     'operator.recent.entity.procurement_order_with_date' => '',
     'operator.recent.entity.procurement_order_with_part_date' => '',
     'operator.recent.entity.procurement_receipt_with_date' => '',

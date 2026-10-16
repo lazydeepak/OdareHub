@@ -1,5 +1,21 @@
 # AGENT-COMPLIANCE-CHECKLIST
 
+## Session Summary (2026-10-16) — OH-AUTO2-117 recent-activity authorization
+
+Audited the seven recent-activity entity-enrichment query shapes. The audit
+history query remains actor-email restricted, but no existing cross-domain
+record-scope authority was available before the secondary lookups. This was a
+confirmed authorization-boundary defect, although no installed-database
+disclosure was attempted or demonstrated.
+
+Added a fail-closed owner authorization resolver seam to
+`OperatorRecentActivityComposer`. Missing or denied authority prevents
+secondary queries and returns localized non-sensitive details without entity
+IDs; authorized resolver fixtures preserve existing enrichment and formatting.
+Added **21/21** isolated fake-query, authorization, and rendered-view
+assertions. No Core, database, SQL execution, schema, route, permission-model,
+browser, activation, deployment, Material, SBAIO, or OH-AUTO2-105B change.
+
 ## Session Summary (2026-10-16) — OH-AUTO2-105B prerequisite assessment
 
 The authorized database incident assessment was resumed only through its

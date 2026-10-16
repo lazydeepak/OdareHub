@@ -2,6 +2,20 @@
 
 ## Decision Log
 
+### 2026-10-16 — OH-AUTO2-117 recent-activity entity enrichment boundary
+
+**Status:** Accepted — fail closed until owner authorization exists
+
+An audit row restricted to the authenticated actor does not independently prove
+current access to its referenced Manufacturing or Procurement record. The Shell
+recent-activity composer therefore requires an owner-provided authoritative
+entity authorization resolver before performing any secondary entity lookup.
+Without that resolver, it preserves the audit event and presentation counts but
+returns a localized record-details-unavailable fallback that contains no entity
+type or record ID. No new scope mapping, permission, or business authorization
+model is introduced. Authorized owner fixtures may retain existing enrichment
+through the resolver seam.
+
 ### 2026-10-16 — OH-AUTO2-103 host-provider containment boundary
 
 **Status:** Accepted — bounded Shell composition admission

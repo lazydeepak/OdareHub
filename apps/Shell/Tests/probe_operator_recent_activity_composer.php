@@ -104,7 +104,10 @@ $translator = static function (string $key, string $fallback, array $params = []
 };
 
 $composer = new OperatorRecentActivityComposer($fetchAll, $fetchOne, $translator);
-$result = $composer->build(['user_email' => 'operator@example.test']);
+$result = $composer->build([
+    'user_email' => 'operator@example.test',
+    'recent_entity_authorization_resolver' => static fn(string $entityType, int $entityId): bool => true,
+]);
 $assert($result['total'] === 3 && $result['unique_events'] === 2, 'event totals and unique-event count preserve parity');
 $assert($result['event_bars'] === [
     ['label' => 'Localized Workflow', 'count' => 2, 'percent' => 100.0],
@@ -120,6 +123,41 @@ $assert($result['rows'][0]['module'] === 'manufacturing / production' && $result
 $assert(count(array_filter($queries, static fn(array $query): bool => $query['kind'] === 'one')) === 2, 'entity summary cache prevents duplicate entity reads');
 $assert($queries[0]['kind'] === 'all' && $queries[0]['params'] === ['operator@example.test'], 'audit query preserves the authenticated actor parameter');
 $assert(str_contains($queries[0]['sql'], 'WHERE actor_email = ?') && str_contains($queries[0]['sql'], 'ORDER BY created_at DESC, id DESC') && str_contains($queries[0]['sql'], 'LIMIT 200'), 'audit predicates, ordering, and row limit remain unchanged');
+
+$unauthorizedQueries = [];
+$unauthorized = new OperatorRecentActivityComposer(
+    static function (string $sql, array $params) use (&$unauthorizedQueries, $rows): array {
+        $unauthorizedQueries[] = ['kind' => 'all', 'sql' => $sql, 'params' => $params];
+        return $rows;
+    },
+    static function (string $sql, array $params) use (&$unauthorizedQueries): array {
+        $unauthorizedQueries[] = ['kind' => 'one', 'sql' => $sql, 'params' => $params];
+        return ['part_name' => 'Should never be read'];
+    },
+    $translator
+);
+$unauthorizedResult = $unauthorized->build(['user_email' => 'operator@example.test']);
+$assert(count(array_filter($unauthorizedQueries, static fn(array $query): bool => $query['kind'] === 'one')) === 0, 'missing entity authority prevents secondary record queries');
+$assert(str_contains($unauthorizedResult['rows'][0]['action_display'], 'Record details unavailable.') && !str_contains($unauthorizedResult['rows'][0]['action_display'], '#5'), 'unauthorized enrichment uses a non-sensitive fallback without record ID');
+
+$deniedQueries = [];
+$denied = new OperatorRecentActivityComposer(
+    static function (string $sql, array $params) use (&$deniedQueries, $rows): array {
+        $deniedQueries[] = ['kind' => 'all', 'sql' => $sql, 'params' => $params];
+        return $rows;
+    },
+    static function (string $sql, array $params) use (&$deniedQueries): array {
+        $deniedQueries[] = ['kind' => 'one', 'sql' => $sql, 'params' => $params];
+        return ['part_name' => 'Should never be read'];
+    },
+    $translator
+);
+$deniedResult = $denied->build([
+    'user_email' => 'operator@example.test',
+    'recent_entity_authorization_resolver' => static fn(string $entityType, int $entityId): bool => false,
+]);
+$assert(count(array_filter($deniedQueries, static fn(array $query): bool => $query['kind'] === 'one')) === 0, 'denied entity authority prevents secondary record queries');
+$assert(str_contains($deniedResult['rows'][1]['action_display'], 'Record details unavailable.') && !str_contains($deniedResult['rows'][1]['action_display'], '#9'), 'denied cross-application enrichment does not expose the entity ID');
 
 $queryCalls = 0;
 $missing = (new OperatorRecentActivityComposer(
@@ -156,6 +194,20 @@ $rendered = (new class {
     }
 })->render(['username' => 'operator', 'recent_activity' => $result]);
 $assert(str_contains($rendered, 'Localized Workflow') && str_contains($rendered, 'Approved note'), 'existing recent-activity view consumes the unchanged payload structure');
+$renderedSafe = (new class {
+    public function tr(string $key, string $fallback): string
+    {
+        return $fallback;
+    }
+
+    public function render(array $data): string
+    {
+        ob_start();
+        include APP_ROOT . '/apps/Shell/Views/operator/recent.php';
+        return (string)ob_get_clean();
+    }
+})->render(['username' => 'operator', 'recent_activity' => $unauthorizedResult]);
+$assert(!str_contains($renderedSafe, '#5') && str_contains($renderedSafe, 'Localized Approved'), 'rendered recent activity preserves the event while suppressing entity identity');
 
 if ($failed > 0) {
     fwrite(STDERR, "RESULT: {$passed}/" . ($passed + $failed) . " assertions passed; {$failed} failed\n");

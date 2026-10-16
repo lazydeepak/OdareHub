@@ -25,6 +25,9 @@ final class OperatorRecentActivityComposer
     /** @var array<string,string> */
     private array $recentEntitySummaryCache = [];
 
+    /** @var null|callable(string, int):bool */
+    private $entityAuthorizationResolver;
+
     /**
      * @param null|callable(string, array<int,mixed>):array<int,array<string,mixed>> $fetchAll
      * @param null|callable(string, array<int,mixed>):array<string,mixed>|false|null $fetchOne
@@ -76,6 +79,10 @@ final class OperatorRecentActivityComposer
         if ($userEmail === '') {
             return $empty;
         }
+
+        $this->entityAuthorizationResolver = is_callable($context['recent_entity_authorization_resolver'] ?? null)
+            ? $context['recent_entity_authorization_resolver']
+            : null;
 
         try {
             $rows = ($this->fetchAll)(
@@ -247,6 +254,20 @@ final class OperatorRecentActivityComposer
         $normalizedType = strtolower(trim($entityType));
         if ($entityId <= 0) {
             return $this->tr('operator.recent.entity_unknown', 'record');
+        }
+
+        // Audit visibility does not prove current access to the referenced
+        // business record. Owner code must supply an authoritative resolver
+        // before this composer performs any entity-enrichment query.
+        if (!is_callable($this->entityAuthorizationResolver)) {
+            return $this->entityDetailsUnavailable();
+        }
+        try {
+            if (($this->entityAuthorizationResolver)($normalizedType, $entityId) !== true) {
+                return $this->entityDetailsUnavailable();
+            }
+        } catch (\Throwable) {
+            return $this->entityDetailsUnavailable();
         }
 
         $cacheKey = $normalizedType . ':' . $entityId;
@@ -443,18 +464,16 @@ final class OperatorRecentActivityComposer
         }
 
         if ($summary === '') {
-            $readableType = $normalizedType !== ''
-                ? strtolower((string)preg_replace('/[\/_\-]+/', ' ', $normalizedType))
-                : $this->tr('operator.recent.entity_record', 'record');
-            $summary = sprintf(
-                $this->tr('operator.recent.entity.generic_with_id', '%1$s #%2$d'),
-                $readableType,
-                $entityId
-            );
+            $summary = $this->entityDetailsUnavailable();
         }
 
         $this->recentEntitySummaryCache[$cacheKey] = $summary;
         return $summary;
+    }
+
+    private function entityDetailsUnavailable(): string
+    {
+        return $this->tr('operator.recent.entity.unavailable', 'Record details unavailable.');
     }
 
 }

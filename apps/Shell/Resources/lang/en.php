@@ -126,6 +126,7 @@ return [
     'operator.recent.empty' => 'No activity log entries found.',
     'operator.recent.entity.daily_order_with_part_date' => 'daily order for %1$s dated %2$s',
     'operator.recent.entity.generic_with_id' => '%1$s #%2$d',
+    'operator.recent.entity.unavailable' => 'Record details unavailable.',
     'operator.recent.entity.procurement_order_with_date' => 'purchase order %1$s expected %2$s',
     'operator.recent.entity.procurement_order_with_part_date' => 'purchase order %1$s for %2$s expected %3$s',
     'operator.recent.entity.procurement_receipt_with_date' => 'receipt %1$s dated %2$s',

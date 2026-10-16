@@ -6,6 +6,20 @@ OH-AUTO1-094 Processing authority closure is complete. Shell remains the
 generic operator composition and rendering boundary; Manufacturing owns lane
 authority and data projection.
 
+## 2026-10-16 — OH-AUTO2-117 recent-activity entity authorization
+
+- [x] Confirmed the audit query remains restricted to the authenticated
+  `actor_email`, with its existing ordering and 200-row limit unchanged.
+- [x] Confirmed the seven entity-enrichment query shapes had no established
+  record-scope authorization before lookup; raw entity IDs could therefore
+  reach secondary queries and ID-bearing generic fallbacks.
+- [x] Added a fail-closed owner authorization seam. Without an authoritative
+  resolver, no entity query runs and the payload uses a localized non-sensitive
+  fallback without record IDs. Authorized fake-resolver fixtures retain the
+  existing enrichment behavior.
+- [x] Isolated authorization/query/rendering probe passes **21/21**; no
+  database, browser, activation, or incident-database operation was used.
+
 ## 2026-10-16 — OH-AUTO2-115 recent-activity extraction
 
 - [x] Extracted recent-activity data construction, date formatting, and cached
