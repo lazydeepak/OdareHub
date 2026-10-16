@@ -45,6 +45,16 @@ remain disabled.
 
 Release/update foundation governance and controlled-cycle readiness.
 
+## 2026-10-16 — OH-AUTO2-111 admission containment
+
+- [x] Manufacturing removed the unsafe aggregate hook and descriptor; Platform
+  admission remains unchanged and therefore fails closed on missing capability
+  evidence before provider loading.
+- [x] Existing six navigation descriptors and provider ordering remain intact;
+  inventory/containment proof is **11/11**.
+- [x] No generic admission relaxation, scope model, Core, database, or route
+  change was made.
+
 ## 2026-10-16 — OH-AUTO2-109 Material summary admission
 
 - [x] Extended the existing admission contract for one explicit

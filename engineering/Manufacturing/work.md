@@ -7,6 +7,29 @@ Continue
 through the same owner-contract pattern for parts, work areas, and process
 areas only as separately bounded milestones.
 
+## 2026-10-16 — OH-AUTO2-111 Material aggregate authorization containment
+
+- [x] Removed the unsafe `/me` Material aggregate hook and capability
+  descriptor after restricted-scope differential verification.
+- [x] Preserved the inactive provider source, `summaryReadOnly()`, ordinary
+  Material operations, six navigation capabilities, and other suppressed
+  providers.
+- [x] Registry containment/inventory proof: **11/11**; inactive-source proof:
+  **17/17**; Material read safety remains **18/18**.
+- [x] No new record-scope model, route, schema, database, activation, or
+  deployment operation.
+
+## 2026-10-16 — OH-AUTO2-111 Material aggregate containment
+
+- [x] Removed the unsafe Material aggregate host hook and trusted capability
+  descriptor after OH-AUTO2-110 proved restricted scopes produced identical
+  counts.
+- [x] Preserved the extracted source as inactive code and preserved
+  `summaryReadOnly()` plus ordinary Material Management operations.
+- [x] Confirmed six navigation descriptors remain and the suppressed provider
+  is not loaded by the governed registry.
+- [x] No new scope model, route, schema, database, or provider migration.
+
 ## 2026-10-16 — OH-AUTO2-109 Material summary extraction
 
 - [x] Added the isolated Manufacturing-owned Material summary provider and

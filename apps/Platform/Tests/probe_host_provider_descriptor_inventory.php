@@ -106,7 +106,8 @@ namespace {
         }
     };
 
-    $assert(count($approved) === 7, 'six navigation plus one extracted aggregate descriptor exist');
+    $assert(count($approved) === 6, 'six approved navigation descriptors exist');
+    $assert(!in_array('manufacturing:manufacturing.me.material_summary', $approved, true), 'unsafe material aggregate descriptor is absent');
     $headerApps = array_values(array_unique(array_map(
         static fn(array $item): string => (string)($item['app_key'] ?? ''),
         array_values(array_filter((array)($regions['header_actions'] ?? []), 'is_array'))
@@ -120,6 +121,20 @@ namespace {
     $assert($headerApps === ['manufacturing', 'sbaio', 'studio'], 'existing assigned-app provider ordering is preserved');
     $assert(($regions['header_actions'][0]['app_key'] ?? '') !== '', 'approved output retains provider ownership');
     $assert(($regions['quick_links'][0]['region'] ?? '') === 'quick_links', 'approved output retains region identity');
+    $assert(!class_exists('Apps\\Manufacturing\\Services\\HostMaterialSummaryContributionService', false), 'suppressed material provider is not loaded');
+
+    \App\Core\DB::$hooks = $rows;
+    $restrictedRegions = \Plugins\Base\Services\HostSurfaceRegistryService::build('me', [
+        'user' => ['id' => 8, 'authority_role' => 'leader'],
+        'context' => [
+            'authority_role' => 'leader',
+            'active_assigned_apps' => ['manufacturing', 'sbaio', 'studio'],
+            'scope' => ['material_ids' => [999999]],
+        ],
+    ]);
+    $restrictedSummary = (array)($restrictedRegions['summary_cards'] ?? []);
+    $assert($restrictedSummary === [], 'restricted /me context emits no material aggregate');
+    $assert(!array_filter($restrictedSummary, static fn(array $item): bool => ($item['widget_key'] ?? '') === 'materials_summary'), 'restricted output has no material summary widget');
 
     \App\Core\DB::$hooks = [[
         'app_key' => 'fixture_legacy',

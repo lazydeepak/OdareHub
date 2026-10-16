@@ -1,5 +1,36 @@
 # AGENT-COMPLIANCE-CHECKLIST
 
+## Session Summary (2026-10-16) — OH-AUTO2-111 Material aggregate authorization containment
+
+Removed the unsafe `manufacturing.me.material_summary` host hook and trusted
+capability descriptor after OH-AUTO2-110 proved restricted scopes produced the
+same whole-domain counts. The extracted provider source remains preserved but
+is no longer registered, admitted, loaded, or invoked through the `/me` host
+registry. `summaryReadOnly()` and ordinary Material Management behavior remain
+unchanged.
+
+Validation: containment/provider inventory **11/11**; descriptor removal and
+inactive-source proof **17/17**; Material read safety **18/18**; existing
+authorization **12/12**; restricted containment **15/15**; admission **9/9**;
+manifest validation, architecture gates, deletion gates, deployment readiness,
+PHP lint, and diff hygiene passed. No Core, database, SQL, schema, route,
+browser, activation, deployment, or record-scope redesign operation.
+
+## Session Summary (2026-10-16) — OH-AUTO2-111 Material aggregate containment
+
+Contained the OH-AUTO2-110 authorization defect by removing the unsafe
+`manufacturing.me.material_summary` hook and trusted capability descriptor from
+`apps/Manufacturing/manifest.json`. The extracted provider source remains
+preserved but cannot be discovered, admitted, loaded, or invoked through the
+governed `/me` registry. `MaterialManagementService::summaryReadOnly()` and
+ordinary Material Management behavior were not changed.
+
+The provider inventory now proves six navigation descriptors, absence of the
+unsafe descriptor, and no loading of the suppressed provider. Existing
+navigation ordering, containment, authorization, admission, and Material
+read-safety behavior remain covered. No Core, database, SQL, schema, route,
+browser, activation, deployment, or record-scope redesign operation.
+
 ## Session Summary (2026-10-16) — OH-AUTO2-109 safe Material summary extraction
 
 Extracted one independently governed Manufacturing `/me` operational

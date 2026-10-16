@@ -111,6 +111,12 @@ Evidence for the completed milestones is recorded in:
   Management aggregate summary provider. It uses existing module authority and
   `summaryReadOnly()` only; the composite callback, monitoring providers, and
   SBAIO sensitive providers remain suppressed.
+- OH-AUTO2-110 — record-scope audit proved that the Material aggregate ignores
+  restricted scope and must not be admitted on module authority alone.
+- OH-AUTO2-111 — the unsafe Material aggregate hook and descriptor are removed
+  from executable Manufacturing `/me` metadata. The provider source and
+  `summaryReadOnly()` remain preserved but inactive; six navigation providers
+  remain admitted.
 
 After the release/update cycle is proven, resume the product roadmap focus from
 `README.md`:

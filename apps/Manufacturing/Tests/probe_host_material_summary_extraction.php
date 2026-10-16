@@ -199,7 +199,8 @@ namespace {
             'context' => ['active_assigned_apps' => ['manufacturing']],
         ]
     );
-    $assert(($admission['allowed'] ?? false) === true, 'trusted extracted descriptor is admitted');
+    $assert(($descriptor ?? null) === null, 'unsafe extracted descriptor is no longer trusted');
+    $assert(($admission['allowed'] ?? true) === false, 'removed extracted descriptor is rejected');
 
     $tamperedAdmission = \Apps\Platform\Services\HostProviderAdmissionService::admit(
         ['app_key' => 'manufacturing', 'hook_key' => 'manufacturing.me.material_summary', 'install_path' => APP_ROOT . '/apps/Manufacturing'],

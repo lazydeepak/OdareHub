@@ -2,6 +2,28 @@
 
 ## Decision Log
 
+### 2026-10-16 — OH-AUTO2-111 disable unsafe Material aggregate
+
+**Status:** Accepted — immediate fail-closed containment
+
+The `manufacturing.me.material_summary` hook and trusted capability descriptor
+are removed from executable Manufacturing `/me` metadata. The provider source
+and `summaryReadOnly()` remain preserved for traceability and future review,
+but the governed registry cannot discover, admit, load, or invoke the
+whole-domain aggregate. Six navigation capabilities remain unchanged. Record-
+scoped aggregation is deferred to a separately authorized owner contract.
+
+### 2026-10-16 — OH-AUTO2-111 disable unsafe Material aggregate
+
+**Status:** Accepted — immediate fail-closed containment
+
+The `manufacturing.me.material_summary` hook and trusted capability descriptor
+are removed from executable Manufacturing `/me` metadata. The provider source
+and `summaryReadOnly()` remain preserved for future separately authorized work,
+but the governed registry cannot discover/admit/load/invoke the aggregate.
+Six navigation capabilities remain unchanged. No record-scope redesign is
+introduced in this containment milestone.
+
 ### 2026-10-16 — OH-AUTO2-109 bounded Material summary extraction
 
 **Status:** Accepted — one aggregate contribution admitted

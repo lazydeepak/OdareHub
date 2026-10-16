@@ -1,5 +1,15 @@
 # Platform — Decisions
 
+### 2026-10-16 — OH-AUTO2-111 missing-capability containment
+
+**Status:** Accepted — fail closed before provider loading
+
+The unsafe Material aggregate is contained by removing its trusted owner
+metadata, not by weakening or special-casing Platform admission. Missing
+capability evidence remains a pre-load rejection. The existing aggregate
+admission shape is retained only as a future contract surface; no provider is
+currently authorized under it.
+
 ### 2026-10-16 — OH-AUTO2-109 aggregate capability contract
 
 **Status:** Accepted — explicit bounded aggregate shape
