@@ -143,6 +143,22 @@ transaction mechanism or Core change was introduced.
 Evidence: isolated source/instrumentation proof, 24/24 assertions; live
 database failure and concurrency behavior remain unverified.
 
+### 2026-10-17 — OH-AUTO2-127R receipt posting transaction reconciliation
+
+**Status:** Accepted for bounded correction — DDL and snapshot hazards removed
+
+Because `AuditLogService::logEvent()` re-enters DDL-capable
+`ensureSchema()`, `setReceiptStatus()` now explicitly initializes audit
+storage before beginning its business transaction. The preliminary receipt
+identity read also occurs before transaction start. After begin, the first
+database operation is the PO locking read; receipt identity and ownership are
+then revalidated with a receipt-row lock before any mutation. No Core change,
+global isolation change, nested transaction, or lifecycle-policy change was
+introduced.
+
+Evidence: source/call-graph and isolated instrumentation proof, 29/29
+assertions. Real database rollback and concurrency behavior remain unverified.
+
 ### YYYY-MM-DD — Decision title
 **Status:** Proposed / Accepted / Superseded
 

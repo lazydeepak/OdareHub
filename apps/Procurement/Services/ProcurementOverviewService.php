@@ -1140,22 +1140,31 @@ final class ProcurementOverviewService
             throw new \InvalidArgumentException('Unsupported receipt status transition.');
         }
 
+        // AuditLogService::logEvent() re-enters ensureSchema(). Complete that
+        // DDL-capable initialization before opening the business transaction
+        // so audit initialization cannot implicitly commit receipt changes.
+        AuditLogService::ensureSchema();
+
+        // Discover the PO outside the transaction. Once the transaction
+        // begins, its first database operation is the PO locking read rather
+        // than a non-locking consistent read that could establish a stale
+        // snapshot under MySQL REPEATABLE READ.
+        $identity = DB::fetchOne(
+            'SELECT po_id FROM procurement_receipts WHERE id=? LIMIT 1',
+            [$id]
+        );
+        if (!is_array($identity)) {
+            throw new \RuntimeException('Receipt not found.');
+        }
+        $discoveredPoId = self::normalizeReceiptPurchaseOrderId($identity['po_id'] ?? null);
+
         $db = DB::conn();
         $db->begin_transaction();
         try {
-            // Read the identity first, then lock the PO before locking the
-            // receipt row. This matches createReceipt()'s PO-first ordering
-            // and avoids a receipt-row/PO-row lock inversion.
-            $identity = DB::fetchOne(
-                'SELECT po_id FROM procurement_receipts WHERE id=? LIMIT 1',
-                [$id]
-            );
-            if (!is_array($identity)) {
-                throw new \RuntimeException('Receipt not found.');
-            }
-
-            $poId = self::normalizeReceiptPurchaseOrderId($identity['po_id'] ?? null);
-            self::assertPurchaseOrderExists($poId);
+            // Lock the discovered PO before locking the receipt row. This
+            // matches createReceipt()'s PO-first ordering and avoids a
+            // receipt-row/PO-row lock inversion.
+            self::assertPurchaseOrderExists($discoveredPoId);
 
             // Revalidate both receipt identity and PO ownership while the PO
             // lock is held, immediately before any mutation.
@@ -1167,9 +1176,10 @@ final class ProcurementOverviewService
                 throw new \RuntimeException('Receipt not found.');
             }
             $lockedPoId = self::normalizeReceiptPurchaseOrderId($before['po_id'] ?? null);
-            if ($lockedPoId !== $poId) {
+            if ($lockedPoId !== $discoveredPoId) {
                 throw new \RuntimeException('Receipt purchase order changed during posting.');
             }
+            $poId = $lockedPoId;
 
             DB::query(
                 'UPDATE procurement_receipts SET receipt_status=?, updated_at=NOW(), created_by=COALESCE(created_by, ?) WHERE id=? LIMIT 1',

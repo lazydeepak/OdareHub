@@ -123,6 +123,18 @@ State the current verified objective.
   update, audit, and recomputation failures rolling back. No database, SQL,
   browser, activation, or deployment operation was used.
 
+## 2026-10-17 — OH-AUTO2-127R receipt posting reconciliation
+
+- [x] Confirmed the prior implementation left audit DDL reachable through
+  `AuditLogService::logEvent()` inside the transaction and performed the first
+  receipt identity read after transaction start.
+- [x] Moved explicit audit initialization before transaction start and moved
+  preliminary receipt-to-PO discovery outside the transaction. The transaction
+  now begins with PO `FOR UPDATE`, then receipt-row `FOR UPDATE` revalidation,
+  update, audit, recomputation, and one commit/rollback boundary.
+- [x] Strengthened the source/call-graph and instrumentation proof to **29/29**;
+  no database, SQL, browser, activation, or deployment operation was used.
+
 ## In Progress
 
 - [x] OH-AUTO1-018 — Corrected misplaced receipt-line validation in `ProcurementOverviewService::createOrder()` and added `probe_order_receipt_method_boundaries.php`.

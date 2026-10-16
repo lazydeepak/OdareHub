@@ -12,8 +12,10 @@ declare(strict_types=1);
 $root = dirname(__DIR__, 3);
 $servicePath = $root . '/apps/Procurement/Services/ProcurementOverviewService.php';
 $controllerPath = $root . '/apps/Procurement/Controllers/ProcurementDashboardController.php';
+$auditPath = $root . '/app/Core/AuditLogService.php';
 $source = (string)file_get_contents($servicePath);
 $controller = (string)file_get_contents($controllerPath);
+$auditSource = (string)file_get_contents($auditPath);
 $start = strpos($source, 'public static function setReceiptStatus(');
 $end = strpos($source, '    private static function recomputeOrderStatusFromReceipts', $start === false ? 0 : $start);
 $method = $start !== false && $end !== false ? substr($source, $start, $end - $start) : '';
@@ -34,7 +36,7 @@ $check($position('begin_transaction()') !== false, 'posting begins an explicit t
 $check($position('$db->commit()') !== false, 'posting commits explicitly');
 $check($position('$db->rollback()') !== false, 'posting rolls back explicitly');
 $check($position('SELECT po_id FROM procurement_receipts') !== false, 'posting establishes linked PO identity');
-$check($position('self::assertPurchaseOrderExists($poId)') !== false, 'posting locks and validates the linked PO');
+$check($position('self::assertPurchaseOrderExists($discoveredPoId)') !== false, 'posting locks and validates the linked PO');
 $check($position('FOR UPDATE') !== false, 'posting revalidates and locks the receipt row');
 $check($position('UPDATE procurement_receipts SET receipt_status') !== false, 'receipt status update remains present');
 $check($position('self::recordAudit(') !== false, 'receipt audit remains inside posting method');
@@ -46,17 +48,25 @@ $check($position('rollback();') !== false, 'downstream failures trigger rollback
 
 $begin = $position('$db->begin_transaction()');
 $identity = $position('SELECT po_id FROM procurement_receipts');
-$poLock = $position('self::assertPurchaseOrderExists($poId)');
+$poLock = $position('self::assertPurchaseOrderExists($discoveredPoId)');
 $receiptLock = $position('FOR UPDATE');
 $update = $position('UPDATE procurement_receipts SET receipt_status');
 $audit = $position('self::recordAudit(');
 $recompute = $position('self::recomputeOrderStatusFromReceipts($poId, $actor)');
 $commit = $position('$db->commit()');
 $rollback = $position('$db->rollback()');
-$check($begin < $identity && $identity < $poLock && $poLock < $receiptLock, 'PO lock precedes receipt-row lock');
+
+$auditEnsure = $position('AuditLogService::ensureSchema()');
+$check($auditEnsure !== false, 'audit initialization remains explicit');
+$check($auditEnsure !== false && $auditEnsure < $begin, 'audit initialization precedes transaction start');
+$check($auditEnsure !== false && substr_count(substr($method, $begin), 'AuditLogService::ensureSchema()') === 0, 'no audit initialization remains inside transaction');
+$check(str_contains($auditSource, 'self::ensureSchema();'), 'audit log call graph re-enters schema initialization');
+$check(str_contains($auditSource, 'CREATE TABLE IF NOT EXISTS audit_activity_log'), 'audit initialization is DDL-capable');
+
+$check($identity < $begin && $begin < $poLock && $poLock < $receiptLock, 'preliminary identity read is outside transaction and PO lock is first inside');
 $check($receiptLock < $update && $update < $audit && $audit < $recompute && $recompute < $commit, 'update, audit, recomputation, and commit are ordered atomically');
 $check($rollback > $recompute, 'rollback covers downstream audit/recompute failures');
-$check(!str_contains($method, 'ensureSchema()'), 'posting does not add schema provisioning');
+$check($auditEnsure !== false && substr_count(substr($method, $begin), 'AuditLogService::ensureSchema()') === 0, 'posting transaction body has no audit schema initialization');
 $check(str_contains($controller, "ProcurementOverviewService::setReceiptStatus(") && str_contains($controller, "'posted'"), 'controller keeps existing posting dispatch');
 
 $spy = ['events' => [], 'committed' => false, 'rolled_back' => false];

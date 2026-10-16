@@ -52,6 +52,17 @@ proof passes **24/24**, including simulated update, audit, and recomputation
 rollback cases. No database, SQL, schema, browser, Core, activation,
 deployment, Material, SBAIO, or OH-AUTO2-105B operation occurred.
 
+## Session Summary (2026-10-17) — OH-AUTO2-127R Procurement receipt posting reconciliation
+
+Reconciled both transaction hazards identified after OH-AUTO2-127. Audit
+schema initialization now completes before the receipt-posting transaction,
+and preliminary receipt-to-PO discovery now occurs before transaction start.
+The transaction begins with PO locking, revalidates the receipt row and PO
+ownership under lock, then performs update, audit, recomputation, and one
+commit/rollback boundary. Strengthened proof passes **29/29**. No database,
+SQL, schema, browser, Core, activation, deployment, Material, SBAIO, or
+OH-AUTO2-105B operation occurred.
+
 ## Session Summary (2026-10-16) — OH-AUTO2-122 Procurement write authorization
 
 Closed the nine missing direct controller app-access checks. All 12 Procurement
