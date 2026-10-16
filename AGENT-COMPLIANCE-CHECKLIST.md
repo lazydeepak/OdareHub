@@ -1,5 +1,43 @@
 # AGENT-COMPLIANCE-CHECKLIST
 
+## Session Summary (2026-10-16) — OH-AUTO2-107 governed `/me` provider admission
+
+Implemented the bounded non-Core admission foundation authorized by the
+Planner. `HostProviderAdmissionService` is Platform-owned; Base retains
+discovery, execution, normalization, ordering, route checks, and exception
+isolation. Admission runs before `/me` provider file loading.
+
+Added version-controlled descriptors to Manufacturing, SBAIO, and Studio
+manifests for six navigation-only providers. Summary, monitoring,
+personnel/payroll, watchlist, and other operational callbacks remain
+unadmitted and fail closed. Descriptor declarations are not treated as proof
+of non-mutation; static review and isolated behavioral tests remain required.
+
+Validation: admission **9/9**; actual approved-provider inventory/order
+**7/7**; OH-AUTO2-103 containment **15/15**; OH-AUTO2-105 authorization
+**12/12**; PHP lint; manifest JSON validation; diff hygiene. No Core, schema,
+route, database, browser, activation, deployment, or SBAIO restoration work.
+
+## Session Summary (2026-10-16) — OH-AUTO2-106 Host-provider capability governance audit
+
+Completed the authorized read-only design audit in
+`docs/architecture/oh-auto2-106-host-provider-capability-governance-audit-2026-10-16.md`.
+The audit traced manifest and `core_app_hooks` registration, Shell/Base dynamic
+loading, operator/module provider paths, existing app/module and route
+authority, and Manufacturing/SBAIO/Hospitality/Studio provider compatibility.
+
+Findings: current unrestricted callbacks are executable metadata, not proven
+capability evidence. OH-AUTO2-103 restricted `/me` containment and OH-AUTO2-105
+owner checks remain valid but do not establish callback non-mutation,
+record-level scope, exact method allowlists, or complete loader coverage.
+
+Validation: isolated host containment **15/15**; isolated provider scope
+authorization **12/12**; PHP lint for audited registry/provider files; no
+application bootstrap, database connection, SQL, schema, activation, browser,
+deployment, commit, or push. Existing lifecycle logs and PHPUnit cache remain
+preserved. Final classification at audit completion was **REQUIRES
+ARCHITECTURAL DECISION**; Planner approval subsequently authorized OH-AUTO2-107.
+
 ## Incident Reconciliation (2026-10-16) — OH-AUTO2-105R
 
 The earlier OH-AUTO2-105 entry below incorrectly stated that no database
@@ -18,8 +56,9 @@ available repository evidence. Therefore persistent impact is **undetermined**.
 No cleanup, SQL, migration, repair, restart, or DB-backed rerun was performed
 during the reconciliation. Modified lifecycle logs and the untracked PHPUnit
 cache remain preserved. No remediation is claimed. A separately authorized
-database assessment/restoration decision is required before OH-AUTO2-105 can
-be closed or OH-AUTO2-106 can begin.
+database assessment/restoration decision is still required before
+OH-AUTO2-105 can be closed; OH-AUTO2-107 remains independent and did not
+reopen OH-AUTO2-105B.
 
 ## Session Summary (2026-10-16) — OH-AUTO2-105S DB-backed probe execution safeguard
 

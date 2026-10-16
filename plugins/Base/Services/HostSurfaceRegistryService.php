@@ -4,6 +4,9 @@ declare(strict_types=1);
 namespace Plugins\Base\Services;
 
 use App\Core\DB;
+use Apps\Platform\Services\HostProviderAdmissionService;
+
+require_once dirname(__DIR__, 3) . '/apps/Platform/Services/HostProviderAdmissionService.php';
 
 final class HostSurfaceRegistryService
 {
@@ -105,6 +108,13 @@ final class HostSurfaceRegistryService
             [$class, $method] = explode('::', $provider, 2);
             if ($class === '' || $method === '') {
                 continue;
+            }
+
+            if (strtolower($surface) === 'me') {
+                $admission = HostProviderAdmissionService::admit($row, $payload, $surface, $context);
+                if (!(bool)($admission['allowed'] ?? false)) {
+                    continue;
+                }
             }
 
             try {

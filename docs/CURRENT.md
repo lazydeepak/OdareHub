@@ -95,6 +95,13 @@ Evidence for the completed milestones is recorded in:
 - OH-AUTO2-105S — the unguarded SBAIO DB-backed probe now requires the existing
   disposable entry-point attestation before any application autoload/bootstrap;
   the isolated source-root inventory contains 29 governed DB entry points.
+- OH-AUTO2-106 — the independent, non-database host-provider capability
+  governance design audit was accepted by Planner. Its findings authorize the
+  bounded OH-AUTO2-107 implementation; OH-AUTO2-105B remains blocked.
+- OH-AUTO2-107 — the bounded Platform-owned `/me` provider admission
+  foundation is implemented. Six navigation-only providers are admitted from
+  version-controlled app manifests; unsupported operational callbacks fail
+  closed before provider loading. No Core or database change was made.
 
 After the release/update cycle is proven, resume the product roadmap focus from
 `README.md`:

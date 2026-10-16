@@ -30,13 +30,27 @@ namespace App\Core {
 }
 
 namespace {
+    final class HostContainmentPolicy
+    {
+        public function isAppEnabled(string $appKey): bool { return $appKey === 'safe_app'; }
+        public function canAccessModule(?array $user, string $moduleKey): bool { return true; }
+        public function routeAccessDecision(?array $user, string $path, string $method = 'GET'): array { return ['allowed' => true]; }
+    }
+
+    $hostContainmentPolicy = new HostContainmentPolicy();
+    function platform_user_access_policy_contract(): HostContainmentPolicy
+    {
+        global $hostContainmentPolicy;
+        return $hostContainmentPolicy;
+    }
+
     $root = sys_get_temp_dir() . '/oh-auto2-103-host-containment-' . bin2hex(random_bytes(5));
     mkdir($root . '/providers', 0700, true);
     $safeMarker = $root . '/safe.invoked';
     $failingMarker = $root . '/failing.invoked';
 
     $cleanup = static function () use ($root, $safeMarker, $failingMarker): void {
-        foreach ([$root . '/providers/SafeProvider.php', $root . '/providers/FailingProvider.php', $safeMarker, $failingMarker] as $path) {
+        foreach ([$root . '/providers/SafeProvider.php', $root . '/providers/FailingProvider.php', $root . '/manifest.json', $safeMarker, $failingMarker] as $path) {
             if (is_file($path)) {
                 unlink($path);
             }
@@ -61,6 +75,45 @@ final class SafeProvider
     }
 }
 PHP);
+
+    file_put_contents($root . '/manifest.json', json_encode([
+        'id' => 'safe_app',
+        'app_key' => 'safe_app',
+        'host_provider_capabilities' => [
+            [
+                'key' => 'safe.me',
+                'owner_app' => 'safe_app',
+                'provider' => 'FixtureOHAuto2103\\SafeProvider::contribute',
+                'provider_file' => 'providers/SafeProvider.php',
+                'surface' => 'me',
+                'region' => 'summary_cards',
+                'required_app_authority' => 'existing_app_assignment',
+                'effect' => 'read_only_navigation',
+                'record_scope' => 'route_authority_only',
+                'record_authorization' => 'route_authority',
+                'output' => 'navigation_items',
+                'failure_behavior' => 'suppress',
+                'review' => ['static' => 'approved', 'isolated' => 'approved'],
+                'enabled' => true,
+            ],
+            [
+                'key' => 'failing.me',
+                'owner_app' => 'safe_app',
+                'provider' => 'FixtureOHAuto2103\\FailingProvider::contribute',
+                'provider_file' => 'providers/FailingProvider.php',
+                'surface' => 'me',
+                'region' => 'summary_cards',
+                'required_app_authority' => 'existing_app_assignment',
+                'effect' => 'read_only_navigation',
+                'record_scope' => 'route_authority_only',
+                'record_authorization' => 'route_authority',
+                'output' => 'navigation_items',
+                'failure_behavior' => 'suppress',
+                'review' => ['static' => 'approved', 'isolated' => 'approved'],
+                'enabled' => true,
+            ],
+        ],
+    ], JSON_THROW_ON_ERROR));
     file_put_contents($root . '/providers/FailingProvider.php', <<<'PHP'
 <?php
 namespace FixtureOHAuto2103;
@@ -91,7 +144,7 @@ PHP);
             'install_path' => $root,
         ],
         [
-            'app_key' => 'failing_app',
+            'app_key' => 'safe_app',
             'hook_key' => 'failing.me',
             'payload_json' => json_encode([
                 'surface' => 'me',
@@ -116,8 +169,8 @@ PHP);
         $reflection = new \ReflectionClass(\Apps\Shell\Composers\AdminSurfaceComposer::class);
         $instance = $reflection->newInstanceWithoutConstructor();
         foreach ([
-            'user' => [],
-            'ctx' => ['_scope_preflight_state' => $state],
+            'user' => ['id' => 7, 'authority_role' => 'platform_admin'],
+            'ctx' => ['_scope_preflight_state' => $state, 'authority_role' => 'platform_admin', 'active_assigned_apps' => ['safe_app']],
             'query' => [],
             'hostProvidersAllowed' => $allowed,
         ] as $property => $value) {

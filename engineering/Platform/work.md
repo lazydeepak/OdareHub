@@ -45,6 +45,26 @@ remain disabled.
 
 Release/update foundation governance and controlled-cycle readiness.
 
+## 2026-10-16 — OH-AUTO2-107 governed `/me` provider admission foundation
+
+- [x] Added Platform-owned `HostProviderAdmissionService` with trusted
+  app-manifest descriptor validation before provider file loading.
+- [x] Bound admission to exact owner app, canonical confined provider file,
+  class/method declaration, `/me` surface/region, existing app assignment and
+  Platform app/module authority, route-only scope, output, failure, and review
+  evidence.
+- [x] Admitted only six navigation-only providers across Manufacturing, SBAIO,
+  and Studio. Operational summaries, monitoring, personnel/payroll, watchlists,
+  and unsupported callbacks fail closed.
+- [x] Preserved Base registry ordering, normalization, route filtering,
+  exception isolation, and all non-`/me` host surfaces.
+- [x] Verification: admission **9/9**, actual provider inventory **7/7**,
+  containment **15/15**, host authorization **12/12**, PHP lint, and manifest
+  JSON validation. No Core, schema, database, route, browser, activation, or
+  deployment operation.
+- [!] Descriptor read-only declarations remain necessary evidence only; OH-AUTO2-108
+  must migrate additional providers with dependency and record-scope proof.
+
 ## 2026-10-16 — OH-AUTO2-100 restricted My Work non-mutating preflight
 
 - [x] Added the Platform-facing read-only context contract and Base adapter

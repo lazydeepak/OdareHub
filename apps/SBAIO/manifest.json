@@ -159,6 +159,42 @@
       "order": 105
     }
   ],
+  "host_provider_capabilities": [
+    {
+      "key": "sbaio.me.header_actions",
+      "owner_app": "sbaio",
+      "provider": "Apps\\SBAIO\\Services\\HostSurfaceContributionService::contribute",
+      "provider_file": "Services/HostSurfaceContributionService.php",
+      "surface": "me",
+      "region": "header_actions",
+      "required_modules": [],
+      "required_app_authority": "existing_app_assignment",
+      "effect": "read_only_navigation",
+      "record_scope": "route_authority_only",
+      "record_authorization": "route_authority",
+      "output": "navigation_items",
+      "failure_behavior": "suppress",
+      "review": {"static": "approved", "isolated": "approved"},
+      "enabled": true
+    },
+    {
+      "key": "sbaio.me.quick_links",
+      "owner_app": "sbaio",
+      "provider": "Apps\\SBAIO\\Services\\HostSurfaceContributionService::contribute",
+      "provider_file": "Services/HostSurfaceContributionService.php",
+      "surface": "me",
+      "region": "quick_links",
+      "required_modules": [],
+      "required_app_authority": "existing_app_assignment",
+      "effect": "read_only_navigation",
+      "record_scope": "route_authority_only",
+      "record_authorization": "route_authority",
+      "output": "navigation_items",
+      "failure_behavior": "suppress",
+      "review": {"static": "approved", "isolated": "approved"},
+      "enabled": true
+    }
+  ],
   "routes": [
     {
       "path": "/apps/sbaio"

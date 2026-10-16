@@ -6,6 +6,33 @@ OH-AUTO1-094 Processing authority closure is complete. Shell remains the
 generic operator composition and rendering boundary; Manufacturing owns lane
 authority and data projection.
 
+## 2026-10-16 — OH-AUTO2-107 `/me` admission integration
+
+- [x] Base `/me` host registry now consults the Platform admission boundary
+  before requiring provider files or invoking callbacks.
+- [x] Non-`/me` host surfaces retain their existing discovery and execution
+  behavior; Shell preflight suppression remains unchanged.
+- [x] Existing containment proof remains **15/15** and actual approved provider
+  loading/order proof is **7/7**. No Shell runtime renderer or route behavior
+  was changed.
+
+## 2026-10-16 — OH-AUTO2-106 host-provider capability governance audit
+
+- [x] Traced the admin `/me` registry, operator manifest registry, legacy module
+  widget loader, manifest persistence path, provider loading, callback
+  resolution, output normalization, and route filtering without application
+  bootstrap or database access.
+- [x] Confirmed OH-AUTO2-103 restricted containment and OH-AUTO2-105 owner
+  authorization are bounded safeguards, not a complete provider capability or
+  read-only execution contract.
+- [x] Recorded the proposed descriptor/admission contract, provider matrix,
+  future file surface, regression proof, and required Planner decisions in
+  `docs/architecture/oh-auto2-106-host-provider-capability-governance-audit-2026-10-16.md`.
+- [x] Isolated verification: containment **15/15**, provider authorization
+  **12/12**, PHP lint pass. No implementation, Core change, database, route,
+  activation, browser, deployment, commit, or push.
+- [!] Final classification: **REQUIRES ARCHITECTURAL DECISION**.
+
 ## 2026-10-16 — OH-AUTO2-103 restricted host-surface containment
 
 - [x] `AdminLayerService` passes the existing preflight admission decision to

@@ -1,5 +1,19 @@
 # Platform — Decisions
 
+### 2026-10-16 — OH-AUTO2-107 bounded `/me` provider admission
+**Status:** Implemented — first-phase admission only
+
+Platform owns capability admission while Base retains host-provider discovery,
+execution, normalization, ordering, route filtering, and exception isolation.
+Version-controlled application manifest descriptors bind trusted owner,
+provider file, class, method, surface, authority, scope, output, failure, and
+review evidence. Missing or conflicting descriptors fail closed before PHP
+provider loading. The first phase admits only six navigation-only `/me`
+providers; operational providers remain unadmitted pending scope and read-safety
+proof. Descriptor read-only claims never independently prove non-mutation.
+
+No Core, schema, or database change is permitted by this decision.
+
 ### 2026-10-15 — OH-AUTO1-080 final disposable release-cycle safety closure
 **Status:** Accepted as complete disposable-only proof; production remains gated
 

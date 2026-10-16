@@ -35,7 +35,8 @@
 - [x] Static/configuration-only proof passes **65/65**; isolated source-root
   proof passes **17/17**. No DB-backed probe was executed.
 - [!] The affected database remains unassessed and unchanged by this work;
-  OH-AUTO2-105 remains open and OH-AUTO2-106 remains deferred.
+  OH-AUTO2-105 remains open. OH-AUTO2-106 proceeded independently as a
+  non-database provider-governance design audit; it did not reopen 105B.
 
 ## Current Focus
 

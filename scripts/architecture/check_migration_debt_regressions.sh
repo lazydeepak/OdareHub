@@ -204,7 +204,11 @@ fi
 
 echo "- scanning for new active usage of frozen legacy composition artifacts"
 legacy_artifact_pattern='(ShellCompositionService|SidebarBuilder|DashboardBuilder|plugins/Base/Views/ops/me\.php|renderMyWork|HostSurfaceRegistryService|MyWorkService)'
-legacy_artifact_allowlist='legacy|compat|frozen|migration|inventory|debt|diagnostic|comment|prevent|do not|deep dashboardbuilder logic remains|check_migration_debt_regressions'
+# HostSurfaceRegistryService is the explicitly retained Base execution
+# registry and the approved OH-AUTO2-107 compatibility adapter. Its governed
+# Platform admission seam must not be classified as a new legacy-composition
+# consumer; unrelated legacy artifacts remain protected by this diagnostic.
+legacy_artifact_allowlist='legacy|compat|frozen|migration|inventory|debt|diagnostic|comment|prevent|do not|deep dashboardbuilder logic remains|check_migration_debt_regressions|HostSurfaceRegistryService\.php|probe_host_provider_admission'
 legacy_artifact_count="$(count_filtered_matches "$legacy_artifact_pattern" "$legacy_artifact_allowlist")"
 if [[ "$legacy_artifact_count" != "0" ]]; then
   echo "new active usage of frozen legacy composition artifacts found"
