@@ -1,5 +1,18 @@
 # AGENT-COMPLIANCE-CHECKLIST
 
+## Session Summary (2026-10-16) — OH-AUTO2-115 recent-activity extraction
+
+Extracted recent-activity data construction from `OperatorSurfaceComposer` into
+the focused Shell-owned `OperatorRecentActivityComposer`. The existing
+actor-email restriction, SQL predicates, ordering, 200-row limit, entity lookup
+queries, cache, localization, date handling, fallback behavior, and
+`Views/operator/recent.php` payload contract are preserved.
+
+Added an isolated fake-query/translation/rendering probe with **16/16**
+assertions. No Core, database, SQL execution, schema, route, authorization,
+browser, activation, deployment, Manufacturing, Material, SBAIO, or
+OH-AUTO2-105B changes were made.
+
 ## Session Summary (2026-10-16) — OH-AUTO2-114 Shell account-panel extraction
 
 Extracted the existing operator account-panel data construction from

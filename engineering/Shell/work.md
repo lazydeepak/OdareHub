@@ -6,6 +6,15 @@ OH-AUTO1-094 Processing authority closure is complete. Shell remains the
 generic operator composition and rendering boundary; Manufacturing owns lane
 authority and data projection.
 
+## 2026-10-16 — OH-AUTO2-115 recent-activity extraction
+
+- [x] Extracted recent-activity data construction, date formatting, and cached
+  entity summaries into `OperatorRecentActivityComposer`.
+- [x] Preserved the actor-email predicate, query ordering/limit, localization,
+  fallback behavior, entity lookup shape, and existing view payload.
+- [x] Isolated fake-query/translation/rendering parity probe passes **16/16**;
+  no database, browser, or runtime activation was used.
+
 ## 2026-10-16 — OH-AUTO2-114 account-panel extraction
 
 - [x] Extracted only `OperatorSurfaceComposer::buildAccountPanelData()` into
