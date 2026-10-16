@@ -44,7 +44,7 @@ final class ProcurementDashboardController
             'rows' => ProcurementOverviewService::latestOrders(40),
             'summary' => ProcurementOverviewService::summary(),
             'suppliers' => ProcurementOverviewService::eligibleSupplierOptions(120),
-            'requests' => ProcurementOverviewService::latestRequests(120),
+            'requests' => ProcurementOverviewService::eligibleRequestOptions(120),
             'message' => (string)($_GET['ok'] ?? ''),
             'error' => (string)($_GET['err'] ?? ''),
         ]);

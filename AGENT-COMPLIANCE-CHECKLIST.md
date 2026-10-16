@@ -1,5 +1,16 @@
 # AGENT-COMPLIANCE-CHECKLIST
 
+## Session Summary (2026-10-16) — OH-AUTO2-121 manual request-link integrity
+
+Reused the existing approved-request conversion contract for manual PO links:
+requests must exist, be approved, and have no existing PO. Manual standalone
+orders remain permitted. Manual creation now locks and validates linked
+requests inside its existing transaction before PO, line, request-status, or
+audit mutation. Added `eligibleRequestOptions()` for the order form only;
+historical request listings remain unchanged. Isolated proof passes **26/26**.
+No database, SQL, schema, browser, Core, route, activation, deployment,
+Material, SBAIO, or OH-AUTO2-105B operation occurred.
+
 ## Session Summary (2026-10-16) — OH-AUTO2-120 eligible supplier selection
 
 Added the Procurement-owned `eligibleSupplierOptions()` source for new order

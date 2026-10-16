@@ -34,6 +34,18 @@ State the current verified objective.
 - [x] Isolated selection/source/rendering contract proof passes **16/16**; no
   database, SQL, browser, activation, or deployment operation was used.
 
+## 2026-10-16 — OH-AUTO2-121 manual request-link integrity
+
+- [x] Confirmed the existing approved-request conversion contract: linked
+  requests must be approved, must exist, and may have only one purchase order;
+  conversion already locks the request row before checking linkage.
+- [x] Applied the same validation and row-lock boundary inside manual order
+  creation. Standalone orders with no request retain their existing behavior.
+- [x] Added `eligibleRequestOptions()` for the manual order form only; request
+  history listings remain unrestricted and the empty standalone option remains.
+- [x] Isolated linkage/transaction/source proof passes **26/26**; no database,
+  SQL, browser, activation, or deployment operation was used.
+
 ## In Progress
 
 - [x] OH-AUTO1-018 — Corrected misplaced receipt-line validation in `ProcurementOverviewService::createOrder()` and added `probe_order_receipt_method_boundaries.php`.

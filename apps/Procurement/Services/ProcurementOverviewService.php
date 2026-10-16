@@ -124,6 +124,32 @@ final class ProcurementOverviewService
     }
 
     /**
+     * Requests eligible for a new manual purchase-order linkage.
+     *
+     * Historical/request-workflow listings continue to use latestRequests().
+     * This source excludes non-approved requests and requests already linked
+     * to a purchase order before ordering and applying the result limit.
+     *
+     * @return array<int,array<string,mixed>>
+     */
+    public static function eligibleRequestOptions(int $limit = 120): array
+    {
+        if (!self::tableExists('procurement_requests') || !self::tableExists('procurement_purchase_orders')) {
+            return [];
+        }
+
+        return DB::fetchAll(
+            "SELECT r.id, r.request_ref, r.product_id, r.requested_qty, r.needed_date, r.request_status, r.created_at
+             FROM procurement_requests r
+             LEFT JOIN procurement_purchase_orders po ON po.request_id = r.id
+             WHERE LOWER(COALESCE(r.request_status, 'draft')) = 'approved'
+               AND po.id IS NULL
+             ORDER BY r.id DESC
+             LIMIT " . max(1, (int)$limit)
+        );
+    }
+
+    /**
      * @return array<int,array<string,mixed>>
      */
     public static function latestOrders(int $limit = 20): array
@@ -640,6 +666,8 @@ final class ProcurementOverviewService
             $poRef = self::nextRef('PO');
         }
 
+        $requestId = self::toPositiveInt($input['request_id'] ?? null);
+
         // Validate the selected supplier before schema access, transaction
         // opening, or any order/request/audit mutation. A null supplier keeps
         // the established automatic/omitted supplier behavior.
@@ -648,13 +676,14 @@ final class ProcurementOverviewService
         $db = DB::conn();
         $db->begin_transaction();
         try {
+            self::assertManualOrderRequestEligible($requestId);
             DB::query(
                 'INSERT INTO procurement_purchase_orders (po_ref, supplier_id, request_id, po_status, order_date, expected_date, created_by)
                  VALUES (?,?,?,?,?,?,?)',
                 [
                     $poRef,
                     self::toPositiveInt($input['supplier_id'] ?? null),
-                    self::toPositiveInt($input['request_id'] ?? null),
+                    $requestId,
                     self::nullIfBlank((string)($input['po_status'] ?? 'draft')) ?? 'draft',
                     self::nullIfBlank((string)($input['order_date'] ?? '')),
                     self::nullIfBlank((string)($input['expected_date'] ?? '')),
@@ -663,7 +692,6 @@ final class ProcurementOverviewService
             );
 
             $poId = (int)($db->insert_id ?: 0);
-            $requestId = self::toPositiveInt($input['request_id'] ?? null);
             $orderedQty = round(max(0.0, (float)($input['ordered_qty'] ?? 0)), 2);
             if ($poId > 0 && $orderedQty > 0) {
                 DB::query(
@@ -708,6 +736,57 @@ final class ProcurementOverviewService
             $db->rollback();
             throw $e;
         }
+    }
+
+    /**
+     * Validate and lock a manually linked request inside the active order
+     * transaction. The optional readers exist only for isolated verification.
+     *
+     * @param null|callable(int):array<string,mixed>|false|null $requestReader
+     * @param null|callable(int):array<string,mixed>|false|null $existingPoReader
+     * @return null|array<string,mixed>
+     */
+    public static function assertManualOrderRequestEligible(
+        ?int $requestId,
+        ?callable $requestReader = null,
+        ?callable $existingPoReader = null
+    ): ?array {
+        if ($requestId === null || $requestId <= 0) {
+            return null;
+        }
+
+        $readRequest = $requestReader ?? static fn(int $id) => DB::fetchOne(
+            'SELECT id, request_ref, request_status
+             FROM procurement_requests
+             WHERE id=?
+             LIMIT 1
+             FOR UPDATE',
+            [$id]
+        );
+        $request = $readRequest($requestId);
+        if (!is_array($request)) {
+            throw new \RuntimeException('Request not found.');
+        }
+
+        $requestRef = trim((string)($request['request_ref'] ?? ''));
+        if ($requestRef === '') {
+            $requestRef = '#' . (string)$requestId;
+        }
+        $status = strtolower(trim((string)($request['request_status'] ?? 'draft')));
+        if ($status !== 'approved') {
+            throw new \RuntimeException('Request ' . $requestRef . ' is currently "' . $status . '". Only approved requests can be linked to a PO.');
+        }
+
+        $readExistingPo = $existingPoReader ?? static fn(int $id) => DB::fetchOne(
+            'SELECT id FROM procurement_purchase_orders WHERE request_id=? LIMIT 1',
+            [$id]
+        );
+        $existingPo = $readExistingPo($requestId);
+        if (is_array($existingPo) && (int)($existingPo['id'] ?? 0) > 0) {
+            throw new \RuntimeException('Request ' . $requestRef . ' already has a purchase order.');
+        }
+
+        return $request;
     }
 
     /**

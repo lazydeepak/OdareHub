@@ -37,6 +37,22 @@ rendering. Historical order queries and supplier lifecycle data are unchanged.
 
 Evidence: isolated selection/source/rendering probe, 16/16 assertions.
 
+### 2026-10-16 — OH-AUTO2-121 manual request-link integrity
+
+**Status:** Accepted — reuse approved-request conversion boundary
+
+Manual purchase orders may remain standalone when `request_id` is omitted. When
+linked to a request, the existing conversion contract governs: the request must
+exist, be `approved`, and have no existing purchase order. Manual creation now
+locks and validates that request inside its existing transaction before PO,
+line, request-status, or audit mutation. The manual selector uses a separate
+approved-and-unlinked source; historical request listings remain unchanged.
+`setRequestStatus()` was not changed globally, and no schema constraint or new
+status was introduced.
+
+Evidence: isolated linkage/transaction/source probe, 26/26 assertions. Database
+concurrency execution remains outside this assignment.
+
 ### YYYY-MM-DD — Decision title
 **Status:** Proposed / Accepted / Superseded
 
