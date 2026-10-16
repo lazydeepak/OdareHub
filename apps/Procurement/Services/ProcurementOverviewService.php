@@ -1080,6 +1080,43 @@ final class ProcurementOverviewService
         }
     }
 
+    /**
+     * Direct, controller-owned PO status transition boundary.
+     *
+     * Receipt-driven recomputation must not call this method because it already
+     * owns the surrounding transaction. That path uses setOrderStatus(), which
+     * remains a transaction-compatible internal update.
+     */
+    public static function setOrderStatusDirect(int $id, string $status, string $actor, string $note = ''): void
+    {
+        $id = (int)$id;
+        if ($id <= 0) {
+            throw new \InvalidArgumentException('Invalid order id.');
+        }
+
+        $status = self::normalizeOrderStatus($status);
+        // AuditLogService::logEvent() can initialize DDL on its first call;
+        // complete that before the business transaction begins.
+        AuditLogService::ensureSchema();
+
+        $db = DB::conn();
+        $db->begin_transaction();
+        try {
+            // The PO lock is the first business read and serializes this
+            // direct transition with receipt creation/posting.
+            self::assertPurchaseOrderExists($id);
+            self::setOrderStatus($id, $status, $actor, $note);
+            $db->commit();
+        } catch (\Throwable $e) {
+            $db->rollback();
+            throw $e;
+        }
+    }
+
+    /**
+     * Transaction-compatible PO status update used by receipt recomputation.
+     * The caller owns the surrounding transaction and PO-first lock.
+     */
     public static function setOrderStatus(int $id, string $status, string $actor, string $note = ''): void
     {
         $id = (int)$id;
@@ -1087,15 +1124,14 @@ final class ProcurementOverviewService
             throw new \InvalidArgumentException('Invalid order id.');
         }
 
-        $before = DB::fetchOne('SELECT po_status FROM procurement_purchase_orders WHERE id=? LIMIT 1', [$id]);
+        self::setOrderStatusWithinTransaction($id, self::normalizeOrderStatus($status), $actor, $note);
+    }
+
+    private static function setOrderStatusWithinTransaction(int $id, string $status, string $actor, string $note): void
+    {
+        $before = DB::fetchOne('SELECT po_status FROM procurement_purchase_orders WHERE id=? LIMIT 1 FOR UPDATE', [$id]);
         if (!is_array($before)) {
             throw new \RuntimeException('Order not found.');
-        }
-
-        $allowed = ['draft', 'approved', 'issued', 'partial', 'closed', 'cancelled'];
-        $status = strtolower(trim($status));
-        if (!in_array($status, $allowed, true)) {
-            throw new \InvalidArgumentException('Unsupported order status transition.');
         }
 
         if ($status === 'cancelled') {
@@ -1465,6 +1501,16 @@ final class ProcurementOverviewService
 
         if (!in_array($status, ['received', 'posted', 'cancelled'], true)) {
             throw new \InvalidArgumentException($errorMessage);
+        }
+
+        return $status;
+    }
+
+    private static function normalizeOrderStatus(string $status): string
+    {
+        $status = strtolower(trim($status));
+        if (!in_array($status, ['draft', 'approved', 'issued', 'partial', 'closed', 'cancelled'], true)) {
+            throw new \InvalidArgumentException('Unsupported order status transition.');
         }
 
         return $status;

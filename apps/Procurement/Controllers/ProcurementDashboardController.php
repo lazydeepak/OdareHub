@@ -244,7 +244,7 @@ final class ProcurementDashboardController
         }
 
         try {
-            ProcurementOverviewService::setOrderStatus($id, 'issued', (string)(Auth::user()['email'] ?? ''));
+            ProcurementOverviewService::setOrderStatusDirect($id, 'issued', (string)(Auth::user()['email'] ?? ''));
             self::redirect('/apps/procurement/orders', 'ok', 'Purchase order issued.');
         } catch (\Throwable $e) {
             self::redirect('/apps/procurement/orders', 'err', $e->getMessage());
@@ -261,7 +261,7 @@ final class ProcurementDashboardController
         }
 
         try {
-            ProcurementOverviewService::setOrderStatus($id, 'cancelled', (string)(Auth::user()['email'] ?? ''));
+            ProcurementOverviewService::setOrderStatusDirect($id, 'cancelled', (string)(Auth::user()['email'] ?? ''));
             self::redirect('/apps/procurement/orders', 'ok', 'Purchase order cancelled.');
         } catch (\Throwable $e) {
             self::redirect('/apps/procurement/orders', 'err', $e->getMessage());

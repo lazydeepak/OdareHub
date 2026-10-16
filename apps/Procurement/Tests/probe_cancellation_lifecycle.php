@@ -31,7 +31,7 @@ $audit["Downstream receipt guard for cancel"] = str_contains($service, 'Cannot c
 $checks = [
     "Route /apps/procurement/orders/cancel exists" => str_contains($routes, '/apps/procurement/orders/cancel'),
     "Controller cancelOrder exists" => str_contains($controller, 'function cancelOrder') || str_contains($controller, 'cancelOrder()'),
-    "Controller calls setOrderStatus with cancelled" => str_contains($controller, "'cancelled'") ? (str_contains($controller, 'setOrderStatus') ? true : false) : false,
+    "Controller calls direct PO transition with cancelled" => str_contains($controller, "'cancelled'") ? (str_contains($controller, 'setOrderStatusDirect') ? true : false) : false,
     "Orders view shows cancel form for non-cancelled" => (str_contains($orders, 'action="/apps/procurement/orders/cancel"') ? true : false),
     "No route change for receipt/request cancel (scope preserved)" => true,
     "Service rejects cancel with posted receipts" => str_contains($service, 'Cannot cancel purchase order with posted receipts.') ? true : false,

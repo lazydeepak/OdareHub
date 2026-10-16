@@ -141,6 +141,24 @@ State the current verified objective.
   before audit/schema setup, transaction opening, or receipt insertion; preserved
   the existing `received`/`posted`/`cancelled` contract and verified in isolation.
 
+- [x] OH-AUTO2-129 — direct PO issue/cancel transitions now use a bounded
+  Procurement transaction without changing receipt recomputation ownership.
+
+## 2026-10-17 — OH-AUTO2-129 direct PO transition integrity
+
+- [x] Confirmed the caller graph: issue/cancel controllers use the direct
+  transition entry point; receipt creation and posting retain internal
+  `setOrderStatus()` recomputation inside their existing transactions.
+- [x] Added the narrowly scoped direct boundary: audit initialization before
+  transaction start, PO-first `FOR UPDATE`, status-dependent checks, PO update,
+  audit, and one commit/rollback. The internal update opens no transaction and
+  performs no audit DDL setup.
+- [x] Preserved existing issue quantity, posted-receipt cancellation, status,
+  same-state audit, authorization, CSRF, receipt, supplier, linkage, and GET
+  readiness behavior.
+- [x] Isolated direct-transition proof passes **31/31**; no database, SQL,
+  browser, activation, or deployment operation was used.
+
 ## 2026-10-17 — OH-AUTO2-128 receipt-creation status integrity
 
 - [x] Confirmed the existing receipt status vocabulary is `received`, `posted`,

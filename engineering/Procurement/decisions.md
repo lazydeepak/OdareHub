@@ -175,6 +175,21 @@ permission, Core, or transaction policy changed.
 Evidence: isolated reflection/source-order proof, 32/32 assertions; no live
 database execution is claimed.
 
+### 2026-10-17 — OH-AUTO2-129 direct PO transition integrity
+
+**Status:** Accepted — direct issue/cancel operations own the transaction
+
+Controllers use `setOrderStatusDirect()` for direct issue/cancel requests. It
+validates the target status, initializes audit storage before the transaction,
+locks the PO first, performs the existing receipt/ordered-quantity checks,
+updates the PO, records audit, and commits or rolls back once. Receipt-driven
+recomputation continues using transaction-compatible `setOrderStatus()` and
+does not open a nested transaction. No new workflow, permission, quantity,
+receipt, supplier, linkage, route, Core, or schema policy was introduced.
+
+Evidence: isolated source/instrumentation proof, 31/31 assertions; live MySQL
+rollback and concurrency behavior remain unverified.
+
 ### YYYY-MM-DD — Decision title
 **Status:** Proposed / Accepted / Superseded
 

@@ -23,6 +23,17 @@ or PO recomputation. Isolated proof passes **32/32**. No database, SQL, schema,
 browser, Core, activation, deployment, Material, SBAIO, or OH-AUTO2-105B
 operation occurred.
 
+## Session Summary (2026-10-17) — OH-AUTO2-129 Procurement direct PO transition integrity
+
+Added a bounded direct PO issue/cancel transaction entry point while retaining
+the transaction-compatible internal status update used by receipt
+recomputation. Direct operations now perform audit initialization before the
+transaction, PO-first locking, existing policy checks, update, audit, and one
+commit/rollback boundary. Isolated proof passes **31/31**; authorization,
+CSRF, receipt, supplier, linkage, and GET regressions remain passing. No
+database, SQL, schema, browser, Core, activation, deployment, Material, SBAIO,
+or OH-AUTO2-105B operation occurred.
+
 ## Session Summary (2026-10-16) — OH-AUTO2-124 Procurement readiness completeness
 
 Completed the demonstrated Procurement GET dependency matrix. Readiness now

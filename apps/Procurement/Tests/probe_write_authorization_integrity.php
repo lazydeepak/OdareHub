@@ -36,8 +36,8 @@ $selected = [
     'cancelRequest' => 'ProcurementOverviewService::setRequestStatus(',
     'createOrder' => 'ProcurementOverviewService::createOrder(',
     'createOrderFromRequest' => 'ProcurementOverviewService::createOrderFromApprovedRequest(',
-    'issueOrder' => 'ProcurementOverviewService::setOrderStatus(',
-    'cancelOrder' => 'ProcurementOverviewService::setOrderStatus(',
+    'issueOrder' => 'ProcurementOverviewService::setOrderStatusDirect(',
+    'cancelOrder' => 'ProcurementOverviewService::setOrderStatusDirect(',
     'createReceipt' => 'ProcurementOverviewService::createReceipt(',
     'postReceipt' => 'ProcurementOverviewService::setReceiptStatus(',
 ];
