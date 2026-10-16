@@ -34,6 +34,16 @@ CSRF, receipt, supplier, linkage, and GET regressions remain passing. No
 database, SQL, schema, browser, Core, activation, deployment, Material, SBAIO,
 or OH-AUTO2-105B operation occurred.
 
+## Session Summary (2026-10-17) — OH-AUTO2-130 Procurement direct request transition integrity
+
+Added a bounded direct request approval/cancellation transaction entry point
+while retaining the transaction-compatible internal request update used by PO
+creation. Direct operations now initialize audit storage before the transaction,
+lock the request row first, preserve the linked-PO cancellation guard, then
+update, audit, and commit/rollback atomically. Isolated proof passes **38/38**;
+no database, SQL, schema, browser, Core, activation, deployment, Material,
+SBAIO, or OH-AUTO2-105B operation occurred.
+
 ## Session Summary (2026-10-16) — OH-AUTO2-124 Procurement readiness completeness
 
 Completed the demonstrated Procurement GET dependency matrix. Readiness now

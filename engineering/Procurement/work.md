@@ -144,6 +144,24 @@ State the current verified objective.
 - [x] OH-AUTO2-129 — direct PO issue/cancel transitions now use a bounded
   Procurement transaction without changing receipt recomputation ownership.
 
+- [x] OH-AUTO2-130 — direct request approval/cancellation transitions now use
+  a bounded Procurement transaction without changing PO-conversion ownership.
+
+## 2026-10-17 — OH-AUTO2-130 direct request transition integrity
+
+- [x] Confirmed the caller graph: approval/cancellation controllers use the
+  direct transition entry point; manual and approved-request PO creation retain
+  internal `setRequestStatus()` closure inside their existing transactions.
+- [x] Added the direct boundary: status validation and audit initialization
+  before transaction start, request-row `FOR UPDATE`, existing cancellation
+  linkage check, request update, audit, and one commit/rollback. The internal
+  update opens no transaction and performs no audit DDL setup.
+- [x] Preserved request statuses, approval/cancellation behavior, same-state
+  audit handling, request linkage, supplier eligibility, authorization, CSRF,
+  receipt, and GET readiness behavior.
+- [x] Isolated direct-request proof passes **38/38**; no database, SQL,
+  browser, activation, or deployment operation was used.
+
 ## 2026-10-17 — OH-AUTO2-129 direct PO transition integrity
 
 - [x] Confirmed the caller graph: issue/cancel controllers use the direct

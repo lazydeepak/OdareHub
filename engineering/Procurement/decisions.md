@@ -190,6 +190,22 @@ receipt, supplier, linkage, route, Core, or schema policy was introduced.
 Evidence: isolated source/instrumentation proof, 31/31 assertions; live MySQL
 rollback and concurrency behavior remain unverified.
 
+### 2026-10-17 — OH-AUTO2-130 direct request transition integrity
+
+**Status:** Accepted — direct approval/cancellation operations own the transaction
+
+Controllers use `setRequestStatusDirect()` for direct approval/cancellation
+requests. It validates the target status, initializes audit storage before the
+transaction, acquires the request row with `FOR UPDATE`, performs the existing
+linked-PO cancellation check, updates the request, records audit, and commits
+or rolls back once. PO creation retains transaction-compatible
+`setRequestStatus()` and does not open a nested transaction or initialize audit
+DDL. No lifecycle, permission, route, Core, schema, supplier, or receipt policy
+changed.
+
+Evidence: isolated source/instrumentation proof, 38/38 assertions; live MySQL
+rollback and concurrency behavior remain unverified.
+
 ### YYYY-MM-DD — Decision title
 **Status:** Proposed / Accepted / Superseded
 

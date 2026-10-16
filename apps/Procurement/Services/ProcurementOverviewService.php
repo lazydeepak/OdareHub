@@ -1030,6 +1030,41 @@ final class ProcurementOverviewService
         }
     }
 
+    /**
+     * Direct, controller-owned request status transition boundary.
+     *
+     * PO creation already owns a transaction and calls setRequestStatus(), so
+     * direct request actions use this separate transaction-owning entry point.
+     */
+    public static function setRequestStatusDirect(int $id, string $status, string $actor, string $note = ''): void
+    {
+        $id = (int)$id;
+        if ($id <= 0) {
+            throw new \InvalidArgumentException('Invalid request id.');
+        }
+
+        $status = self::normalizeRequestStatus($status);
+        // AuditLogService::logEvent() can initialize DDL on its first call;
+        // complete that before the request transaction begins.
+        AuditLogService::ensureSchema();
+
+        $db = DB::conn();
+        $db->begin_transaction();
+        try {
+            // The internal update's first business read locks the request row
+            // before cancellation/linkage checks or any mutation.
+            self::setRequestStatus($id, $status, $actor, $note);
+            $db->commit();
+        } catch (\Throwable $e) {
+            $db->rollback();
+            throw $e;
+        }
+    }
+
+    /**
+     * Transaction-compatible request update used by PO creation.
+     * The caller owns the surrounding transaction and request-row lock.
+     */
     public static function setRequestStatus(int $id, string $status, string $actor, string $note = ''): void
     {
         $id = (int)$id;
@@ -1037,15 +1072,14 @@ final class ProcurementOverviewService
             throw new \InvalidArgumentException('Invalid request id.');
         }
 
-        $before = DB::fetchOne('SELECT request_status FROM procurement_requests WHERE id=? LIMIT 1', [$id]);
+        self::setRequestStatusWithinTransaction($id, self::normalizeRequestStatus($status), $actor, $note);
+    }
+
+    private static function setRequestStatusWithinTransaction(int $id, string $status, string $actor, string $note): void
+    {
+        $before = DB::fetchOne('SELECT request_status FROM procurement_requests WHERE id=? LIMIT 1 FOR UPDATE', [$id]);
         if (!is_array($before)) {
             throw new \RuntimeException('Request not found.');
-        }
-
-        $allowed = ['draft', 'approved', 'closed', 'cancelled'];
-        $status = strtolower(trim($status));
-        if (!in_array($status, $allowed, true)) {
-            throw new \InvalidArgumentException('Unsupported request status transition.');
         }
 
         if ($status === 'cancelled') {
@@ -1511,6 +1545,16 @@ final class ProcurementOverviewService
         $status = strtolower(trim($status));
         if (!in_array($status, ['draft', 'approved', 'issued', 'partial', 'closed', 'cancelled'], true)) {
             throw new \InvalidArgumentException('Unsupported order status transition.');
+        }
+
+        return $status;
+    }
+
+    private static function normalizeRequestStatus(string $status): string
+    {
+        $status = strtolower(trim($status));
+        if (!in_array($status, ['draft', 'approved', 'closed', 'cancelled'], true)) {
+            throw new \InvalidArgumentException('Unsupported request status transition.');
         }
 
         return $status;
