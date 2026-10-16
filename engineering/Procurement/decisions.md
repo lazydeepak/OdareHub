@@ -23,6 +23,20 @@ future database-backed policy/transaction concern and were not redesigned here.
 Evidence: isolated supplier policy and source-order probe, 22/22 assertions;
 existing route and transaction contracts remain unchanged.
 
+### 2026-10-16 — OH-AUTO2-120 selection-source separation
+
+**Status:** Accepted — eligible source for order entry, unrestricted source for administration
+
+Supplier selection for manual purchase orders and approved-request conversion
+must use a query-level eligible source filtering the existing ineligible
+statuses before ordering and limiting. Supplier administration must continue to
+use the unrestricted source so inactive suppliers can be reviewed or
+reactivated. This is a selection usability boundary only; submission-time
+`assertSupplierEligible()` remains authoritative for status changes after page
+rendering. Historical order queries and supplier lifecycle data are unchanged.
+
+Evidence: isolated selection/source/rendering probe, 16/16 assertions.
+
 ### YYYY-MM-DD — Decision title
 **Status:** Proposed / Accepted / Superseded
 

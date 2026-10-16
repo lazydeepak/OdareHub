@@ -1,5 +1,17 @@
 # AGENT-COMPLIANCE-CHECKLIST
 
+## Session Summary (2026-10-16) — OH-AUTO2-120 eligible supplier selection
+
+Added the Procurement-owned `eligibleSupplierOptions()` source for new order
+entry, filtering inactive, disabled, and blocked suppliers before ordering and
+the existing limit. Requests and orders use it; dashboard supplier
+administration continues using unrestricted `supplierOptions()` for review and
+reactivation. Manual required selection, approved-request Auto supplier,
+historical order loading, and server-side eligibility validation remain intact.
+Selection/source/rendering proof passes **16/16**. No database, SQL, schema,
+browser, Core, route, activation, deployment, Material, SBAIO, or OH-AUTO2-105B
+operation occurred.
+
 ## Session Summary (2026-10-16) — OH-AUTO2-119 Procurement supplier eligibility
 
 Confirmed the existing Procurement rule: active suppliers are eligible;

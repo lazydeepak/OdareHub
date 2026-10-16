@@ -20,6 +20,20 @@ State the current verified objective.
 - [x] Existing route app-access/CSRF authority and transaction boundaries remain
   unchanged. Historical orders are untouched.
 
+## 2026-10-16 — OH-AUTO2-120 eligible supplier selection
+
+- [x] Added `eligibleSupplierOptions()` with the established
+  `inactive`/`disabled`/`blocked` filter applied before supplier ordering and
+  the existing result limit.
+- [x] Requests and purchase-order forms now use the eligible source; dashboard
+  supplier administration retains unrestricted `supplierOptions()` so inactive
+  suppliers remain selectable for review/reactivation.
+- [x] Preserved the required manual supplier selector, approved-request Auto
+  supplier option, historical order loading, and server-side
+  `assertSupplierEligible()` authority.
+- [x] Isolated selection/source/rendering contract proof passes **16/16**; no
+  database, SQL, browser, activation, or deployment operation was used.
+
 ## In Progress
 
 - [x] OH-AUTO1-018 — Corrected misplaced receipt-line validation in `ProcurementOverviewService::createOrder()` and added `probe_order_receipt_method_boundaries.php`.

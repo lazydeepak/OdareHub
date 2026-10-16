@@ -377,6 +377,29 @@ final class ProcurementOverviewService
     }
 
     /**
+     * Supplier options for new purchase-order creation only.
+     *
+     * Supplier administration continues to use supplierOptions(), which must
+     * retain inactive suppliers so they can be reviewed or reactivated.
+     *
+     * @return array<int,array<string,mixed>>
+     */
+    public static function eligibleSupplierOptions(int $limit = 120): array
+    {
+        if (!self::tableExists('procurement_suppliers')) {
+            return [];
+        }
+
+        return DB::fetchAll(
+            "SELECT id, supplier_name
+             FROM procurement_suppliers
+             WHERE LOWER(COALESCE(supplier_status, 'active')) NOT IN ('inactive', 'disabled', 'blocked')
+             ORDER BY supplier_name ASC
+             LIMIT " . max(1, (int)$limit)
+        );
+    }
+
+    /**
      * @param array<string,mixed> $input
      */
     public static function createSupplier(array $input, string $actor): void
