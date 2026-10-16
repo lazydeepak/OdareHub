@@ -5,7 +5,6 @@ namespace Apps\Shell\Composers;
 
 use App\Core\Auth;
 use App\Core\DB;
-use App\Services\MyAccountService;
 use Apps\Platform\Services\UserAssignmentContext;
 use Apps\Manufacturing\Services\OperatorLayerAdapters\AssemblyAdapter;
 use Apps\Manufacturing\Services\OperatorLayerAdapters\CoverageAdapter;
@@ -37,6 +36,7 @@ require_once __DIR__ . '/../Services/OperatorLayerWidgetService.php';
 require_once __DIR__ . '/../Services/OperatorPartDetailActionAuthority.php';
 require_once APP_ROOT . '/plugins/Base/Services/HostSurfaceRegistryService.php'; // compatibility owner-surface bridge
 require_once __DIR__ . '/OperatorAvatarMenuComposer.php';
+require_once __DIR__ . '/OperatorAccountPanelComposer.php';
 require_once __DIR__ . '/OperatorDashboardComposer.php';
 require_once __DIR__ . '/OperatorFocusLabelComposer.php';
 require_once __DIR__ . '/OperatorHeaderComposer.php';
@@ -1629,37 +1629,7 @@ final class OperatorSurfaceComposer
      */
     private function buildAccountPanelData(): array
     {
-        $empty = [
-            'account' => [],
-            'policy' => [],
-            'flash' => '',
-            'error' => '',
-        ];
-
-        $user = Auth::user();
-        $userId = (int)($user['id'] ?? 0);
-        if ($userId <= 0) {
-            return $empty;
-        }
-
-        try {
-            $service = new MyAccountService();
-            return [
-                'account' => $service->accountForUser($userId),
-                'policy' => $service->passwordPolicy(),
-                'flash' => (string)($_SESSION['my_account_flash_ok'] ?? ''),
-                'error' => (string)($_SESSION['my_account_flash_err'] ?? ''),
-            ];
-        } catch (\Throwable $e) {
-            return [
-                'account' => [],
-                'policy' => [],
-                'flash' => '',
-                'error' => 'operator.common.data_unavailable',
-            ];
-        } finally {
-            unset($_SESSION['my_account_flash_ok'], $_SESSION['my_account_flash_err']);
-        }
+        return (new OperatorAccountPanelComposer())->build();
     }
 
     /**

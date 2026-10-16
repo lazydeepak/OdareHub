@@ -1,5 +1,19 @@
 # AGENT-COMPLIANCE-CHECKLIST
 
+## Session Summary (2026-10-16) — OH-AUTO2-114 Shell account-panel extraction
+
+Extracted the existing operator account-panel data construction from
+`OperatorSurfaceComposer` into the focused Shell-owned
+`OperatorAccountPanelComposer`. The renderer, account URL, routes, payload keys,
+authentication authority, password-policy lookup, service fallback, and exact
+flash cleanup timing remain unchanged. Invalid identity still returns before
+flash consumption; successful and exceptional service paths still clear only
+the two account flash keys in `finally`.
+
+Added an isolated fake-based parity probe with **12/12** assertions. No Core,
+database, SQL, schema, route, authorization, browser, activation, deployment,
+Manufacturing, Material, SBAIO, or OH-AUTO2-105B changes were made.
+
 ## Session Summary (2026-10-16) — OH-AUTO2-113 blocker closure and next milestone
 
 Reconciled OH-AUTO2-112 as **OPTION C — BLOCKED** and preserved the complete

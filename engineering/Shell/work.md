@@ -6,6 +6,15 @@ OH-AUTO1-094 Processing authority closure is complete. Shell remains the
 generic operator composition and rendering boundary; Manufacturing owns lane
 authority and data projection.
 
+## 2026-10-16 — OH-AUTO2-114 account-panel extraction
+
+- [x] Extracted only `OperatorSurfaceComposer::buildAccountPanelData()` into
+  `OperatorAccountPanelComposer`, preserving the established payload.
+- [x] Preserved the early invalid-identity return, service exception fallback,
+  `finally` cleanup timing, existing account view markup, URL, and routes.
+- [x] Isolated fake service/user parity probe passes **12/12** without database,
+  browser, or runtime activation.
+
 ## 2026-10-16 — OH-AUTO2-111 aggregate containment
 
 - [x] Base registry continues to reject missing Material aggregate capability
