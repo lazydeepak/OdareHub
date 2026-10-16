@@ -46,6 +46,16 @@ State the current verified objective.
 - [x] Isolated linkage/transaction/source proof passes **26/26**; no database,
   SQL, browser, activation, or deployment operation was used.
 
+## 2026-10-16 — OH-AUTO2-122 controller write-authorization closure
+
+- [x] Confirmed all 12 registered Procurement POST routes already enforce app
+  access, while nine controller entry points lacked the same direct guard.
+- [x] Added `Auth::requireAppAccess('procurement')` before CSRF, input handling,
+  and service dispatch in the nine missing methods. The three OH-AUTO1-051
+  protected methods remain unchanged.
+- [x] Expanded the write-authorization probe to all 12 controllers/routes;
+  **112/112** assertions pass. No service permission policy was duplicated.
+
 ## In Progress
 
 - [x] OH-AUTO1-018 — Corrected misplaced receipt-line validation in `ProcurementOverviewService::createOrder()` and added `probe_order_receipt_method_boundaries.php`.

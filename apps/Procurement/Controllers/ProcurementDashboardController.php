@@ -64,6 +64,7 @@ final class ProcurementDashboardController
 
     public static function editSupplier(): void
     {
+        Auth::requireAppAccess('procurement');
         Auth::requireCsrf((string)($_POST['csrf'] ?? ''));
         $id = (int)($_POST['supplier_id'] ?? 0);
         if ($id <= 0) {
@@ -80,6 +81,7 @@ final class ProcurementDashboardController
 
     public static function createSupplier(): void
     {
+        Auth::requireAppAccess('procurement');
         Auth::requireCsrf((string)($_POST['csrf'] ?? ''));
 
         $supplierName = trim((string)($_POST['supplier_name'] ?? ''));
@@ -97,6 +99,7 @@ final class ProcurementDashboardController
 
     public static function createRequest(): void
     {
+        Auth::requireAppAccess('procurement');
         Auth::requireCsrf((string)($_POST['csrf'] ?? ''));
 
         $qty = (float)($_POST['requested_qty'] ?? 0);
@@ -114,6 +117,7 @@ final class ProcurementDashboardController
 
     public static function intakeManufacturingRequest(): void
     {
+        Auth::requireAppAccess('procurement');
         Auth::requireCsrf((string)($_POST['csrf'] ?? ''));
         $demandId = (int)($_POST['demand_id'] ?? 0);
         if ($demandId <= 0) {
@@ -133,6 +137,7 @@ final class ProcurementDashboardController
 
     public static function approveRequest(): void
     {
+        Auth::requireAppAccess('procurement');
         Auth::requireCsrf((string)($_POST['csrf'] ?? ''));
         $id = (int)($_POST['id'] ?? 0);
         if ($id <= 0) {
@@ -149,6 +154,7 @@ final class ProcurementDashboardController
 
     public static function cancelRequest(): void
     {
+        Auth::requireAppAccess('procurement');
         Auth::requireCsrf((string)($_POST['csrf'] ?? ''));
         $id = (int)($_POST['id'] ?? 0);
         if ($id <= 0) {
@@ -204,6 +210,7 @@ final class ProcurementDashboardController
 
     public static function issueOrder(): void
     {
+        Auth::requireAppAccess('procurement');
         Auth::requireCsrf((string)($_POST['csrf'] ?? ''));
         $id = (int)($_POST['id'] ?? 0);
         if ($id <= 0) {
@@ -220,6 +227,7 @@ final class ProcurementDashboardController
 
     public static function cancelOrder(): void
     {
+        Auth::requireAppAccess('procurement');
         Auth::requireCsrf((string)($_POST['csrf'] ?? ''));
         $id = (int)($_POST['id'] ?? 0);
         if ($id <= 0) {
@@ -254,6 +262,7 @@ final class ProcurementDashboardController
 
     public static function postReceipt(): void
     {
+        Auth::requireAppAccess('procurement');
         Auth::requireCsrf((string)($_POST['csrf'] ?? ''));
         $id = (int)($_POST['id'] ?? 0);
         if ($id <= 0) {

@@ -1,5 +1,15 @@
 # AGENT-COMPLIANCE-CHECKLIST
 
+## Session Summary (2026-10-16) — OH-AUTO2-122 Procurement write authorization
+
+Closed the nine missing direct controller app-access checks. All 12 Procurement
+write controllers now call `Auth::requireAppAccess('procurement')` before CSRF,
+input handling, and service dispatch; all 12 POST routes retain their existing
+route guard and session behavior. Expanded authorization proof passes
+**112/112**. No new permission model, service ACL, route, database, schema,
+browser, Core, activation, deployment, Material, SBAIO, or OH-AUTO2-105B
+operation occurred.
+
 ## Session Summary (2026-10-16) — OH-AUTO2-121 manual request-link integrity
 
 Reused the existing approved-request conversion contract for manual PO links:

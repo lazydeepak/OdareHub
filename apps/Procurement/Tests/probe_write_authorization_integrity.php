@@ -28,9 +28,18 @@ $methodBody = static function (string $source, string $method): string {
 };
 
 $selected = [
+    'editSupplier' => 'ProcurementOverviewService::updateSupplier(',
+    'createSupplier' => 'ProcurementOverviewService::createSupplier(',
+    'createRequest' => 'ProcurementOverviewService::createRequest(',
+    'intakeManufacturingRequest' => 'ProcurementOverviewService::intakeFromManufacturingDemand(',
+    'approveRequest' => 'ProcurementOverviewService::setRequestStatus(',
+    'cancelRequest' => 'ProcurementOverviewService::setRequestStatus(',
     'createOrder' => 'ProcurementOverviewService::createOrder(',
     'createOrderFromRequest' => 'ProcurementOverviewService::createOrderFromApprovedRequest(',
+    'issueOrder' => 'ProcurementOverviewService::setOrderStatus(',
+    'cancelOrder' => 'ProcurementOverviewService::setOrderStatus(',
     'createReceipt' => 'ProcurementOverviewService::createReceipt(',
+    'postReceipt' => 'ProcurementOverviewService::setReceiptStatus(',
 ];
 
 foreach ($selected as $method => $delegate) {
@@ -43,9 +52,18 @@ foreach ($selected as $method => $delegate) {
 }
 
 foreach ([
+    '/apps/procurement/suppliers/edit' => 'ProcurementDashboardController::editSupplier()',
+    '/apps/procurement/suppliers/create' => 'ProcurementDashboardController::createSupplier()',
+    '/apps/procurement/requests/create' => 'ProcurementDashboardController::createRequest()',
+    '/apps/procurement/requests/intake/manufacturing' => 'ProcurementDashboardController::intakeManufacturingRequest()',
+    '/apps/procurement/requests/approve' => 'ProcurementDashboardController::approveRequest()',
     '/apps/procurement/orders/create' => 'ProcurementDashboardController::createOrder()',
     '/apps/procurement/orders/create-from-request' => 'ProcurementDashboardController::createOrderFromRequest()',
+    '/apps/procurement/requests/cancel' => 'ProcurementDashboardController::cancelRequest()',
+    '/apps/procurement/orders/cancel' => 'ProcurementDashboardController::cancelOrder()',
+    '/apps/procurement/orders/issue' => 'ProcurementDashboardController::issueOrder()',
     '/apps/procurement/receipts/create' => 'ProcurementDashboardController::createReceipt()',
+    '/apps/procurement/receipts/post' => 'ProcurementDashboardController::postReceipt()',
 ] as $route => $handler) {
     $position = strpos($routes, "'$route'");
     $tail = $position === false ? '' : substr($routes, $position, 700);

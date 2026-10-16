@@ -53,6 +53,19 @@ status was introduced.
 Evidence: isolated linkage/transaction/source probe, 26/26 assertions. Database
 concurrency execution remains outside this assignment.
 
+### 2026-10-16 — OH-AUTO2-122 controller app-access defense in depth
+
+**Status:** Accepted — require existing Procurement app access at every write controller
+
+All Procurement POST routes already require `procurement` app access, but nine
+controller methods did not repeat that authority when invoked directly. The
+same existing `Auth::requireAppAccess('procurement')` guard used by the three
+OH-AUTO1-051 methods is now present before CSRF, input processing, and service
+dispatch in all 12 write controllers. This adds no permission semantics,
+service-level ACL, route, or workflow change.
+
+Evidence: expanded static route/controller probe, 112/112 assertions.
+
 ### YYYY-MM-DD — Decision title
 **Status:** Proposed / Accepted / Superseded
 
