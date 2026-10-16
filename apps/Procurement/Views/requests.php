@@ -54,7 +54,9 @@ $chipClass = static function (string $state): string {
 <section class="card">
   <h3 class="u-style-d462248a40"><?= e(t('proc.requests.mfg_intake_title')) ?></h3>
   <div class="muted u-style-761d3addb2"><?= e(t('proc.requests.mfg_intake_description')) ?></div>
-  <?php if (empty($mfg_demands)): ?>
+  <?php if (!($readiness['optional_sources']['manufacturing_demands'] ?? false)): ?>
+    <p class="muted u-style-1169661891"><?= e(t('proc.read.manufacturing_unavailable')) ?></p>
+  <?php elseif (empty($mfg_demands)): ?>
     <p class="muted u-style-1169661891"><?= e(t('proc.requests.mfg_no_demands')) ?></p>
   <?php else: ?>
     <div class="table-wrap">

@@ -40,7 +40,9 @@ final class ProcurementDashboardController
         $view->render('procurement::requests.php', [
             'pageTitle' => 'Procurement Requests',
             'rows' => ProcurementOverviewService::latestRequests(40),
-            'mfg_demands' => ProcurementOverviewService::latestManufacturingDemands(40),
+            'mfg_demands' => ($readiness['optional_sources']['manufacturing_demands'] ?? false)
+                ? ProcurementOverviewService::latestManufacturingDemands(40)
+                : [],
             'suppliers' => ProcurementOverviewService::eligibleSupplierOptions(120),
             'summary' => ProcurementOverviewService::summary(),
             'message' => (string)($_GET['ok'] ?? ''),

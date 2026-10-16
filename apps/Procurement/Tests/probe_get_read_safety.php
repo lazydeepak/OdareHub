@@ -34,21 +34,28 @@ $check = static function (bool $condition, string $label) use (&$passed, &$faile
     $condition ? $passed++ : $failed++;
 };
 
-$requiredTables = [
-    'procurement_suppliers',
-    'procurement_requests',
-    'procurement_purchase_orders',
-    'procurement_purchase_order_lines',
-    'procurement_receipts',
-];
-$readyReader = static fn(string $table, array $columns): bool => true;
+$seenColumns = [];
+$readyReader = static function (string $table, array $columns) use (&$seenColumns): bool {
+    $seenColumns[$table] = $columns;
+    return true;
+};
 $missingReader = static fn(string $table, array $columns): bool|string => $table === 'procurement_purchase_orders' ? 'missing' : true;
 $incompatibleReader = static fn(string $table, array $columns): bool => $table !== 'procurement_receipts';
 $noAuditReader = static fn(string $table, array $columns): bool => $table !== 'audit_activity_log';
+$noManufacturingReader = static fn(string $table, array $columns): bool => $table !== 'mfg_procurement_demands';
+$missingAuditAppReader = static fn(string $table, array $columns): bool => !($table === 'audit_activity_log' && in_array('app_key', $columns, true));
+$missingAuditActorReader = static fn(string $table, array $columns): bool => !($table === 'audit_activity_log' && in_array('actor_display_name', $columns, true));
+$missingSelectedColumnReader = static fn(string $table, array $columns): bool => !($table === 'procurement_requests' && in_array('request_status', $columns, true));
+$missingJoinColumnReader = static fn(string $table, array $columns): bool => !($table === 'procurement_purchase_orders' && in_array('supplier_id', $columns, true));
 $ready = ProcurementOverviewService::readReadiness($readyReader);
 $missing = ProcurementOverviewService::readReadiness($missingReader);
 $incompatible = ProcurementOverviewService::readReadiness($incompatibleReader);
 $noAudit = ProcurementOverviewService::readReadiness($noAuditReader);
+$noManufacturing = ProcurementOverviewService::readReadiness($noManufacturingReader);
+$missingAuditApp = ProcurementOverviewService::readReadiness($missingAuditAppReader);
+$missingAuditActor = ProcurementOverviewService::readReadiness($missingAuditActorReader);
+$missingSelectedColumn = ProcurementOverviewService::readReadiness($missingSelectedColumnReader);
+$missingJoinColumn = ProcurementOverviewService::readReadiness($missingJoinColumnReader);
 
 $check($ready['available'] === true && $ready['audit_available'] === true, 'ready metadata reports essential and optional storage available');
 $check($missing['available'] === false && $missing['audit_available'] === true, 'missing essential storage fails closed without claiming readiness');
@@ -57,6 +64,17 @@ $check($ready['missing_tables'] === [] && $ready['incompatible_tables'] === [], 
 $check($missing['missing_tables'] === ['procurement_purchase_orders'], 'missing required storage is identified without SQL writes');
 $check($incompatible['incompatible_tables'] === ['procurement_receipts'], 'incompatible required table is identified');
 $check($noAudit['available'] === true && $noAudit['audit_available'] === false, 'missing optional audit storage does not block business reads');
+$check($noManufacturing['optional_sources']['manufacturing_demands'] === false, 'missing optional Manufacturing storage is classified separately');
+$check($missingAuditApp['available'] === true && $missingAuditApp['audit_available'] === false, 'missing audit app filter column marks audit unavailable');
+$check($missingAuditActor['available'] === true && $missingAuditActor['audit_available'] === false, 'missing audit actor column marks audit unavailable');
+$check($missingSelectedColumn['available'] === false, 'missing essential selected/filter column is rejected');
+$check($missingJoinColumn['available'] === false, 'missing essential join column is rejected');
+$check(in_array('request_status', $seenColumns['procurement_requests'] ?? [], true), 'request status filter dependency is declared');
+$check(in_array('supplier_id', $seenColumns['procurement_purchase_orders'] ?? [], true), 'order supplier join dependency is declared');
+$check(in_array('app_key', $seenColumns['audit_activity_log'] ?? [], true), 'audit app filter dependency is declared');
+$check(in_array('old_state', $seenColumns['audit_activity_log'] ?? [], true), 'audit old-state selected dependency is declared');
+$check(in_array('actor_display_name', $seenColumns['audit_activity_log'] ?? [], true), 'audit actor display dependency is declared');
+$check(in_array('execution_path_label', $seenColumns['mfg_procurement_demands'] ?? [], true), 'optional Manufacturing dependency is declared');
 
 foreach (['/apps/procurement', '/apps/procurement/requests', '/apps/procurement/orders', '/apps/procurement/receipts'] as $path) {
     $routeStart = strpos($routes, "\$router->get('{$path}'");
@@ -101,6 +119,8 @@ $partial = (string)file_get_contents($root . '/apps/Procurement/Views/_read_unav
 $check(str_contains($partial, 'proc.read.unavailable_title'), 'unavailable state is localized');
 $check(str_contains($partial, 'proc.read.no_changes'), 'unavailable state states that no storage mutation occurred');
 $check(str_contains($views['dashboard'], 'proc.read.audit_unavailable'), 'dashboard distinguishes unavailable audit history from an empty history');
+$check(str_contains($views['requests'], 'proc.read.manufacturing_unavailable'), 'requests view distinguishes unavailable Manufacturing intake from an empty queue');
+$check(str_contains($controller, "optional_sources']['manufacturing_demands"), 'controller skips optional Manufacturing query when readiness is false');
 
 foreach (['latestRequests', 'latestOrders', 'latestReceipts', 'summary'] as $reader) {
     $check(str_contains($controller, "ProcurementOverviewService::{$reader}(") || str_contains($service, "public static function {$reader}"), "established {$reader} read path remains present");

@@ -12,17 +12,26 @@ final class ProcurementOverviewService
      * Read-only storage contract for Procurement GET surfaces.
      *
      * @param null|callable(string,array<int,string>):bool|string $schemaReader
-     * @return array{available:bool,audit_available:bool,missing_tables:array<int,string>,incompatible_tables:array<int,string>}
+     * @return array{available:bool,audit_available:bool,missing_tables:array<int,string>,incompatible_tables:array<int,string>,optional_sources:array{manufacturing_demands:bool}}
      */
     public static function readReadiness(?callable $schemaReader = null): array
     {
         $schemaReader ??= static fn(string $table, array $columns): string => self::tableShape($table, $columns);
         $required = [
             'procurement_suppliers' => ['id', 'supplier_name', 'supplier_status'],
-            'procurement_requests' => ['id', 'request_ref', 'request_status'],
-            'procurement_purchase_orders' => ['id', 'po_ref', 'request_id', 'po_status'],
+            'procurement_requests' => [
+                'id', 'request_ref', 'product_id', 'requested_qty', 'needed_date',
+                'source_app', 'source_ref_type', 'source_ref_id', 'request_status', 'created_at',
+            ],
+            'procurement_purchase_orders' => [
+                'id', 'po_ref', 'supplier_id', 'request_id', 'po_status',
+                'order_date', 'expected_date', 'created_at',
+            ],
             'procurement_purchase_order_lines' => ['id', 'po_id', 'ordered_qty'],
-            'procurement_receipts' => ['id', 'po_id', 'received_qty', 'receipt_status'],
+            'procurement_receipts' => [
+                'id', 'receipt_ref', 'po_id', 'po_line_id', 'received_qty',
+                'receipt_date', 'receipt_status', 'created_at',
+            ],
         ];
         $missing = [];
         $incompatible = [];
@@ -42,11 +51,23 @@ final class ProcurementOverviewService
         $auditAvailable = false;
         try {
             $auditShape = $schemaReader('audit_activity_log', [
-                'id', 'entity_type', 'entity_id', 'action_name', 'new_state', 'created_at',
+                'id', 'entity_type', 'entity_id', 'action_name', 'old_state', 'new_state',
+                'note_text', 'actor_email', 'actor_display_name', 'app_key', 'created_at',
             ]);
             $auditAvailable = $auditShape === true || $auditShape === 'ready';
         } catch (\Throwable) {
             $auditAvailable = false;
+        }
+
+        $manufacturingDemandsAvailable = false;
+        try {
+            $manufacturingDemandsShape = $schemaReader('mfg_procurement_demands', [
+                'id', 'product_id', 'required_qty', 'required_date', 'status',
+                'route_family', 'execution_path_label',
+            ]);
+            $manufacturingDemandsAvailable = $manufacturingDemandsShape === true || $manufacturingDemandsShape === 'ready';
+        } catch (\Throwable) {
+            $manufacturingDemandsAvailable = false;
         }
 
         return [
@@ -54,6 +75,9 @@ final class ProcurementOverviewService
             'audit_available' => $auditAvailable,
             'missing_tables' => $missing,
             'incompatible_tables' => array_values(array_unique($incompatible)),
+            'optional_sources' => [
+                'manufacturing_demands' => $manufacturingDemandsAvailable,
+            ],
         ];
     }
 
@@ -382,7 +406,10 @@ final class ProcurementOverviewService
      */
     public static function recentTransitions(int $limit = 40): array
     {
-        if (!self::tableHasColumns('audit_activity_log', ['id', 'entity_type', 'entity_id', 'action_name', 'new_state', 'created_at'])) {
+        if (!self::tableHasColumns('audit_activity_log', [
+            'id', 'entity_type', 'entity_id', 'action_name', 'old_state', 'new_state',
+            'note_text', 'actor_email', 'actor_display_name', 'app_key', 'created_at',
+        ])) {
             return [];
         }
 
@@ -412,7 +439,12 @@ final class ProcurementOverviewService
      */
     public static function latestManufacturingDemands(int $limit = 20): array
     {
-        if (!self::tableExists('mfg_procurement_demands')) {
+        if (!self::tableHasColumns('mfg_procurement_demands', [
+            'id', 'product_id', 'required_qty', 'required_date', 'status',
+            'route_family', 'execution_path_label',
+        ]) || !self::tableHasColumns('procurement_requests', [
+            'id', 'request_ref', 'source_app', 'source_ref_type', 'source_ref_id',
+        ])) {
             return [];
         }
 
@@ -1191,7 +1223,10 @@ final class ProcurementOverviewService
      */
     private static function latestTransitionMap(string $entityType, array $entityIds): array
     {
-        if (!self::tableHasColumns('audit_activity_log', ['id', 'entity_type', 'entity_id', 'action_name', 'new_state', 'created_at'])) {
+        if (!self::tableHasColumns('audit_activity_log', [
+            'id', 'entity_type', 'entity_id', 'action_name', 'new_state',
+            'note_text', 'actor_email', 'actor_display_name', 'created_at',
+        ])) {
             return [];
         }
 

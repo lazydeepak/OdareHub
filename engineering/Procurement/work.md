@@ -71,6 +71,20 @@ State the current verified objective.
   supplier, authorization, form, receipt, and transaction regressions pass.
   No database, SQL, browser, activation, or deployment operation was used.
 
+## 2026-10-16 — OH-AUTO2-124 GET readiness contract completeness
+
+- [x] Audited the GET dependency matrix: Procurement supplier, request, PO,
+  PO-line, and receipt reads; request/PO/supplier joins; status filters; ID
+  ordering; complete audit activity fields and app filter; and optional
+  Manufacturing-demand/request join fields.
+- [x] Extended metadata readiness to validate the demonstrated selected,
+  joined, filtered, ordered, and grouped columns. Incomplete audit storage is
+  unavailable rather than treated as empty history.
+- [x] Optional Manufacturing-demand storage now has separate readiness and
+  unavailable presentation; Procurement pages are not blocked by that source.
+- [x] Isolated readiness contract proof passes **74/74**; no database, SQL,
+  browser, activation, or deployment operation was used.
+
 ## In Progress
 
 - [x] OH-AUTO1-018 — Corrected misplaced receipt-line validation in `ProcurementOverviewService::createOrder()` and added `probe_order_receipt_method_boundaries.php`.

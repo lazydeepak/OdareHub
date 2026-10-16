@@ -83,6 +83,22 @@ unavailable and no audit query or schema creation occurs. Existing
 Evidence: isolated read-safety probe and focused Procurement regressions; no
 database-backed execution is claimed.
 
+### 2026-10-16 — OH-AUTO2-124 GET dependency completeness
+
+**Status:** Accepted — readiness mirrors dependent query contracts
+
+Procurement readiness now covers all columns used by essential GET SELECTs,
+including selected fields, status filters, ordering, and supplier/request/PO
+joins. Audit readiness covers every field used by `recentTransitions()` and
+`latestTransitionMap()`, including `app_key`, state/note fields, and actor
+fields. Optional Manufacturing-demand readiness covers both demand columns and
+the request-link join columns; when unavailable, only that intake section is
+shown unavailable and no dependent SELECT runs. No schema definition,
+provisioning path, Core code, or database behavior was changed.
+
+Evidence: injected metadata-catalog probe, 74/74 assertions; live database
+compatibility remains unverified.
+
 ### YYYY-MM-DD — Decision title
 **Status:** Proposed / Accepted / Superseded
 

@@ -4,6 +4,7 @@ return [
     'proc.read.unavailable_message' => 'आवश्यक खरीद भण्डारण हराइरहेको वा असंगत छ। डाटाबेस परिवर्तन गरिएको छैन।',
     'proc.read.audit_unavailable' => 'वैकल्पिक अडिट भण्डारण तयार नभएकाले गतिविधि इतिहास उपलब्ध छैन।',
     'proc.read.no_changes' => 'यो पढ्ने मात्र पृष्ठले भण्डारण सिर्जना वा प्रारम्भ गरेन।',
+    'proc.read.manufacturing_unavailable' => 'वैकल्पिक भण्डारण हराइरहेको वा असंगत भएकाले निर्माण माग सेवन उपलब्ध छैन।',
     // Procurement app - Requests module
     'app.procurement.requests.dashboard.table.title' => 'अनुरोध ड्यासबोर्ड',
     'app.procurement.requests.dashboard.table.display_name' => 'खरीद अनुरोध ड्यासबोर्ड',

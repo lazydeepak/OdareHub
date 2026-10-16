@@ -4,6 +4,7 @@ return [
     'proc.read.unavailable_message' => 'Required Procurement storage is missing or incompatible. No database changes were made.',
     'proc.read.audit_unavailable' => 'Activity history is unavailable because optional audit storage is not ready.',
     'proc.read.no_changes' => 'This read-only page did not create or initialize storage.',
+    'proc.read.manufacturing_unavailable' => 'Manufacturing demand intake is unavailable because its optional storage is missing or incompatible.',
     // Procurement app - Requests module
     'app.procurement.requests.dashboard.table.title' => 'Requests Dashboard',
     'app.procurement.requests.dashboard.table.display_name' => 'Procurement Requests Dashboard',
