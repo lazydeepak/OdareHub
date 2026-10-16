@@ -1,5 +1,17 @@
 # AGENT-COMPLIANCE-CHECKLIST
 
+## Session Summary (2026-10-16) — OH-AUTO2-123 Procurement GET read safety
+
+Removed Procurement schema initialization from the four GET route closures and
+from transitive audit/transition readers. Added Procurement-owned read-only
+table/column readiness inspection, explicit unavailable presentation for missing
+or incompatible essential storage, and separate optional-audit unavailable
+handling. POST/mutation schema authority and Core `AuditLogService` remain
+unchanged. Isolated GET proof passes **61/61** and all requested Procurement
+regressions pass. No database,
+SQL, schema, browser, Core, activation, deployment, Material, SBAIO, or
+OH-AUTO2-105B operation occurred.
+
 ## Session Summary (2026-10-16) — OH-AUTO2-122 Procurement write authorization
 
 Closed the nine missing direct controller app-access checks. All 12 Procurement

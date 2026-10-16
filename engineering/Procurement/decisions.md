@@ -66,6 +66,23 @@ service-level ACL, route, or workflow change.
 
 Evidence: expanded static route/controller probe, 112/112 assertions.
 
+### 2026-10-16 — OH-AUTO2-123 Procurement GET read boundary
+
+**Status:** Accepted — fail closed without schema initialization
+
+Procurement GET routes must not call `ProcurementOverviewService::ensureSchema()`
+or transitively initialize audit storage. The app-owned read path now checks
+required Procurement table/column metadata using read-only information-schema
+queries before composing page data. Missing or incompatible essential storage
+renders an explicit unavailable state rather than verified-zero business data.
+Audit storage is optional: when unavailable, activity history is shown as
+unavailable and no audit query or schema creation occurs. Existing
+`ensureSchema()` calls remain in POST/mutation paths, and Core's
+`AuditLogService` is unchanged.
+
+Evidence: isolated read-safety probe and focused Procurement regressions; no
+database-backed execution is claimed.
+
 ### YYYY-MM-DD — Decision title
 **Status:** Proposed / Accepted / Superseded
 

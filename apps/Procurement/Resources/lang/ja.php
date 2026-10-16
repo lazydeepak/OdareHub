@@ -1,5 +1,9 @@
 <?php
 return [
+    'proc.read.unavailable_title' => '調達データを利用できません',
+    'proc.read.unavailable_message' => '必要な調達ストレージが存在しないか互換性がありません。データベースは変更されていません。',
+    'proc.read.audit_unavailable' => 'オプションの監査ストレージが準備されていないため、アクティビティ履歴を利用できません。',
+    'proc.read.no_changes' => 'この読み取り専用ページはストレージを作成または初期化していません。',
     // Procurement app - Requests module
     'app.procurement.requests.dashboard.table.title' => 'リクエスト ダッシュボード',
     'app.procurement.requests.dashboard.table.display_name' => '調達 リクエスト ダッシュボード',

@@ -1,4 +1,5 @@
 <?php require APP_ROOT . '/public/views/layouts/admin-wrapper-open.php'; ?>
+<?php if (!($readiness['available'] ?? false)): require __DIR__ . '/_read_unavailable.php'; return; endif; ?>
 
 <?php $summary = is_array($summary ?? null) ? $summary : []; ?>
 <?php $recentTransitions = is_array($recent_transitions ?? null) ? $recent_transitions : []; ?>
@@ -187,7 +188,9 @@ foreach ($recentTransitions as $row) {
     <a class="btn" href="/apps/procurement"><?= e(t('common.reset')) ?></a>
   </form>
 
-  <?php if ($filteredTransitions === []): ?>
+  <?php if (!($readiness['audit_available'] ?? false)): ?>
+    <p class="muted u-style-1169661891"><?= e(t('proc.read.audit_unavailable')) ?></p>
+  <?php elseif ($filteredTransitions === []): ?>
     <p class="muted u-style-1169661891"><?= e(t('proc.dashboard.no_transitions')) ?></p>
   <?php else: ?>
     <div class="table-wrap">

@@ -56,6 +56,21 @@ State the current verified objective.
 - [x] Expanded the write-authorization probe to all 12 controllers/routes;
   **112/112** assertions pass. No service permission policy was duplicated.
 
+## 2026-10-16 — OH-AUTO2-123 non-mutating Procurement GET pages
+
+- [x] Confirmed all four Procurement GET routes called
+  `ProcurementOverviewService::ensureSchema()`. Dashboard activity and list
+  transition enrichment also reached `AuditLogService::ensureSchema()`.
+- [x] Removed schema initialization from the four GET route closures and made
+  the Procurement read path inspect required table/column metadata only.
+  Missing or incompatible essential storage now fails closed with an explicit
+  unavailable state; optional audit storage is reported separately.
+- [x] Preserved `ensureSchema()` in POST/mutation routes and business write
+  paths. No Core or AuditLogService change was made.
+- [x] Isolated GET read-safety proof passes **61/61**; requested linkage,
+  supplier, authorization, form, receipt, and transaction regressions pass.
+  No database, SQL, browser, activation, or deployment operation was used.
+
 ## In Progress
 
 - [x] OH-AUTO1-018 — Corrected misplaced receipt-line validation in `ProcurementOverviewService::createOrder()` and added `probe_order_receipt_method_boundaries.php`.

@@ -14,7 +14,6 @@ $view->addNamespace('procurement', __DIR__ . '/Views');
 $router->get('/apps/procurement', function () use ($view) {
     Auth::requireAppAccess('procurement');
     Auth::bootSession();
-    ProcurementOverviewService::ensureSchema();
     ProcurementDashboardController::dashboard($view);
     return null;
 });
@@ -22,7 +21,6 @@ $router->get('/apps/procurement', function () use ($view) {
 $router->get('/apps/procurement/requests', function () use ($view) {
     Auth::requireAppAccess('procurement');
     Auth::bootSession();
-    ProcurementOverviewService::ensureSchema();
     ProcurementDashboardController::requests($view);
     return null;
 });
@@ -30,7 +28,6 @@ $router->get('/apps/procurement/requests', function () use ($view) {
 $router->get('/apps/procurement/orders', function () use ($view) {
     Auth::requireAppAccess('procurement');
     Auth::bootSession();
-    ProcurementOverviewService::ensureSchema();
     ProcurementDashboardController::orders($view);
     return null;
 });
@@ -38,7 +35,6 @@ $router->get('/apps/procurement/orders', function () use ($view) {
 $router->get('/apps/procurement/receipts', function () use ($view) {
     Auth::requireAppAccess('procurement');
     Auth::bootSession();
-    ProcurementOverviewService::ensureSchema();
     ProcurementDashboardController::receipts($view);
     return null;
 });

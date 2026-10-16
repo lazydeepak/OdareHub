@@ -1,4 +1,5 @@
 <?php require APP_ROOT . '/public/views/layouts/admin-wrapper-open.php'; ?>
+<?php if (!($readiness['available'] ?? false)): require __DIR__ . '/_read_unavailable.php'; return; endif; ?>
 
 <?php $suppliers = is_array($suppliers ?? null) ? $suppliers : []; ?>
 <?php $requests = is_array($requests ?? null) ? $requests : []; ?>

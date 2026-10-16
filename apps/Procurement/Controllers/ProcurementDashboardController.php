@@ -10,6 +10,11 @@ final class ProcurementDashboardController
 {
     public static function dashboard($view): void
     {
+        $readiness = ProcurementOverviewService::readReadiness();
+        if (!$readiness['available']) {
+            $view->render('procurement::dashboard.php', ['pageTitle' => 'Procurement', 'readiness' => $readiness]);
+            return;
+        }
         $summary = ProcurementOverviewService::summary();
         $view->render('procurement::dashboard.php', [
             'pageTitle' => 'Procurement',
@@ -21,11 +26,17 @@ final class ProcurementDashboardController
             'suppliers' => ProcurementOverviewService::supplierOptions(120),
             'message' => (string)($_GET['ok'] ?? ''),
             'error' => (string)($_GET['err'] ?? ''),
+            'readiness' => $readiness,
         ]);
     }
 
     public static function requests($view): void
     {
+        $readiness = ProcurementOverviewService::readReadiness();
+        if (!$readiness['available']) {
+            $view->render('procurement::requests.php', ['pageTitle' => 'Procurement Requests', 'readiness' => $readiness]);
+            return;
+        }
         $view->render('procurement::requests.php', [
             'pageTitle' => 'Procurement Requests',
             'rows' => ProcurementOverviewService::latestRequests(40),
@@ -34,11 +45,17 @@ final class ProcurementDashboardController
             'summary' => ProcurementOverviewService::summary(),
             'message' => (string)($_GET['ok'] ?? ''),
             'error' => (string)($_GET['err'] ?? ''),
+            'readiness' => $readiness,
         ]);
     }
 
     public static function orders($view): void
     {
+        $readiness = ProcurementOverviewService::readReadiness();
+        if (!$readiness['available']) {
+            $view->render('procurement::orders.php', ['pageTitle' => 'Purchase Orders', 'readiness' => $readiness]);
+            return;
+        }
         $view->render('procurement::orders.php', [
             'pageTitle' => 'Purchase Orders',
             'rows' => ProcurementOverviewService::latestOrders(40),
@@ -47,11 +64,17 @@ final class ProcurementDashboardController
             'requests' => ProcurementOverviewService::eligibleRequestOptions(120),
             'message' => (string)($_GET['ok'] ?? ''),
             'error' => (string)($_GET['err'] ?? ''),
+            'readiness' => $readiness,
         ]);
     }
 
     public static function receipts($view): void
     {
+        $readiness = ProcurementOverviewService::readReadiness();
+        if (!$readiness['available']) {
+            $view->render('procurement::receipts.php', ['pageTitle' => 'Receipts', 'readiness' => $readiness]);
+            return;
+        }
         $view->render('procurement::receipts.php', [
             'pageTitle' => 'Receipts',
             'rows' => ProcurementOverviewService::latestReceipts(40),
@@ -59,6 +82,7 @@ final class ProcurementDashboardController
             'orders' => ProcurementOverviewService::latestOrders(120),
             'message' => (string)($_GET['ok'] ?? ''),
             'error' => (string)($_GET['err'] ?? ''),
+            'readiness' => $readiness,
         ]);
     }
 

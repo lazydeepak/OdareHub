@@ -8,6 +8,55 @@ use App\Core\DB;
 
 final class ProcurementOverviewService
 {
+    /**
+     * Read-only storage contract for Procurement GET surfaces.
+     *
+     * @param null|callable(string,array<int,string>):bool|string $schemaReader
+     * @return array{available:bool,audit_available:bool,missing_tables:array<int,string>,incompatible_tables:array<int,string>}
+     */
+    public static function readReadiness(?callable $schemaReader = null): array
+    {
+        $schemaReader ??= static fn(string $table, array $columns): string => self::tableShape($table, $columns);
+        $required = [
+            'procurement_suppliers' => ['id', 'supplier_name', 'supplier_status'],
+            'procurement_requests' => ['id', 'request_ref', 'request_status'],
+            'procurement_purchase_orders' => ['id', 'po_ref', 'request_id', 'po_status'],
+            'procurement_purchase_order_lines' => ['id', 'po_id', 'ordered_qty'],
+            'procurement_receipts' => ['id', 'po_id', 'received_qty', 'receipt_status'],
+        ];
+        $missing = [];
+        $incompatible = [];
+        foreach ($required as $table => $columns) {
+            try {
+                $shape = $schemaReader($table, $columns);
+                if ($shape === 'missing') {
+                    $missing[] = $table;
+                } elseif ($shape !== true && $shape !== 'ready') {
+                    $incompatible[] = $table;
+                }
+            } catch (\Throwable) {
+                $incompatible[] = $table;
+            }
+        }
+
+        $auditAvailable = false;
+        try {
+            $auditShape = $schemaReader('audit_activity_log', [
+                'id', 'entity_type', 'entity_id', 'action_name', 'new_state', 'created_at',
+            ]);
+            $auditAvailable = $auditShape === true || $auditShape === 'ready';
+        } catch (\Throwable) {
+            $auditAvailable = false;
+        }
+
+        return [
+            'available' => $missing === [] && $incompatible === [],
+            'audit_available' => $auditAvailable,
+            'missing_tables' => $missing,
+            'incompatible_tables' => array_values(array_unique($incompatible)),
+        ];
+    }
+
     public static function ensureSchema(): void
     {
         DB::query("CREATE TABLE IF NOT EXISTS procurement_suppliers (
@@ -333,7 +382,9 @@ final class ProcurementOverviewService
      */
     public static function recentTransitions(int $limit = 40): array
     {
-        AuditLogService::ensureSchema();
+        if (!self::tableHasColumns('audit_activity_log', ['id', 'entity_type', 'entity_id', 'action_name', 'new_state', 'created_at'])) {
+            return [];
+        }
 
         $rows = DB::fetchAll(
             'SELECT id, entity_type, entity_id, action_name, old_state, new_state, note_text, actor_email, actor_display_name, created_at
@@ -1140,7 +1191,9 @@ final class ProcurementOverviewService
      */
     private static function latestTransitionMap(string $entityType, array $entityIds): array
     {
-        AuditLogService::ensureSchema();
+        if (!self::tableHasColumns('audit_activity_log', ['id', 'entity_type', 'entity_id', 'action_name', 'new_state', 'created_at'])) {
+            return [];
+        }
 
         $ids = array_values(array_unique(array_filter(array_map('intval', $entityIds), static fn(int $v): bool => $v > 0)));
         if ($ids === []) {
@@ -1237,6 +1290,48 @@ final class ProcurementOverviewService
             [$safe]
         );
         return (int)($row['c'] ?? 0) > 0;
+    }
+
+    /**
+     * Read-only table shape inspection. This deliberately uses metadata only;
+     * schema creation remains owned by authorized lifecycle/mutation paths.
+     *
+     * @param array<int,string> $columns
+     */
+    private static function tableHasColumns(string $table, array $columns): bool
+    {
+        return self::tableShape($table, $columns) === 'ready';
+    }
+
+    /**
+     * @param array<int,string> $columns
+     * @return 'missing'|'incompatible'|'ready'
+     */
+    private static function tableShape(string $table, array $columns): string
+    {
+        if (!self::tableExists($table)) {
+            return 'missing';
+        }
+
+        $safeColumns = array_values(array_filter(array_map(
+            static fn(string $column): string => preg_replace('/[^a-zA-Z0-9_]/', '', $column) ?? '',
+            $columns
+        )));
+        if ($safeColumns === []) {
+            return 'ready';
+        }
+
+        $placeholders = implode(',', array_fill(0, count($safeColumns), '?'));
+        $row = DB::fetchOne(
+            'SELECT COUNT(*) AS c
+             FROM information_schema.columns
+             WHERE table_schema = DATABASE() AND table_name = ?
+               AND column_name IN (' . $placeholders . ')
+             LIMIT 1',
+            array_merge([$table], $safeColumns)
+        );
+
+        return (int)($row['c'] ?? 0) === count($safeColumns) ? 'ready' : 'incompatible';
     }
 
     private static function nullIfBlank(string $value): ?string
