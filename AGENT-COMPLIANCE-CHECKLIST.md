@@ -42,6 +42,16 @@ status, audit, and rollback contracts remain unchanged. Isolated proof passes
 **18/18**. No database, SQL, schema, browser, Core, activation, deployment,
 Material, SBAIO, or OH-AUTO2-105B operation occurred.
 
+## Session Summary (2026-10-16) — OH-AUTO2-127 Procurement receipt posting transaction
+
+Closed the receipt-posting atomicity gap in `setReceiptStatus()`. Posting now
+uses one explicit transaction, locks the linked PO before the receipt row,
+revalidates receipt identity/ownership, and keeps receipt update, audit, PO
+status recomputation, and commit within the same boundary. Isolated transaction
+proof passes **24/24**, including simulated update, audit, and recomputation
+rollback cases. No database, SQL, schema, browser, Core, activation,
+deployment, Material, SBAIO, or OH-AUTO2-105B operation occurred.
+
 ## Session Summary (2026-10-16) — OH-AUTO2-122 Procurement write authorization
 
 Closed the nine missing direct controller app-access checks. All 12 Procurement

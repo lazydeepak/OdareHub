@@ -112,6 +112,17 @@ State the current verified objective.
   linkage, and form regressions remain passing. No database, SQL, browser,
   activation, or deployment operation was used.
 
+## 2026-10-16 — OH-AUTO2-127 receipt posting transaction integrity
+
+- [x] Confirmed `setReceiptStatus()` previously updated the receipt, recorded
+  audit, and recomputed PO status without one transaction or a PO lock.
+- [x] Added one explicit commit/rollback boundary. Posting now establishes the
+  receipt's PO, locks the PO first, re-locks and revalidates the receipt, then
+  performs update, audit, recomputation, and one commit.
+- [x] Isolated transaction/order proof passes **24/24**, including simulated
+  update, audit, and recomputation failures rolling back. No database, SQL,
+  browser, activation, or deployment operation was used.
+
 ## In Progress
 
 - [x] OH-AUTO1-018 — Corrected misplaced receipt-line validation in `ProcurementOverviewService::createOrder()` and added `probe_order_receipt_method_boundaries.php`.

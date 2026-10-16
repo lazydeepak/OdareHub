@@ -1134,44 +1134,72 @@ final class ProcurementOverviewService
             throw new \InvalidArgumentException('Invalid receipt id.');
         }
 
-        $before = DB::fetchOne('SELECT receipt_status, po_id FROM procurement_receipts WHERE id=? LIMIT 1', [$id]);
-        if (!is_array($before)) {
-            throw new \RuntimeException('Receipt not found.');
-        }
-
         $allowed = ['received', 'posted', 'cancelled'];
         $status = strtolower(trim($status));
         if (!in_array($status, $allowed, true)) {
             throw new \InvalidArgumentException('Unsupported receipt status transition.');
         }
 
-        DB::query(
-            'UPDATE procurement_receipts SET receipt_status=?, updated_at=NOW(), created_by=COALESCE(created_by, ?) WHERE id=? LIMIT 1',
-            [$status, self::nullIfBlank($actor), $id]
-        );
-
-        $oldState = strtolower(trim((string)($before['receipt_status'] ?? '')));
-        if ($oldState !== $status) {
-            self::recordAudit(
-                'procurement_receipt',
-                $id,
-                AuditLogService::EVENT_WORKFLOW,
-                $status === 'posted' ? AuditLogService::ACTION_STOCK_ADJUSTMENT_POSTED : AuditLogService::ACTION_UPDATED,
-                $actor,
-                [
-                    'app' => 'procurement',
-                    'module' => 'receipts',
-                    'old_state' => $oldState,
-                    'new_state' => $status,
-                    'note' => $note !== '' ? $note : 'Receipt status updated.',
-                    'metadata' => ['po_id' => self::toPositiveInt($before['po_id'] ?? null)],
-                ]
+        $db = DB::conn();
+        $db->begin_transaction();
+        try {
+            // Read the identity first, then lock the PO before locking the
+            // receipt row. This matches createReceipt()'s PO-first ordering
+            // and avoids a receipt-row/PO-row lock inversion.
+            $identity = DB::fetchOne(
+                'SELECT po_id FROM procurement_receipts WHERE id=? LIMIT 1',
+                [$id]
             );
-        }
+            if (!is_array($identity)) {
+                throw new \RuntimeException('Receipt not found.');
+            }
 
-        $poId = self::toPositiveInt($before['po_id'] ?? null);
-        if ($poId !== null) {
+            $poId = self::normalizeReceiptPurchaseOrderId($identity['po_id'] ?? null);
+            self::assertPurchaseOrderExists($poId);
+
+            // Revalidate both receipt identity and PO ownership while the PO
+            // lock is held, immediately before any mutation.
+            $before = DB::fetchOne(
+                'SELECT receipt_status, po_id FROM procurement_receipts WHERE id=? LIMIT 1 FOR UPDATE',
+                [$id]
+            );
+            if (!is_array($before)) {
+                throw new \RuntimeException('Receipt not found.');
+            }
+            $lockedPoId = self::normalizeReceiptPurchaseOrderId($before['po_id'] ?? null);
+            if ($lockedPoId !== $poId) {
+                throw new \RuntimeException('Receipt purchase order changed during posting.');
+            }
+
+            DB::query(
+                'UPDATE procurement_receipts SET receipt_status=?, updated_at=NOW(), created_by=COALESCE(created_by, ?) WHERE id=? LIMIT 1',
+                [$status, self::nullIfBlank($actor), $id]
+            );
+
+            $oldState = strtolower(trim((string)($before['receipt_status'] ?? '')));
+            if ($oldState !== $status) {
+                self::recordAudit(
+                    'procurement_receipt',
+                    $id,
+                    AuditLogService::EVENT_WORKFLOW,
+                    $status === 'posted' ? AuditLogService::ACTION_STOCK_ADJUSTMENT_POSTED : AuditLogService::ACTION_UPDATED,
+                    $actor,
+                    [
+                        'app' => 'procurement',
+                        'module' => 'receipts',
+                        'old_state' => $oldState,
+                        'new_state' => $status,
+                        'note' => $note !== '' ? $note : 'Receipt status updated.',
+                        'metadata' => ['po_id' => $poId],
+                    ]
+                );
+            }
+
             self::recomputeOrderStatusFromReceipts($poId, $actor);
+            $db->commit();
+        } catch (\Throwable $e) {
+            $db->rollback();
+            throw $e;
         }
     }
 

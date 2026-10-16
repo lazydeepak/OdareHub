@@ -23,7 +23,7 @@ $checks = [
     "po_line_id non-existent rejected message" => str_contains($content, 'Receipt line reference does not exist.'),
     "po_line_id cross-order rejected message" => str_contains($content, 'Receipt line reference does not belong to the selected purchase order.'),
     "poLineId variable declared before query" => str_contains($content, '$poLineId = self::toPositiveInt'),
-    "poId variable declared before validation" => str_contains($content, '$poId = self::toPositiveInt'),
+    "poId variable declared before validation" => str_contains($content, '$poId = self::normalizeReceiptPurchaseOrderId'),
     "DB insert uses validated poLineId" => str_contains($content, '$poLineId,'),
     "No schema change" => true, // no migration edited
 ];

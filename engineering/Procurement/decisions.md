@@ -128,6 +128,21 @@ receipt over-quantity policy is introduced.
 Evidence: injected-reader/source-order proof, 18/18 assertions; live database
 and database-level concurrency behavior remain unverified.
 
+### 2026-10-16 — OH-AUTO2-127 receipt posting transaction integrity
+
+**Status:** Accepted — receipt posting is one PO-serialized transaction
+
+Receipt posting now begins one Procurement transaction, establishes the linked
+PO, locks the PO before the receipt row, revalidates receipt identity and PO
+ownership under lock, updates the receipt, records its audit, recomputes linked
+PO status, and commits once. Any downstream failure rolls back the operation.
+Existing status vocabulary, no-change behavior, receipt creation, quantity
+policy, line optionality, and authorization remain unchanged. No nested
+transaction mechanism or Core change was introduced.
+
+Evidence: isolated source/instrumentation proof, 24/24 assertions; live
+database failure and concurrency behavior remain unverified.
+
 ### YYYY-MM-DD — Decision title
 **Status:** Proposed / Accepted / Superseded
 
