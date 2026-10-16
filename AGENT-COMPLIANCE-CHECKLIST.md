@@ -12,6 +12,17 @@ regressions pass. No database,
 SQL, schema, browser, Core, activation, deployment, Material, SBAIO, or
 OH-AUTO2-105B operation occurred.
 
+## Session Summary (2026-10-17) — OH-AUTO2-128 Procurement receipt-creation status integrity
+
+Confirmed and preserved the existing receipt status contract
+(`received`/`posted`/`cancelled`). Added shared canonical status normalization
+to receipt creation and status transitions. Missing/blank creation status
+defaults to `received`; supported values are normalized; unsupported values are
+rejected before audit initialization, transaction opening, insertion, audit,
+or PO recomputation. Isolated proof passes **32/32**. No database, SQL, schema,
+browser, Core, activation, deployment, Material, SBAIO, or OH-AUTO2-105B
+operation occurred.
+
 ## Session Summary (2026-10-16) — OH-AUTO2-124 Procurement readiness completeness
 
 Completed the demonstrated Procurement GET dependency matrix. Readiness now

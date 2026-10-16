@@ -159,6 +159,22 @@ introduced.
 Evidence: source/call-graph and isolated instrumentation proof, 29/29
 assertions. Real database rollback and concurrency behavior remain unverified.
 
+### 2026-10-17 — OH-AUTO2-128 receipt-creation status integrity
+
+**Status:** Accepted — creation uses the existing receipt status vocabulary
+
+New receipt creation accepts only `received`, `posted`, or `cancelled`, using
+the same canonical lowercased/trimmed values as `setReceiptStatus()`. Missing or
+blank creation input remains `received`, preserving the form default. Valid
+internal `posted` creation remains permitted; `cancelled` remains accepted under
+the existing lifecycle contract. Unsupported values are rejected before audit
+schema initialization, transaction opening, receipt insertion, audit, and PO
+recomputation. No historical receipt, quantity rule, line optionality, route,
+permission, Core, or transaction policy changed.
+
+Evidence: isolated reflection/source-order proof, 32/32 assertions; no live
+database execution is claimed.
+
 ### YYYY-MM-DD — Decision title
 **Status:** Proposed / Accepted / Superseded
 

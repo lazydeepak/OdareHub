@@ -137,6 +137,25 @@ State the current verified objective.
 
 ## In Progress
 
+- [x] OH-AUTO2-128 — validated and canonicalized receipt status during creation
+  before audit/schema setup, transaction opening, or receipt insertion; preserved
+  the existing `received`/`posted`/`cancelled` contract and verified in isolation.
+
+## 2026-10-17 — OH-AUTO2-128 receipt-creation status integrity
+
+- [x] Confirmed the existing receipt status vocabulary is `received`, `posted`,
+  and `cancelled`; the form defaults to `received`, while internal creation
+  paths already use `posted`.
+- [x] Added one shared normalizer used by creation and status transitions.
+  Creation defaults missing/blank input to `received`; supported values are
+  lowercased and trimmed; unsupported values are rejected before audit schema
+  initialization, transaction start, or insertion.
+- [x] The canonical status now feeds receipt insertion, audit `new_state`, and
+  posted-status recomputation. Optional receipt lines, PO identity, supplier,
+  linkage, authorization, CSRF, and transaction boundaries remain unchanged.
+- [x] Isolated status/source proof passes **32/32**; no database, SQL, browser,
+  activation, or deployment operation was used.
+
 - [x] OH-AUTO1-018 — Corrected misplaced receipt-line validation in `ProcurementOverviewService::createOrder()` and added `probe_order_receipt_method_boundaries.php`.
 - [x] OH-AUTO1-020 — Completed non-mutating transaction-contract audit; disposable DB execution is blocked because an isolated target and credentials were not proven.
 - [x] OH-AUTO1-029 — Verified Procurement transactions against an independently attested disposable MySQL instance and added app-owned rollback boundaries.

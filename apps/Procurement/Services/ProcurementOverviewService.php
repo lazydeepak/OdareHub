@@ -937,6 +937,16 @@ final class ProcurementOverviewService
      */
     public static function createReceipt(array $input, string $actor): void
     {
+        // Validate and canonicalize before audit initialization, transaction
+        // opening, or any business mutation. Creation intentionally permits
+        // the same receipt vocabulary as setReceiptStatus(), including
+        // internally supplied posted/cancelled receipts.
+        $status = self::normalizeReceiptStatus(
+            $input['receipt_status'] ?? null,
+            true,
+            'Unsupported receipt status.'
+        );
+
         $qty = round(max(0.0, (float)($input['received_qty'] ?? 0)), 2);
         if ($qty <= 0) {
             throw new \InvalidArgumentException('Received quantity must be greater than zero.');
@@ -983,7 +993,7 @@ final class ProcurementOverviewService
                     $poLineId,
                     $qty,
                     self::nullIfBlank((string)($input['receipt_date'] ?? '')),
-                    self::nullIfBlank((string)($input['receipt_status'] ?? 'received')) ?? 'received',
+                    $status,
                     self::nullIfBlank((string)($input['note'] ?? '')),
                     self::nullIfBlank($actor),
                 ]
@@ -991,7 +1001,6 @@ final class ProcurementOverviewService
 
             $receiptId = (int)($db->insert_id ?: 0);
             if ($receiptId > 0) {
-                $status = strtolower(trim((string)($input['receipt_status'] ?? 'received')));
                 self::recordAudit(
                     'procurement_receipt',
                     $receiptId,
@@ -1134,11 +1143,7 @@ final class ProcurementOverviewService
             throw new \InvalidArgumentException('Invalid receipt id.');
         }
 
-        $allowed = ['received', 'posted', 'cancelled'];
-        $status = strtolower(trim($status));
-        if (!in_array($status, $allowed, true)) {
-            throw new \InvalidArgumentException('Unsupported receipt status transition.');
-        }
+        $status = self::normalizeReceiptStatus($status);
 
         // AuditLogService::logEvent() re-enters ensureSchema(). Complete that
         // DDL-capable initialization before opening the business transaction
@@ -1428,6 +1433,41 @@ final class ProcurementOverviewService
     {
         $trimmed = trim($value);
         return $trimmed === '' ? null : $trimmed;
+    }
+
+    /**
+     * Normalize the existing receipt-status vocabulary for both creation and
+     * transitions. Creation defaults missing/blank form values to received;
+     * transitions preserve their historical rejection of blank values.
+     *
+     * @param mixed $value
+     */
+    private static function normalizeReceiptStatus(
+        $value,
+        bool $defaultReceived = false,
+        string $errorMessage = 'Unsupported receipt status transition.'
+    ): string {
+        if ($value === null) {
+            if ($defaultReceived) {
+                return 'received';
+            }
+            throw new \InvalidArgumentException($errorMessage);
+        }
+
+        if (!is_string($value)) {
+            throw new \InvalidArgumentException($errorMessage);
+        }
+
+        $status = strtolower(trim($value));
+        if ($status === '' && $defaultReceived) {
+            return 'received';
+        }
+
+        if (!in_array($status, ['received', 'posted', 'cancelled'], true)) {
+            throw new \InvalidArgumentException($errorMessage);
+        }
+
+        return $status;
     }
 
     /**
