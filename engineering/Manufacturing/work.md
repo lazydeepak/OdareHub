@@ -7,6 +7,18 @@ Continue
 through the same owner-contract pattern for parts, work areas, and process
 areas only as separately bounded milestones.
 
+## 2026-10-16 — OH-AUTO2-109 Material summary extraction
+
+- [x] Added the isolated Manufacturing-owned Material summary provider and
+  exact manifest capability descriptor.
+- [x] Required existing `materials` module authority and retained the
+  `summaryReadOnly()` missing/incompatible-storage fail-closed path.
+- [x] Kept the composite provider, monitoring region, routes, and schema-backed
+  ordinary Material consumers unchanged.
+- [x] Extraction proof: **16/16**; Material read safety: **18/18**; existing
+  authorization/containment/admission/inventory proofs remain **12/12**,
+  **15/15**, **9/9**, and **7/7**.
+
 ## 2026-10-16 — OH-AUTO2-108 operational provider migration inventory
 
 - [x] Audited Manufacturing `/me` summary and monitoring callbacks and their

@@ -108,21 +108,27 @@ final class HostProviderAdmissionService
         }
 
         $effect = strtolower(trim((string)($descriptor['effect'] ?? '')));
-        if ($effect !== 'read_only_navigation') {
-            return ['allowed' => false, 'reason' => 'unsupported_effect'];
-        }
-
+        $output = trim((string)($descriptor['output'] ?? ''));
+        $recordScope = strtolower(trim((string)($descriptor['record_scope'] ?? '')));
+        $recordAuthorization = trim((string)($descriptor['record_authorization'] ?? ''));
+        $requiredModules = array_values(array_filter(
+            array_map(static fn($module): string => trim((string)$module), (array)($descriptor['required_modules'] ?? [])),
+            static fn(string $module): bool => $module !== ''
+        ));
+        $contract = $effect === 'read_only_navigation'
+            && $output === 'navigation_items'
+            && $recordScope === 'route_authority_only'
+            && $recordAuthorization === 'route_authority';
+        $aggregateContract = $effect === 'read_only_aggregate'
+            && $output === 'summary_widgets'
+            && $recordScope === 'module_authority_aggregate'
+            && $requiredModules !== []
+            && preg_match('/^[a-z][a-z0-9_.-]+$/', strtolower($recordAuthorization)) === 1;
         if (trim((string)($descriptor['required_app_authority'] ?? '')) !== 'existing_app_assignment'
-            || trim((string)($descriptor['output'] ?? '')) !== 'navigation_items'
-            || trim((string)($descriptor['record_authorization'] ?? '')) !== 'route_authority'
             || trim((string)($descriptor['failure_behavior'] ?? '')) !== 'suppress'
+            || (!$contract && !$aggregateContract)
         ) {
             return ['allowed' => false, 'reason' => 'incomplete_capability_contract'];
-        }
-
-        $scope = strtolower(trim((string)($descriptor['record_scope'] ?? '')));
-        if ($scope !== 'route_authority_only') {
-            return ['allowed' => false, 'reason' => 'missing_scope_evidence'];
         }
 
         $review = is_array($descriptor['review'] ?? null) ? $descriptor['review'] : [];

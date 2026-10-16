@@ -6,6 +6,14 @@ OH-AUTO1-094 Processing authority closure is complete. Shell remains the
 generic operator composition and rendering boundary; Manufacturing owns lane
 authority and data projection.
 
+## 2026-10-16 — OH-AUTO2-109 extracted aggregate contribution
+
+- [x] Base registry continues to perform pre-load Platform admission and
+  downstream route filtering; no Shell renderer or route logic changed.
+- [x] One separately declared Manufacturing Material summary may now reach the
+  existing summary region; composite operational providers and restricted
+  containment behavior remain unchanged.
+
 ## 2026-10-16 — OH-AUTO2-108 operational provider migration inventory
 
 - [x] Shell runtime behavior is unchanged; the existing admission boundary

@@ -2,6 +2,17 @@
 
 ## Decision Log
 
+### 2026-10-16 — OH-AUTO2-109 bounded Material summary extraction
+
+**Status:** Accepted — one aggregate contribution admitted
+
+The Material Management aggregate is admitted through a separate provider only
+because its existing read-only service path has isolated zero-write/schema/
+demand evidence and its existing module ACL is required. The provider does not
+invoke the composite Manufacturing callback or dynamic widget registries. It
+emits aggregate counts and an existing route only; record rows and identities
+remain outside the contribution. Other operational regions remain suppressed.
+
 ### 2026-10-16 — OH-AUTO2-108 operational `/me` provider boundary
 
 **Status:** Accepted — operational providers remain suppressed

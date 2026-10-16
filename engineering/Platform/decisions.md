@@ -1,5 +1,15 @@
 # Platform — Decisions
 
+### 2026-10-16 — OH-AUTO2-109 aggregate capability contract
+
+**Status:** Accepted — explicit bounded aggregate shape
+
+The Platform admission service may admit a read-only aggregate only when its
+descriptor explicitly binds `summary_widgets`, `module_authority_aggregate`,
+and an owner-specific record-authorization contract. This is an additive
+bounded shape for the Material Management extraction, not a generic operational
+provider allowance. Existing navigation admission rules remain unchanged.
+
 ### 2026-10-16 — OH-AUTO2-108 no operational provider admission
 **Status:** Accepted — fail closed pending owner evidence
 

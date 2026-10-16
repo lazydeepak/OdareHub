@@ -106,7 +106,7 @@ namespace {
         }
     };
 
-    $assert(count($approved) === 6, 'six approved navigation descriptors exist');
+    $assert(count($approved) === 7, 'six navigation plus one extracted aggregate descriptor exist');
     $headerApps = array_values(array_unique(array_map(
         static fn(array $item): string => (string)($item['app_key'] ?? ''),
         array_values(array_filter((array)($regions['header_actions'] ?? []), 'is_array'))

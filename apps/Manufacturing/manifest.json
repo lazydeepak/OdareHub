@@ -113,6 +113,15 @@
     },
     {
       "type": "host_surface",
+      "key": "manufacturing.me.material_summary",
+      "surface": "me",
+      "region": "summary_cards",
+      "provider": "Apps\\Manufacturing\\Services\\HostMaterialSummaryContributionService::contribute",
+      "provider_file": "Services/HostMaterialSummaryContributionService.php",
+      "order": 21
+    },
+    {
+      "type": "host_surface",
       "key": "manufacturing.me.quick_links",
       "surface": "me",
       "region": "quick_links",
@@ -240,6 +249,23 @@
       "record_scope": "route_authority_only",
       "record_authorization": "route_authority",
       "output": "navigation_items",
+      "failure_behavior": "suppress",
+      "review": {"static": "approved", "isolated": "approved"},
+      "enabled": true
+    },
+    {
+      "key": "manufacturing.me.material_summary",
+      "owner_app": "manufacturing",
+      "provider": "Apps\\Manufacturing\\Services\\HostMaterialSummaryContributionService::contribute",
+      "provider_file": "Services/HostMaterialSummaryContributionService.php",
+      "surface": "me",
+      "region": "summary_cards",
+      "required_modules": ["materials"],
+      "required_app_authority": "existing_app_assignment",
+      "effect": "read_only_aggregate",
+      "record_scope": "module_authority_aggregate",
+      "record_authorization": "material_module_acl",
+      "output": "summary_widgets",
       "failure_behavior": "suppress",
       "review": {"static": "approved", "isolated": "approved"},
       "enabled": true

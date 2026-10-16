@@ -45,6 +45,17 @@ remain disabled.
 
 Release/update foundation governance and controlled-cycle readiness.
 
+## 2026-10-16 — OH-AUTO2-109 Material summary admission
+
+- [x] Extended the existing admission contract for one explicit
+  `read_only_aggregate` / `summary_widgets` capability shape without adding a
+  generic fallback.
+- [x] Verified the Manufacturing descriptor requires existing app assignment
+  and `materials` module authority.
+- [x] Real admission plus callback extraction proof passed **16/16**; prior
+  admission, containment, authorization, and read-safety proofs remain green.
+- [x] No Core, database, schema, route, or runtime governance redesign.
+
 ## 2026-10-16 — OH-AUTO2-108 operational provider migration inventory
 
 - [x] Audited all suppressed Manufacturing, SBAIO, and Studio `/me` regions

@@ -1,5 +1,27 @@
 # AGENT-COMPLIANCE-CHECKLIST
 
+## Session Summary (2026-10-16) — OH-AUTO2-109 safe Material summary extraction
+
+Extracted one independently governed Manufacturing `/me` operational
+contribution: `HostMaterialSummaryContributionService` for the Material
+Management aggregate summary. It requires existing Manufacturing assignment,
+existing `materials` module authority, and the existing
+`MaterialAccessService::canAccessAny()` contract; it calls only
+`MaterialManagementService::summaryReadOnly()`. The composite Manufacturing
+provider and all other operational regions remain unchanged/suppressed.
+
+The exact descriptor `manufacturing.me.material_summary` is admitted as a
+read-only aggregate with summary-widget output and fail-closed behavior.
+The 16-assertion extraction proof covers trusted admission, tampered binding
+rejection, actual callback output, canonical destination, denied authority,
+missing storage, unsupported regions, zero writes, zero schema initialization,
+and zero demand recalculation.
+
+Validation: Material read safety **18/18**; extraction **16/16**; provider
+authorization **12/12**; containment **15/15**; admission **9/9**; provider
+inventory/order **7/7**. No Core, schema, route, installed database, browser,
+activation, deployment, or SBAIO sensitive-data restoration operation.
+
 ## Session Summary (2026-10-16) — OH-AUTO2-108 operational provider migration inventory
 
 Completed the bounded suppressed-provider inventory. No operational callback

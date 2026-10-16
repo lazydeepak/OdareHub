@@ -107,6 +107,10 @@ Evidence for the completed milestones is recorded in:
   the complete admission contract, so none was restored; Material Management
   read safety remains proven but its composite summary callback lacks complete
   record-scope evidence. SBAIO sensitive providers remain suppressed.
+- OH-AUTO2-109 — extracted and admitted one bounded Manufacturing Material
+  Management aggregate summary provider. It uses existing module authority and
+  `summaryReadOnly()` only; the composite callback, monitoring providers, and
+  SBAIO sensitive providers remain suppressed.
 
 After the release/update cycle is proven, resume the product roadmap focus from
 `README.md`:
