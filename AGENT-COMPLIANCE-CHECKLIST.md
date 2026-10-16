@@ -1,5 +1,38 @@
 # AGENT-COMPLIANCE-CHECKLIST
 
+## Session Summary (2026-10-16) — OH-AUTO2-113 blocker closure and next milestone
+
+Reconciled OH-AUTO2-112 as **OPTION C — BLOCKED** and preserved the complete
+OH-AUTO2-109/110/111 history and containment decision. Reviewed remaining
+Manufacturing, Platform, Shell, Procurement, Hospitality, SBAIO, and Shared
+milestones. The recommended next executable task is a bounded Shell
+`OperatorSurfaceComposer::buildAccountPanelData()` extraction, not Material
+reactivation or another speculative authorization audit.
+
+Documentation-only changes are limited to the OH-AUTO2-112 report/records and
+this milestone-selection record. No application source, Core, database, SQL,
+schema, browser, activation, deployment, or authorization change occurred.
+Lifecycle logs and PHPUnit cache remain preserved and unstaged.
+
+## Session Summary (2026-10-16) — OH-AUTO2-112 record-scope authority investigation
+
+Completed a read-only Manufacturing scope and query-contract investigation.
+The existing assignment authority provides machine, part, task, department,
+branch, and ownership scope evidence, with fail-closed denied/malformed
+semantics. Existing Processing, Production, Parts, and My Work paths prove
+source-level filtering where explicit field mappings exist.
+
+Material Management remains **OPTION C — BLOCKED**: its aggregate sources do
+not share a complete authoritative relationship to those scope dimensions.
+`MaterialAccessService::canAccessAny()` is module authority only; it cannot
+authorize whole-domain Material aggregates. OH-AUTO2-111 containment remains
+in force. No source implementation, database, SQL, schema, browser, activation,
+deployment, Core, or authorization-model change occurred.
+
+Isolated verification: Parts **14/14**, Processing **35/35**, restricted My
+Work **21/21**, preflight **17/17**. Full findings are recorded in
+`docs/architecture/oh-auto2-112-manufacturing-record-scope-authority-query-contract-2026-10-16.md`.
+
 ## Session Summary (2026-10-16) — OH-AUTO2-111 Material aggregate authorization containment
 
 Removed the unsafe `manufacturing.me.material_summary` host hook and trusted

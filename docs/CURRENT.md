@@ -117,6 +117,14 @@ Evidence for the completed milestones is recorded in:
   from executable Manufacturing `/me` metadata. The provider source and
   `summaryReadOnly()` remain preserved but inactive; six navigation providers
   remain admitted.
+- OH-AUTO2-112 — the read-only record-scope investigation is complete and
+  classified **OPTION C — BLOCKED**. Existing part/machine query filters do not
+  map consistently to all Material aggregate sources; no whole-domain authority
+  was found. OH-AUTO2-111 containment remains in force.
+- OH-AUTO2-113 — closed the blocked Material workstream administratively and
+  selected the next executable milestone: a bounded Shell
+  `OperatorSurfaceComposer` account-panel data extraction. No runtime change is
+  included in this selection record.
 
 After the release/update cycle is proven, resume the product roadmap focus from
 `README.md`:

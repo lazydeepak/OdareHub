@@ -257,7 +257,10 @@ authority and data projection.
 
 ## Next
 
-- [ ] Identify next extraction candidate from remaining `OperatorSurfaceComposer.php` private methods.
+- [ ] Proposed OH-AUTO2-114 — extract the existing `buildAccountPanelData()`
+  non-rendering block into a focused Shell composer/service with exact payload,
+  flash, URL, and rendering parity. No new route, schema, database, ACL, or
+  app-specific capability authority.
 
 ## Blocked
 

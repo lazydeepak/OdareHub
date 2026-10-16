@@ -7,6 +7,20 @@ Continue
 through the same owner-contract pattern for parts, work areas, and process
 areas only as separately bounded milestones.
 
+## 2026-10-16 — OH-AUTO2-112 record-scope authority investigation
+
+- [x] Traced existing assignment scope authority and Material Management source
+  relationships without database access or source implementation changes.
+- [x] Confirmed reusable part/machine query filters exist, but Material,
+  ledger, reservation, order, capacity, demand, and plan inputs lack one
+  complete authoritative record-scope mapping.
+- [x] Classified the restoration decision **OPTION C — BLOCKED**. Module
+  permission is not whole-domain Material authorization; OH-AUTO2-111 remains
+  in force.
+- [x] Isolated fixture verification: Parts **14/14**, Processing **35/35**,
+  restricted My Work **21/21**, preflight **17/17**.
+- [x] Full findings: `docs/architecture/oh-auto2-112-manufacturing-record-scope-authority-query-contract-2026-10-16.md`.
+
 ## 2026-10-16 — OH-AUTO2-111 Material aggregate authorization containment
 
 - [x] Removed the unsafe `/me` Material aggregate hook and capability

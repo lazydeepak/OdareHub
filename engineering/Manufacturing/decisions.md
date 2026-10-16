@@ -2,6 +2,18 @@
 
 ## Decision Log
 
+### 2026-10-16 — OH-AUTO2-112 Material record-scope contract investigation
+
+**Status:** Blocked — OPTION C
+
+Existing authoritative scope evidence supports bounded machine/product query
+patterns, but no complete Material source-to-scope relationship exists for
+the aggregate's independent material, ledger, reservation, order, capacity,
+demand, and plan inputs. `MaterialAccessService::canAccessAny()` remains
+module authority only. No whole-domain authority was found, and the Material
+aggregate must remain suppressed until an owner-approved source-level contract
+is established.
+
 ### 2026-10-16 — OH-AUTO2-111 disable unsafe Material aggregate
 
 **Status:** Accepted — immediate fail-closed containment
