@@ -42,6 +42,7 @@ $router->get('/apps/procurement/receipts', function () use ($view) {
 $router->post('/apps/procurement/suppliers/edit', function () {
     Auth::requireAppAccess('procurement');
     Auth::bootSession();
+    Auth::requireCsrf((string)($_POST['csrf'] ?? ''));
     ProcurementOverviewService::ensureSchema();
     ProcurementDashboardController::editSupplier();
     return null;
@@ -50,6 +51,7 @@ $router->post('/apps/procurement/suppliers/edit', function () {
 $router->post('/apps/procurement/suppliers/create', function () {
     Auth::requireAppAccess('procurement');
     Auth::bootSession();
+    Auth::requireCsrf((string)($_POST['csrf'] ?? ''));
     ProcurementOverviewService::ensureSchema();
     ProcurementDashboardController::createSupplier();
     return null;
@@ -58,6 +60,7 @@ $router->post('/apps/procurement/suppliers/create', function () {
 $router->post('/apps/procurement/requests/create', function () {
     Auth::requireAppAccess('procurement');
     Auth::bootSession();
+    Auth::requireCsrf((string)($_POST['csrf'] ?? ''));
     ProcurementOverviewService::ensureSchema();
     ProcurementDashboardController::createRequest();
     return null;
@@ -66,6 +69,7 @@ $router->post('/apps/procurement/requests/create', function () {
 $router->post('/apps/procurement/requests/intake/manufacturing', function () {
     Auth::requireAppAccess('procurement');
     Auth::bootSession();
+    Auth::requireCsrf((string)($_POST['csrf'] ?? ''));
     ProcurementOverviewService::ensureSchema();
     ProcurementDashboardController::intakeManufacturingRequest();
     return null;
@@ -74,6 +78,7 @@ $router->post('/apps/procurement/requests/intake/manufacturing', function () {
 $router->post('/apps/procurement/requests/approve', function () {
     Auth::requireAppAccess('procurement');
     Auth::bootSession();
+    Auth::requireCsrf((string)($_POST['csrf'] ?? ''));
     ProcurementOverviewService::ensureSchema();
     ProcurementDashboardController::approveRequest();
     return null;
@@ -82,6 +87,7 @@ $router->post('/apps/procurement/requests/approve', function () {
 $router->post('/apps/procurement/orders/create', function () {
     Auth::requireAppAccess('procurement');
     Auth::bootSession();
+    Auth::requireCsrf((string)($_POST['csrf'] ?? ''));
     ProcurementOverviewService::ensureSchema();
     ProcurementDashboardController::createOrder();
     return null;
@@ -90,6 +96,7 @@ $router->post('/apps/procurement/orders/create', function () {
 $router->post('/apps/procurement/orders/create-from-request', function () {
     Auth::requireAppAccess('procurement');
     Auth::bootSession();
+    Auth::requireCsrf((string)($_POST['csrf'] ?? ''));
     ProcurementOverviewService::ensureSchema();
     ProcurementDashboardController::createOrderFromRequest();
     return null;
@@ -98,6 +105,7 @@ $router->post('/apps/procurement/orders/create-from-request', function () {
 $router->post('/apps/procurement/requests/cancel', function () {
     Auth::requireAppAccess('procurement');
     Auth::bootSession();
+    Auth::requireCsrf((string)($_POST['csrf'] ?? ''));
     ProcurementOverviewService::ensureSchema();
     ProcurementDashboardController::cancelRequest();
     return null;
@@ -106,6 +114,7 @@ $router->post('/apps/procurement/requests/cancel', function () {
 $router->post('/apps/procurement/orders/cancel', function () {
     Auth::requireAppAccess('procurement');
     Auth::bootSession();
+    Auth::requireCsrf((string)($_POST['csrf'] ?? ''));
     ProcurementOverviewService::ensureSchema();
     ProcurementDashboardController::cancelOrder();
     return null;
@@ -114,6 +123,7 @@ $router->post('/apps/procurement/orders/cancel', function () {
 $router->post('/apps/procurement/orders/issue', function () {
     Auth::requireAppAccess('procurement');
     Auth::bootSession();
+    Auth::requireCsrf((string)($_POST['csrf'] ?? ''));
     ProcurementOverviewService::ensureSchema();
     ProcurementDashboardController::issueOrder();
     return null;
@@ -122,6 +132,7 @@ $router->post('/apps/procurement/orders/issue', function () {
 $router->post('/apps/procurement/receipts/create', function () {
     Auth::requireAppAccess('procurement');
     Auth::bootSession();
+    Auth::requireCsrf((string)($_POST['csrf'] ?? ''));
     ProcurementOverviewService::ensureSchema();
     ProcurementDashboardController::createReceipt();
     return null;
@@ -130,6 +141,7 @@ $router->post('/apps/procurement/receipts/create', function () {
 $router->post('/apps/procurement/receipts/post', function () {
     Auth::requireAppAccess('procurement');
     Auth::bootSession();
+    Auth::requireCsrf((string)($_POST['csrf'] ?? ''));
     ProcurementOverviewService::ensureSchema();
     ProcurementDashboardController::postReceipt();
     return null;

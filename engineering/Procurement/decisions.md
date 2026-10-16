@@ -99,6 +99,19 @@ provisioning path, Core code, or database behavior was changed.
 Evidence: injected metadata-catalog probe, 74/74 assertions; live database
 compatibility remains unverified.
 
+### 2026-10-16 — OH-AUTO2-125 CSRF-before-provisioning boundary
+
+**Status:** Accepted — reject CSRF before route schema provisioning
+
+Every Procurement POST route now preserves app access and session boot, then
+calls the existing Core `Auth::requireCsrf()` before
+`ProcurementOverviewService::ensureSchema()`. Controller-level CSRF checks,
+controller dispatch, route registration, and authorized provisioning remain
+unchanged. No token mechanism, permission model, or business service changed.
+
+Evidence: route/controller structural proof, 160/160 assertions. No live
+database or application execution is claimed.
+
 ### YYYY-MM-DD — Decision title
 **Status:** Proposed / Accepted / Superseded
 

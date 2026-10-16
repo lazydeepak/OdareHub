@@ -22,6 +22,15 @@ sources are explicitly unavailable and their queries are skipped. Isolated
 readiness proof passes **74/74**. No database, SQL, schema, browser, Core,
 activation, deployment, Material, SBAIO, or OH-AUTO2-105B operation occurred.
 
+## Session Summary (2026-10-16) — OH-AUTO2-125 Procurement CSRF ordering
+
+Moved the existing route-level CSRF check ahead of Procurement schema
+provisioning on all 12 POST routes. App access, session boot, controller-level
+CSRF defense, dispatch, and authorized POST provisioning remain preserved.
+Structural/instrumented authorization proof passes **160/160**. No database,
+SQL, schema, browser, Core, activation, deployment, Material, SBAIO, or
+OH-AUTO2-105B operation occurred.
+
 ## Session Summary (2026-10-16) — OH-AUTO2-122 Procurement write authorization
 
 Closed the nine missing direct controller app-access checks. All 12 Procurement

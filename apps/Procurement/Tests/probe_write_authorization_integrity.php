@@ -65,11 +65,19 @@ foreach ([
     '/apps/procurement/receipts/create' => 'ProcurementDashboardController::createReceipt()',
     '/apps/procurement/receipts/post' => 'ProcurementDashboardController::postReceipt()',
 ] as $route => $handler) {
-    $position = strpos($routes, "'$route'");
-    $tail = $position === false ? '' : substr($routes, $position, 700);
+    $position = strpos($routes, "\$router->post('{$route}'");
+    $end = $position === false ? false : strpos($routes, "});", $position);
+    $body = $position !== false && $end !== false ? substr($routes, $position, $end - $position) : '';
     $check($position !== false, "route {$route} exists");
-    $check(str_contains($tail, "Auth::requireAppAccess('procurement')"), "route {$route} enforces app access");
-    $check(str_contains($tail, $handler), "route {$route} dispatches the expected controller");
+    $check(str_contains($body, "Auth::requireAppAccess('procurement')"), "route {$route} enforces app access");
+    $check(str_contains($body, $handler), "route {$route} dispatches the expected controller");
+    $csrfPosition = strpos($body, 'Auth::requireCsrf(');
+    $schemaPosition = strpos($body, 'ProcurementOverviewService::ensureSchema()');
+    $dispatchPosition = strpos($body, $handler);
+    $check($csrfPosition !== false, "route {$route} enforces CSRF before provisioning");
+    $check($schemaPosition !== false, "route {$route} retains schema provisioning");
+    $check($csrfPosition !== false && $schemaPosition !== false && $csrfPosition < $schemaPosition, "route {$route} rejects CSRF before schema provisioning");
+    $check($csrfPosition !== false && $dispatchPosition !== false && $csrfPosition < $dispatchPosition, "route {$route} rejects CSRF before controller dispatch");
 }
 
 $check(str_contains($service, 'SELECT id, supplier_name, supplier_status'), 'approved-request conversion validates selected supplier identity');

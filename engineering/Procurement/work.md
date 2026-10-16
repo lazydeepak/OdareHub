@@ -85,6 +85,17 @@ State the current verified objective.
 - [x] Isolated readiness contract proof passes **74/74**; no database, SQL,
   browser, activation, or deployment operation was used.
 
+## 2026-10-16 — OH-AUTO2-125 CSRF-before-provisioning integrity
+
+- [x] Confirmed all 12 Procurement POST routes previously ran app access,
+  session boot, schema initialization, then controller-level CSRF validation.
+- [x] Added the existing `Auth::requireCsrf()` call after session boot and
+  before `ProcurementOverviewService::ensureSchema()` on every POST route.
+  Controller-level CSRF checks remain unchanged as defense in depth.
+- [x] Expanded route/controller authorization proof passes **160/160**;
+  invalid-token rejection is structural/instrumented, with no database,
+  schema, browser, activation, or deployment operation.
+
 ## In Progress
 
 - [x] OH-AUTO1-018 — Corrected misplaced receipt-line validation in `ProcurementOverviewService::createOrder()` and added `probe_order_receipt_method_boundaries.php`.
