@@ -1,5 +1,18 @@
 # AGENT-COMPLIANCE-CHECKLIST
 
+## Session Summary (2026-10-16) — OH-AUTO2-118 runtime authorization and safe presentation
+
+Verified the production call path invokes recent activity without an owner
+record-authorizer; no exact-record Manufacturing or Procurement resolver is
+currently available or wired. The seven enrichment types remain fail-closed.
+
+Closed the second disclosure path by suppressing owner-controlled `note_text`,
+`reason_text`, and `new_state` when exact entity authority is absent or denied.
+Safe event metadata and existing actor filtering, seven-day window, ordering,
+limit, counts, localization, and view payload remain preserved. Isolated proof
+passes **24/24**. No database, SQL, browser, Core, route, schema, permission
+model, activation, deployment, Material, SBAIO, or OH-AUTO2-105B operation.
+
 ## Session Summary (2026-10-16) — OH-AUTO2-117 recent-activity authorization
 
 Audited the seven recent-activity entity-enrichment query shapes. The audit

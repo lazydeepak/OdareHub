@@ -6,6 +6,19 @@ OH-AUTO1-094 Processing authority closure is complete. Shell remains the
 generic operator composition and rendering boundary; Manufacturing owns lane
 authority and data projection.
 
+## 2026-10-16 — OH-AUTO2-118 runtime authorization and safe presentation
+
+- [x] Traced the production path: `OperatorSurfaceComposer` invokes
+  `OperatorRecentActivityComposer::build($this->context)` without an owner
+  resolver; no exact-record Manufacturing or Procurement resolver is wired.
+- [x] Kept all seven entity types fail-closed in production rather than
+  fabricating scope or treating app/module/route access as record authority.
+- [x] Suppressed owner-controlled `note_text`, `reason_text`, and `new_state`
+  presentation when exact entity authority is absent or denied. Safe event
+  metadata, counts, actor filter, seven-day window, ordering, and limit remain.
+- [x] Isolated query/authorization/rendering proof passes **24/24**; no
+  database, browser, activation, or deployment operation was used.
+
 ## 2026-10-16 — OH-AUTO2-117 recent-activity entity authorization
 
 - [x] Confirmed the audit query remains restricted to the authenticated

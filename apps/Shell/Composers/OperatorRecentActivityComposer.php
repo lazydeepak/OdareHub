@@ -160,11 +160,12 @@ final class OperatorRecentActivityComposer
 
             $entityType = trim((string)($row['entity_type'] ?? ''));
             $entityId = (int)($row['entity_id'] ?? 0);
-            $entitySummary = $this->buildRecentEntitySummary($entityType, $entityId);
+            $entityAuthorized = $this->isEntityAuthorized($entityType, $entityId);
+            $entitySummary = $this->buildRecentEntitySummary($entityType, $entityId, $entityAuthorized);
             $activityDate = $this->formatRecentActivityDate((string)($row['created_at'] ?? ''));
 
             $newStateText = trim((string)($row['new_state'] ?? ''));
-            $stateLabel = $newStateText === ''
+            $stateLabel = !$entityAuthorized || $newStateText === ''
                 ? ''
                 : sprintf(
                     $this->tr('operator.recent.state_label', 'status: %s'),
@@ -185,14 +186,16 @@ final class OperatorRecentActivityComposer
                 $actorLabel
             );
 
-            $note = trim((string)($row['note_text'] ?? ''));
-            if ($note === '') {
+            $note = $entityAuthorized
+                ? trim((string)($row['note_text'] ?? ''))
+                : $this->tr('operator.recent.note.unavailable', 'Details unavailable.');
+            if ($entityAuthorized && $note === '') {
                 $note = trim((string)($row['reason_text'] ?? ''));
             }
-            if ($note === '') {
+            if ($entityAuthorized && $note === '') {
                 $note = trim((string)($row['new_state'] ?? ''));
             }
-            if ($note === '') {
+            if ($entityAuthorized && $note === '') {
                 $note = '-';
             }
 
@@ -249,24 +252,34 @@ final class OperatorRecentActivityComposer
         }
     }
 
-    private function buildRecentEntitySummary(string $entityType, int $entityId): string
+    private function isEntityAuthorized(string $entityType, int $entityId): bool
     {
         $normalizedType = strtolower(trim($entityType));
         if ($entityId <= 0) {
-            return $this->tr('operator.recent.entity_unknown', 'record');
+            return false;
         }
 
         // Audit visibility does not prove current access to the referenced
         // business record. Owner code must supply an authoritative resolver
         // before this composer performs any entity-enrichment query.
         if (!is_callable($this->entityAuthorizationResolver)) {
-            return $this->entityDetailsUnavailable();
+            return false;
         }
         try {
-            if (($this->entityAuthorizationResolver)($normalizedType, $entityId) !== true) {
-                return $this->entityDetailsUnavailable();
-            }
+            return ($this->entityAuthorizationResolver)($normalizedType, $entityId) === true;
         } catch (\Throwable) {
+            return false;
+        }
+    }
+
+    private function buildRecentEntitySummary(string $entityType, int $entityId, bool $entityAuthorized): string
+    {
+        $normalizedType = strtolower(trim($entityType));
+        if ($entityId <= 0) {
+            return $this->tr('operator.recent.entity_unknown', 'record');
+        }
+
+        if (!$entityAuthorized) {
             return $this->entityDetailsUnavailable();
         }
 

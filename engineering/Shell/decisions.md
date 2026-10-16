@@ -16,6 +16,20 @@ type or record ID. No new scope mapping, permission, or business authorization
 model is introduced. Authorized owner fixtures may retain existing enrichment
 through the resolver seam.
 
+### 2026-10-16 — OH-AUTO2-118 recent-activity payload safety
+
+**Status:** Accepted — preserve safe audit metadata; suppress unauthorized details
+
+The production operator context does not currently bind an exact-record owner
+resolver for any supported Manufacturing or Procurement entity type. The
+fail-closed enrichment boundary therefore remains active. Additionally,
+`note_text`, `reason_text`, and `new_state` are owner-controlled payload fields
+and are not independently safe merely because the audit row belongs to the
+authenticated actor. When exact entity authority is absent or denied, those
+fields are suppressed and the existing event counts, type/action/module/date,
+actor, ordering, seven-day window, and 200-row limit remain available. No new
+authorization model or broad fallback is introduced.
+
 ### 2026-10-16 — OH-AUTO2-103 host-provider containment boundary
 
 **Status:** Accepted — bounded Shell composition admission

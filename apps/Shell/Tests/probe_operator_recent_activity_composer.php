@@ -139,6 +139,8 @@ $unauthorized = new OperatorRecentActivityComposer(
 $unauthorizedResult = $unauthorized->build(['user_email' => 'operator@example.test']);
 $assert(count(array_filter($unauthorizedQueries, static fn(array $query): bool => $query['kind'] === 'one')) === 0, 'missing entity authority prevents secondary record queries');
 $assert(str_contains($unauthorizedResult['rows'][0]['action_display'], 'Record details unavailable.') && !str_contains($unauthorizedResult['rows'][0]['action_display'], '#5'), 'unauthorized enrichment uses a non-sensitive fallback without record ID');
+$assert($unauthorizedResult['rows'][0]['note'] === 'Details unavailable.', 'unauthorized owner-controlled note is suppressed');
+$assert(!str_contains($unauthorizedResult['rows'][0]['event_display'], 'pending'), 'unauthorized owner-controlled state is suppressed');
 
 $deniedQueries = [];
 $denied = new OperatorRecentActivityComposer(
@@ -158,6 +160,7 @@ $deniedResult = $denied->build([
 ]);
 $assert(count(array_filter($deniedQueries, static fn(array $query): bool => $query['kind'] === 'one')) === 0, 'denied entity authority prevents secondary record queries');
 $assert(str_contains($deniedResult['rows'][1]['action_display'], 'Record details unavailable.') && !str_contains($deniedResult['rows'][1]['action_display'], '#9'), 'denied cross-application enrichment does not expose the entity ID');
+$assert($deniedResult['rows'][1]['note'] === 'Details unavailable.', 'denied owner-controlled note is suppressed');
 
 $queryCalls = 0;
 $missing = (new OperatorRecentActivityComposer(
@@ -207,7 +210,7 @@ $renderedSafe = (new class {
         return (string)ob_get_clean();
     }
 })->render(['username' => 'operator', 'recent_activity' => $unauthorizedResult]);
-$assert(!str_contains($renderedSafe, '#5') && str_contains($renderedSafe, 'Localized Approved'), 'rendered recent activity preserves the event while suppressing entity identity');
+$assert(!str_contains($renderedSafe, '#5') && str_contains($renderedSafe, 'Localized Approved') && str_contains($renderedSafe, 'Details unavailable.'), 'rendered recent activity preserves safe metadata while suppressing sensitive details');
 
 if ($failed > 0) {
     fwrite(STDERR, "RESULT: {$passed}/" . ($passed + $failed) . " assertions passed; {$failed} failed\n");
