@@ -112,6 +112,22 @@ unchanged. No token mechanism, permission model, or business service changed.
 Evidence: route/controller structural proof, 160/160 assertions. No live
 database or application execution is claimed.
 
+### 2026-10-16 — OH-AUTO2-126 receipt PO identity
+
+**Status:** Accepted — a new receipt requires an existing purchase order
+
+`createReceipt()` must reject absent, non-positive, malformed, or nonexistent
+purchase-order identities before receipt insertion. Valid identities are
+locked with the existing `FOR UPDATE` query inside the transaction and the
+same validated ID is used for insertion and posted-status recomputation.
+`po_line_id` remains optional; when supplied, its existing existence and
+cross-order checks remain authoritative. Quantity, receipt status, audit, and
+rollback policies are unchanged. No historical receipt is changed and no
+receipt over-quantity policy is introduced.
+
+Evidence: injected-reader/source-order proof, 18/18 assertions; live database
+and database-level concurrency behavior remain unverified.
+
 ### YYYY-MM-DD — Decision title
 **Status:** Proposed / Accepted / Superseded
 

@@ -906,6 +906,33 @@ final class ProcurementOverviewService
     }
 
     /**
+     * Validate and lock the purchase order used by a new receipt.
+     *
+     * The injectable reader is limited to isolated contract verification. The
+     * production reader retains the row lock required by receipt/status writes.
+     *
+     * @param null|callable(int):array<string,mixed>|false|null $purchaseOrderReader
+     * @return array<string,mixed>
+     */
+    public static function assertPurchaseOrderExists(int $poId, ?callable $purchaseOrderReader = null): array
+    {
+        if ($poId <= 0) {
+            throw new \InvalidArgumentException('Purchase order reference is required.');
+        }
+
+        $reader = $purchaseOrderReader ?? static fn(int $id) => DB::fetchOne(
+            'SELECT id FROM procurement_purchase_orders WHERE id=? LIMIT 1 FOR UPDATE',
+            [$id]
+        );
+        $purchaseOrder = $reader($poId);
+        if (!is_array($purchaseOrder) || (int)($purchaseOrder['id'] ?? 0) !== $poId) {
+            throw new \InvalidArgumentException('Purchase order reference does not exist.');
+        }
+
+        return $purchaseOrder;
+    }
+
+    /**
      * @param array<string,mixed> $input
      */
     public static function createReceipt(array $input, string $actor): void
@@ -915,13 +942,14 @@ final class ProcurementOverviewService
             throw new \InvalidArgumentException('Received quantity must be greater than zero.');
         }
 
+        $poId = self::normalizeReceiptPurchaseOrderId($input['po_id'] ?? null);
+
         $receiptRef = trim((string)($input['receipt_ref'] ?? ''));
         if ($receiptRef === '') {
             $receiptRef = self::nextRef('RCV');
         }
 
         $poLineId = self::toPositiveInt($input['po_line_id'] ?? null);
-        $poId = self::toPositiveInt($input['po_id'] ?? null);
 
         AuditLogService::ensureSchema();
         $db = DB::conn();
@@ -930,15 +958,7 @@ final class ProcurementOverviewService
             // Serialize receipt insertion and aggregate order-status
             // recomputation for one purchase order. Without this lock two
             // posted receipts can each calculate status from a stale snapshot.
-            if ($poId !== null) {
-                $purchaseOrder = DB::fetchOne(
-                    'SELECT id FROM procurement_purchase_orders WHERE id=? LIMIT 1 FOR UPDATE',
-                    [$poId]
-                );
-                if (!is_array($purchaseOrder) || (int)($purchaseOrder['id'] ?? 0) <= 0) {
-                    throw new \InvalidArgumentException('Purchase order reference does not exist.');
-                }
-            }
+            self::assertPurchaseOrderExists($poId);
 
             if ($poLineId !== null) {
                 $line = DB::fetchOne(
@@ -959,7 +979,7 @@ final class ProcurementOverviewService
                  VALUES (?,?,?,?,?,?,?,?)',
                 [
                     $receiptRef,
-                    self::toPositiveInt($input['po_id'] ?? null),
+                    $poId,
                     $poLineId,
                     $qty,
                     self::nullIfBlank((string)($input['receipt_date'] ?? '')),
@@ -991,10 +1011,7 @@ final class ProcurementOverviewService
                 );
 
                 if ($status === 'posted') {
-                    $poId = self::toPositiveInt($input['po_id'] ?? null);
-                    if ($poId !== null) {
-                        self::recomputeOrderStatusFromReceipts($poId, $actor);
-                    }
+                    self::recomputeOrderStatusFromReceipts($poId, $actor);
                 }
             }
             $db->commit();
@@ -1382,6 +1399,32 @@ final class ProcurementOverviewService
     {
         $n = (int)$value;
         return $n > 0 ? $n : null;
+    }
+
+    /**
+     * Receipt purchase orders are required and must use an exact positive
+     * integer identity. This is intentionally stricter than the legacy
+     * optional-ID normalization used by unrelated Procurement inputs.
+     *
+     * @param mixed $value
+     */
+    public static function normalizeReceiptPurchaseOrderId($value): int
+    {
+        if (is_int($value) && $value > 0) {
+            return $value;
+        }
+
+        if (is_string($value) && preg_match('/\A[0-9]+\z/', $value) === 1) {
+            $normalized = ltrim($value, '0');
+            $maximum = (string)PHP_INT_MAX;
+            if ($normalized !== ''
+                && (strlen($normalized) < strlen($maximum)
+                    || (strlen($normalized) === strlen($maximum) && strcmp($normalized, $maximum) <= 0))) {
+                return (int)$normalized;
+            }
+        }
+
+        throw new \InvalidArgumentException('Purchase order reference is required.');
     }
 
     private static function nextRef(string $prefix): string

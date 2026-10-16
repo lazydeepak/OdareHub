@@ -96,6 +96,22 @@ State the current verified objective.
   invalid-token rejection is structural/instrumented, with no database,
   schema, browser, activation, or deployment operation.
 
+## 2026-10-16 — OH-AUTO2-126 receipt purchase-order identity integrity
+
+- [x] Confirmed `createReceipt()` previously normalized missing, zero,
+  negative, and malformed `po_id` values to `null`, conditionally skipped the
+  purchase-order lookup, and could proceed to receipt insertion with a null
+  identity. The receipt form itself requires a PO; `po_line_id` remains
+  intentionally optional.
+- [x] Added strict receipt-only PO identity normalization before audit/schema
+  setup and made the existing purchase-order `FOR UPDATE` lookup unconditional
+  for valid identities. The validated exact PO ID is used for insertion and
+  posted-status recomputation.
+- [x] Added isolated injectable-reader and source-order proof: **18/18**.
+  Existing receipt-line, transaction, authorization, GET-readiness, supplier,
+  linkage, and form regressions remain passing. No database, SQL, browser,
+  activation, or deployment operation was used.
+
 ## In Progress
 
 - [x] OH-AUTO1-018 — Corrected misplaced receipt-line validation in `ProcurementOverviewService::createOrder()` and added `probe_order_receipt_method_boundaries.php`.

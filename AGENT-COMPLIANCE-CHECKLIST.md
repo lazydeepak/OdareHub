@@ -31,6 +31,17 @@ Structural/instrumented authorization proof passes **160/160**. No database,
 SQL, schema, browser, Core, activation, deployment, Material, SBAIO, or
 OH-AUTO2-105B operation occurred.
 
+## Session Summary (2026-10-16) — OH-AUTO2-126 Procurement receipt PO identity
+
+Closed the demonstrated missing-purchase-order identity path in
+`createReceipt()`. Strict receipt-only normalization rejects absent, zero,
+negative, and malformed PO inputs before audit/schema setup; valid PO IDs are
+still checked with the existing transactional `FOR UPDATE` lock before any
+receipt write. Optional receipt-line behavior, line ownership, quantity,
+status, audit, and rollback contracts remain unchanged. Isolated proof passes
+**18/18**. No database, SQL, schema, browser, Core, activation, deployment,
+Material, SBAIO, or OH-AUTO2-105B operation occurred.
+
 ## Session Summary (2026-10-16) — OH-AUTO2-122 Procurement write authorization
 
 Closed the nine missing direct controller app-access checks. All 12 Procurement
