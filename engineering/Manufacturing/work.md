@@ -7,6 +7,18 @@ Continue
 through the same owner-contract pattern for parts, work areas, and process
 areas only as separately bounded milestones.
 
+## 2026-10-16 — OH-AUTO2-108 operational provider migration inventory
+
+- [x] Audited Manufacturing `/me` summary and monitoring callbacks and their
+  module widget dependencies.
+- [x] Confirmed Material Management read-only evidence (**18/18**) does not
+  cover the composite summary callback's broad order, approval, and dynamic
+  module reads.
+- [x] Left both operational regions unadmitted; no descriptor, route, schema,
+  or business-provider change was made.
+- [!] A future bounded split may be considered only with pre-limit record scope,
+  destination authority, and transitive no-mutation evidence.
+
 ## 2026-10-16 — OH-AUTO2-105 Manufacturing host-provider scope authorization
 
 - [x] Manufacturing `/me` summary and module-widget providers now require the

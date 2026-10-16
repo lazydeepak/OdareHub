@@ -17,6 +17,16 @@ incident remediation is implied by this decision.
 
 ## Decision Log
 
+### 2026-10-16 — OH-AUTO2-108 SBAIO operational provider boundary
+
+**Status:** Accepted — retain suppression
+
+SBAIO personnel, attendance, timecard, payroll, leave, and watchlist host
+contributions remain suppressed. Existing app/module access and route
+authority do not independently establish record-level personnel authorization;
+no new visibility rule or authorization field may be created as a migration
+shortcut.
+
 ### 2026-10-16 — OH-AUTO2-105 SBAIO `/me` personnel-data boundary
 
 **Status:** Accepted — suppress until record-level authority exists

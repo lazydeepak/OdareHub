@@ -1,5 +1,17 @@
 # Platform — Decisions
 
+### 2026-10-16 — OH-AUTO2-108 no operational provider admission
+**Status:** Accepted — fail closed pending owner evidence
+
+The suppressed `/me` operational callbacks remain unadmitted unless one
+callback has both existing record-level authorization and independently proven
+non-mutating read behavior. Manufacturing's Material Management
+`summaryReadOnly()` evidence is valid but cannot authorize the composite
+summary callback, which also performs broad order/approval aggregation and
+loads module widgets. SBAIO sensitive summaries and watchlists remain
+suppressed. No generic read-only flag, new permission, route, scope field, or
+fallback is introduced.
+
 ### 2026-10-16 — OH-AUTO2-107 bounded `/me` provider admission
 **Status:** Implemented — first-phase admission only
 

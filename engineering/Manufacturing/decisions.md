@@ -2,6 +2,18 @@
 
 ## Decision Log
 
+### 2026-10-16 — OH-AUTO2-108 operational `/me` provider boundary
+
+**Status:** Accepted — operational providers remain suppressed
+
+Manufacturing's existing app/module authority is necessary but does not prove
+record-level visibility for broad order, approval, or module-widget aggregates.
+The Material Management read-only summary is independently safe from schema
+preparation, but the composite host summary cannot be admitted as a whole.
+Monitoring remains blocked until every contributing module supplies equivalent
+scope and read-safety evidence. No new Manufacturing scope field or generic
+read-only flag is added.
+
 ### 2026-10-16 — OH-AUTO2-105 Manufacturing host provider admission
 
 **Status:** Accepted — reuse existing Platform policy before collection

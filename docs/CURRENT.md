@@ -102,6 +102,11 @@ Evidence for the completed milestones is recorded in:
   foundation is implemented. Six navigation-only providers are admitted from
   version-controlled app manifests; unsupported operational callbacks fail
   closed before provider loading. No Core or database change was made.
+- OH-AUTO2-108 — suppressed operational providers were inventoried against
+  their actual callbacks and read-safety evidence. No operational provider met
+  the complete admission contract, so none was restored; Material Management
+  read safety remains proven but its composite summary callback lacks complete
+  record-scope evidence. SBAIO sensitive providers remain suppressed.
 
 After the release/update cycle is proven, resume the product roadmap focus from
 `README.md`:

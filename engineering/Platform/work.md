@@ -45,6 +45,21 @@ remain disabled.
 
 Release/update foundation governance and controlled-cycle readiness.
 
+## 2026-10-16 — OH-AUTO2-108 operational provider migration inventory
+
+- [x] Audited all suppressed Manufacturing, SBAIO, and Studio `/me` regions
+  against actual callbacks, module providers, data sources, authority, and
+  read-safety evidence.
+- [x] Confirmed no operational callback currently satisfies the complete
+  admission contract; no new descriptor or runtime restoration was performed.
+- [x] Recorded the bounded remediation candidate: split Manufacturing's
+  proven Material Management read-only summary from the composite broad
+  summary callback only after record-scope and route evidence is established.
+- [x] Preserved SBAIO sensitive-summary/watchlist suppression and all existing
+  OH-AUTO2-107 navigation admission.
+- [x] Validation: Material **18/18**, authorization **12/12**, containment
+  **15/15**, admission **9/9**, inventory/order **7/7**. No database or Core.
+
 ## 2026-10-16 — OH-AUTO2-107 governed `/me` provider admission foundation
 
 - [x] Added Platform-owned `HostProviderAdmissionService` with trusted
