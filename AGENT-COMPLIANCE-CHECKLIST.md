@@ -23,6 +23,17 @@ or PO recomputation. Isolated proof passes **32/32**. No database, SQL, schema,
 browser, Core, activation, deployment, Material, SBAIO, or OH-AUTO2-105B
 operation occurred.
 
+## Session Summary (2026-10-17) — OH-AUTO2-133 request creation transaction integrity
+
+Manual Procurement request creation now initializes audit storage before its
+business transaction and performs request insertion, identity retrieval, audit
+result validation, and commit/rollback within one boundary. Exceptions and
+non-OK audit results roll back; OH-AUTO2-132 status normalization and all
+request/provenance/controller/integration contracts remain preserved.
+Isolated atomicity proof passes **35/35**. No database, SQL, schema, browser,
+Core, activation, deployment, Material, SBAIO, or OH-AUTO2-105B operation
+occurred.
+
 ## Session Summary (2026-10-17) — OH-AUTO2-132 request creation status integrity
 
 Manual Procurement request creation now validates and canonicalizes the

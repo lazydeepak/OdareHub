@@ -155,6 +155,25 @@ State the current verified objective.
   status before reference generation, audit access, and insertion while
   preserving the existing four-status vocabulary and draft default.
 
+- [x] OH-AUTO2-133 — manual request insertion and creation audit now share one
+  explicit transaction with audit initialization before transaction start and
+  rollback on exceptions or non-OK audit results.
+
+## 2026-10-17 — OH-AUTO2-133 request creation transaction integrity
+
+- [x] Confirmed the prior sequence inserted the request and then called the
+  audit helper without a shared explicit transaction. `logEvent()` can invoke
+  DDL-capable audit initialization and can return a non-OK result as well as
+  throwing on database failure.
+- [x] Added audit initialization before `begin_transaction()`, then one
+  request insert, inserted-ID retrieval, required creation audit, explicit
+  non-OK audit-result rejection, one commit, and rollback on every failure.
+- [x] Preserved OH-AUTO2-132 status normalization, canonical insert/audit
+  state, quantity/reference/provenance/optional fields, controller authority,
+  direct transitions, linkage, and unchanged Manufacturing-demand intake.
+- [x] Isolated atomicity proof passes **35/35**; no database, SQL, browser,
+  activation, or deployment operation was used.
+
 ## 2026-10-17 — OH-AUTO2-132 request creation status integrity
 
 - [x] Confirmed the form submits `draft`, missing/blank service input defaults

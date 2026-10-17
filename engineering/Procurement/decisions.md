@@ -236,6 +236,21 @@ access, or business writes. Manufacturing-demand intake remains explicitly
 Evidence: isolated reflection/source-order proof, 33/33 assertions; no live
 database execution is claimed.
 
+### 2026-10-17 — OH-AUTO2-133 request creation transaction integrity
+
+**Status:** Accepted — manual request insertion and creation audit are atomic
+
+Manual request creation initializes the DDL-capable audit storage before
+opening its business transaction. Request insertion, inserted-ID retrieval,
+creation audit, and the explicit non-OK audit-result check occur inside one
+transaction; success commits once and exceptions or audit failure roll back.
+The existing request status, quantity, reference, provenance, optional-field,
+authorization, CSRF, linkage, and Manufacturing-demand contracts remain
+unchanged. Manufacturing-demand intake was not modified.
+
+Evidence: isolated transaction/source proof, 35/35 assertions; simulated
+rollback is not live MySQL rollback or concurrency evidence.
+
 ### YYYY-MM-DD — Decision title
 **Status:** Proposed / Accepted / Superseded
 

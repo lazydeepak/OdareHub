@@ -623,42 +623,56 @@ final class ProcurementOverviewService
             $requestRef = self::nextRef('PR');
         }
 
-        DB::query(
-            'INSERT INTO procurement_requests (request_ref, product_id, requested_qty, needed_date, source_app, source_ref_type, source_ref_id, request_status, note, created_by)
-             VALUES (?,?,?,?,?,?,?,?,?,?)',
-            [
-                $requestRef,
-                self::toPositiveInt($input['product_id'] ?? null),
-                $qty,
-                self::nullIfBlank((string)($input['needed_date'] ?? '')),
-                self::nullIfBlank((string)($input['source_app'] ?? '')),
-                self::nullIfBlank((string)($input['source_ref_type'] ?? '')),
-                self::nullIfBlank((string)($input['source_ref_id'] ?? '')),
-                $requestStatus,
-                self::nullIfBlank((string)($input['note'] ?? '')),
-                self::nullIfBlank($actor),
-            ]
-        );
-
-        $requestId = (int)(DB::conn()->insert_id ?: 0);
-        if ($requestId > 0) {
-            self::recordAudit(
-                'procurement_request',
-                $requestId,
-                AuditLogService::EVENT_WORKFLOW,
-                AuditLogService::ACTION_CREATED,
-                $actor,
+        // AuditLogService::logEvent() can initialize DDL on its first call;
+        // complete that before opening the request transaction.
+        AuditLogService::ensureSchema();
+        $db = DB::conn();
+        $db->begin_transaction();
+        try {
+            DB::query(
+                'INSERT INTO procurement_requests (request_ref, product_id, requested_qty, needed_date, source_app, source_ref_type, source_ref_id, request_status, note, created_by)
+                 VALUES (?,?,?,?,?,?,?,?,?,?)',
                 [
-                    'app' => 'procurement',
-                    'module' => 'requests',
-                    'new_state' => $requestStatus,
-                    'note' => 'Procurement request created.',
-                    'metadata' => [
-                        'request_ref' => $requestRef,
-                        'source_app' => (string)($input['source_app'] ?? ''),
-                    ],
+                    $requestRef,
+                    self::toPositiveInt($input['product_id'] ?? null),
+                    $qty,
+                    self::nullIfBlank((string)($input['needed_date'] ?? '')),
+                    self::nullIfBlank((string)($input['source_app'] ?? '')),
+                    self::nullIfBlank((string)($input['source_ref_type'] ?? '')),
+                    self::nullIfBlank((string)($input['source_ref_id'] ?? '')),
+                    $requestStatus,
+                    self::nullIfBlank((string)($input['note'] ?? '')),
+                    self::nullIfBlank($actor),
                 ]
             );
+
+            $requestId = (int)($db->insert_id ?: 0);
+            if ($requestId > 0) {
+                $audit = self::recordAudit(
+                    'procurement_request',
+                    $requestId,
+                    AuditLogService::EVENT_WORKFLOW,
+                    AuditLogService::ACTION_CREATED,
+                    $actor,
+                    [
+                        'app' => 'procurement',
+                        'module' => 'requests',
+                        'new_state' => $requestStatus,
+                        'note' => 'Procurement request created.',
+                        'metadata' => [
+                            'request_ref' => $requestRef,
+                            'source_app' => (string)($input['source_app'] ?? ''),
+                        ],
+                    ]
+                );
+                if (($audit['ok'] ?? false) !== true) {
+                    throw new \RuntimeException((string)($audit['message'] ?? 'Request creation audit failed.'));
+                }
+            }
+            $db->commit();
+        } catch (\Throwable $e) {
+            $db->rollback();
+            throw $e;
         }
     }
 
@@ -1418,13 +1432,13 @@ final class ProcurementOverviewService
     /**
      * @param array<string,mixed> $options
      */
-    private static function recordAudit(string $entityType, int $entityId, string $eventType, string $action, string $actorEmail, array $options = []): void
+    private static function recordAudit(string $entityType, int $entityId, string $eventType, string $action, string $actorEmail, array $options = []): array
     {
         if ($entityId <= 0) {
-            return;
+            return ['ok' => false, 'message' => 'Invalid audit entity.'];
         }
 
-        AuditLogService::logEvent(
+        return AuditLogService::logEvent(
             $entityType,
             $entityId,
             $eventType,
