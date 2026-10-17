@@ -502,7 +502,7 @@ final class ProcurementOverviewService
         return DB::fetchAll(
             "SELECT id, supplier_name
              FROM procurement_suppliers
-             WHERE LOWER(COALESCE(supplier_status, 'active')) NOT IN ('inactive', 'disabled', 'blocked')
+             WHERE LOWER(TRIM(COALESCE(supplier_status, 'active'))) NOT IN ('inactive', 'disabled', 'blocked')
              ORDER BY supplier_name ASC
              LIMIT " . max(1, (int)$limit)
         );

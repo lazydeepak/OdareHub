@@ -34,7 +34,9 @@ $eligibleMethod = $methodStart !== false && $methodEnd !== false
     : '';
 
 $check($eligibleMethod !== '', 'eligible supplier selection method exists');
-$check(str_contains($eligibleMethod, "LOWER(COALESCE(supplier_status, 'active')) NOT IN ('inactive', 'disabled', 'blocked')"), 'selection reuses the established ineligible statuses');
+$check(str_contains($eligibleMethod, "LOWER(TRIM(COALESCE(supplier_status, 'active'))) NOT IN ('inactive', 'disabled', 'blocked')"), 'selection trims ordinary spaces before applying established ineligible statuses');
+$check(!str_contains($eligibleMethod, "IN ('active')"), 'selection remains exclusion-based rather than active-only');
+$check(str_contains($eligibleMethod, "COALESCE(supplier_status, 'active')"), 'null supplier status retains the active fallback');
 $check(strpos($eligibleMethod, 'NOT IN') < strpos($eligibleMethod, 'ORDER BY supplier_name ASC'), 'eligibility filtering precedes supplier ordering');
 $check(strpos($eligibleMethod, 'ORDER BY supplier_name ASC') < strpos($eligibleMethod, 'LIMIT '), 'supplier ordering precedes the result limit');
 $check(str_contains($service, 'public static function supplierOptions('), 'administrative supplier selection remains available');
@@ -43,10 +45,16 @@ $check(substr_count($controller, "'suppliers' => ProcurementOverviewService::eli
 
 $fixtureSuppliers = [
     ['id' => 1, 'supplier_name' => 'Active', 'supplier_status' => 'active'],
-    ['id' => 2, 'supplier_name' => 'Inactive', 'supplier_status' => 'inactive'],
-    ['id' => 3, 'supplier_name' => 'Disabled', 'supplier_status' => 'disabled'],
-    ['id' => 4, 'supplier_name' => 'Blocked', 'supplier_status' => 'blocked'],
-    ['id' => 5, 'supplier_name' => 'Legacy status', 'supplier_status' => 'review'],
+    ['id' => 2, 'supplier_name' => 'Uppercase active', 'supplier_status' => 'ACTIVE'],
+    ['id' => 3, 'supplier_name' => 'Null status', 'supplier_status' => null],
+    ['id' => 4, 'supplier_name' => 'Inactive', 'supplier_status' => 'inactive'],
+    ['id' => 5, 'supplier_name' => 'Disabled', 'supplier_status' => 'disabled'],
+    ['id' => 6, 'supplier_name' => 'Blocked', 'supplier_status' => 'blocked'],
+    ['id' => 7, 'supplier_name' => 'Padded inactive', 'supplier_status' => ' inactive '],
+    ['id' => 8, 'supplier_name' => 'Padded disabled', 'supplier_status' => ' DISABLED '],
+    ['id' => 9, 'supplier_name' => 'Padded blocked', 'supplier_status' => ' BlOcKeD '],
+    ['id' => 10, 'supplier_name' => 'Legacy review', 'supplier_status' => 'review'],
+    ['id' => 11, 'supplier_name' => 'Legacy pending', 'supplier_status' => 'pending'],
 ];
 $eligibleFixture = array_values(array_filter(
     $fixtureSuppliers,
@@ -56,8 +64,8 @@ $eligibleFixture = array_values(array_filter(
         true
     )
 ));
-$check(array_column($eligibleFixture, 'id') === [1, 5], 'fixture selection retains active and other recognized statuses');
-$check(!array_intersect(array_column($eligibleFixture, 'id'), [2, 3, 4]), 'fixture selection excludes inactive, disabled, and blocked suppliers');
+$check(array_column($eligibleFixture, 'id') === [1, 2, 3, 10, 11], 'fixture selection retains active, uppercase active, null, and legacy statuses');
+$check(!array_intersect(array_column($eligibleFixture, 'id'), [4, 5, 6, 7, 8, 9]), 'fixture selection excludes plain and padded inactive, disabled, and blocked suppliers');
 $limitedFixture = array_slice($eligibleFixture, 0, 1);
 $check(count($limitedFixture) === 1 && $limitedFixture[0]['id'] === 1, 'eligible filtering occurs before applying the result limit');
 

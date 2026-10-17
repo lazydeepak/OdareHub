@@ -251,6 +251,23 @@ unchanged. Manufacturing-demand intake was not modified.
 Evidence: isolated transaction/source proof, 35/35 assertions; simulated
 rollback is not live MySQL rollback or concurrency evidence.
 
+### 2026-10-17 — OH-AUTO2-134 supplier eligibility normalization alignment
+
+**Status:** Accepted — selection trims ordinary spaces under the existing rule
+
+The order-entry supplier selector now applies
+`LOWER(TRIM(COALESCE(supplier_status, 'active')))` before excluding only
+`inactive`, `disabled`, and `blocked`. This aligns ordinary-space handling with
+the established PHP server-side validator without introducing an active-only
+whitelist. Null status remains eligible through the active fallback; legacy
+statuses such as `review` remain eligible; administration retains its
+unrestricted historical supplier source. MySQL `TRIM()` behavior for tabs,
+newlines, and unusual whitespace remains unclaimed and is documented as a
+residual limitation.
+
+Evidence: isolated selection/source proof, 18/18 assertions; server-side
+eligibility proof, 22/22 assertions; no live database execution is claimed.
+
 ### YYYY-MM-DD — Decision title
 **Status:** Proposed / Accepted / Superseded
 

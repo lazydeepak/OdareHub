@@ -23,6 +23,18 @@ or PO recomputation. Isolated proof passes **32/32**. No database, SQL, schema,
 browser, Core, activation, deployment, Material, SBAIO, or OH-AUTO2-105B
 operation occurred.
 
+## Session Summary (2026-10-17) — OH-AUTO2-134 supplier eligibility normalization
+
+Aligned Procurement order-entry supplier selection with the established
+server-side eligibility rule by trimming ordinary spaces inside the existing
+case-insensitive exclusion predicate. Null status and legacy statuses remain
+eligible; administration remains unrestricted; no active-only whitelist or
+supplier lifecycle change was introduced. Tabs/newlines/unusual whitespace
+are not claimed equivalent to MySQL `TRIM()` and remain documented residuals.
+Focused selection proof passes **18/18** and eligibility proof **22/22**. No
+database, SQL, schema, browser, Core, activation, deployment, Material,
+SBAIO, or OH-AUTO2-105B operation occurred.
+
 ## Session Summary (2026-10-17) — OH-AUTO2-133 request creation transaction integrity
 
 Manual Procurement request creation now initializes audit storage before its

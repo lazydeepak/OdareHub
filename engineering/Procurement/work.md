@@ -159,6 +159,29 @@ State the current verified objective.
   explicit transaction with audit initialization before transaction start and
   rollback on exceptions or non-OK audit results.
 
+- [x] OH-AUTO2-134 — supplier selection now trims ordinary spaces before the
+  established exclusion-based inactive/disabled/blocked filter, preserving
+  null and legacy-status eligibility.
+
+## 2026-10-17 — OH-AUTO2-134 supplier eligibility normalization alignment
+
+- [x] Confirmed the selector used `LOWER(COALESCE(...))` while
+  `assertSupplierEligible()` uses PHP `strtolower(trim(...))`; ordinary-space
+  padded excluded statuses could therefore appear in selection and fail on
+  submission.
+- [x] Applied the smallest SQL correction:
+  `LOWER(TRIM(COALESCE(...)))`, preserving null→active fallback, the
+  exclusion-based policy, ordering before limit, and unrestricted supplier
+  administration.
+- [x] Preserved legacy statuses such as `review` and `pending`, server-side
+  eligibility authority, supplier creation/update behavior, request/PO
+  linkage, and authorization/CSRF boundaries. MySQL `TRIM()` equivalence for
+  tabs, newlines, or unusual whitespace is not claimed and remains an explicit
+  residual limitation.
+- [x] Focused selection proof passes **18/18**; supplier eligibility remains
+  **22/22**. No database, SQL, browser, activation, or deployment operation
+  was used.
+
 ## 2026-10-17 — OH-AUTO2-133 request creation transaction integrity
 
 - [x] Confirmed the prior sequence inserted the request and then called the
