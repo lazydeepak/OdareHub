@@ -32,8 +32,6 @@ final class ProcurementOverviewService
                 'id', 'receipt_ref', 'po_id', 'po_line_id', 'received_qty',
                 'receipt_date', 'receipt_status', 'created_at',
             ],
-
-            'procurement_suppliers_audit' => ['id', 'supplier_id', 'entity_type', 'event_type', 'action', 'new_state'],
         ];
         $missing = [];
         $incompatible = [];
@@ -540,26 +538,27 @@ final class ProcurementOverviewService
             );
 
             $supplierId = (int)($db->insert_id ?: 0);
-            if ($supplierId > 0) {
-                $audit = self::recordAudit(
-                    'procurement_supplier',
-                    $supplierId,
-                    AuditLogService::EVENT_WORKFLOW,
-                    AuditLogService::ACTION_CREATED,
-                    $actor,
-                    [
-                        'app' => 'procurement',
-                        'module' => 'suppliers',
-                        'new_state' => (string)($input['supplier_status'] ?? 'active'),
-                        'note' => 'Supplier created.',
-                        'metadata' => [
-                            'supplier_name' => $name,
-                        ],
-                    ]
-                );
-                if (($audit['ok'] ?? false) !== true) {
-                    throw new \RuntimeException((string)($audit['message'] ?? 'Supplier creation audit failed.'));
-                }
+            if ($supplierId <= 0) {
+                throw new \RuntimeException('Failed to create supplier.');
+            }
+            $audit = self::recordAudit(
+                'procurement_supplier',
+                $supplierId,
+                AuditLogService::EVENT_WORKFLOW,
+                AuditLogService::ACTION_CREATED,
+                $actor,
+                [
+                    'app' => 'procurement',
+                    'module' => 'suppliers',
+                    'new_state' => (string)($input['supplier_status'] ?? 'active'),
+                    'note' => 'Supplier created.',
+                    'metadata' => [
+                        'supplier_name' => $name,
+                    ],
+                ]
+            );
+            if (($audit['ok'] ?? false) !== true) {
+                throw new \RuntimeException((string)($audit['message'] ?? 'Supplier creation audit failed.'));
             }
             $db->commit();
         } catch (\Throwable $e) {

@@ -153,6 +153,6 @@ $check(str_contains($controller, 'ProcurementOverviewService::createSupplier($_P
 $check(str_contains($routes, '/apps/procurement/suppliers/create'), 'supplier-create POST route remains registered');
 $check($view !== '' && $controller !== '' && $routes !== '', 'all integration components present');
 
-$completed = ($passed === $failed) ? 'PASS' : 'FAIL';
+$completed = ($failed === 0) ? 'PASS' : 'FAIL';
 echo "RESULT: $completed passed={$passed} failed={$failed}\n";
 exit($failed === 0 ? 0 : 1);
