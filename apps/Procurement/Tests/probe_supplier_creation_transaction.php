@@ -115,6 +115,13 @@ $auditFalse = $simulate(
 $check(!$auditFalse['committed'] && $auditFalse['rolled_back'], 'non-OK audit result rolls back without commit');
 $check($auditFalse['events'] === ['insert', 'audit', 'failure:audit rejected'], 'non-OK audit result prevents success commit');
 
+$insertInvalidId = $simulate(
+    static function (array &$events): void { $events[] = 'insert'; },
+    static function (array &$events): array { return ['ok' => true]; }
+);
+$check(!$insertInvalidId['committed'] && $insertInvalidId['rolled_back'], 'simulated insertion with invalid identity rolls back without commit');
+$check($insertInvalidId['events'] === ['insert', 'failure:Failed to create supplier'], 'invalid identity prevents audit and success commit');
+
 $source = (string)file_get_contents($servicePath);
 $controller = (string)file_get_contents($controllerPath);
 $routes = (string)file_get_contents($routesPath);
