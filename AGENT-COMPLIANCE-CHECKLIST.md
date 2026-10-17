@@ -23,6 +23,17 @@ or PO recomputation. Isolated proof passes **32/32**. No database, SQL, schema,
 browser, Core, activation, deployment, Material, SBAIO, or OH-AUTO2-105B
 operation occurred.
 
+## Session Summary (2026-10-17) — OH-AUTO2-131 manual PO creation status integrity
+
+Manual PO creation now validates and canonicalizes the existing PO status
+vocabulary before audit initialization, transaction opening, or insertion.
+Missing/blank status remains `draft`; the canonical value is shared by PO
+insertion and creation audit state. Approved-request conversion, direct PO
+transitions, linkage, supplier, authorization, CSRF, and transaction contracts
+remain unchanged. Isolated proof passes **36/36**. No database, SQL, schema,
+browser, Core, activation, deployment, Material, SBAIO, or OH-AUTO2-105B
+operation occurred.
+
 ## Session Summary (2026-10-17) — OH-AUTO2-129 Procurement direct PO transition integrity
 
 Added a bounded direct PO issue/cancel transaction entry point while retaining

@@ -206,6 +206,21 @@ changed.
 Evidence: isolated source/instrumentation proof, 38/38 assertions; live MySQL
 rollback and concurrency behavior remain unverified.
 
+### 2026-10-17 — OH-AUTO2-131 manual PO creation status integrity
+
+**Status:** Accepted — manual PO creation uses canonical existing statuses
+
+Manual PO creation now defaults missing/blank status to `draft` and delegates
+supported nonblank values to the established PO status normalizer:
+`draft`, `approved`, `issued`, `partial`, `closed`, and `cancelled`. The
+canonical value is used for both insertion and creation audit `new_state`.
+Unsupported or malformed values are rejected before audit initialization,
+transaction start, or business writes. Approved-request conversion remains
+explicitly `draft`; no draft-only creation policy or lifecycle rule was added.
+
+Evidence: isolated reflection/source-order proof, 36/36 assertions; no live
+database execution is claimed.
+
 ### YYYY-MM-DD — Decision title
 **Status:** Proposed / Accepted / Superseded
 

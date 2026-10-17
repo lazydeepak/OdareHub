@@ -744,6 +744,12 @@ final class ProcurementOverviewService
      */
     public static function createOrder(array $input, string $actor): void
     {
+        // Validate and canonicalize before supplier/audit setup, transaction
+        // opening, or any order/request mutation. Manual creation keeps the
+        // established blank/missing default of draft while accepting the
+        // existing PO status vocabulary for internal callers.
+        $poStatus = self::normalizeOrderCreationStatus($input['po_status'] ?? null);
+
         $poRef = trim((string)($input['po_ref'] ?? ''));
         if ($poRef === '') {
             $poRef = self::nextRef('PO');
@@ -767,7 +773,7 @@ final class ProcurementOverviewService
                     $poRef,
                     self::toPositiveInt($input['supplier_id'] ?? null),
                     $requestId,
-                    self::nullIfBlank((string)($input['po_status'] ?? 'draft')) ?? 'draft',
+                    $poStatus,
                     self::nullIfBlank((string)($input['order_date'] ?? '')),
                     self::nullIfBlank((string)($input['expected_date'] ?? '')),
                     self::nullIfBlank($actor),
@@ -805,7 +811,7 @@ final class ProcurementOverviewService
                     [
                         'app' => 'procurement',
                         'module' => 'orders',
-                        'new_state' => (string)($input['po_status'] ?? 'draft'),
+                        'new_state' => $poStatus,
                         'note' => 'Purchase order created.',
                         'metadata' => [
                             'request_id' => $requestId,
@@ -1548,6 +1554,26 @@ final class ProcurementOverviewService
         }
 
         return $status;
+    }
+
+    /**
+     * Creation-specific wrapper around the established PO status vocabulary.
+     * Missing/blank form values retain the historical draft default without
+     * weakening the strict normalizer used by status transitions.
+     *
+     * @param mixed $value
+     */
+    private static function normalizeOrderCreationStatus($value): string
+    {
+        if ($value === null || (is_string($value) && trim($value) === '')) {
+            return 'draft';
+        }
+
+        if (!is_string($value)) {
+            throw new \InvalidArgumentException('Unsupported order status transition.');
+        }
+
+        return self::normalizeOrderStatus($value);
     }
 
     private static function normalizeRequestStatus(string $status): string

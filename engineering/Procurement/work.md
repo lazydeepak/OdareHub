@@ -147,6 +147,24 @@ State the current verified objective.
 - [x] OH-AUTO2-130 — direct request approval/cancellation transitions now use
   a bounded Procurement transaction without changing PO-conversion ownership.
 
+- [x] OH-AUTO2-131 — manual PO creation now validates and canonicalizes status
+  before audit setup, transaction opening, and insertion while preserving the
+  existing six-status vocabulary and draft default.
+
+## 2026-10-17 — OH-AUTO2-131 manual PO creation status integrity
+
+- [x] Confirmed the form submits `draft`, missing/blank service input defaults
+  to `draft`, and approved-request conversion explicitly creates `draft` POs.
+  The prior manual path inserted a trimmed raw value and audited a separate raw
+  value without vocabulary validation.
+- [x] Reused the established PO normalizer through a creation-specific default
+  wrapper. The canonical status now feeds both PO insertion and audit
+  `new_state`; invalid values are rejected before audit setup or transaction.
+- [x] Preserved direct PO transitions, internal receipt recomputation, request
+  linkage, supplier eligibility, authorization, CSRF, and transaction behavior.
+- [x] Isolated creation-status proof passes **36/36**; no database, SQL,
+  browser, activation, or deployment operation was used.
+
 ## 2026-10-17 — OH-AUTO2-130 direct request transition integrity
 
 - [x] Confirmed the caller graph: approval/cancellation controllers use the
