@@ -32,6 +32,8 @@ final class ProcurementOverviewService
                 'id', 'receipt_ref', 'po_id', 'po_line_id', 'received_qty',
                 'receipt_date', 'receipt_status', 'created_at',
             ],
+
+            'procurement_suppliers_audit' => ['id', 'supplier_id', 'entity_type', 'event_type', 'action', 'new_state'],
         ];
         $missing = [];
         $incompatible = [];
@@ -518,37 +520,51 @@ final class ProcurementOverviewService
             throw new \InvalidArgumentException('Supplier name is required.');
         }
 
-        DB::query(
-            'INSERT INTO procurement_suppliers (supplier_code, supplier_name, contact_name, email, phone, supplier_status)
-             VALUES (?,?,?,?,?,?)',
-            [
-                self::nullIfBlank((string)($input['supplier_code'] ?? '')),
-                $name,
-                self::nullIfBlank((string)($input['contact_name'] ?? '')),
-                self::nullIfBlank((string)($input['email'] ?? '')),
-                self::nullIfBlank((string)($input['phone'] ?? '')),
-                self::nullIfBlank((string)($input['supplier_status'] ?? 'active')) ?? 'active',
-            ]
-        );
-
-        $supplierId = (int)(DB::conn()->insert_id ?: 0);
-        if ($supplierId > 0) {
-            self::recordAudit(
-                'procurement_supplier',
-                $supplierId,
-                AuditLogService::EVENT_WORKFLOW,
-                AuditLogService::ACTION_CREATED,
-                $actor,
+        // AuditLogService::logEvent() can initialize DDL on its first call;
+        // complete that before opening the supplier transaction.
+        AuditLogService::ensureSchema();
+        $db = DB::conn();
+        $db->begin_transaction();
+        try {
+            DB::query(
+                'INSERT INTO procurement_suppliers (supplier_code, supplier_name, contact_name, email, phone, supplier_status)
+                 VALUES (?,?,?,?,?,?)',
                 [
-                    'app' => 'procurement',
-                    'module' => 'suppliers',
-                    'new_state' => (string)($input['supplier_status'] ?? 'active'),
-                    'note' => 'Supplier created.',
-                    'metadata' => [
-                        'supplier_name' => $name,
-                    ],
+                    self::nullIfBlank((string)($input['supplier_code'] ?? '')),
+                    $name,
+                    self::nullIfBlank((string)($input['contact_name'] ?? '')),
+                    self::nullIfBlank((string)($input['email'] ?? '')),
+                    self::nullIfBlank((string)($input['phone'] ?? '')),
+                    self::nullIfBlank((string)($input['supplier_status'] ?? 'active')) ?? 'active',
                 ]
             );
+
+            $supplierId = (int)($db->insert_id ?: 0);
+            if ($supplierId > 0) {
+                $audit = self::recordAudit(
+                    'procurement_supplier',
+                    $supplierId,
+                    AuditLogService::EVENT_WORKFLOW,
+                    AuditLogService::ACTION_CREATED,
+                    $actor,
+                    [
+                        'app' => 'procurement',
+                        'module' => 'suppliers',
+                        'new_state' => (string)($input['supplier_status'] ?? 'active'),
+                        'note' => 'Supplier created.',
+                        'metadata' => [
+                            'supplier_name' => $name,
+                        ],
+                    ]
+                );
+                if (($audit['ok'] ?? false) !== true) {
+                    throw new \RuntimeException((string)($audit['message'] ?? 'Supplier creation audit failed.'));
+                }
+            }
+            $db->commit();
+        } catch (\Throwable $e) {
+            $db->rollback();
+            throw $e;
         }
     }
 
