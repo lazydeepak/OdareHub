@@ -23,6 +23,17 @@ or PO recomputation. Isolated proof passes **32/32**. No database, SQL, schema,
 browser, Core, activation, deployment, Material, SBAIO, or OH-AUTO2-105B
 operation occurred.
 
+## Session Summary (2026-10-17) — OH-AUTO2-132 request creation status integrity
+
+Manual Procurement request creation now validates and canonicalizes the
+existing request status vocabulary before reference generation, audit access,
+or insertion. Missing/blank status remains `draft`; the canonical value is
+shared by request insertion and creation audit state. Manufacturing-demand
+intake remains explicitly `draft`; quantity, provenance, linkage, direct
+transitions, authorization, CSRF, and transaction contracts remain unchanged.
+Isolated proof passes **33/33**. No database, SQL, schema, browser, Core,
+activation, deployment, Material, SBAIO, or OH-AUTO2-105B operation occurred.
+
 ## Session Summary (2026-10-17) — OH-AUTO2-131 manual PO creation status integrity
 
 Manual PO creation now validates and canonicalizes the existing PO status

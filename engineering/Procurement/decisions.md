@@ -221,6 +221,21 @@ explicitly `draft`; no draft-only creation policy or lifecycle rule was added.
 Evidence: isolated reflection/source-order proof, 36/36 assertions; no live
 database execution is claimed.
 
+### 2026-10-17 — OH-AUTO2-132 request creation status integrity
+
+**Status:** Accepted — manual request creation uses canonical existing statuses
+
+Manual request creation now defaults missing/blank status to `draft` and
+delegates supported nonblank values to the established request status
+normalizer: `draft`, `approved`, `closed`, and `cancelled`. The canonical value
+is used for both request insertion and creation audit `new_state`. Unsupported
+or malformed values are rejected before request-reference generation, audit
+access, or business writes. Manufacturing-demand intake remains explicitly
+`draft`; no draft-only creation policy or lifecycle rule was added.
+
+Evidence: isolated reflection/source-order proof, 33/33 assertions; no live
+database execution is claimed.
+
 ### YYYY-MM-DD — Decision title
 **Status:** Proposed / Accepted / Superseded
 

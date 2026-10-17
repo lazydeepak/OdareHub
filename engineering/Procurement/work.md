@@ -151,6 +151,26 @@ State the current verified objective.
   before audit setup, transaction opening, and insertion while preserving the
   existing six-status vocabulary and draft default.
 
+- [x] OH-AUTO2-132 — manual request creation now validates and canonicalizes
+  status before reference generation, audit access, and insertion while
+  preserving the existing four-status vocabulary and draft default.
+
+## 2026-10-17 — OH-AUTO2-132 request creation status integrity
+
+- [x] Confirmed the form submits `draft`, missing/blank service input defaults
+  to `draft`, and Manufacturing-demand intake explicitly creates `draft`
+  requests. The prior manual path inserted a separately cast raw status and
+  audited the independent raw input without vocabulary validation.
+- [x] Reused the established request normalizer through a creation-specific
+  default wrapper. The canonical status now feeds both request insertion and
+  creation audit `new_state`; invalid values are rejected before request
+  reference generation, audit access, or business writes.
+- [x] Preserved positive quantity validation, optional fields, provenance,
+  direct request transitions, internal request closure, approved-request PO
+  conversion, request linkage, authorization, CSRF, and Manufacturing intake.
+- [x] Isolated creation-status proof passes **33/33**; no database, SQL,
+  browser, activation, or deployment operation was used.
+
 ## 2026-10-17 — OH-AUTO2-131 manual PO creation status integrity
 
 - [x] Confirmed the form submits `draft`, missing/blank service input defaults

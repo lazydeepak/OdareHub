@@ -607,6 +607,12 @@ final class ProcurementOverviewService
      */
     public static function createRequest(array $input, string $actor): void
     {
+        // Validate and canonicalize before request-reference generation,
+        // audit access, or any request mutation. Manual creation keeps the
+        // established blank/missing default of draft while accepting the
+        // existing request status vocabulary for internal callers.
+        $requestStatus = self::normalizeRequestCreationStatus($input['request_status'] ?? null);
+
         $qty = round(max(0.0, (float)($input['requested_qty'] ?? 0)), 2);
         if ($qty <= 0) {
             throw new \InvalidArgumentException('Requested quantity must be greater than zero.');
@@ -628,7 +634,7 @@ final class ProcurementOverviewService
                 self::nullIfBlank((string)($input['source_app'] ?? '')),
                 self::nullIfBlank((string)($input['source_ref_type'] ?? '')),
                 self::nullIfBlank((string)($input['source_ref_id'] ?? '')),
-                self::nullIfBlank((string)($input['request_status'] ?? 'draft')) ?? 'draft',
+                $requestStatus,
                 self::nullIfBlank((string)($input['note'] ?? '')),
                 self::nullIfBlank($actor),
             ]
@@ -645,7 +651,7 @@ final class ProcurementOverviewService
                 [
                     'app' => 'procurement',
                     'module' => 'requests',
-                    'new_state' => (string)($input['request_status'] ?? 'draft'),
+                    'new_state' => $requestStatus,
                     'note' => 'Procurement request created.',
                     'metadata' => [
                         'request_ref' => $requestRef,
@@ -1584,6 +1590,26 @@ final class ProcurementOverviewService
         }
 
         return $status;
+    }
+
+    /**
+     * Creation-specific wrapper around the established request status
+     * vocabulary. Missing/blank form values retain the historical draft
+     * default without weakening the strict transition normalizer.
+     *
+     * @param mixed $value
+     */
+    private static function normalizeRequestCreationStatus($value): string
+    {
+        if ($value === null || (is_string($value) && trim($value) === '')) {
+            return 'draft';
+        }
+
+        if (!is_string($value)) {
+            throw new \InvalidArgumentException('Unsupported request status transition.');
+        }
+
+        return self::normalizeRequestStatus($value);
     }
 
     /**
