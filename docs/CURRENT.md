@@ -26,13 +26,13 @@ historical aliases; new assignments must use domain-qualified identifiers.
 
 ## Active Focus
 
-- **OH-AUTO2-HOSP-002 — Reservation create-to-manage assessment is complete.**
-  The existing journey is continuous for today/future arrivals, but a valid
-  past-date reservation can be created and then omitted from the operator board
-  because the returned reservation identity is not retained for a focus/list
-  path. The assessment recommends a separately authorized narrow implementation;
-  no implementation is authorized yet. See
-  `docs/architecture/oh-auto2-hosp-002-reservation-create-to-manage-assessment-2026-10-21.md`.
+- **OH-AUTO2-HOSP-003 — Reservation identity and post-creation continuity is
+  implemented and verified offline.** The canonical service now uses the
+  current connection's inserted ID, validates it before commit, rolls back on
+  identity failure across assigned/unassigned creation, and provides a one-time
+  jailed localized confirmation. Live database/concurrency/browser acceptance
+  remains blocked. See
+  `docs/architecture/oh-auto2-hosp-003-reservation-identity-post-creation-continuity-2026-10-21.md`.
 
 Completed execution milestone:
 

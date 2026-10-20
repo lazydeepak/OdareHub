@@ -43,7 +43,7 @@ namespace Apps\Hospitality\Services {
                 throw new \RuntimeException('HOSPITALITY_RES_ROOM_CONFLICT');
             }
             $GLOBALS['calls'][] = ['method' => 'reservationCreate', 'post' => $post];
-            return 42;
+            return (int)($GLOBALS['reservation_id'] ?? 42);
         }
     }
 
@@ -140,6 +140,7 @@ namespace {
         $_POST = [$definition['post_key'] => $value, 'csrf' => $mode === 'csrf' ? 'bad' : 'csrf-ok', 'payload_marker' => 'forwarded'];
         if ($operation === 'reservationCreate') {
             $GLOBALS['reservation_service_error'] = $mode === 'service_error';
+            $GLOBALS['reservation_id'] = $mode === 'invalid_generated_id' ? 0 : 731;
             $_POST = [
                 'guest_id' => $mode === 'malformed_guest' ? '7abc' : ($mode === 'csrf' || $mode === 'unauthorized' ? '7' : (string)PHP_INT_MAX),
                 'room_id' => $mode === 'malformed_room' ? '8abc' : ($mode === 'unassigned' ? '' : (string)PHP_INT_MAX),
@@ -158,6 +159,7 @@ namespace {
                 'calls' => $GLOBALS['calls'] ?? [],
                 'flash_error' => $_SESSION['operator_hospitality_flash_err'] ?? null,
                 'flash_ok' => $_SESSION['operator_hospitality_flash_ok'] ?? null,
+                'created_id' => $_SESSION['operator_hospitality_created_reservation_id'] ?? null,
             ], JSON_THROW_ON_ERROR) . "\n";
         });
 
@@ -207,7 +209,7 @@ namespace {
         }
     }
 
-    $reservationModes = ['valid', 'unassigned', 'malformed_guest', 'malformed_room', 'unauthorized', 'csrf', 'service_error'];
+    $reservationModes = ['valid', 'unassigned', 'malformed_guest', 'malformed_room', 'unauthorized', 'csrf', 'service_error', 'invalid_generated_id'];
     foreach ($reservationModes as $mode) {
         $command = escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg(__FILE__)
             . ' child reservationCreate ' . escapeshellarg($mode);
@@ -221,7 +223,9 @@ namespace {
             (count($calls) === 1 && ($call['method'] ?? '') === 'reservationCreate'
                 && ($call['post']['guest_id'] ?? null) === PHP_INT_MAX
                 && ($call['post']['room_id'] ?? null) === PHP_INT_MAX
-                && ($call['post']['note'] ?? '') === 'forwarded')
+                && ($call['post']['note'] ?? '') === 'forwarded'
+                && ($payload['flash_ok'] ?? null) === 'HOSPITALITY_RES_CREATED'
+                && ($payload['created_id'] ?? null) === 731)
                 ? $pass('reservationCreate forwards normalized assigned reservation payload once')
                 : $fail('reservationCreate valid delegation', json_encode($payload));
             continue;
@@ -229,16 +233,22 @@ namespace {
         if ($mode === 'unassigned') {
             $call = $calls[0] ?? [];
             (count($calls) === 1 && ($call['post']['guest_id'] ?? null) === PHP_INT_MAX
-                && ($call['post']['room_id'] ?? null) === 0)
+                && ($call['post']['room_id'] ?? null) === 0
+                && ($payload['created_id'] ?? null) === 731)
                 ? $pass('reservationCreate preserves optional unassigned room')
                 : $fail('reservationCreate unassigned delegation', json_encode($payload));
             continue;
         }
         $expectedError = in_array($mode, ['unauthorized'], true)
             ? 'HOSPITALITY_FORBIDDEN_MANAGE'
-            : ($mode === 'csrf' ? 'CSRF_FAILED' : ($mode === 'service_error' ? 'HOSPITALITY_RES_ROOM_CONFLICT' : 'HOSPITALITY_ID_INVALID'));
-        (count($calls) === 0 && ($payload['flash_error'] ?? null) === $expectedError)
-            ? $pass("reservationCreate/{$mode} blocks before service dispatch")
+            : ($mode === 'csrf' ? 'CSRF_FAILED' : ($mode === 'service_error' ? 'HOSPITALITY_RES_ROOM_CONFLICT' : ($mode === 'invalid_generated_id' ? 'HOSPITALITY_RES_ID_INVALID' : 'HOSPITALITY_ID_INVALID')));
+        $generatedIdRejected = $mode === 'invalid_generated_id'
+            && count($calls) === 1
+            && ($payload['created_id'] ?? null) === null;
+        $blockedBeforeDispatch = $mode !== 'invalid_generated_id' && count($calls) === 0;
+        (($generatedIdRejected || $blockedBeforeDispatch)
+            && ($payload['flash_error'] ?? null) === $expectedError)
+            ? $pass("reservationCreate/{$mode} rejects without success confirmation")
             : $fail("reservationCreate/{$mode} rejection", json_encode($payload));
     }
 
@@ -271,6 +281,11 @@ namespace {
         && str_contains($viewSource, 'HospitalityBoardAdapter::reservationFormOptions()')
         ? $pass('reservation form is manage-gated and uses owner adapter options')
         : $fail('reservation form authority/source boundary');
+    str_contains($viewSource, 'operator_hospitality_created_reservation_id')
+        && str_contains($viewSource, 'hospitality.operator.flash.reservation_created_with_id')
+        && str_contains($viewSource, 'unset($_SESSION')
+        ? $pass('created reservation confirmation is exact and one-time session scoped')
+        : $fail('created reservation confirmation boundary');
 
     echo "\nResult: {$passed} passed, {$failed} failed\n";
     exit($failed > 0 ? 1 : 0);

@@ -1,5 +1,27 @@
 # Hospitality Work Log
 
+## OH-AUTO2-HOSP-003 — Reservation identity and post-creation continuity
+
+Status: Implemented and verified offline; live database/concurrency/browser
+acceptance remains blocked under existing restrictions.
+
+- [x] Replaced the global latest-row reservation ID lookup with the current
+  connection's `insert_id` and positive-ID validation before commit.
+- [x] Extended the transaction boundary to unassigned-room creation so identity
+  retrieval/validation failure cannot leave a durable reservation after failure.
+- [x] Preserved room locking, overlap validation, optional unassigned rooms,
+  domain validation, lifecycle state, and rollback semantics.
+- [x] Captured the returned ID in the operator action and added a one-time,
+  session-scoped, escaped localized confirmation containing only the exact ID.
+- [x] Added offline identity, mocked concurrent-insert separation, invalid-ID,
+  confirmation, rollback-boundary, and existing lifecycle regression coverage.
+
+Results: behavioral **57/57**, identity continuity **6/6**, reservation
+integrity **33/33**, input identity **24/24**, transition authorization **62/62**.
+PHP lint, diff hygiene, architecture gates, deletion family **28/28**, and
+read-only deployment readiness also passed. The aggregate Hospitality runner
+was not executed because it includes database-backed probes.
+
 ## OH-AUTO2-HOSP-002 — Reservation create-to-manage workflow assessment
 
 Status: Read-only assessment complete; classified **INCOMPLETE** for valid

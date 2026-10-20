@@ -1,5 +1,27 @@
 # AGENT-COMPLIANCE-CHECKLIST
 
+## Session Summary (2026-10-21) — OH-AUTO2-HOSP-003 Reservation Identity and Confirmation
+
+Corrected `ReservationsService::create()` to use the current connection's
+`insert_id` instead of a global latest-row query, validate the generated ID as
+positive before commit, and cover unassigned-room creation with the same
+rollback boundary. Existing room locking, overlap, optional-room, validation,
+and lifecycle semantics remain intact.
+
+Updated the operator action to capture the exact returned ID and provide a
+one-time session-scoped localized confirmation containing only that ID. Failed
+or invalid identity results clear confirmation state and cannot render success.
+No arbitrary lookup, new route, permission, record details, or management
+control was added.
+
+Safe individual verification passed: behavioral **57/57**, identity continuity
+**6/6**, reservation integrity **33/33**, input identity **24/24**, transition
+authorization **62/62**, PHP lint, diff hygiene, architecture gates, deletion
+family **28/28**, and read-only deployment readiness. The aggregate Hospitality
+runner was not executed because it includes database-backed probes. No database,
+SQL, browser/HTTP, activation, deployment, Core, schema, Manufacturing,
+Material, SBAIO, or unrelated working-tree operation occurred.
+
 ## Session Summary (2026-10-21) — OH-AUTO2-HOSP-002 Create-to-Manage Assessment
 
 Completed the read-only source assessment of the Hospitality reservation

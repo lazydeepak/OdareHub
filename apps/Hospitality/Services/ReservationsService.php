@@ -92,10 +92,10 @@ final class ReservationsService
         $roomAssigned = false;
         $transactionStarted = false;
         try {
-            if ($roomId > 0) {
-                DB::query('START TRANSACTION');
-                $transactionStarted = true;
+            DB::query('START TRANSACTION');
+            $transactionStarted = true;
 
+            if ($roomId > 0) {
                 $room = DB::fetchOne(
                     'SELECT id, room_status FROM hosp_rooms WHERE id=? LIMIT 1 FOR UPDATE',
                     [$roomId]
@@ -117,12 +117,15 @@ final class ReservationsService
                  VALUES (?,?,?,?,?,?,?,?,?)',
                 [$guestId, $roomAssigned ? $roomId : null, $checkIn, $checkOut, $adults, $children, $rate, 'booked', $note]
             );
-            $row = DB::fetchOne('SELECT id FROM hosp_reservations ORDER BY id DESC LIMIT 1');
+            $reservationId = (int)DB::conn()->insert_id;
+            if ($reservationId <= 0) {
+                throw new \RuntimeException('HOSPITALITY_RES_ID_INVALID');
+            }
 
             if ($transactionStarted) {
                 DB::query('COMMIT');
             }
-            return (int)($row['id'] ?? 0);
+            return $reservationId;
         } catch (\Throwable $e) {
             if ($transactionStarted) {
                 try {

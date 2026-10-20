@@ -1,5 +1,25 @@
 # Hospitality — Decisions
 
+## 2026-10-21 — OH-AUTO2-HOSP-003 reservation identity continuity
+
+**Status:** Implemented and accepted within the bounded non-Core assignment.
+
+`ReservationsService::create()` now returns the ID from the current connection's
+`insert_id`, rejects non-positive generated identities before commit, and uses a
+transaction for both assigned and unassigned-room creation so identity failure
+rolls back. The unsafe global latest-row query is removed.
+
+The operator action stores only the exact positive returned ID in the existing
+session, sets the existing localized success key, and redirects to the same
+jailed Hospitality workspace. The view consumes/unsets the ID once and renders
+an escaped localized confirmation. No arbitrary lookup, extra details, action,
+route, permission, or authorization authority was added.
+
+Verification is isolated offline only. Actual database concurrency,
+browser/HTTP acceptance, activation, deployment, and live acceptance remain
+blocked; mocked concurrency evidence is explicitly not treated as real DB
+proof.
+
 ## 2026-10-21 — OH-AUTO2-HOSP-002 create-to-manage assessment
 
 **Status:** Read-only assessment complete; **INCOMPLETE** for one valid input

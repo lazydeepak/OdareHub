@@ -23,7 +23,10 @@ $tr = static fn (string $key, string $fallback): string => htmlspecialchars($thi
         $opUsername = rawurlencode((string)($data['username'] ?? ''));
         $flashOk = isset($_SESSION['operator_hospitality_flash_ok']) ? (string)$_SESSION['operator_hospitality_flash_ok'] : '';
         $flashErr = isset($_SESSION['operator_hospitality_flash_err']) ? (string)$_SESSION['operator_hospitality_flash_err'] : '';
-        unset($_SESSION['operator_hospitality_flash_ok'], $_SESSION['operator_hospitality_flash_err']);
+        $createdReservationId = isset($_SESSION['operator_hospitality_created_reservation_id'])
+            ? (int)$_SESSION['operator_hospitality_created_reservation_id']
+            : 0;
+        unset($_SESSION['operator_hospitality_flash_ok'], $_SESSION['operator_hospitality_flash_err'], $_SESSION['operator_hospitality_created_reservation_id']);
         $csrfToken = Auth::csrfToken();
         $reservationOptions = $canManage ? HospitalityBoardAdapter::reservationFormOptions() : null;
     ?>
@@ -39,7 +42,11 @@ $tr = static fn (string $key, string $fallback): string => htmlspecialchars($thi
             default => 'hospitality.operator.flash.updated',
         };
     ?>
+    <?php if ($flashOk === 'HOSPITALITY_RES_CREATED' && $createdReservationId > 0): ?>
+    <p class="hosp-chip hosp-chip--ok"><?php echo $esc($this->tr('hospitality.operator.flash.reservation_created_with_id', 'Reservation created. ID: {id}', ['id' => $createdReservationId])); ?></p>
+    <?php else: ?>
     <p class="hosp-chip hosp-chip--ok"><?php echo $esc($this->tr($okMsgKey, 'Status updated.')); ?></p>
+    <?php endif; ?>
     <?php endif; ?>
     <?php if ($flashErr !== ''): ?>
     <p class="hosp-chip hosp-chip--danger"><?php echo $esc($this->tr(str_starts_with($flashErr, 'HOSPITALITY_RES_') ? 'hospitality.operator.flash.reservation_create_failed' : 'hospitality.operator.flash.update_failed', 'Unable to update the Hospitality action.')); ?></p>

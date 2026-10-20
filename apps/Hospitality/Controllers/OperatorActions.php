@@ -15,8 +15,7 @@ use Throwable;
  * Operator-layer action edge for jailed /u/{username}/hospitality mutations.
  *
  * Performs only: hospitality.manage check, CSRF validation, input forwarding to
- * the single domain services (HousekeepingService::updateStatus,
- * FrontDeskService::checkIn/checkout), and a jailed success/error redirect.
+ * the single domain services, and a jailed success/error redirect.
  * It implements no business workflow of its own.
  */
 final class OperatorActions
@@ -25,6 +24,7 @@ final class OperatorActions
     {
         $username = rawurlencode((string)($operatorRoute['username'] ?? ''));
         $redirectTo = '/u/' . $username . '/hospitality';
+        unset($_SESSION['operator_hospitality_created_reservation_id']);
 
         try {
             if (!AclPolicy::can('hospitality.manage', Auth::user())) {
@@ -36,10 +36,15 @@ final class OperatorActions
             $payload = $_POST;
             $payload['guest_id'] = self::normalizePositiveId($_POST['guest_id'] ?? null);
             $payload['room_id'] = self::normalizeOptionalPositiveId($_POST['room_id'] ?? null);
-            ReservationsService::create($payload);
+            $reservationId = ReservationsService::create($payload);
+            if ($reservationId <= 0) {
+                throw new \RuntimeException('HOSPITALITY_RES_ID_INVALID');
+            }
 
+            $_SESSION['operator_hospitality_created_reservation_id'] = $reservationId;
             $_SESSION['operator_hospitality_flash_ok'] = 'HOSPITALITY_RES_CREATED';
         } catch (Throwable $e) {
+            unset($_SESSION['operator_hospitality_created_reservation_id']);
             $_SESSION['operator_hospitality_flash_err'] = $e->getMessage();
         }
 

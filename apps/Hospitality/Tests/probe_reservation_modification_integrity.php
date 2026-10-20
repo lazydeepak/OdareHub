@@ -32,6 +32,14 @@ $check(str_contains($service, "DB::query('START TRANSACTION');"), 'assigned crea
 $check(str_contains($service, 'FOR UPDATE'), 'assigned create locks the room row before overlap evaluation');
 $check(str_contains($service, "DB::query('COMMIT');"), 'create commits the reservation transaction');
 $check(str_contains($service, "DB::query('ROLLBACK');"), 'create rolls back failed reservation work');
+$check(str_contains($service, 'DB::conn()->insert_id'), 'create reads inserted ID from the current database connection');
+$check(!str_contains($service, 'SELECT id FROM hosp_reservations ORDER BY id DESC LIMIT 1'), 'create does not use global latest-row identity lookup');
+$check(str_contains($service, 'if ($reservationId <= 0)'), 'create rejects a missing or invalid generated ID');
+$check(str_contains($service, "DB::query('START TRANSACTION');") && str_contains($service, '$transactionStarted = true;'), 'assigned and unassigned creation enter the same transaction boundary');
+$insertIdPosition = strpos($service, 'DB::conn()->insert_id');
+$commitPosition = strpos($service, "DB::query('COMMIT');");
+$check($insertIdPosition !== false && $commitPosition !== false && $insertIdPosition < $commitPosition, 'generated ID is validated before transaction commit');
+$check(str_contains($service, '$roomAssigned ? $roomId : null'), 'unassigned-room inserts remain explicitly nullable');
 $check(str_contains($service, "reservation_status IN ('booked','checked_in')"), 'overlap considers only active reservation states');
 $check(str_contains($service, 'check_in_date < ? AND check_out_date > ?'), 'overlap uses adjacent-range-safe half-open predicate');
 $check(str_contains($service, "'booked' => ['checked_in', 'cancelled', 'no_show']"), 'booked lifecycle transitions are explicit');
