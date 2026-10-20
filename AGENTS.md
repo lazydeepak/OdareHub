@@ -1,5 +1,21 @@
 # AGENTS.md
 
+## Session Summary (2026-10-20) — OH-AUTO2-121 Hospitality operator behavioral verification
+
+Reconciled OH-AUTO2-120 readiness evidence: the initial 120-second run was
+incomplete, while the later 300-second read-only verification completed with
+`DEPLOYMENT READINESS: PASS` and `ARCHITECTURE GATES: PASS`. Added the isolated
+child-process Hospitality operator behavioral probe
+`apps/Hospitality/Tests/probe_operator_behavioral.php`; it executes the real
+`OperatorActions` methods with Auth/ACL/domain-service doubles and passes
+**45/45**. Exact IDs, payload forwarding, malformed/overflow rejection,
+authorization, CSRF, route/self-workspace, and generic error boundaries are
+covered. No production defect remained and no correction was made.
+
+No database, SQL, browser, activation, deployment, Core, or OH-AUTO2-105B
+operation occurred. OH-AUTO2-119 remains queued/blocked. Unrelated Procurement
+changes, lifecycle logs, backup, and PHPUnit cache were preserved.
+
 ## Session Summary (2026-10-16) — OH-AUTO2-105R Database probe incident reconciliation
 
 Read-only reconstruction found that the existing DB-backed

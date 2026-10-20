@@ -1,5 +1,28 @@
 # Hospitality Work Log
 
+## OH-AUTO2-121 — Hospitality operator behavioral verification
+
+Status: Completed offline; authenticated runtime acceptance remains blocked under
+OH-AUTO2-119.
+
+- [x] Reconciled the OH-AUTO2-120 readiness discrepancy: the initial 120-second
+  invocation was incomplete; the later 300-second read-only verification
+  completed with `DEPLOYMENT READINESS: PASS` and `ARCHITECTURE GATES: PASS`.
+- [x] Added and executed `probe_operator_behavioral.php` with isolated child
+  processes and Auth/ACL/domain-service doubles; no application bootstrap,
+  database, route loader, migration, or HTTP runtime is loaded.
+- [x] Verified all seven actions preserve exact IDs, forward the add-charge
+  payload, and reject malformed/overflowing IDs, unauthorized requests, and
+  invalid CSRF before domain-service dispatch: **45/45**.
+- [x] Preserved route existence, self-workspace binding, and generic localized
+  error presentation evidence.
+- [x] Confirmed no additional reproducible defect in this behavioral scope;
+  no production correction was required.
+
+Remaining live acceptance: assigned Hospitality user, isolated HTTP/database
+environment, explicit database authorization, and browser proof remain required
+for OH-AUTO2-119. Existing DB-backed Hospitality probes were not run.
+
 ## OH-AUTO2-120 — Hospitality offline acceptance readiness
 
 Status: Completed offline; authenticated runtime acceptance remains blocked under

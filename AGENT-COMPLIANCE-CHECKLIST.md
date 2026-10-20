@@ -1,5 +1,28 @@
 # AGENT-COMPLIANCE-CHECKLIST
 
+## Session Summary (2026-10-20) — OH-AUTO2-121 Hospitality operator behavioral verification
+
+Reconciled the OH-AUTO2-120 deployment-readiness discrepancy: the initial
+120-second invocation was incomplete, while the later 300-second read-only
+verification completed with `DEPLOYMENT READINESS: PASS` and
+`ARCHITECTURE GATES: PASS`. No gate was weakened or bypassed.
+
+Added `apps/Hospitality/Tests/probe_operator_behavioral.php`, an offline
+child-process probe that defines isolated Auth, ACL, and domain-service doubles
+before loading the real `OperatorActions` class. It does not load application
+bootstrap, a database, SQL, migrations, route registration, or HTTP runtime.
+All seven operator actions preserve exact canonical IDs and the add-charge
+payload, while malformed/overflowing IDs, unauthorized requests, and invalid
+CSRF are rejected before service dispatch. Route presence, self-workspace
+binding, and generic localized error presentation are also checked.
+
+Validation: behavioral proof **45/45**; PHP lint; architecture gates **49/49**;
+deletion family gates **28/28**; deployment readiness **PASS**; diff hygiene
+PASS. No production correction was required. No database, browser, activation,
+deployment, Core, or OH-AUTO2-105B operation occurred. OH-AUTO2-119 remains
+queued/blocked pending assigned-user live acceptance prerequisites. Existing
+Procurement changes, lifecycle logs, backup, and PHPUnit cache remain untouched.
+
 ## Session Summary (2026-10-16) — OH-AUTO2-123 Procurement GET read safety
 
 Removed Procurement schema initialization from the four GET route closures and
