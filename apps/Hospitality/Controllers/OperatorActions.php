@@ -32,7 +32,7 @@ final class OperatorActions
 
             Auth::requireCsrf((string)($_POST['csrf'] ?? ''), $redirectTo);
 
-            HousekeepingService::updateStatus((int)($_POST['room_id'] ?? 0), $_POST);
+            HousekeepingService::updateStatus(self::normalizePositiveId($_POST['room_id'] ?? null), $_POST);
 
             $_SESSION['operator_hospitality_flash_ok'] = 'HOSPITALITY_HK_UPDATED';
         } catch (Throwable $e) {
@@ -55,7 +55,7 @@ final class OperatorActions
 
             Auth::requireCsrf((string)($_POST['csrf'] ?? ''), $redirectTo);
 
-            FrontDeskService::addChargeForReservation((int)($_POST['reservation_id'] ?? 0), $_POST);
+            FrontDeskService::addChargeForReservation(self::normalizePositiveId($_POST['reservation_id'] ?? null), $_POST);
 
             $_SESSION['operator_hospitality_flash_ok'] = 'HOSPITALITY_FD_CHARGE_ADDED';
         } catch (Throwable $e) {
@@ -75,7 +75,7 @@ final class OperatorActions
                 throw new \RuntimeException('HOSPITALITY_FORBIDDEN_MANAGE');
             }
             Auth::requireCsrf((string)($_POST['csrf'] ?? ''), $redirectTo);
-            FrontDeskService::markReservationNoShow((int)($_POST['reservation_id'] ?? 0));
+            FrontDeskService::markReservationNoShow(self::normalizePositiveId($_POST['reservation_id'] ?? null));
             $_SESSION['operator_hospitality_flash_ok'] = 'HOSPITALITY_RES_NO_SHOW';
         } catch (Throwable $e) {
             $_SESSION['operator_hospitality_flash_err'] = $e->getMessage();
@@ -95,7 +95,7 @@ final class OperatorActions
             }
             Auth::requireCsrf((string)($_POST['csrf'] ?? ''), $redirectTo);
 
-            FrontDeskService::voidCharge((int)($_POST['charge_id'] ?? 0));
+            FrontDeskService::voidCharge(self::normalizePositiveId($_POST['charge_id'] ?? null));
             $_SESSION['operator_hospitality_flash_ok'] = 'HOSPITALITY_FD_CHARGE_VOIDED';
         } catch (Throwable $e) {
             $_SESSION['operator_hospitality_flash_err'] = $e->getMessage();
@@ -116,7 +116,7 @@ final class OperatorActions
 
             Auth::requireCsrf((string)($_POST['csrf'] ?? ''), $redirectTo);
 
-            FrontDeskService::cancelReservation((int)($_POST['reservation_id'] ?? 0));
+            FrontDeskService::cancelReservation(self::normalizePositiveId($_POST['reservation_id'] ?? null));
 
             $_SESSION['operator_hospitality_flash_ok'] = 'HOSPITALITY_RES_CANCELLED';
         } catch (Throwable $e) {
@@ -139,7 +139,7 @@ final class OperatorActions
 
             Auth::requireCsrf((string)($_POST['csrf'] ?? ''), $redirectTo);
 
-            FrontDeskService::checkout((int)($_POST['reservation_id'] ?? 0));
+            FrontDeskService::checkout(self::normalizePositiveId($_POST['reservation_id'] ?? null));
 
             $_SESSION['operator_hospitality_flash_ok'] = 'HOSPITALITY_FD_CHECKED_OUT';
         } catch (Throwable $e) {
@@ -162,7 +162,7 @@ final class OperatorActions
 
             Auth::requireCsrf((string)($_POST['csrf'] ?? ''), $redirectTo);
 
-            FrontDeskService::checkIn((int)($_POST['reservation_id'] ?? 0));
+            FrontDeskService::checkIn(self::normalizePositiveId($_POST['reservation_id'] ?? null));
 
             $_SESSION['operator_hospitality_flash_ok'] = 'HOSPITALITY_FD_CHECKED_IN';
         } catch (Throwable $e) {
@@ -171,5 +171,31 @@ final class OperatorActions
 
         header('Location: ' . $redirectTo, true, 302);
         exit;
+    }
+
+    /**
+     * Preserve an exact positive record identity from an untrusted POST value.
+     * PHP integer coercion can turn malformed or overflowing input into a
+     * different valid identifier before the domain service validates it.
+     *
+     * @param mixed $value
+     */
+    private static function normalizePositiveId(mixed $value): int
+    {
+        if (is_int($value) && $value > 0) {
+            return $value;
+        }
+
+        if (!is_string($value) || preg_match('/^[1-9][0-9]*$/D', $value) !== 1) {
+            throw new \InvalidArgumentException('HOSPITALITY_ID_INVALID');
+        }
+
+        $maximum = (string)PHP_INT_MAX;
+        if (strlen($value) > strlen($maximum)
+            || (strlen($value) === strlen($maximum) && strcmp($value, $maximum) > 0)) {
+            throw new \InvalidArgumentException('HOSPITALITY_ID_INVALID');
+        }
+
+        return (int)$value;
     }
 }

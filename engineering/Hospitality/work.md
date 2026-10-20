@@ -1,5 +1,29 @@
 # Hospitality Work Log
 
+## OH-AUTO2-120 — Hospitality offline acceptance readiness
+
+Status: Completed offline; authenticated runtime acceptance remains blocked under
+OH-AUTO2-119.
+
+- [x] Traced the five Hospitality operator domains through the existing Shell
+  `/u/hospitality` GET seam, seven jailed POST action routes, app-owned
+  `OperatorActions`, domain services, and the read-only board adapter.
+- [x] Confirmed existing permission, CSRF, self-workspace, route-confinement,
+  lifecycle, folio, and housekeeping contracts from source and existing probes.
+- [x] Found and corrected a reproducible input-integrity defect: operator action
+  IDs were cast directly to `int`, allowing malformed or overflowing POST values
+  to become a different valid record identity before service dispatch.
+- [x] Added strict positive decimal identity normalization for room,
+  reservation, and charge IDs; invalid values fail closed through the existing
+  jailed error redirect without changing domain authority or routes.
+- [x] Added an offline-only identity probe; it passes **18/18**. No database,
+  browser, activation, deployment, or OH-AUTO2-105B operation was performed.
+- [x] PHP lint and diff hygiene pass.
+
+Remaining live acceptance: assigned Hospitality user, isolated HTTP/database
+environment, explicit database authorization, and browser proof remain required
+for OH-AUTO2-119. Existing DB-backed Hospitality probes were not run.
+
 ## Slice 1 - App skeleton + registration proof (2026-08-23)
 
 Status: Completed.

@@ -6739,3 +6739,26 @@ Actual isolated view/access coverage is **40/40**; architecture, deletion, and
 deployment readiness checks pass. No new route, schema, task service,
 database, production installation/update, live browser, Core, `/me` routing,
 or specialized operator-view change.
+
+## Session Summary (2026-10-20) — OH-AUTO2-120 Hospitality Offline Acceptance Readiness
+
+Inspected the Hospitality operator execution graph without database or browser
+execution: the existing `/u/hospitality` GET seam and seven jailed POST routes
+resolve through Shell's operator identity pipeline to the app-owned
+`OperatorActions`, then delegate to the canonical Housekeeping and FrontDesk
+services. Existing permission, CSRF, self-workspace, route-confinement,
+lifecycle, folio, and housekeeping contracts were preserved.
+
+Found and corrected a reproducible input-integrity defect: direct `(int)` casts
+on untrusted operator `room_id`, `reservation_id`, and `charge_id` values could
+coerce malformed or overflowing POST input into a different valid record ID
+before domain-service validation. Added private strict positive-decimal
+normalization at the action boundary and an offline-only probe: **18/18**.
+
+Validation: PHP lint; focused identity probe 18/18; Core lock PASS; operator
+confinement PASS; Shell rendering PASS; business app/module contracts PASS;
+`git diff --check` PASS. The deployment-readiness command exceeded its 120-second
+execution window while traversing the repository; no database, browser,
+activation, deployment, or OH-AUTO2-105B operation occurred. Existing DB-backed
+Hospitality probes were not run. Unrelated Procurement changes, lifecycle logs,
+backup file, and PHPUnit cache remain untouched.
