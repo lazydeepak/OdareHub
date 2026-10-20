@@ -66,6 +66,13 @@ $assert(($ownerDestination[0]['destination'] ?? '') === '/u/worker/tasks?task_id
 $ownerSpecificDestination = array_values(array_filter($result['current'], static fn (array $item): bool => $item['item_id'] === 18));
 $assert(($ownerSpecificDestination[0]['destination'] ?? '') === '/u/worker/coverage?focus=task', 'authorized non-task owner destination remains usable');
 $assert($result['current'][0]['item_scope'] === null, 'missing provider item scope remains unavailable without fabrication');
+$malformedIdentityTasks = [
+    ['id' => '15abc', 'title' => 'Malformed provider ID', 'assigned_to' => 7, 'status' => 'open', 'priority' => 'low', 'due_date' => date('Y-m-d')],
+    ['id' => '9223372036854775808', 'title' => 'Overflow provider ID', 'assigned_to' => 7, 'status' => 'open', 'priority' => 'low', 'due_date' => date('Y-m-d')],
+    ['id' => 19, 'title' => 'Valid provider ID', 'assigned_to' => 7, 'status' => 'open', 'priority' => 'low', 'due_date' => date('Y-m-d')],
+];
+$malformedIdentityResult = OperatorWorkerWorkComposer::compose(['tasks' => $malformedIdentityTasks, 'error' => ''], $workerContext, 'worker');
+$assert(count($malformedIdentityResult['current']) === 1 && $malformedIdentityResult['current'][0]['item_id'] === 19 && $malformedIdentityResult['current'][0]['destination'] === '/u/worker/tasks?task_id=19', 'malformed and overflowing provider IDs are suppressed without rebinding to another task');
 $empty = OperatorWorkerWorkComposer::compose(['tasks' => [], 'error' => ''], $workerContext, 'worker');
 $assert($empty['available'] === true && $empty['current'] === [] && $empty['upcoming'] === [] && $empty['attention'] === [], 'empty assignments produce safe empty lanes');
 $unavailable = OperatorWorkerWorkComposer::compose(['tasks' => [], 'error' => 'operator.common.data_unavailable'], $workerContext, 'worker');

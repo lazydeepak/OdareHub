@@ -243,6 +243,25 @@ new action or lookup authority.
 - The selected task is actionable without duplicating status-transition logic
   or introducing a second mutation endpoint.
 
+### 2026-10-20 — OH-AUTO2-116 exact provider task identity binding
+
+**Status:** Accepted
+
+**Decision**
+
+The worker dashboard composer must reject malformed, non-positive, and
+overflowing provider task identifiers before constructing an item-bound
+`/u/{username}/tasks?task_id=` destination. It may accept only a positive
+native integer or a canonical decimal string within `PHP_INT_MAX`.
+
+**Consequences**
+
+- PHP integer coercion cannot silently redirect a worker to a different task.
+- Existing route authority, selected-task projection, CSRF-protected status
+  action, and operator URL confinement remain unchanged.
+- Invalid provider identity evidence is suppressed rather than fabricated;
+  no new route, lookup, schema, or database authority is introduced.
+
 ### 2026-07-20 — Runtime catalogs and owner providers are search discovery authority
 **Status:** Accepted
 

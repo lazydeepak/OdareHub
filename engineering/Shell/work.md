@@ -6,6 +6,18 @@ OH-AUTO1-094 Processing authority closure is complete. Shell remains the
 generic operator composition and rendering boundary; Manufacturing owns lane
 authority and data projection.
 
+## 2026-10-20 — OH-AUTO2-116 worker task-to-action integrity
+
+- [x] Inspected and hardened exact provider task-ID binding from worker dashboard
+  cards to the existing authorized `/u/{username}/tasks?task_id=` route.
+- [x] Preserved existing task selection, status actions, route authority, and
+  no-database/no-new-route boundaries.
+- [x] Added focused adversarial coverage for malformed and overflow provider
+  IDs; the worker proof passes **42/42**.
+- [x] PHP lint, operator confinement, Shell rendering, Core lock, deployment
+  readiness, and diff hygiene pass. No database, browser, activation, or
+  deployment operation was used.
+
 ## 2026-10-16 — OH-AUTO2-118 runtime authorization and safe presentation
 
 - [x] Traced the production path: `OperatorSurfaceComposer` invokes

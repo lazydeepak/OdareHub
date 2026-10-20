@@ -48,11 +48,11 @@ final class OperatorWorkerWorkComposer
             if (!is_array($task)) {
                 continue;
             }
-            $taskId = (int)($task['id'] ?? 0);
+            $taskId = self::normalizeTaskId($task['id'] ?? null);
             $title = trim((string)($task['title'] ?? ''));
             $status = strtolower(trim((string)($task['status'] ?? '')));
             $assignedTo = (int)($task['assigned_to'] ?? 0);
-            if ($taskId <= 0 || $title === '' || $assignedTo <= 0) {
+            if ($taskId === null || $title === '' || $assignedTo <= 0) {
                 continue;
             }
             if ($authenticatedUserId > 0 && $assignedTo !== $authenticatedUserId) {
@@ -106,6 +106,28 @@ final class OperatorWorkerWorkComposer
                 'attention' => count($attention),
             ],
         ];
+    }
+
+    /**
+     * Preserve the provider's exact positive integer identity before building
+     * an item-bound operator URL. Silent PHP casts could turn malformed or
+     * overflowing provider values into a different task ID.
+     */
+    private static function normalizeTaskId(mixed $value): ?int
+    {
+        if (is_int($value)) {
+            return $value > 0 ? $value : null;
+        }
+        if (!is_string($value) || !preg_match('/^[1-9][0-9]*$/D', $value)) {
+            return null;
+        }
+
+        $max = (string)PHP_INT_MAX;
+        if (strlen($value) > strlen($max) || (strlen($value) === strlen($max) && strcmp($value, $max) > 0)) {
+            return null;
+        }
+
+        return (int)$value;
     }
 
     /**

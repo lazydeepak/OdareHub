@@ -7610,3 +7610,19 @@ preserved.
 - [x] Complete rehearsal: 49/49; transaction probe: 24/24; restore probe:
   10/10; exact-step governed suite: 4/4; architecture 49/49; deletion 28/28;
   deployment readiness PASS.
+
+## Session Summary (2026-10-20) — OH-AUTO2-116 Worker Task-to-Action Integrity
+
+Hardened the Shell worker dashboard boundary so malformed, non-positive, and
+overflowing provider task identifiers are rejected before an item-bound
+`/u/{username}/tasks?task_id=` destination is constructed. This prevents PHP
+integer coercion from silently binding a dashboard card to a different task.
+Canonical positive integer IDs remain unchanged; the existing route authority,
+selected-task projection, CSRF-protected Start/Mark Done action, and operator
+URL confinement remain unchanged.
+
+Validation: focused worker/task proof **42/42**; PHP lint; operator
+confinement; Shell rendering; Core lock; deployment readiness PASS; diff
+hygiene PASS. No database, schema, browser, activation, deployment, or Core
+operation was performed. Existing Procurement changes, lifecycle logs, and
+PHPUnit cache remain untouched.
