@@ -7743,3 +7743,19 @@ backup file, and PHPUnit cache remain untouched.
   incident evidence.
 - [x] Recorded conclusions in
   `docs/architecture/oh-auto2-mfg-002-fulfillment-dispatch-operator-contract-2026-10-20.md`.
+
+# OH-AUTO2-MFG-003 — Processing Operator Workflow Completeness (2026-10-20)
+
+- [x] Read-only Processing journey assessment; no production code changed.
+- [x] No database, SQL, schema, migration, browser, HTTP, activation,
+  deployment, Fulfillment dispatch, Material, Core, or unrelated-owner work.
+- [x] Focused offline evidence passed: Processing **35/35** and work/process
+  summary **23/23**.
+- [x] Confirmed existing scoped projection, separate Assembly/QC authority,
+  CSRF, lifecycle validation, feedback, and same-user confinement.
+- [x] Identified the bounded status-redirect context-preservation defect and
+  recommended a future separately authorized implementation.
+- [x] Preserved unrelated Procurement logs, backup, PHPUnit cache, and prior
+  incident evidence.
+- [x] Recorded conclusions in
+  `docs/architecture/oh-auto2-mfg-003-processing-operator-workflow-completeness-assessment-2026-10-20.md`.

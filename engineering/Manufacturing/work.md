@@ -44,6 +44,26 @@ areas only as separately bounded milestones.
   Material aggregate, or Core change was made.
 - [x] Full report: `docs/architecture/oh-auto2-mfg-002-fulfillment-dispatch-operator-contract-2026-10-20.md`.
 
+## 2026-10-20 — OH-AUTO2-MFG-003 Processing operator workflow completeness
+
+- [x] Traced the complete Processing operator journey from assigned Assembly/QC
+  projection through lane presentation, CSRF-protected POST handlers,
+  Manufacturing authority checks, persistence path, flash feedback, and reload.
+- [x] Confirmed completed scope, lane authority, read-only denial, transition,
+  and operator route-confinement evidence; focused offline probes passed
+  Processing **35/35** and work/process summary **23/23**.
+- [x] Identified one reproducible usability defect: Assembly/QC status forms
+  redirect to bare `/u/{username}/processing` and drop the active
+  `processing_date`/`product_id` context, unlike the create forms.
+- [x] Classified the defect as **DEFECTIVE**, medium usability severity, with
+  a small future context-preserving redirect correction.
+- [x] Classified live persistence/transaction behavior as **BLOCKED** by the
+  no-database/no-HTTP restriction, not as a speculative source defect.
+- [x] Recommended **IMPLEMENT** only through a subsequent bounded assignment;
+  no production code, route, database, SQL, schema, activation, deployment,
+  Fulfillment, Material, or Core change was made.
+- [x] Full report: `docs/architecture/oh-auto2-mfg-003-processing-operator-workflow-completeness-assessment-2026-10-20.md`.
+
 ## 2026-10-16 — OH-AUTO2-112 record-scope authority investigation
 
 - [x] Traced existing assignment scope authority and Material Management source

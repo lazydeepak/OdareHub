@@ -68,6 +68,7 @@ domain-qualified identifiers going forward.
 | `OH-AUTO2-135` | Procurement | Accepted after OH-AUTO2-PROC-001 bounded review; live DB/concurrency evidence remains out of scope |
 | `OH-AUTO2-MFG-001` | Manufacturing | Provisional local assessment complete; report untracked and pending independent baseline verification |
 | `OH-AUTO2-MFG-002` | Manufacturing | Contract assessment complete; dispatch operator exposure blocked; no implementation authorized |
+| `OH-AUTO2-MFG-003` | Manufacturing | Processing assessment complete; bounded status-redirect context defect identified; implementation requires separate authorization |
 
 ## Confirmed collision set
 
@@ -191,6 +192,17 @@ authority, complete legal-status transition contract, transaction/rollback
 boundary, or required AuditLog integration; it also performs runtime schema
 ensure work. The admin route and CSRF checks do not establish operator
 eligibility. No implementation assignment is authorized.
+
+### OH-AUTO2-MFG-003 assessment disposition — 2026-10-20
+
+The Processing operator workflow is supported by scoped Assembly/QC
+projection, separate module authority, CSRF-protected actions, record-level
+part scope, legal status checks, and isolated evidence (**35/35** Processing;
+**23/23** work/process summary). One medium usability defect is confirmed:
+Assembly/QC status forms drop the selected `processing_date` and `product_id`
+when redirecting after submission. A future bounded implementation may preserve
+that context; no implementation is authorized by MFG-003. Live persistence and
+transaction behavior remain unverified under the no-database/no-HTTP boundary.
 
 ## Validation boundary
 

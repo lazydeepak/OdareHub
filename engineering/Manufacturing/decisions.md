@@ -2,6 +2,34 @@
 
 ## Decision Log
 
+### 2026-10-20 — OH-AUTO2-MFG-003 Processing operator workflow completeness
+
+**Status:** Assessment complete — bounded usability correction recommended; implementation not authorized
+
+**Decision**
+
+The Processing operator workflow is functionally complete across assignment
+projection, separate Assembly/QC authority, action presentation, CSRF, record
+scope, legal status checks, feedback, and same-user confinement. Existing
+offline evidence passes Processing **35/35** and work/process summary **23/23**.
+
+One concrete usability defect remains: Assembly/QC status forms redirect to the
+bare Processing path and drop the active `processing_date` and `product_id`
+context. The status mutation and flash still occur, but the updated row can
+disappear from the selected result window after redirect.
+
+**Consequence**
+
+Recommend a future small **IMPLEMENT** task to preserve the existing selected
+context in status-action redirects. It must reuse the current authority,
+status, CSRF, and redirect-confinement contracts and must not reopen completed
+scope hardening or expand into execution-progress, Fulfillment, Material, or
+live database work. MFG-003 itself made no production change.
+
+**Evidence**
+
+See `docs/architecture/oh-auto2-mfg-003-processing-operator-workflow-completeness-assessment-2026-10-20.md`.
+
 ### 2026-10-20 — OH-AUTO2-MFG-002 Fulfillment dispatch operator contract
 
 **Status:** Blocked — contract resolution required; no implementation authorized
