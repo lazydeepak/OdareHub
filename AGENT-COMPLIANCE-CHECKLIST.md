@@ -1,5 +1,29 @@
 # AGENT-COMPLIANCE-CHECKLIST
 
+## Session Summary (2026-10-21) — OH-AUTO2-GOV-003 Product Readiness Prioritization
+
+Reconciled the current roadmap, assignment registry, active briefs, and
+Manufacturing, Hospitality, Procurement, Shell, Platform, SBAIO, and Studio
+work/decision records. Ranked five unfinished capabilities and classified them
+as READY, COMPLETE, BLOCKED, or NEEDS DECISION without repeating completed
+audits or treating missing browser/database evidence as a defect.
+
+Identified Hospitality operator reservation creation as the highest-value
+candidate, but did not issue an implementation assignment because the active
+Hospitality operator-action plan explicitly defers it. The next required step is
+an explicit product/authority decision covering operator fields, `hospitality.manage`
+authority, active guest/room sources, optional-room behavior, jailed redirects,
+and offline proof scope. Manufacturing dispatch, Material restoration,
+Hospitality live acceptance, SBAIO incident work, and production release apply
+remain blocked under existing records.
+
+Created the evidence-backed report at
+`docs/architecture/oh-auto2-gov-003-cross-workstream-product-readiness-prioritization-2026-10-21.md`
+and updated `docs/CURRENT.md` plus the authoritative assignment registry. No
+database, SQL, browser/HTTP, activation, deployment, Core, Fulfillment,
+Material, or SBAIO incident operation occurred. Unrelated Procurement logs,
+backup, PHPUnit cache, and incident evidence were preserved.
+
 ## Session Summary (2026-10-20) — OH-AUTO2-PROC-001 Supplier Acceptance and History Integrity
 
 Compared Procurement records before and after `1107ca0` and confirmed that the

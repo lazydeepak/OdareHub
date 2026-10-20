@@ -70,6 +70,7 @@ domain-qualified identifiers going forward.
 | `OH-AUTO2-MFG-002` | Manufacturing | Contract assessment complete; dispatch operator exposure blocked; no implementation authorized |
 | `OH-AUTO2-MFG-003` | Manufacturing | Accepted assessment; bounded status-redirect context defect advanced to MFG-004 |
 | `OH-AUTO2-MFG-004` | Manufacturing | Implemented and verified Processing status-redirect context preservation; remote parity pending delivery |
+| `OH-AUTO2-GOV-003` | Governance | Cross-workstream prioritization complete; Hospitality reservation creation requires product/authority decision before implementation |
 
 ## Confirmed collision set
 
@@ -167,6 +168,20 @@ without the required isolated authorization.
 Hospitality live acceptance remains a separate blocked prerequisite and should
 not be repeated offline. No speculative feature implementation is authorized
 by this reconciliation.
+
+### OH-AUTO2-GOV-003 prioritization disposition — 2026-10-21
+
+Cross-workstream reconciliation found no meaningful product implementation that
+is both independently authorized and unblocked. The highest-value candidate is
+Hospitality operator reservation creation: the owner service, transaction,
+overlap-lock, manage/CSRF, and operator-confinement precedents exist, but the
+active operator-action plan explicitly defers reservation creation. The required
+next step is a product/authority decision defining the operator contract.
+
+Manufacturing dispatch lifecycle, Material aggregate restoration, Hospitality
+live acceptance, SBAIO sensitive summaries/incident work, and production release
+apply remain blocked under their existing records. Shell account-panel extraction
+is technically ready but intentionally deprioritized as structural cleanup.
 
 ### OH-AUTO2-MFG-001 assessment disposition — 2026-10-20
 

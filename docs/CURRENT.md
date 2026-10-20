@@ -26,6 +26,15 @@ historical aliases; new assignments must use domain-qualified identifiers.
 
 ## Active Focus
 
+- **OH-AUTO2-GOV-003 — Cross-workstream product readiness completed.** No
+  meaningful product implementation is currently independently authorized. The
+  highest-value candidate is Hospitality operator reservation creation, which
+  requires an explicit product/authority decision because the active action plan
+  still defers it. Manufacturing dispatch, Material restoration, Hospitality
+  live acceptance, SBAIO incident work, and production release apply remain
+  blocked under their existing records. See
+  `docs/architecture/oh-auto2-gov-003-cross-workstream-product-readiness-prioritization-2026-10-21.md`.
+
 Completed execution milestone:
 
 - Release/update foundation — isolated installation, signed update,
