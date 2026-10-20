@@ -7,6 +7,43 @@ Continue
 through the same owner-contract pattern for parts, work areas, and process
 areas only as separately bounded milestones.
 
+## 2026-10-20 — OH-AUTO2-MFG-001 operator workflow gap assessment
+
+- [x] Completed the read-only Manufacturing operator workflow map across
+  Production, Processing, Fulfillment/Preparation/Dispatch, Parts, Machines,
+  Assembly, QC, Orders, Demand, Coverage, Materials, and Handoff.
+- [x] Distinguished completed scope/read-safety safeguards from product gaps;
+  Manufacturing's disabled runtime is not treated as a source defect.
+- [x] Identified the strongest product gap as dispatch lifecycle continuation:
+  operator Fulfillment can create dispatch entries, while the existing
+  `DispatchOpsService` lifecycle methods (`markReady`, `prepare`, `complete`)
+  are not exposed through the operator surface.
+- [x] Ranked two additional candidates: machine/assembly execution progress
+  capture and operator handoff ownership. Both remain lower-confidence or
+  higher-dependency work.
+- [x] Recommended dispatch lifecycle continuation for a separately authorized
+  implementation/design slice. No implementation was authorized or made.
+- [x] Full report: `docs/architecture/oh-auto2-mfg-001-manufacturing-operator-workflow-gap-assessment-2026-10-20.md`.
+
+## 2026-10-20 — OH-AUTO2-MFG-002 Fulfillment dispatch operator contract
+
+- [x] Reconciled the local MFG-001 report and Git state. The report is present
+  locally but untracked and therefore not independently verified from GitHub
+  `main`; no unrelated changes were overwritten or discarded.
+- [x] Traced administrative dispatch routes, `DispatchOpsController`,
+  `DispatchOpsService`, operator POST routing, assignment/view admission, and
+  existing dispatch workflow hints.
+- [x] Classified `markReady`, `prepare`, and `complete` as **BLOCKED** for
+  operator exposure: no record-level operator scope, incomplete legal-status
+  transition contract, runtime schema ensure, no transaction boundary, and no
+  required audit integration.
+- [x] Confirmed no action is READY or ALREADY IMPLEMENTED for the operator
+  surface; existing admin workflows do not satisfy the operator contract.
+- [x] Recorded the smallest future boundary and offline test strategy. No
+  production code, route, database, SQL, schema, activation, deployment,
+  Material aggregate, or Core change was made.
+- [x] Full report: `docs/architecture/oh-auto2-mfg-002-fulfillment-dispatch-operator-contract-2026-10-20.md`.
+
 ## 2026-10-16 — OH-AUTO2-112 record-scope authority investigation
 
 - [x] Traced existing assignment scope authority and Material Management source

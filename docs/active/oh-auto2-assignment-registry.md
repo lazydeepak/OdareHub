@@ -66,6 +66,8 @@ domain-qualified identifiers going forward.
 | `OH-AUTO2-133` | Procurement | Completed request creation transaction integrity |
 | `OH-AUTO2-134` | Procurement | Completed supplier eligibility normalization alignment |
 | `OH-AUTO2-135` | Procurement | Accepted after OH-AUTO2-PROC-001 bounded review; live DB/concurrency evidence remains out of scope |
+| `OH-AUTO2-MFG-001` | Manufacturing | Provisional local assessment complete; report untracked and pending independent baseline verification |
+| `OH-AUTO2-MFG-002` | Manufacturing | Contract assessment complete; dispatch operator exposure blocked; no implementation authorized |
 
 ## Confirmed collision set
 
@@ -163,6 +165,32 @@ without the required isolated authorization.
 Hospitality live acceptance remains a separate blocked prerequisite and should
 not be repeated offline. No speculative feature implementation is authorized
 by this reconciliation.
+
+### OH-AUTO2-MFG-001 assessment disposition — 2026-10-20
+
+The read-only Manufacturing workflow assessment is complete. It found one
+evidence-backed product candidate: expose the existing dispatch lifecycle
+continuation (`markReady`, `prepare`, `complete`) through the operator
+Fulfillment surface, which currently creates dispatch entries but does not
+complete their lifecycle. Machine/assembly execution progress and operator
+handoff ownership were recorded as lower-ranked candidates with additional
+dependencies or unresolved product ownership.
+
+No implementation assignment is reserved by this assessment. Any follow-up
+must use a new domain-qualified `OH-AUTO2-MFG-*` identifier and separately
+authorize operator role/status rules, record scope, transaction/audit behavior,
+and isolated verification. Material restoration remains blocked under
+OH-AUTO2-112.
+
+### OH-AUTO2-MFG-002 contract disposition — 2026-10-20
+
+The Fulfillment dispatch contract assessment traced the existing administrative
+`markReady`, `prepare`, and `complete` graph. All three actions are blocked for
+operator exposure because the service layer has no operator record-scope
+authority, complete legal-status transition contract, transaction/rollback
+boundary, or required AuditLog integration; it also performs runtime schema
+ensure work. The admin route and CSRF checks do not establish operator
+eligibility. No implementation assignment is authorized.
 
 ## Validation boundary
 

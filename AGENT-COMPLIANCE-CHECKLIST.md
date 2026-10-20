@@ -7715,3 +7715,31 @@ execution window while traversing the repository; no database, browser,
 activation, deployment, or OH-AUTO2-105B operation occurred. Existing DB-backed
 Hospitality probes were not run. Unrelated Procurement changes, lifecycle logs,
 backup file, and PHPUnit cache remain untouched.
+# OH-AUTO2-MFG-001 — Manufacturing Operator Workflow Gap Assessment (2026-10-20)
+
+- [x] Read-only assessment only; no production code changed.
+- [x] No database, SQL, browser, HTTP, activation, deployment, Core, schema,
+  migration, Material aggregate, or unrelated-owner operation performed.
+- [x] Existing unrelated Procurement logs, backup, and PHPUnit cache preserved.
+- [x] Manufacturing operator workflow map and exact source evidence recorded in
+  `docs/architecture/oh-auto2-mfg-001-manufacturing-operator-workflow-gap-assessment-2026-10-20.md`.
+- [x] Completed safeguards distinguished from genuine product gaps.
+- [x] Top candidate ranked: operator dispatch lifecycle continuation.
+- [x] Implementation remains unauthorized pending explicit product/authority
+  decisions and independently testable scope.
+
+# OH-AUTO2-MFG-002 — Fulfillment Dispatch Operator Contract (2026-10-20)
+
+- [x] Reconciled local MFG-001 report and Git state; report is present locally
+  but untracked and not independently verified from GitHub main.
+- [x] Read-only source tracing only; no production code, route, database, SQL,
+  schema, migration, browser, HTTP, activation, deployment, Material
+  aggregate, Core, or unrelated-owner operation.
+- [x] Traced service/controller/admin route/operator route/assignment/scope,
+  transition, transaction, audit, and idempotency boundaries.
+- [x] Classified `markReady`, `prepare`, and `complete` as BLOCKED for
+  operator exposure.
+- [x] Preserved unrelated Procurement logs, backup, PHPUnit cache, and prior
+  incident evidence.
+- [x] Recorded conclusions in
+  `docs/architecture/oh-auto2-mfg-002-fulfillment-dispatch-operator-contract-2026-10-20.md`.

@@ -2,6 +2,63 @@
 
 ## Decision Log
 
+### 2026-10-20 — OH-AUTO2-MFG-002 Fulfillment dispatch operator contract
+
+**Status:** Blocked — contract resolution required; no implementation authorized
+
+**Decision**
+
+The existing `DispatchOpsService::markReady()`, `prepare()`, and `complete()`
+methods are administrative lifecycle operations, not an operator-ready
+contract. Their routes enforce admin route access and CSRF, but the service
+loads and updates dispatch rows by opaque ID without operator record scope.
+The methods call runtime `ensureSchema()`, do not establish transaction or
+rollback boundaries, and do not invoke the existing audit authority. The
+transition checks also do not form a complete `draft -> ready -> prepared ->
+completed` state machine.
+
+All three actions are therefore **BLOCKED** for operator exposure. The
+administrative implementation must be reused rather than duplicated only
+after explicit existing-policy mapping, exact record-scope authority, legal
+status transitions, migration/transaction resolution, audit semantics, and
+idempotency behavior are established.
+
+**Evidence**
+
+See `docs/architecture/oh-auto2-mfg-002-fulfillment-dispatch-operator-contract-2026-10-20.md`.
+
+### 2026-10-20 — OH-AUTO2-MFG-001 Manufacturing operator workflow assessment
+
+**Status:** Assessment complete — implementation not authorized
+
+**Decision**
+
+The Manufacturing operator surfaces are substantially implemented: scoped Parts,
+Processing plan/status actions, Production plan actions, Fulfillment creation,
+read-only machine/assembly/QC monitoring, and handoff notes/acknowledgment are
+all evidenced in source. Completed scope and read-safety work must not be
+reissued as product tasks, and the disabled runtime is not evidence of a source
+defect.
+
+The strongest independently shapeable product gap is the dispatch lifecycle:
+operator Fulfillment creates dispatch entries but does not expose the existing
+`DispatchOpsService::markReady()`, `prepare()`, or `complete()` operations.
+Machine/assembly execution progress is a higher-dependency second candidate;
+operator handoff ownership is lower-confidence because role ownership is not
+established.
+
+**Consequence**
+
+Dispatch lifecycle continuation may be considered as a future
+`OH-AUTO2-MFG-*` implementation assignment only after explicit approval of
+operator roles, status transitions, record scope, transaction/audit behavior,
+and isolated proof. No Material aggregate restoration, Core change, schema,
+activation, or live database operation is authorized by this assessment.
+
+**Evidence**
+
+See `docs/architecture/oh-auto2-mfg-001-manufacturing-operator-workflow-gap-assessment-2026-10-20.md`.
+
 ### 2026-10-16 — OH-AUTO2-112 Material record-scope contract investigation
 
 **Status:** Blocked — OPTION C
