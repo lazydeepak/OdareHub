@@ -1,5 +1,28 @@
 # Hospitality Work Log
 
+## OH-AUTO2-HOSP-002 — Reservation create-to-manage workflow assessment
+
+Status: Read-only assessment complete; classified **INCOMPLETE** for valid
+past-date reservation creates. A separately authorized implementation is
+recommended; no production code was changed.
+
+- [x] Traced the create form, jailed POST route, own-handle binding, manage and
+  CSRF checks, canonical service delegation, success flash, and redirect.
+- [x] Confirmed today/future booked reservations appear in the operator Arrivals
+  projection with exact reservation IDs and existing check-in, cancel, no-show,
+  checkout, charge, and folio controls.
+- [x] Confirmed read-only/unauthorized users do not receive mutation controls or
+  mutation authority.
+- [x] Identified the bounded gap: `ReservationsService::create()` accepts valid
+  past dates, while `FrontDeskService::board()` excludes them and the operator
+  action discards the returned reservation identity.
+- [x] Ran only safe individual probes: behavioral **55/55**, identity **24/24**,
+  transition authorization **62/62**, and diff hygiene. The aggregate
+  Hospitality runner was not executed because it includes DB-backed probes.
+
+Assessment report:
+`docs/architecture/oh-auto2-hosp-002-reservation-create-to-manage-assessment-2026-10-21.md`.
+
 ## OH-AUTO2-HOSP-001 — Operator reservation creation
 
 Status: Implemented and verified offline; live authenticated acceptance remains

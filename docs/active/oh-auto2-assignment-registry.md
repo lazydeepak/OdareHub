@@ -72,6 +72,7 @@ domain-qualified identifiers going forward.
 | `OH-AUTO2-MFG-004` | Manufacturing | Implemented and verified Processing status-redirect context preservation; remote parity pending delivery |
 | `OH-AUTO2-GOV-003` | Governance | Cross-workstream prioritization complete; Hospitality reservation creation subsequently accepted under OH-AUTO2-HOSP-001 |
 | `OH-AUTO2-HOSP-001` | Hospitality | Authorized bounded operator reservation creation; live acceptance remains blocked under OH-AUTO2-119 |
+| `OH-AUTO2-HOSP-002` | Hospitality | Read-only create-to-manage assessment: incomplete for valid past-date creates; implementation requires separate authorization |
 
 ## Confirmed collision set
 

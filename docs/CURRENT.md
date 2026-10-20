@@ -26,13 +26,13 @@ historical aliases; new assignments must use domain-qualified identifiers.
 
 ## Active Focus
 
-- **OH-AUTO2-HOSP-001 — Hospitality operator reservation creation is active.**
-  The approved bounded slice reuses `ReservationsService::create()` for assigned
-  operators with explicit `hospitality.manage`, existing guest/room sources,
-  optional unassigned rooms, jailed own-handle routing, and offline isolated
-  verification. Live acceptance remains blocked under OH-AUTO2-119. The
-  prioritization and approval record is
-  `docs/architecture/oh-auto2-gov-003-cross-workstream-product-readiness-prioritization-2026-10-21.md`.
+- **OH-AUTO2-HOSP-002 — Reservation create-to-manage assessment is complete.**
+  The existing journey is continuous for today/future arrivals, but a valid
+  past-date reservation can be created and then omitted from the operator board
+  because the returned reservation identity is not retained for a focus/list
+  path. The assessment recommends a separately authorized narrow implementation;
+  no implementation is authorized yet. See
+  `docs/architecture/oh-auto2-hosp-002-reservation-create-to-manage-assessment-2026-10-21.md`.
 
 Completed execution milestone:
 

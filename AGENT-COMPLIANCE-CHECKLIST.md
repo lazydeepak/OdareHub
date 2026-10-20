@@ -1,5 +1,27 @@
 # AGENT-COMPLIANCE-CHECKLIST
 
+## Session Summary (2026-10-21) — OH-AUTO2-HOSP-002 Create-to-Manage Assessment
+
+Completed the read-only source assessment of the Hospitality reservation
+create-to-manage journey. The graph is continuous for today/future booked
+reservations: the board reads the created row, preserves `r.id`, and renders
+existing manage-gated check-in, checkout, cancellation, no-show, charge, and
+folio controls with the exact reservation identity. Own-handle, assignment,
+view/manage ACL, CSRF, strict identity normalization, and service delegation
+remain enforced.
+
+Classified the journey **INCOMPLETE** for a bounded valid-input gap:
+`ReservationsService::create()` accepts past check-in dates, but
+`FrontDeskService::board()` excludes them and `OperatorActions` discards the
+returned reservation ID. A future separately authorized owner-owned focus or
+lookup projection is recommended; no production code was changed.
+
+Safe individual probes passed: behavioral **55/55**, identity **24/24**, and
+transition authorization **62/62**. The aggregate Hospitality runner was not
+executed because it includes database-backed probes. No database/SQL,
+browser/HTTP, activation, deployment, Core, schema, Manufacturing, Material,
+SBAIO, or unrelated working-tree operation occurred.
+
 ## Session Summary (2026-10-21) — OH-AUTO2-GOV-003 Product Readiness Prioritization
 
 Reconciled the current roadmap, assignment registry, active briefs, and
