@@ -7,6 +7,7 @@ use App\Core\Auth;
 use App\Core\AclPolicy;
 use Apps\Hospitality\Services\FrontDeskService;
 use Apps\Hospitality\Services\HousekeepingService;
+use Apps\Hospitality\Services\ReservationsService;
 use Throwable;
 
 
@@ -20,6 +21,32 @@ use Throwable;
  */
 final class OperatorActions
 {
+    public static function reservationCreate(array $operatorRoute): void
+    {
+        $username = rawurlencode((string)($operatorRoute['username'] ?? ''));
+        $redirectTo = '/u/' . $username . '/hospitality';
+
+        try {
+            if (!AclPolicy::can('hospitality.manage', Auth::user())) {
+                throw new \RuntimeException('HOSPITALITY_FORBIDDEN_MANAGE');
+            }
+
+            Auth::requireCsrf((string)($_POST['csrf'] ?? ''), $redirectTo);
+
+            $payload = $_POST;
+            $payload['guest_id'] = self::normalizePositiveId($_POST['guest_id'] ?? null);
+            $payload['room_id'] = self::normalizeOptionalPositiveId($_POST['room_id'] ?? null);
+            ReservationsService::create($payload);
+
+            $_SESSION['operator_hospitality_flash_ok'] = 'HOSPITALITY_RES_CREATED';
+        } catch (Throwable $e) {
+            $_SESSION['operator_hospitality_flash_err'] = $e->getMessage();
+        }
+
+        header('Location: ' . $redirectTo, true, 302);
+        exit;
+    }
+
     public static function housekeepingStatus(array $operatorRoute): void
     {
         $username = rawurlencode((string)($operatorRoute['username'] ?? ''));
@@ -197,5 +224,15 @@ final class OperatorActions
         }
 
         return (int)$value;
+    }
+
+    /** @param mixed $value */
+    private static function normalizeOptionalPositiveId(mixed $value): int
+    {
+        if ($value === null || $value === '' || $value === 0 || $value === '0') {
+            return 0;
+        }
+
+        return self::normalizePositiveId($value);
     }
 }

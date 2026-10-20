@@ -25,10 +25,12 @@ $tr = static fn (string $key, string $fallback): string => htmlspecialchars($thi
         $flashErr = isset($_SESSION['operator_hospitality_flash_err']) ? (string)$_SESSION['operator_hospitality_flash_err'] : '';
         unset($_SESSION['operator_hospitality_flash_ok'], $_SESSION['operator_hospitality_flash_err']);
         $csrfToken = Auth::csrfToken();
+        $reservationOptions = $canManage ? HospitalityBoardAdapter::reservationFormOptions() : null;
     ?>
     <?php if ($flashOk !== ''): ?>
     <?php
         $okMsgKey = match ($flashOk) {
+            'HOSPITALITY_RES_CREATED' => 'hospitality.operator.flash.reservation_created',
             'HOSPITALITY_FD_CHECKED_IN' => 'hospitality.operator.flash.checked_in',
             'HOSPITALITY_FD_CHECKED_OUT' => 'hospitality.operator.flash.checked_out',
             'HOSPITALITY_FD_CHARGE_ADDED' => 'hospitality.operator.flash.charge_added',
@@ -40,13 +42,61 @@ $tr = static fn (string $key, string $fallback): string => htmlspecialchars($thi
     <p class="hosp-chip hosp-chip--ok"><?php echo $esc($this->tr($okMsgKey, 'Status updated.')); ?></p>
     <?php endif; ?>
     <?php if ($flashErr !== ''): ?>
-    <p class="hosp-chip hosp-chip--danger"><?php echo $esc($this->tr('hospitality.operator.flash.update_failed', 'Unable to update status.')); ?></p>
+    <p class="hosp-chip hosp-chip--danger"><?php echo $esc($this->tr(str_starts_with($flashErr, 'HOSPITALITY_RES_') ? 'hospitality.operator.flash.reservation_create_failed' : 'hospitality.operator.flash.update_failed', 'Unable to update the Hospitality action.')); ?></p>
     <?php endif; ?>
 
     <?php $summary = HospitalityBoardAdapter::summary(); ?>
     <?php if (!is_array($summary)): ?>
     <p class="text-muted"><?php echo $tr('hospitality.operator.schema_pending', 'Hospitality operator data appears after the app schema is installed.'); ?></p>
     <?php else: ?>
+
+    <?php if ($canManage && is_array($reservationOptions)): ?>
+    <div class="card">
+        <h3><?php echo $tr('hospitality.operator.reservation.create_title', 'Create reservation'); ?></h3>
+        <?php if ((array)($reservationOptions['guests'] ?? []) === []): ?>
+        <p class="text-muted"><?php echo $tr('hospitality.operator.reservation.no_active_guests', 'No active guests are available for reservation creation.'); ?></p>
+        <?php else: ?>
+        <form method="post" action="/u/<?php echo $esc($opUsername); ?>/hospitality/reservations/create" class="hosp-form">
+            <input type="hidden" name="csrf" value="<?php echo $esc($csrfToken); ?>">
+            <label><?php echo $tr('hospitality.field.guest', 'Guest'); ?>
+                <select name="guest_id" required>
+                    <option value=""><?php echo $tr('hospitality.operator.reservation.choose_guest', 'Choose guest'); ?></option>
+                    <?php foreach ((array)$reservationOptions['guests'] as $guest): ?>
+                    <option value="<?php echo $esc((int)($guest['id'] ?? 0)); ?>"><?php echo $esc($guest['full_name'] ?? ''); ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </label>
+            <label><?php echo $tr('hospitality.field.room', 'Room'); ?>
+                <select name="room_id">
+                    <option value=""><?php echo $tr('hospitality.operator.reservation.unassigned_room', 'Leave room unassigned'); ?></option>
+                    <?php foreach ((array)($reservationOptions['rooms'] ?? []) as $room): ?>
+                    <option value="<?php echo $esc((int)($room['id'] ?? 0)); ?>"><?php echo $esc($room['room_number'] ?? ''); ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </label>
+            <label><?php echo $tr('hospitality.field.check_in_date', 'Arrival (planned)'); ?>
+                <input type="date" name="check_in_date" required>
+            </label>
+            <label><?php echo $tr('hospitality.field.check_out_date', 'Departure (planned)'); ?>
+                <input type="date" name="check_out_date" required>
+            </label>
+            <label><?php echo $tr('hospitality.field.adults', 'Adults'); ?>
+                <input type="number" name="adults" min="0" max="99" value="1" required>
+            </label>
+            <label><?php echo $tr('hospitality.field.children', 'Children'); ?>
+                <input type="number" name="children" min="0" max="99" value="0" required>
+            </label>
+            <label><?php echo $tr('hospitality.field.rate', 'Nightly rate (optional)'); ?>
+                <input type="text" name="rate" inputmode="decimal">
+            </label>
+            <label><?php echo $tr('hospitality.field.note', 'Note'); ?>
+                <textarea name="note" maxlength="1000" rows="2"></textarea>
+            </label>
+            <button class="btn" type="submit"><?php echo $tr('hospitality.operator.reservation.create_submit', 'Create reservation'); ?></button>
+        </form>
+        <?php endif; ?>
+    </div>
+    <?php endif; ?>
 
     <?php
         $kpis = (array)($summary['kpis'] ?? []);

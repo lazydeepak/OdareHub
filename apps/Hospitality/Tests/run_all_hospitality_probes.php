@@ -36,6 +36,8 @@ $probes = [
     'operator slice7 add charge' => 'apps/Hospitality/Tests/probe_operator_slice7_add_charge.php',
     'operator slice8 cancel' => 'apps/Hospitality/Tests/probe_operator_slice8_cancel.php',
     'operator slice9 no-show' => 'apps/Hospitality/Tests/probe_operator_slice9_no_show.php',
+    'operator behavioral dispatch' => 'apps/Hospitality/Tests/probe_operator_behavioral.php',
+    'operator input identity' => 'apps/Hospitality/Tests/probe_operator_input_identity.php',
 ];
 
 $passed = 0;

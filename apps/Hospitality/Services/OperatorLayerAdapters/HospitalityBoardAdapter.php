@@ -5,9 +5,26 @@ namespace Apps\Hospitality\Services\OperatorLayerAdapters;
 
 use Apps\Hospitality\Services\FrontDeskService;
 use Apps\Hospitality\Services\HousekeepingService;
+use Apps\Hospitality\Services\ReservationsService;
 
 final class HospitalityBoardAdapter
 {
+    /**
+     * @return array{guests:array<int,array<string,mixed>>,rooms:array<int,array<string,mixed>>}|null
+     */
+    public static function reservationFormOptions(): ?array
+    {
+        try {
+            $options = ReservationsService::formOptions();
+            return [
+                'guests' => array_values((array)($options['guests'] ?? [])),
+                'rooms' => array_values((array)($options['rooms'] ?? [])),
+            ];
+        } catch (\Throwable) {
+            return null;
+        }
+    }
+
     /**
      * Read-only operator payload over existing Hospitality foundation services.
      *

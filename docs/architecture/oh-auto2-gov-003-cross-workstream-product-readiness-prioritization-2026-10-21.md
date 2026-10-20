@@ -3,7 +3,7 @@
 **Date:** 2026-10-21
 **Baseline:** `29bea8f117c2d8f96c8aa8531c79d94f0d91a755`
 **Authorization:** Read-only assessment, documentation, and isolated non-database verification
-**Status:** Prioritization complete; no new implementation assignment selected
+**Status:** Prioritization complete; proposal subsequently approved as `OH-AUTO2-HOSP-001`
 
 ## 1. Mission and boundary
 
@@ -164,3 +164,13 @@ in their existing blocked states.
 
 GOV-003 itself made no production-code, database, runtime, activation, or
 deployment change.
+
+## 8. Subsequent product decision
+
+The planner subsequently accepted the reservation-creation proposal as
+`OH-AUTO2-HOSP-001`. The approved contract keeps the boundary defined here:
+assigned Hospitality operators with explicit `hospitality.manage`, active guest
+and eligible-room sources, optional unassigned rooms where the canonical service
+supports them, existing reservation fields, the existing service as sole write
+authority, jailed own-handle routing, and offline isolated verification only.
+Live acceptance remains blocked under legacy OH-AUTO2-119.

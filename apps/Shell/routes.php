@@ -1064,6 +1064,25 @@ $router->get('/u/hospitality', function () use ($resolveOperatorGetRoute) {
     return null;
 });
 
+$router->post('/u/hospitality/reservations/create', function () use ($resolveOperatorPostRoute) {
+    $operatorRoute = $resolveOperatorPostRoute('hospitality', false, 'hospitality');
+
+    // Operator mutations are self-workspace only; admin inspection of another
+    // user's workspace does not confer cross-user mutation authority.
+    $authenticatedHandleRc = WorkspaceWrapperRegistry::handleFromIdentity([
+        'username' => (string)($operatorRoute['user']['username'] ?? ''),
+        'email' => (string)($operatorRoute['user']['email'] ?? ''),
+    ]);
+    if ($authenticatedHandleRc === '' || !hash_equals($authenticatedHandleRc, (string)$operatorRoute['username'])) {
+        $safeHandleRc = $authenticatedHandleRc !== '' ? $authenticatedHandleRc : (string)$operatorRoute['username'];
+        header('Location: /u/' . rawurlencode($safeHandleRc) . '/dashboard', true, 302);
+        exit;
+    }
+
+    \Apps\Hospitality\Controllers\OperatorActions::reservationCreate($operatorRoute);
+    return null;
+});
+
 $router->post('/u/hospitality/housekeeping/status', function () use ($resolveOperatorPostRoute) {
     $operatorRoute = $resolveOperatorPostRoute('hospitality', false, 'hospitality');
 

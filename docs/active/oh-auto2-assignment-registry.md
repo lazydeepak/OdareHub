@@ -70,7 +70,8 @@ domain-qualified identifiers going forward.
 | `OH-AUTO2-MFG-002` | Manufacturing | Contract assessment complete; dispatch operator exposure blocked; no implementation authorized |
 | `OH-AUTO2-MFG-003` | Manufacturing | Accepted assessment; bounded status-redirect context defect advanced to MFG-004 |
 | `OH-AUTO2-MFG-004` | Manufacturing | Implemented and verified Processing status-redirect context preservation; remote parity pending delivery |
-| `OH-AUTO2-GOV-003` | Governance | Cross-workstream prioritization complete; Hospitality reservation creation requires product/authority decision before implementation |
+| `OH-AUTO2-GOV-003` | Governance | Cross-workstream prioritization complete; Hospitality reservation creation subsequently accepted under OH-AUTO2-HOSP-001 |
+| `OH-AUTO2-HOSP-001` | Hospitality | Authorized bounded operator reservation creation; live acceptance remains blocked under OH-AUTO2-119 |
 
 ## Confirmed collision set
 

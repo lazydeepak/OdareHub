@@ -24,6 +24,38 @@ database, SQL, browser/HTTP, activation, deployment, Core, Fulfillment,
 Material, or SBAIO incident operation occurred. Unrelated Procurement logs,
 backup, PHPUnit cache, and incident evidence were preserved.
 
+## Session Summary (2026-10-21) — OH-AUTO2-HOSP-001 Operator Reservation Creation
+
+Implemented the approved bounded Hospitality operator reservation workflow. The
+existing Hospitality operator focus now renders a localized reservation form
+only for users with explicit `hospitality.manage`; active guest and eligible
+room options come from the app-owned adapter, with an explicit unassigned-room
+option where the canonical service permits it.
+
+Added one jailed `/u/hospitality/reservations/create` POST seam using the
+existing Shell operator route pipeline and own-handle binding. The app-owned
+`OperatorActions::reservationCreate()` validates manage authority and CSRF
+before strict operator-boundary identity normalization, then delegates exactly
+once to `ReservationsService::create()`. Existing date, guest, room, overlap,
+transaction, commit, rollback, occupancy, rate, note, and error semantics were
+not duplicated or changed. Feedback remains localized and jailed.
+
+Extended `probe_operator_behavioral.php` to cover authorized delegation,
+optional unassigned rooms, malformed guest/room identities, denied permission,
+invalid CSRF, service exceptions, route presence, form controls, localization,
+manage gating, and single-dispatch behavior: **55/55**. The identity probe now
+passes **24/24**. PHP lint, focused architecture gates, operator confinement,
+Shell rendering, business-app contracts, Core lock, diff hygiene, the full
+architecture suite, deletion family (`28/28`), and read-only deployment
+readiness pass. Database-backed probes, browser/HTTP runtime, activation, and
+live acceptance were not run.
+
+Updated the Hospitality action plan, work log, decision record, assignment
+registry, current context, GOV-003 report, and this compliance record. No Core,
+schema, migration, Manufacturing, Material, SBAIO, or unrelated Procurement
+changes were made; existing logs, backup, cache, and incident evidence remain
+preserved.
+
 ## Session Summary (2026-10-20) — OH-AUTO2-PROC-001 Supplier Acceptance and History Integrity
 
 Compared Procurement records before and after `1107ca0` and confirmed that the

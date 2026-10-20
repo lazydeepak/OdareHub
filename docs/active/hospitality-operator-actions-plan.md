@@ -188,7 +188,14 @@ Authorization rule (restated): assignment = availability; `hospitality.view` /
   rejected, unknown id rejected).
 - **Charge void (completed 2026-09-13 reconciliation)**: implemented as a bounded operator mutation (`POST /u/hospitality/front-desk/charges/void`) following the same confined pattern (manage + CSRF + own-handle binding + service delegation). The admin mutation path (`/apps/hospitality/front-desk/charges/void`) and hardened `FrontDeskService::voidCharge()` (atomic transaction + reservation-row serialization + rollback + canonical state re-check) were the existing truth; only the operator action edge was missing. No audit mechanism or new schema introduced.
 
-Also still deferred: reservation create,
+**Slice 7 (authorized): Operator reservation creation** — the bounded next
+workflow uses the same assignment + own-handle binding + operator-view
+eligibility + `hospitality.manage` + CSRF + jailed redirect pattern, delegates
+only to `ReservationsService::create()`, and keeps optional unassigned rooms
+aligned with the canonical service contract. Offline isolated verification is
+required; live acceptance remains under OH-AUTO2-119.
+
+Still deferred:
 room/guest CRUD, housekeeping history/supply/maintenance workflows, staff
 scheduling, new permissions, schema changes, shared-app dependencies, and any
 generic operator-action framework beyond this bridge.

@@ -35,6 +35,18 @@ namespace App\Core {
 }
 
 namespace Apps\Hospitality\Services {
+    final class ReservationsService
+    {
+        public static function create(array $post): int
+        {
+            if (($GLOBALS['reservation_service_error'] ?? false) === true) {
+                throw new \RuntimeException('HOSPITALITY_RES_ROOM_CONFLICT');
+            }
+            $GLOBALS['calls'][] = ['method' => 'reservationCreate', 'post' => $post];
+            return 42;
+        }
+    }
+
     final class HousekeepingService
     {
         public static function updateStatus(int $id, array $post): void
@@ -108,7 +120,9 @@ namespace {
         require_once $handlerPath;
         $operation = (string)($argv[2] ?? '');
         $mode = (string)($argv[3] ?? '');
-        $definition = $operations[$operation] ?? null;
+        $definition = $operations[$operation] ?? ($operation === 'reservationCreate'
+            ? ['post_key' => 'guest_id', 'service' => 'reservationCreate']
+            : null);
         if (!is_array($definition)) {
             fwrite(STDERR, "unknown operation\n");
             exit(2);
@@ -124,6 +138,20 @@ namespace {
             default => '7',
         };
         $_POST = [$definition['post_key'] => $value, 'csrf' => $mode === 'csrf' ? 'bad' : 'csrf-ok', 'payload_marker' => 'forwarded'];
+        if ($operation === 'reservationCreate') {
+            $GLOBALS['reservation_service_error'] = $mode === 'service_error';
+            $_POST = [
+                'guest_id' => $mode === 'malformed_guest' ? '7abc' : ($mode === 'csrf' || $mode === 'unauthorized' ? '7' : (string)PHP_INT_MAX),
+                'room_id' => $mode === 'malformed_room' ? '8abc' : ($mode === 'unassigned' ? '' : (string)PHP_INT_MAX),
+                'check_in_date' => '2030-01-01',
+                'check_out_date' => '2030-01-03',
+                'adults' => '2',
+                'children' => '1',
+                'rate' => '120.50',
+                'note' => 'forwarded',
+                'csrf' => $mode === 'csrf' ? 'bad' : 'csrf-ok',
+            ];
+        }
 
         register_shutdown_function(static function (): void {
             echo json_encode([
@@ -179,9 +207,44 @@ namespace {
         }
     }
 
+    $reservationModes = ['valid', 'unassigned', 'malformed_guest', 'malformed_room', 'unauthorized', 'csrf', 'service_error'];
+    foreach ($reservationModes as $mode) {
+        $command = escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg(__FILE__)
+            . ' child reservationCreate ' . escapeshellarg($mode);
+        $output = [];
+        $exitCode = 0;
+        exec($command, $output, $exitCode);
+        $payload = json_decode((string)end($output), true);
+        $calls = is_array($payload) ? (array)($payload['calls'] ?? []) : [];
+        if ($mode === 'valid') {
+            $call = $calls[0] ?? [];
+            (count($calls) === 1 && ($call['method'] ?? '') === 'reservationCreate'
+                && ($call['post']['guest_id'] ?? null) === PHP_INT_MAX
+                && ($call['post']['room_id'] ?? null) === PHP_INT_MAX
+                && ($call['post']['note'] ?? '') === 'forwarded')
+                ? $pass('reservationCreate forwards normalized assigned reservation payload once')
+                : $fail('reservationCreate valid delegation', json_encode($payload));
+            continue;
+        }
+        if ($mode === 'unassigned') {
+            $call = $calls[0] ?? [];
+            (count($calls) === 1 && ($call['post']['guest_id'] ?? null) === PHP_INT_MAX
+                && ($call['post']['room_id'] ?? null) === 0)
+                ? $pass('reservationCreate preserves optional unassigned room')
+                : $fail('reservationCreate unassigned delegation', json_encode($payload));
+            continue;
+        }
+        $expectedError = in_array($mode, ['unauthorized'], true)
+            ? 'HOSPITALITY_FORBIDDEN_MANAGE'
+            : ($mode === 'csrf' ? 'CSRF_FAILED' : ($mode === 'service_error' ? 'HOSPITALITY_RES_ROOM_CONFLICT' : 'HOSPITALITY_ID_INVALID'));
+        (count($calls) === 0 && ($payload['flash_error'] ?? null) === $expectedError)
+            ? $pass("reservationCreate/{$mode} blocks before service dispatch")
+            : $fail("reservationCreate/{$mode} rejection", json_encode($payload));
+    }
+
     // Route/self-workspace and disclosure contracts are verified offline here;
     // executing the real route loader would bootstrap the application/DB path.
-    foreach (['housekeeping/status', 'front-desk/check-in', 'front-desk/check-out', 'front-desk/charges/add', 'front-desk/charges/void', 'front-desk/cancel', 'front-desk/no-show'] as $route) {
+    foreach (['reservations/create', 'housekeeping/status', 'front-desk/check-in', 'front-desk/check-out', 'front-desk/charges/add', 'front-desk/charges/void', 'front-desk/cancel', 'front-desk/no-show'] as $route) {
         str_contains($shellSource, "\$router->post('/u/hospitality/{$route}'")
             ? $pass("route /u/hospitality/{$route} exists")
             : $fail("route /u/hospitality/{$route} exists");
@@ -193,6 +256,21 @@ namespace {
         && !preg_match('/echo\s+\$esc\(\$flashErr\)/', $viewSource)
         ? $pass('operator errors render through localized generic fallback')
         : $fail('operator error disclosure boundary');
+    str_contains($viewSource, 'hospitality/reservations/create')
+        && str_contains($viewSource, 'name="guest_id"')
+        && str_contains($viewSource, 'name="room_id"')
+        && str_contains($viewSource, 'name="check_in_date"')
+        && str_contains($viewSource, 'name="check_out_date"')
+        && str_contains($viewSource, 'name="adults"')
+        && str_contains($viewSource, 'name="children"')
+        && str_contains($viewSource, 'name="rate"')
+        && str_contains($viewSource, 'name="note"')
+        ? $pass('reservation form renders the complete existing field contract')
+        : $fail('reservation form field contract');
+    str_contains($viewSource, '$canManage && is_array($reservationOptions)')
+        && str_contains($viewSource, 'HospitalityBoardAdapter::reservationFormOptions()')
+        ? $pass('reservation form is manage-gated and uses owner adapter options')
+        : $fail('reservation form authority/source boundary');
 
     echo "\nResult: {$passed} passed, {$failed} failed\n";
     exit($failed > 0 ? 1 : 0);

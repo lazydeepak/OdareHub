@@ -1,5 +1,29 @@
 # Hospitality Work Log
 
+## OH-AUTO2-HOSP-001 — Operator reservation creation
+
+Status: Implemented and verified offline; live authenticated acceptance remains
+blocked under OH-AUTO2-119.
+
+- [x] Added the app-owned reservation form to the existing Hospitality operator
+  focus view, rendered only for explicit `hospitality.manage` holders with
+  active guest/room options supplied by the Hospitality adapter.
+- [x] Added one jailed Shell POST seam at
+  `/u/hospitality/reservations/create` with existing operator route resolution,
+  assignment/view eligibility, own-handle binding, and same-user redirect.
+- [x] Added `OperatorActions::reservationCreate()` with CSRF-before-dispatch,
+  strict guest identity normalization, optional-room normalization, localized
+  flash behavior, and sole delegation to `ReservationsService::create()`.
+- [x] Preserved optional unassigned-room behavior and all existing domain
+  validation, overlap locking, transaction, commit, and rollback semantics.
+- [x] Extended the offline behavioral probe with reservation delegation,
+  malformed identity, permission, CSRF, service-error, route, form, and
+  localization-boundary coverage.
+
+No database, SQL, browser/HTTP runtime, activation, deployment, schema,
+migration, Core, Manufacturing, Material, SBAIO, or live Hospitality operation
+was performed.
+
 ## OH-AUTO2-121 — Hospitality operator behavioral verification
 
 Status: Completed offline; authenticated runtime acceptance remains blocked under
