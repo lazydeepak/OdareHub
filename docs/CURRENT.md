@@ -20,6 +20,10 @@ development has resumed on the Shell worker surface; OH-AUTO1-096 is the
 completed scope-safe work/process summary milestone and OH-AUTO1-097 is the
 completed restricted-scope My Work containment milestone.
 
+OH-AUTO2 assignment history is reconciled in
+`docs/active/oh-auto2-assignment-registry.md`. Legacy numeric IDs remain
+historical aliases; new assignments must use domain-qualified identifiers.
+
 ## Active Focus
 
 Completed execution milestone:

@@ -1,5 +1,25 @@
 # AGENT-COMPLIANCE-CHECKLIST
 
+## Session Summary (2026-10-20) — OH-AUTO2-GOV-001 Assignment Registry Reconciliation
+
+Performed a read-only inventory of OH-AUTO2 identifiers across engineering work
+logs, decision records, compliance history, `docs/CURRENT.md`, and architecture
+reports. Confirmed numeric collisions across Hospitality and Procurement for
+OH-AUTO2-119, OH-AUTO2-120, and OH-AUTO2-121; recorded the broader overlapping
+workstream history, suffix families, missing OH-AUTO2-102, completion states,
+blocked states, and identifiable commit references.
+
+Created the authoritative registry at
+`docs/active/oh-auto2-assignment-registry.md`. Historical IDs are preserved;
+future assignments now require domain-qualified identifiers. The registry
+recommends qualified Procurement acceptance of implemented OH-AUTO2-135 as the
+highest-priority actionable unfinished item, while preserving blocked
+Hospitality live acceptance and SBAIO/Material boundaries.
+
+Validation: read-only source inventory and `git diff --check` PASS. No database,
+SQL, browser, HTTP, activation, deployment, Core, schema, or runtime operation
+occurred.
+
 ## Session Summary (2026-10-20) — OH-AUTO2-121 Hospitality operator behavioral verification
 
 Reconciled the OH-AUTO2-120 deployment-readiness discrepancy: the initial

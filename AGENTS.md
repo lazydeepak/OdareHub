@@ -1,5 +1,19 @@
 # AGENTS.md
 
+## Session Summary (2026-10-20) — OH-AUTO2-GOV-001 Assignment Registry Reconciliation
+
+Created `docs/active/oh-auto2-assignment-registry.md` as the authoritative
+read-only reconciliation of OH-AUTO2 identifiers across engineering work logs,
+decisions, compliance history, current context, and architecture reports.
+Confirmed the Hospitality/Procurement collisions at 119–121, the wider
+multi-owner history, suffix families, missing 102, completion/blocker states,
+and identifiable implementation commits. Historical IDs remain unchanged;
+future assignments require domain-qualified IDs. Recommended Procurement
+acceptance of implemented 135 as the next actionable unfinished item.
+
+No database, SQL, browser, HTTP, activation, deployment, Core, schema, or
+runtime operation occurred.
+
 ## Session Summary (2026-10-20) — OH-AUTO2-121 Hospitality operator behavioral verification
 
 Reconciled OH-AUTO2-120 readiness evidence: the initial 120-second run was
