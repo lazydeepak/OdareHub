@@ -68,7 +68,8 @@ domain-qualified identifiers going forward.
 | `OH-AUTO2-135` | Procurement | Accepted after OH-AUTO2-PROC-001 bounded review; live DB/concurrency evidence remains out of scope |
 | `OH-AUTO2-MFG-001` | Manufacturing | Provisional local assessment complete; report untracked and pending independent baseline verification |
 | `OH-AUTO2-MFG-002` | Manufacturing | Contract assessment complete; dispatch operator exposure blocked; no implementation authorized |
-| `OH-AUTO2-MFG-003` | Manufacturing | Processing assessment complete; bounded status-redirect context defect identified; implementation requires separate authorization |
+| `OH-AUTO2-MFG-003` | Manufacturing | Accepted assessment; bounded status-redirect context defect advanced to MFG-004 |
+| `OH-AUTO2-MFG-004` | Manufacturing | Implemented and verified Processing status-redirect context preservation; remote parity pending delivery |
 
 ## Confirmed collision set
 
@@ -203,6 +204,16 @@ Assembly/QC status forms drop the selected `processing_date` and `product_id`
 when redirecting after submission. A future bounded implementation may preserve
 that context; no implementation is authorized by MFG-003. Live persistence and
 transaction behavior remain unverified under the no-database/no-HTTP boundary.
+
+### OH-AUTO2-MFG-004 implementation disposition — 2026-10-20
+
+The authorized bounded correction is implemented in the existing Processing
+operator view. All Assembly/QC status forms preserve valid server-rendered
+`processing_date` and `product_id` context in the same-user Processing return
+URL; missing, invalid, and unlisted filters fall back safely. Rendered-form
+verification passed **21/21**, with existing Processing and work/process
+regressions passing **35/35** and **23/23**. No database, SQL, browser, HTTP,
+activation, deployment, Core, or unrelated-owner operation was performed.
 
 ## Validation boundary
 

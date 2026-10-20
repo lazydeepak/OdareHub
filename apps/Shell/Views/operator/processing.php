@@ -14,6 +14,25 @@
 <?php $processingAssemblyAllowed = (bool)($processing['assembly_allowed'] ?? false); ?>
 <?php $processingQcAllowed = (bool)($processing['qc_allowed'] ?? false); ?>
                     <?php $_procSubUser = htmlspecialchars(rawurlencode((string)($data['username'] ?? ''))); ?>
+                    <?php
+                        $processingReturnUrl = '/u/' . rawurlencode((string)($data['username'] ?? '')) . '/processing';
+                        $processingDateObject = \DateTimeImmutable::createFromFormat('!Y-m-d', $processingDate);
+                        $processingDateValid = $processingDateObject instanceof \DateTimeImmutable
+                            && $processingDateObject->format('Y-m-d') === $processingDate;
+                        $processingProductIds = array_values(array_filter(array_map(
+                            static fn($product): int => (int)($product['id'] ?? 0),
+                            $processingProducts
+                        ), static fn(int $productId): bool => $productId > 0));
+                        $processingProductValid = $processingProductId > 0
+                            && in_array($processingProductId, $processingProductIds, true);
+                        if ($processingDateValid && $processingProductValid) {
+                            $processingReturnUrl .= '?' . http_build_query([
+                                'focus' => 'processing',
+                                'processing_date' => $processingDate,
+                                'product_id' => (string)$processingProductId,
+                            ], '', '&', PHP_QUERY_RFC3986);
+                        }
+                    ?>
                     <nav class="operator-subnav" aria-label="<?php echo htmlspecialchars($this->tr('operator.processing.subnav.label', 'Processing sections')); ?>">
                         <a class="operator-subnav-item operator-subnav-item--active" href="/u/<?php echo $_procSubUser; ?>/processing" aria-current="page"><?php echo htmlspecialchars($this->tr('operator.processing.subnav.hub', 'Overview')); ?></a>
                         <?php if ($processingAssemblyAllowed): ?><a class="operator-subnav-item" href="/u/<?php echo $_procSubUser; ?>/assembly"><?php echo htmlspecialchars($this->tr('operator.processing.subnav.assembly', 'Assembly')); ?></a><?php endif; ?>
@@ -93,7 +112,6 @@
                                                 <?php
                                                     $assemblyStatus = strtolower(trim((string)($row['status'] ?? '')));
                                                     $demandId = (int)($row['id'] ?? 0);
-                                                    $processingReturnUrl = '/u/' . urlencode((string)($data['username'] ?? '')) . '/processing';
                                                 ?>
                                                 <tr>
                                                     <td><?php echo htmlspecialchars(trim((string)($row['part_name'] ?? '-')) . ' (' . trim((string)($row['part_number'] ?? '-')) . ')'); ?></td>
@@ -195,7 +213,7 @@
                                                 <?php
                                                     $qcStatus = strtolower(trim((string)($row['status'] ?? '')));
                                                     $qcPlanId = (int)($row['id'] ?? 0);
-                                                    $qcReturnUrl = '/u/' . urlencode((string)($data['username'] ?? '')) . '/processing';
+                                                    $qcReturnUrl = $processingReturnUrl;
                                                 ?>
                                                 <tr>
                                                     <td><?php echo htmlspecialchars(trim((string)($row['part_name'] ?? '-')) . ' (' . trim((string)($row['part_number'] ?? '-')) . ')'); ?></td>

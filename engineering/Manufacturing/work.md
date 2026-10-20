@@ -7,6 +7,26 @@ Continue
 through the same owner-contract pattern for parts, work areas, and process
 areas only as separately bounded milestones.
 
+## 2026-10-20 — OH-AUTO2-MFG-004 Processing status redirect context preservation
+
+- [x] Implemented the smallest Manufacturing Processing usability correction
+  in the existing operator view; no route, service, status, authorization, or
+  CSRF semantics changed.
+- [x] Assembly and QC status forms now preserve the server-rendered valid
+  `processing_date` and `product_id` in the same-user `/u/{username}/processing`
+  return URL.
+- [x] Missing, invalid-date, and unlisted-product contexts safely fall back to
+  the bare same-user Processing path; query values use RFC3986 encoding and
+  HTML-safe form attributes.
+- [x] Rendered-form regression probe passed **21/21**; Processing scope passed
+  **35/35**; work/process summary passed **23/23**.
+- [x] Existing record IDs, CSRF fields, Manufacturing status authorization,
+  route confinement, and creation redirects were verified unchanged.
+- [x] No database, SQL, schema, migration, browser, HTTP, activation,
+  deployment, Fulfillment, Material, SBAIO, unrelated-owner, or Core operation
+  was performed.
+- [x] Focused probe: `apps/Manufacturing/Tests/probe_operator_processing_redirect_context.php`.
+
 ## 2026-10-20 — OH-AUTO2-MFG-001 operator workflow gap assessment
 
 - [x] Completed the read-only Manufacturing operator workflow map across

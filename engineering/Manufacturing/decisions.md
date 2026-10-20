@@ -2,6 +2,32 @@
 
 ## Decision Log
 
+### 2026-10-20 — OH-AUTO2-MFG-004 Processing status redirect context preservation
+
+**Status:** Implemented and verified under bounded authorization
+
+**Decision**
+
+The confirmed MFG-003 usability defect is corrected in the existing Processing
+operator view. Assembly and QC status forms now submit a server-rendered return
+URL that preserves valid `processing_date` and `product_id` context while
+remaining on `/u/{username}/processing`.
+
+Invalid dates, missing filters, and products absent from the server-rendered
+product list do not enter the query string. Existing redirect normalization,
+CSRF validation, Manufacturing status authorization, record IDs, status values,
+and creation redirects remain unchanged.
+
+**Evidence**
+
+Rendered-form redirect probe: **21/21**; Processing scope: **35/35**;
+work/process summary: **23/23**. No database or HTTP execution was performed.
+
+**Boundaries**
+
+No new route, permission, lifecycle behavior, schema, migration, Core,
+Fulfillment, Material, SBAIO, or unrelated-owner change was made.
+
 ### 2026-10-20 — OH-AUTO2-MFG-003 Processing operator workflow completeness
 
 **Status:** Assessment complete — bounded usability correction recommended; implementation not authorized

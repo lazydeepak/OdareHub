@@ -7759,3 +7759,22 @@ backup file, and PHPUnit cache remain untouched.
   incident evidence.
 - [x] Recorded conclusions in
   `docs/architecture/oh-auto2-mfg-003-processing-operator-workflow-completeness-assessment-2026-10-20.md`.
+
+# OH-AUTO2-MFG-004 — Processing Status Redirect Context (2026-10-20)
+
+- [x] Implemented only the bounded operator-view redirect correction authorized
+  after MFG-003; no Core or unrelated production area changed.
+- [x] Valid server-rendered `processing_date` and `product_id` are preserved by
+  Assembly and QC status forms on `/u/{username}/processing`.
+- [x] Missing, invalid-date, and unlisted-product filters fall back safely;
+  RFC3986 query encoding and HTML attribute escaping are covered.
+- [x] Rendered-form probe passed **21/21**; Processing scope **35/35**;
+  work/process summary **23/23**.
+- [x] Existing record IDs, CSRF, Manufacturing authorization, status values,
+  redirect confinement, and creation-form redirects remain intact.
+- [x] No database, SQL, schema, migration, browser, HTTP, activation,
+  deployment, Fulfillment, Material, SBAIO, or unrelated-owner operation.
+- [x] Preserved unrelated Procurement logs, backup, PHPUnit cache, and incident
+  evidence.
+- [x] Focused probe:
+  `apps/Manufacturing/Tests/probe_operator_processing_redirect_context.php`.
