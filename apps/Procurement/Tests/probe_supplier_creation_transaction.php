@@ -64,12 +64,16 @@ final class SupplierCreationTransactionSpy
 }
 
 /** @return array{committed:bool,rolled_back:bool,events:list<string>} */
-$simulate = static function (callable $insert, callable $audit): array {
+$simulate = static function (callable $insert, callable $extractId, callable $audit): array {
     $tx = new SupplierCreationTransactionSpy();
     $events = [];
     $tx->begin();
     try {
         $insert($events);
+        $supplierId = $extractId($tx, $events);
+        if ($supplierId <= 0) {
+            throw new RuntimeException('Failed to create supplier.');
+        }
         $auditResult = $audit($events);
         if (($auditResult['ok'] ?? false) !== true) {
             throw new RuntimeException((string)($auditResult['message'] ?? 'audit failed'));
@@ -89,6 +93,7 @@ $simulate = static function (callable $insert, callable $audit): array {
 
 $success = $simulate(
     static function (array &$events): void { $events[] = 'insert'; },
+    static function (SupplierCreationTransactionSpy $tx, array &$events): int { return 1; },
     static function (array &$events): array { $events[] = 'audit'; return ['ok' => true]; }
 );
 $check($success['committed'] && !$success['rolled_back'], 'successful insert and audit commit once');
@@ -96,6 +101,7 @@ $check($success['events'] === ['insert', 'audit'], 'successful operation orders 
 
 $insertFailure = $simulate(
     static function (array &$events): void { $events[] = 'insert'; throw new RuntimeException('insert failed'); },
+    static function (SupplierCreationTransactionSpy $tx, array &$events): int { return 1; },
     static function (array &$events): array { $events[] = 'audit'; return ['ok' => true]; }
 );
 $check(!$insertFailure['committed'] && $insertFailure['rolled_back'], 'simulated insertion failure rolls back without commit');
@@ -103,6 +109,7 @@ $check($insertFailure['events'] === ['insert', 'failure:insert failed'], 'insert
 
 $auditThrow = $simulate(
     static function (array &$events): void { $events[] = 'insert'; },
+    static function (SupplierCreationTransactionSpy $tx, array &$events): int { return 1; },
     static function (array &$events): array { $events[] = 'audit'; throw new RuntimeException('audit threw'); }
 );
 $check(!$auditThrow['committed'] && $auditThrow['rolled_back'], 'simulated thrown audit failure rolls back without commit');
@@ -110,6 +117,7 @@ $check($auditThrow['events'] === ['insert', 'audit', 'failure:audit threw'], 'th
 
 $auditFalse = $simulate(
     static function (array &$events): void { $events[] = 'insert'; },
+    static function (SupplierCreationTransactionSpy $tx, array &$events): int { return 1; },
     static function (array &$events): array { $events[] = 'audit'; return ['ok' => false, 'message' => 'audit rejected']; }
 );
 $check(!$auditFalse['committed'] && $auditFalse['rolled_back'], 'non-OK audit result rolls back without commit');
@@ -117,10 +125,11 @@ $check($auditFalse['events'] === ['insert', 'audit', 'failure:audit rejected'], 
 
 $insertInvalidId = $simulate(
     static function (array &$events): void { $events[] = 'insert'; },
-    static function (array &$events): array { return ['ok' => true]; }
+    static function (SupplierCreationTransactionSpy $tx, array &$events): int { return 0; },
+    static function (array &$events): array { $events[] = 'audit'; return ['ok' => true]; }
 );
 $check(!$insertInvalidId['committed'] && $insertInvalidId['rolled_back'], 'simulated insertion with invalid identity rolls back without commit');
-$check($insertInvalidId['events'] === ['insert', 'failure:Failed to create supplier'], 'invalid identity prevents audit and success commit');
+$check($insertInvalidId['events'] === ['insert', 'failure:Failed to create supplier.'], 'invalid identity prevents audit and success commit');
 
 $source = (string)file_get_contents($servicePath);
 $controller = (string)file_get_contents($controllerPath);
@@ -140,12 +149,14 @@ $audit = strpos($create, '$audit = self::recordAudit(');
 $auditCheck = strpos($create, '($audit[\'ok\'] ?? false) !== true');
 $commit = strpos($create, '$db->commit()');
 $rollback = strpos($create, '$db->rollback()');
+$invalidCheck = strpos($create, 'if ($supplierId <= 0) {');
 
 $check($create !== '', 'createSupplier method is available');
 $check($ensure !== false && $begin !== false && $ensure < $begin, 'audit initialization precedes transaction start');
 $check($begin !== false && $insert !== false && $begin < $insert, 'supplier insertion occurs inside the transaction');
 $check($insert !== false && $identity !== false && $insert < $identity, 'inserted supplier identity is retrieved after insertion');
-$check($identity !== false && $audit !== false && $identity < $audit, 'creation audit follows inserted identity retrieval');
+$check($identity !== false && $invalidCheck !== false && $identity < $invalidCheck, 'invalid supplier ID check occurs after identity retrieval');
+$check($invalidCheck !== false && $audit !== false && $invalidCheck < $audit, 'creation audit follows invalid supplier ID check');
 $check($audit !== false && $auditCheck !== false && $audit < $auditCheck, 'audit result is checked for non-OK failure');
 $check($auditCheck !== false && $commit !== false && $auditCheck < $commit, 'success commit follows required audit result');
 $check($commit !== false && $rollback !== false && $commit < $rollback, 'commit and rollback paths remain in one try/catch boundary');

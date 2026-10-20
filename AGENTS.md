@@ -1,5 +1,22 @@
 # AGENTS.md
 
+## Session Summary (2026-10-20) — OH-AUTO2-PROC-001 Supplier Acceptance and History Integrity
+
+Restored the Procurement historical work and decision records removed by
+`1107ca0` from `1107ca0^`, preserving the newer OH-AUTO1-034 record and leaving
+unrelated working-tree Procurement changes, logs, backup, and PHPUnit cache
+untouched. The supplier-creation implementation remains contract-compliant:
+audit setup precedes the transaction, generated identity is validated before
+audit, audit success precedes commit, and failure paths roll back; controller
+authorization and CSRF remain intact.
+
+Corrected the focused offline probe's invalid-ID simulation and verified
+**29/29**. No production correction was needed. OH-AUTO2-135 is accepted under
+the qualified assignment `OH-AUTO2-PROC-001`, with live database rollback and
+concurrency behavior explicitly unverified. No database, SQL, browser, HTTP,
+activation, deployment, schema, migration, Core, or OH-AUTO2-105B operation
+occurred.
+
 ## Session Summary (2026-10-20) — OH-AUTO2-GOV-001 Assignment Registry Reconciliation
 
 Created `docs/active/oh-auto2-assignment-registry.md` as the authoritative

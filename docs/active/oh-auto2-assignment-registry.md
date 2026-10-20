@@ -65,7 +65,7 @@ domain-qualified identifiers going forward.
 | `OH-AUTO2-132` | Procurement | Completed request creation status integrity |
 | `OH-AUTO2-133` | Procurement | Completed request creation transaction integrity |
 | `OH-AUTO2-134` | Procurement | Completed supplier eligibility normalization alignment |
-| `OH-AUTO2-135` | Procurement | Implementation completed; acceptance remains pending |
+| `OH-AUTO2-135` | Procurement | Accepted after OH-AUTO2-PROC-001 bounded review; live DB/concurrency evidence remains out of scope |
 
 ## Confirmed collision set
 
@@ -147,16 +147,18 @@ They must not be reissued as duplicate offline assignments.
    assessment boundaries; no database operation is authorized by this registry.
 3. **Material restoration** remains blocked under the OH-AUTO2-112 record-scope
    decision.
-4. **Procurement OH-AUTO2-135 acceptance** is pending, but its implementation
-   is already complete; any follow-up must use a qualified Procurement ID.
+4. **Procurement OH-AUTO2-135** is accepted after the bounded
+   `OH-AUTO2-PROC-001` review. Live database rollback/concurrency behavior was
+   not exercised and remains an environment-bound limitation; any follow-up
+   must use a qualified Procurement ID.
 
 ### Highest-priority unfinished product work
 
-The highest-priority actionable item is **Procurement acceptance of the already
-implemented supplier-creation transaction integrity correction** (future ID
-`OH-AUTO2-PROC-001`), because it is implemented but explicitly marked
-acceptance-pending. This is an acceptance/requalification task, not permission
-to run live database tests without the required isolated authorization.
+The highest-priority actionable item was **Procurement acceptance of the already
+implemented supplier-creation transaction integrity correction** under
+`OH-AUTO2-PROC-001`. That bounded acceptance review is now complete. It was an
+acceptance/requalification task, not permission to run live database tests
+without the required isolated authorization.
 
 Hospitality live acceptance remains a separate blocked prerequisite and should
 not be repeated offline. No speculative feature implementation is authorized

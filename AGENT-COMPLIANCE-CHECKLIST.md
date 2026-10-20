@@ -1,5 +1,28 @@
 # AGENT-COMPLIANCE-CHECKLIST
 
+## Session Summary (2026-10-20) — OH-AUTO2-PROC-001 Supplier Acceptance and History Integrity
+
+Compared Procurement records before and after `1107ca0` and confirmed that the
+commit removed 154 lines from `engineering/Procurement/work.md` and 189 lines
+from `engineering/Procurement/decisions.md`, including OH-AUTO2-119 through
+OH-AUTO2-134 rationale/evidence. Restored that historical content from
+`1107ca0^` without overwriting the newer OH-AUTO1-034 entry, and recorded
+acceptance of OH-AUTO2-135 under the domain-qualified assignment
+`OH-AUTO2-PROC-001`.
+
+Reviewed `ProcurementOverviewService::createSupplier()` and its controller/
+route boundaries: audit initialization precedes the transaction, insertion and
+generated-ID validation precede audit, audit success is required before commit,
+and failures roll back. Existing app authorization and CSRF checks remain.
+Corrected the focused offline probe's invalid-ID fixture and verified **29/29**
+without application bootstrap, database, SQL, browser, HTTP, activation,
+deployment, schema, migration, Core, or OH-AUTO2-105B operation. No production
+code correction was indicated. Live database rollback/concurrency behavior
+remains unverified.
+
+Preserved unrelated Procurement changes, lifecycle logs, backup, and PHPUnit
+cache. `git diff --check` and focused PHP validation pass.
+
 ## Session Summary (2026-10-20) — OH-AUTO2-GOV-001 Assignment Registry Reconciliation
 
 Performed a read-only inventory of OH-AUTO2 identifiers across engineering work
