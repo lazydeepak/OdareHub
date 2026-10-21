@@ -26,13 +26,13 @@ historical aliases; new assignments must use domain-qualified identifiers.
 
 ## Active Focus
 
-- **OH-AUTO2-HOSP-003 — Reservation identity and post-creation continuity is
-  implemented and verified offline.** The canonical service now uses the
-  current connection's inserted ID, validates it before commit, rolls back on
-  identity failure across assigned/unassigned creation, and provides a one-time
-  jailed localized confirmation. Live database/concurrency/browser acceptance
-  remains blocked. See
-  `docs/architecture/oh-auto2-hosp-003-reservation-identity-post-creation-continuity-2026-10-21.md`.
+- **OH-AUTO2-HOSP-004 — Hospitality runtime acceptance is complete in a
+  runner-owned disposable development database.** Reservation lifecycle
+  **27/27**, Front Desk/folio **26/26**, reservation-lock concurrency **3/3**,
+  and independent current-connection identity separation passed. Authenticated
+  browser/HTTP acceptance remains unverified because no approved local HTTP
+  executor was available; production deployment remains separate. See
+  `docs/architecture/oh-auto2-hosp-004-runtime-acceptance-2026-10-21.md`.
 
 Completed execution milestone:
 

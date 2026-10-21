@@ -1,5 +1,29 @@
 # Hospitality Work Log
 
+## OH-AUTO2-HOSP-004 — Hospitality runtime acceptance
+
+Status: Development-only disposable runtime acceptance passed; no production
+database or deployment operation occurred. No Hospitality code defect was
+independently reproduced and no production code correction was made.
+
+- [x] Rejected the configured `os.susankhya.com`/root target as unidentified
+  installed-like configuration; it was not contacted.
+- [x] Provisioned and attested a fresh loopback-only temporary MySQL instance
+  with a runner-owned source root and generated test-only credentials.
+- [x] Captured the empty-target backup before application schema/fixture
+  mutation; backup SHA-256 is recorded in the HOSP-004 runtime report.
+- [x] Ran real Hospitality reservation lifecycle **27/27** and Front Desk/local
+  folio **26/26** probes through the real application services and migrations.
+- [x] Ran reservation-lock concurrency **3/3** and two independent creators;
+  returned IDs matched their exact rows and remained distinct.
+- [x] Destroyed the disposable database, source root, socket, datadir, and
+  process through owned cleanup; no installed listener was changed.
+- [ ] Authenticated browser/HTTP acceptance — no approved local HTTP executor was
+  available; route and server-side guard evidence was still exercised.
+
+Runtime report:
+`docs/architecture/oh-auto2-hosp-004-runtime-acceptance-2026-10-21.md`.
+
 ## OH-AUTO2-HOSP-003 — Reservation identity and post-creation continuity
 
 Status: Implemented and verified offline; live database/concurrency/browser

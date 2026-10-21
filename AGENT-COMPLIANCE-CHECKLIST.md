@@ -1,5 +1,26 @@
 # AGENT-COMPLIANCE-CHECKLIST
 
+## Session Summary (2026-10-21) — OH-AUTO2-HOSP-004 Hospitality Runtime Acceptance
+
+Used only a fresh runner-owned disposable MySQL development instance after
+rejecting the configured `os.susankhya.com`/root target as unidentified
+installed-like configuration. The instance passed 24-point process/socket/
+datadir attestation, used an isolated source root and generated test identity,
+and had an empty-target backup captured before application schema/fixture
+mutation. No configured or production-like database was contacted.
+
+Runtime evidence: reservation lifecycle **27/27**, Front Desk/local folio
+**26/26**, reservation-lock concurrency **3/3**, and two independent creators
+returned distinct IDs matching their exact rows. The disposable process,
+database, datadir, socket, source root, and fixtures were removed through owned
+cleanup. Authenticated browser/HTTP acceptance was not run because no approved
+local HTTP executor was available. No product defect was independently
+reproduced and no code correction was made.
+
+No production deployment, Core change, installed database mutation, schema
+repository change, Manufacturing/Material operation, or SBAIO incident work
+occurred. See `docs/architecture/oh-auto2-hosp-004-runtime-acceptance-2026-10-21.md`.
+
 ## Session Summary (2026-10-21) — OH-AUTO2-HOSP-003 Reservation Identity and Confirmation
 
 Corrected `ReservationsService::create()` to use the current connection's

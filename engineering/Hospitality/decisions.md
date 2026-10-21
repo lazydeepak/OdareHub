@@ -1,5 +1,23 @@
 # Hospitality — Decisions
 
+## 2026-10-21 — OH-AUTO2-HOSP-004 disposable runtime acceptance
+
+**Status:** Runtime acceptance passed in an independently attested disposable
+development MySQL instance; authenticated browser/HTTP acceptance remains
+unverified and production deployment remains a separate decision.
+
+The configured `127.0.0.1:3306` / `os.susankhya.com` / `root` target was not
+used because it was not independently attested as development-only and no
+server was listening. A fresh temporary MySQL instance with no-defaults,
+loopback-only networking, disabled X Plugin, generated test credentials, a
+runner-owned source root, and a recoverable pre-fixture backup was used instead.
+
+Real reservation lifecycle **27/27**, Front Desk/local folio **26/26**,
+reservation-lock concurrency **3/3**, and two-process current-connection ID
+separation passed. Fixtures were confined to and removed with the disposable
+instance. No product defect was independently reproduced; no code correction
+was authorized or made.
+
 ## 2026-10-21 — OH-AUTO2-HOSP-003 reservation identity continuity
 
 **Status:** Implemented and accepted within the bounded non-Core assignment.

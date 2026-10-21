@@ -74,6 +74,7 @@ domain-qualified identifiers going forward.
 | `OH-AUTO2-HOSP-001` | Hospitality | Authorized bounded operator reservation creation; live acceptance remains blocked under OH-AUTO2-119 |
 | `OH-AUTO2-HOSP-002` | Hospitality | Read-only create-to-manage assessment: incomplete for valid past-date creates; implementation requires separate authorization |
 | `OH-AUTO2-HOSP-003` | Hospitality | Implemented current-connection reservation identity and one-time operator confirmation; live DB/concurrency/browser acceptance remains blocked |
+| `OH-AUTO2-HOSP-004` | Hospitality | Disposable development runtime acceptance passed; authenticated browser/HTTP acceptance remains unverified and production deployment is separate |
 
 ## Confirmed collision set
 
