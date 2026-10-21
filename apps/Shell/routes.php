@@ -11,6 +11,7 @@ use Apps\Manufacturing\Services\ProcessingOperationService;
 use Apps\Shell\Services\AdminLayerService;
 use Apps\Shell\Services\DisplayLayerService;
 use Apps\Shell\Services\OperatorLayerService;
+use Apps\Shell\Services\OperatorSurfaceContributionRegistry;
 use Apps\Shell\Composers\OperatorRoleHomeComposer;
 use Apps\Shell\Services\WorkspaceWrapperRegistry;
 use Plugins\Base\Services\NotificationService;

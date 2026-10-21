@@ -1,5 +1,32 @@
 # AGENT-COMPLIANCE-CHECKLIST
 
+## Session Summary (2026-10-21) — OH-AUTO2-PROC-004 Procurement Runtime Acceptance
+
+Completed authenticated runtime acceptance of the bounded Procurement
+operator request queue using only a runner-owned staged source root, attested
+loopback MySQL, and loopback HTTP. Alice and Bob each saw only their exact
+creator-owned request; Alice's approved request showed quantity, needed date,
+and linked PO. Cross-handle, manage-only, approve-only, unassigned, display,
+anonymous, and blank/space/NULL ownership cases passed their fail-closed
+expectations. Admin Procurement routes stayed HTTP 200 and the queue exposed
+no mutation controls.
+
+Two confirmed minimal generic Shell corrections were applied:
+`OperatorSurfaceContributionRegistry` import in `apps/Shell/routes.php` and
+resolved `permissions` forwarding in `OperatorLayerService`. No Procurement
+business logic, permission, schema, Core, or mutation change was made.
+
+Validation: offline queue probe **20/20**; touched PHP lint; focused operator
+confinement, Shell rendering, and business-app contract gates passed. Final
+disposable dump SHA-256:
+`9198c0494003cf11622b355e3decc6025ac1a37aef11cecb3cf4f423b1ab36d6`.
+Attestation JSON SHA-256:
+`6e0e8b437daed196fd48fc7df8bf4c65b6047d02869df5f2a1f83e714203e678`.
+The runtime was stopped and runner-owned resources were removed after
+validation. No production-like host was contacted. Approval, cancellation, PO
+creation, supplier, receiving, installed-database rollback, and deployment
+remain deferred.
+
 ## Session Summary (2026-10-21) — OH-AUTO2-PROC-003 Procurement Operator Request Queue
 
 Implemented the bounded read-only Procurement operator request queue under

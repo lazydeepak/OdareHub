@@ -1,5 +1,33 @@
 # Procurement — Work
 
+## 2026-10-21 — OH-AUTO2-PROC-004 authenticated runtime acceptance
+
+**Status: ACCEPTED — bounded disposable-runtime acceptance complete.**
+
+The creator-owned read-only operator request queue was exercised through the
+real authenticated loopback HTTP path from a runner-owned staged source root
+and runner-owned MySQL database. Alice and Bob each saw only their exact
+creator-owned request; Alice saw the approved status, quantity, needed date,
+and linked purchase order. Cross-handle access, manage-only, approve-only,
+unassigned, display, anonymous, and blank/space/NULL ownership cases all
+failed closed as required. Existing admin Procurement pages remained HTTP 200,
+and the operator queue rendered no mutation controls.
+
+The first runtime pass exposed two generic Shell integration defects: a
+missing `OperatorSurfaceContributionRegistry` import in `apps/Shell/routes.php`
+and missing `permissions` forwarding in
+`apps/Shell/Services/OperatorLayerService.php`. Both were corrected minimally
+and the final staged matrix passed. No Procurement business logic, permission,
+schema, Core, or mutation behavior changed.
+
+Evidence: `docs/architecture/oh-auto2-proc-004-runtime-acceptance-2026-10-21.md`.
+Offline queue probe remains **20/20**. Final disposable dump SHA-256 is
+`9198c0494003cf11622b355e3decc6025ac1a37aef11cecb3cf4f423b1ab36d6`; the
+attestation JSON SHA-256 is
+`6e0e8b437daed196fd48fc7df8bf4c65b6047d02869df5f2a1f83e714203e678`.
+Production access was not attempted; approval, cancellation, PO creation,
+supplier, receiving, and installed-database rollback remain deferred.
+
 ## 2026-10-21 — OH-AUTO2-PROC-002 Procurement Workflow Discovery
 
 **Status: IMPLEMENTED — bounded read-only first stage.**

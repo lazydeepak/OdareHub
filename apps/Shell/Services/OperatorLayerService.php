@@ -183,6 +183,7 @@ final class OperatorLayerService
             'company_fallback_text_compact' => $logoData['fallback_text_compact'],
             'authority_role' => (string)($ctx['authority_role'] ?? 'app_user'),          // step 1
             'access_profiles' => (array)($ctx['access_profiles'] ?? []),
+            'permissions' => (array)($ctx['permissions'] ?? []),
             'duty_codes' => (string)($ctx['duty_codes'] ?? ''),
             'app_roles' => is_array($ctx['app_roles'] ?? null) ? $ctx['app_roles'] : [],
             'operator_home_eligible' => !in_array(strtolower(trim((string)($ctx['authority_role'] ?? ''))), ['tv_display', 'platform_admin', 'app_admin'], true),

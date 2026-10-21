@@ -83,6 +83,7 @@ domain-qualified identifiers going forward.
 | `OH-AUTO2-PROC-001` | Procurement | Historical supplier acceptance baseline | Completed bounded supplier-creation acceptance; live rollback/concurrency evidence remains out of scope |
 | `OH-AUTO2-PROC-002` | Procurement | `ecf021ba20ee3814730b31f8ea040f0465d26abc` | Accepted/closed: selected operator request queue; advanced to bounded implementation `OH-AUTO2-PROC-003` |
 | `OH-AUTO2-PROC-003` | Procurement | `77e0396b9103a6f8d9877ac897f440ec5358028f` | **Implemented:** read-only own-request queue; exact creator ownership, assignment, and `procurement.view` gates; mutation deferred |
+| `OH-AUTO2-PROC-004` | Procurement | runtime acceptance record | **Accepted:** authenticated disposable-runtime acceptance of the read-only queue; two minimal generic Shell integration corrections; production and mutation scope deferred |
 
 ## Confirmed collision set
 

@@ -2,6 +2,29 @@
 
 ## Decision Log
 
+### 2026-10-21 — OH-AUTO2-PROC-004 runtime acceptance
+
+**Status:** Accepted for the bounded read-only queue, qualified by disposable
+runtime evidence.
+
+The Procurement operator request queue is accepted after authenticated
+loopback HTTP verification against a runner-owned staged source root and
+attested runner-owned MySQL database. Exact creator ownership, Procurement
+assignment, and `procurement.view` behavior matched the offline contract:
+Alice and Bob were confined to their own requests; manage-only and approve-only
+identities did not receive the queue; unassigned, display, anonymous,
+cross-handle, and blank/space/NULL ownership cases failed closed. Admin
+Procurement compatibility remained intact and the queue stayed read-only.
+
+The only accepted corrections are generic Shell integration fixes: the
+contributed-focus registry import in `apps/Shell/routes.php` and forwarding of
+resolved `permissions` through `OperatorLayerService`. No new permission,
+schema, mutation, Core, or Procurement business rule was introduced.
+
+Evidence: `docs/architecture/oh-auto2-proc-004-runtime-acceptance-2026-10-21.md`.
+Approval, cancellation, PO creation, supplier, receiving, installed-database
+rollback, and production deployment remain excluded.
+
 ### 2026-10-21 — OH-AUTO2-PROC-002 operator workflow discovery
 
 **Status:** Accepted and implemented as `OH-AUTO2-PROC-003`.

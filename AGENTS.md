@@ -1,5 +1,22 @@
 # AGENTS.md
 
+## Session Summary (2026-10-21) — OH-AUTO2-PROC-004 Procurement Runtime Acceptance
+
+Accepted the bounded authenticated Procurement operator request queue in a
+runner-owned disposable staged runtime. The real login and request-creation
+paths, owner isolation, assignment/permission gates, cross-handle confinement,
+display/anonymous denial, PO linkage, read-only behavior, and admin
+compatibility passed. Blank, whitespace, and NULL ownership controls remained
+hidden. No production-like host was contacted.
+
+Applied only two confirmed generic Shell corrections: import
+`OperatorSurfaceContributionRegistry` in `apps/Shell/routes.php` and forward
+resolved `permissions` through `OperatorLayerService`. Offline queue probe:
+20/20; focused gates and PHP lint passed. Evidence is recorded in
+`docs/architecture/oh-auto2-proc-004-runtime-acceptance-2026-10-21.md`.
+Approval, cancellation, PO creation, supplier, receiving, installed-database
+rollback, and production deployment remain deferred.
+
 ## Session Summary (2026-10-21) — OH-AUTO2-PROC-003 Procurement Operator Request Queue
 
 Implemented the accepted bounded read-only Procurement operator queue under
