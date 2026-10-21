@@ -1,5 +1,25 @@
 # AGENT-COMPLIANCE-CHECKLIST
 
+## Session Summary (2026-10-21) — OH-AUTO2-HOSP-005 Authenticated HTTP acceptance
+
+Ran Hospitality HTTP acceptance only against a runner-owned staged source root,
+loopback PHP server, generated identities, and disposable MySQL. The configured
+`os.susankhya.com`/root target was not contacted. Unattended HTTP evidence
+passed **20/20**: real login/session and CSRF, invalid-CSRF `419`, reservation
+creation with one-time confirmation, check-in/out, read-only non-mutation,
+unassigned denial, cross-handle confinement, and display-only routing. Final
+disposable reservation status was `checked_out`; all disposable resources were
+cleaned.
+
+The first authenticated GET independently reproduced a Hospitality-owned fatal:
+`apps/Hospitality/Views/operator/hospitality.php` used `$this->tr()` although
+the Shell focus-view composer includes the view from a static scope. Replaced
+those calls with a local `t()`-backed translation closure. PHP lint, existing
+Hospitality behavioral proof **57/57**, and the clean disposable HTTP rerun
+passed. No Core, Shell, configured storage, production database, deployment, or
+unrelated Procurement artifact was changed. See
+`docs/architecture/oh-auto2-hosp-005-http-acceptance-2026-10-21.md`.
+
 ## Session Summary (2026-10-21) — OH-AUTO2-HOSP-004 Hospitality Runtime Acceptance
 
 Used only a fresh runner-owned disposable MySQL development instance after

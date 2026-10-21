@@ -1,5 +1,24 @@
 # Hospitality Work Log
 
+## OH-AUTO2-HOSP-005 — Isolated authenticated HTTP acceptance
+
+Status: Complete. Development-only authenticated HTTP acceptance passed in a
+runner-owned staged source root, loopback-only PHP server, generated accounts,
+and disposable MySQL instance. The configured database, production deployment,
+and public exposure were not used.
+
+- [x] Attested the disposable HTTP server and real login/session path.
+- [x] Exercised operator GET/POST routes, CSRF, own-handle confinement,
+  creation confirmation, check-in, and check-out.
+- [x] Verified denied unassigned, read-only, cross-handle, and display-only
+  identities.
+- [x] Corrected the independently reproduced Hospitality view-scope defect
+  in `Views/operator/hospitality.php`.
+- [x] Cleaned the disposable database, source root, socket, datadir, and
+  server; configured storage remained untouched.
+
+Evidence: `docs/architecture/oh-auto2-hosp-005-http-acceptance-2026-10-21.md`.
+
 ## OH-AUTO2-HOSP-004 — Hospitality runtime acceptance
 
 Status: Development-only disposable runtime acceptance passed; no production

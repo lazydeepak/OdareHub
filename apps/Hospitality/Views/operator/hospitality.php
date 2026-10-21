@@ -1,7 +1,7 @@
 <?php
 // Hospitality operator focus view (read-only).
-// Included by the Shell operator composer with full composer scope available
-// ($data, $this->tr()). Data comes ONLY from the app-owned board adapter;
+// Included by the Shell operator composer with the resolved view data scope
+// available. Data comes ONLY from the app-owned board adapter;
 // there are no forms, buttons, links, or writes on this surface.
 
 use App\Core\Auth;
@@ -9,7 +9,26 @@ use App\Core\AclPolicy;
 use Apps\Hospitality\Services\OperatorLayerAdapters\HospitalityBoardAdapter;
 
 $esc = static fn ($value): string => htmlspecialchars((string)$value, ENT_QUOTES, 'UTF-8');
-$tr = static fn (string $key, string $fallback): string => htmlspecialchars($this->tr($key, $fallback), ENT_QUOTES, 'UTF-8');
+$translate = static function (string $key, string $fallback, array $params = []): string {
+    if (function_exists('t')) {
+        $translated = (string)t($key, $params);
+        if ($translated !== '' && $translated !== $key) {
+            return $translated;
+        }
+    }
+
+    if ($params === []) {
+        return $fallback;
+    }
+
+    $replace = [];
+    foreach ($params as $paramKey => $paramValue) {
+        $replace['{' . $paramKey . '}'] = (string)$paramValue;
+    }
+
+    return strtr($fallback, $replace);
+};
+$tr = static fn (string $key, string $fallback): string => htmlspecialchars($translate($key, $fallback), ENT_QUOTES, 'UTF-8');
 ?>
 <section class="recent-focus" aria-label="<?php echo $tr('hospitality.operator.sidebar', 'Hospitality'); ?>">
     <h2 class="dashboard-top-title"><?php echo $tr('hospitality.operator.nav.focus', 'Hospitality Focus'); ?></h2>
@@ -43,13 +62,13 @@ $tr = static fn (string $key, string $fallback): string => htmlspecialchars($thi
         };
     ?>
     <?php if ($flashOk === 'HOSPITALITY_RES_CREATED' && $createdReservationId > 0): ?>
-    <p class="hosp-chip hosp-chip--ok"><?php echo $esc($this->tr('hospitality.operator.flash.reservation_created_with_id', 'Reservation created. ID: {id}', ['id' => $createdReservationId])); ?></p>
+    <p class="hosp-chip hosp-chip--ok"><?php echo $esc($translate('hospitality.operator.flash.reservation_created_with_id', 'Reservation created. ID: {id}', ['id' => $createdReservationId])); ?></p>
     <?php else: ?>
-    <p class="hosp-chip hosp-chip--ok"><?php echo $esc($this->tr($okMsgKey, 'Status updated.')); ?></p>
+    <p class="hosp-chip hosp-chip--ok"><?php echo $esc($translate($okMsgKey, 'Status updated.')); ?></p>
     <?php endif; ?>
     <?php endif; ?>
     <?php if ($flashErr !== ''): ?>
-    <p class="hosp-chip hosp-chip--danger"><?php echo $esc($this->tr(str_starts_with($flashErr, 'HOSPITALITY_RES_') ? 'hospitality.operator.flash.reservation_create_failed' : 'hospitality.operator.flash.update_failed', 'Unable to update the Hospitality action.')); ?></p>
+    <p class="hosp-chip hosp-chip--danger"><?php echo $esc($translate(str_starts_with($flashErr, 'HOSPITALITY_RES_') ? 'hospitality.operator.flash.reservation_create_failed' : 'hospitality.operator.flash.update_failed', 'Unable to update the Hospitality action.')); ?></p>
     <?php endif; ?>
 
     <?php $summary = HospitalityBoardAdapter::summary(); ?>
@@ -161,7 +180,7 @@ $tr = static fn (string $key, string $fallback): string => htmlspecialchars($thi
                 <?php foreach ($arrivals as $arrival): ?>
                     <tr>
                         <td><?php echo $esc($arrival['guest_label'] ?? ''); ?></td>
-                        <td><?php echo $esc(($arrival['room_label'] ?? '') !== '' ? $arrival['room_label'] : $this->tr('hospitality.res_unassigned_room', 'Room unassigned')); ?></td>
+                        <td><?php echo $esc(($arrival['room_label'] ?? '') !== '' ? $arrival['room_label'] : $translate('hospitality.res_unassigned_room', 'Room unassigned')); ?></td>
                         <td><?php echo $esc($arrival['check_in_date'] ?? ''); ?></td>
                         <td><?php echo $esc($arrival['check_out_date'] ?? ''); ?></td>
                         <?php if ($canManage): ?>
@@ -169,17 +188,17 @@ $tr = static fn (string $key, string $fallback): string => htmlspecialchars($thi
                             <form method="post" action="/u/<?php echo $esc($opUsername); ?>/hospitality/front-desk/no-show" class="hosp-inline-form">
                                 <input type="hidden" name="csrf" value="<?php echo $esc($csrfToken); ?>">
                                 <input type="hidden" name="reservation_id" value="<?php echo $esc((int)($arrival['id'] ?? 0)); ?>">
-                                <button class="btn" type="submit"><?php echo $esc($this->tr('hospitality.res_action.no_show', 'No Show')); ?></button>
+                                <button class="btn" type="submit"><?php echo $esc($translate('hospitality.res_action.no_show', 'No Show')); ?></button>
                             </form>
                             <form method="post" action="/u/<?php echo $esc($opUsername); ?>/hospitality/front-desk/cancel" class="hosp-inline-form">
                                 <input type="hidden" name="csrf" value="<?php echo $esc($csrfToken); ?>">
                                 <input type="hidden" name="reservation_id" value="<?php echo $esc((int)($arrival['id'] ?? 0)); ?>">
-                                <button class="btn btn-danger" type="submit"><?php echo $esc($this->tr('hospitality.res_action.cancel', 'Cancel')); ?></button>
+                                <button class="btn btn-danger" type="submit"><?php echo $esc($translate('hospitality.res_action.cancel', 'Cancel')); ?></button>
                             </form>
                             <form method="post" action="/u/<?php echo $esc($opUsername); ?>/hospitality/front-desk/check-in" class="hosp-inline-form">
                                 <input type="hidden" name="csrf" value="<?php echo $esc($csrfToken); ?>">
                                 <input type="hidden" name="reservation_id" value="<?php echo $esc((int)($arrival['id'] ?? 0)); ?>">
-                                <button class="btn" type="submit"><?php echo $esc($this->tr('hospitality.res_action.check_in', 'Check in')); ?></button>
+                                <button class="btn" type="submit"><?php echo $esc($translate('hospitality.res_action.check_in', 'Check in')); ?></button>
                             </form>
                         </td>
                         <?php endif; ?>
@@ -213,27 +232,27 @@ $tr = static fn (string $key, string $fallback): string => htmlspecialchars($thi
                 <?php foreach ($inhouse as $stay): ?>
                     <tr>
                         <td><?php echo $esc($stay['guest_label'] ?? ''); ?></td>
-                        <td><?php echo $esc(($stay['room_label'] ?? '') !== '' ? $stay['room_label'] : $this->tr('hospitality.res_unassigned_room', 'Room unassigned')); ?></td>
+                        <td><?php echo $esc(($stay['room_label'] ?? '') !== '' ? $stay['room_label'] : $translate('hospitality.res_unassigned_room', 'Room unassigned')); ?></td>
                         <td><?php echo $esc($stay['actual_check_in_at'] ?? ''); ?></td>
                         <?php if ($canManage): ?>
                         <td>
                             <form method="post" action="/u/<?php echo $esc($opUsername); ?>/hospitality/front-desk/check-out" class="hosp-inline-form">
                                 <input type="hidden" name="csrf" value="<?php echo $esc($csrfToken); ?>">
                                 <input type="hidden" name="reservation_id" value="<?php echo $esc((int)($stay['id'] ?? 0)); ?>">
-                                <button class="btn" type="submit"><?php echo $esc($this->tr('hospitality.res_action.check_out', 'Check out')); ?></button>
+                                <button class="btn" type="submit"><?php echo $esc($translate('hospitality.res_action.check_out', 'Check out')); ?></button>
                             </form>
                             <form method="post" action="/u/<?php echo $esc($opUsername); ?>/hospitality/front-desk/charges/add" class="hosp-inline-form">
                                 <input type="hidden" name="csrf" value="<?php echo $esc($csrfToken); ?>">
                                 <input type="hidden" name="reservation_id" value="<?php echo $esc((int)($stay['id'] ?? 0)); ?>">
                                 <select name="charge_type">
                                     <?php foreach (\Apps\Hospitality\Services\FrontDeskService::CHARGE_TYPES as $ct): ?>
-                                    <option value="<?php echo $esc($ct); ?>"><?php echo $esc($this->tr('hospitality.charge_type.' . $ct, $ct)); ?></option>
+                                    <option value="<?php echo $esc($ct); ?>"><?php echo $esc($translate('hospitality.charge_type.' . $ct, $ct)); ?></option>
                                     <?php endforeach; ?>
                                 </select>
-                                <input type="text" name="description" maxlength="255" required placeholder="<?php echo $esc($this->tr('hospitality.field.charge_description', 'Description')); ?>">
+                                <input type="text" name="description" maxlength="255" required placeholder="<?php echo $esc($translate('hospitality.field.charge_description', 'Description')); ?>">
                                 <input type="number" name="qty" min="1" max="9999" value="1">
-                                <input type="text" name="unit_amount" inputmode="decimal" required placeholder="<?php echo $esc($this->tr('hospitality.field.unit_amount', 'Amount')); ?>">
-                                <button class="btn" type="submit"><?php echo $esc($this->tr('hospitality.operator.charge.add', 'Add charge')); ?></button>
+                                <input type="text" name="unit_amount" inputmode="decimal" required placeholder="<?php echo $esc($translate('hospitality.field.unit_amount', 'Amount')); ?>">
+                                <button class="btn" type="submit"><?php echo $esc($translate('hospitality.operator.charge.add', 'Add charge')); ?></button>
                             </form>
                         </td>
                         <?php endif; ?>
@@ -256,7 +275,7 @@ $tr = static fn (string $key, string $fallback): string => htmlspecialchars($thi
         <?php $stayFolio = $folioSummariesMap[(int)($stay['id'] ?? 0)] ?? ['folio' => ['folio_status' => 'open', 'id' => 0], 'charges' => [], 'total' => 0.0]; ?>
         <?php if (!empty($stayFolio['charges'])): ?>
         <div class="card">
-            <h3><?= $esc($stay['guest_label'] ?? '?') ?> — <?= $esc(($stay['room_label'] ?? '') !== '' ? $stay['room_label'] : $this->tr('hospitality.res_unassigned_room', 'Room unassigned')) ?></h3>
+            <h3><?= $esc($stay['guest_label'] ?? '?') ?> — <?= $esc(($stay['room_label'] ?? '') !== '' ? $stay['room_label'] : $translate('hospitality.res_unassigned_room', 'Room unassigned')) ?></h3>
             <p class="text-muted"><?= $esc(t('hospitality.folio.total', ['total' => number_format((float)($stayFolio['total'] ?? 0), 2)])) ?></p>
             <div class="table-wrap">
                 <table>
@@ -275,7 +294,7 @@ $tr = static fn (string $key, string $fallback): string => htmlspecialchars($thi
                                 <form method="post" action="/u/<?= $esc($opUsername) ?>/hospitality/front-desk/charges/void" class="hosp-inline-form">
                                     <input type="hidden" name="csrf" value="<?= $esc($csrfToken) ?>">
                                     <input type="hidden" name="charge_id" value="<?= (int)($charge['id'] ?? 0) ?>">
-                                    <button type="submit" class="btn btn-danger"><?= $esc($this->tr('hospitality.res_action.void', 'Void charge')) ?></button>
+                                    <button type="submit" class="btn btn-danger"><?= $esc($translate('hospitality.res_action.void', 'Void charge')) ?></button>
                                 </form>
                                 <?php endif; ?></td>
                         </tr>
@@ -311,7 +330,7 @@ $tr = static fn (string $key, string $fallback): string => htmlspecialchars($thi
                     ?>
                     <tr>
                         <td><?php echo $esc($room['room_number'] ?? ''); ?></td>
-                        <td><span class="hosp-chip <?php echo in_array($status, ['clean', 'inspected'], true) ? 'hosp-chip--ok' : ($status === '' ? 'hosp-chip--neutral' : 'hosp-chip--warning'); ?>"><?php echo $esc($this->tr($statusKey, $status !== '' ? $status : 'Pending')); ?></span></td>
+                        <td><span class="hosp-chip <?php echo in_array($status, ['clean', 'inspected'], true) ? 'hosp-chip--ok' : ($status === '' ? 'hosp-chip--neutral' : 'hosp-chip--warning'); ?>"><?php echo $esc($translate($statusKey, $status !== '' ? $status : 'Pending')); ?></span></td>
                         <?php if ($canManage): ?>
                         <td>
                             <form method="post" action="/u/<?php echo $esc($opUsername); ?>/hospitality/housekeeping/status" class="hosp-inline-form">
@@ -319,10 +338,10 @@ $tr = static fn (string $key, string $fallback): string => htmlspecialchars($thi
                                 <input type="hidden" name="room_id" value="<?php echo $esc((int)($room['room_id'] ?? 0)); ?>">
                                 <select name="hk_status">
                                     <?php foreach (\Apps\Hospitality\Services\HousekeepingService::STATUSES as $hkOption): ?>
-                                    <option value="<?php echo $esc($hkOption); ?>" <?php echo $status === $hkOption ? 'selected' : ''; ?>><?php echo $esc($this->tr($statusLabelKeys[$hkOption] ?? 'hospitality.hk_status.' . $hkOption, $hkOption)); ?></option>
+                                    <option value="<?php echo $esc($hkOption); ?>" <?php echo $status === $hkOption ? 'selected' : ''; ?>><?php echo $esc($translate($statusLabelKeys[$hkOption] ?? 'hospitality.hk_status.' . $hkOption, $hkOption)); ?></option>
                                     <?php endforeach; ?>
                                 </select>
-                                <button class="btn" type="submit"><?php echo $esc($this->tr('hospitality.action.save_changes', 'Save changes')); ?></button>
+                                <button class="btn" type="submit"><?php echo $esc($translate('hospitality.action.save_changes', 'Save changes')); ?></button>
                             </form>
                         </td>
                         <?php endif; ?>
