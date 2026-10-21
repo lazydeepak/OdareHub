@@ -1,5 +1,20 @@
 # AGENTS.md
 
+## Session Summary (2026-10-21) — OH-AUTO2-PROC-003 Procurement Operator Request Queue
+
+Implemented the accepted bounded read-only Procurement operator queue under
+`/u/{username}/procurement`. Exact creator ownership is proven across both
+sanctioned request creation paths, which pass `Auth::user()['email']` into
+`created_by`; the projection uses exact matching and fails closed for blank or
+ambiguous ownership. Access requires Procurement assignment and
+`procurement.view`; manage/approve permissions do not grant queue access.
+
+Focused offline probe passed 20/20 and changed PHP files linted. No Core,
+database mutation, schema, production, or unrelated artifact operation
+occurred. Approval, cancellation, PO creation, supplier, and receiving
+mutations remain deferred. Authenticated HTTP/disposable-runtime acceptance
+remains environment-bound.
+
 ## Session Summary (2026-10-20) — OH-AUTO2-PROC-001 Supplier Acceptance and History Integrity
 
 Restored the Procurement historical work and decision records removed by

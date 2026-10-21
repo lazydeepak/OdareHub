@@ -2232,6 +2232,7 @@ final class OperatorSurfaceComposer
                 'dashboard_type' => (string)($this->context['dashboard_type'] ?? 'operator'),
                 'assigned_apps' => array_values((array)($this->context['active_assigned_apps'] ?? $this->context['assigned_apps'] ?? [])),
                 'active_assigned_apps' => array_values((array)($this->context['active_assigned_apps'] ?? [])),
+                'permissions' => array_values((array)($this->context['permissions'] ?? [])),
                 'current_query' => $renderQuery,
                 'theme_choices' => ThemePreferenceService::themeChoices(),
                 'default_theme_preference' => $effectiveThemePreference,

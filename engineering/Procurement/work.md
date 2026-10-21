@@ -2,9 +2,9 @@
 
 ## 2026-10-21 — OH-AUTO2-PROC-002 Procurement Workflow Discovery
 
-**Status: NEEDS DECISION — no implementation authorized.**
+**Status: IMPLEMENTED — bounded read-only first stage.**
 
-Read-only reconciliation selected one concrete unfinished capability: a
+The accepted product decision selected one concrete unfinished capability: a
 Procurement operator request review/approval queue under `/u/{username}`. The
 existing request → purchase-order → receipt workflow is implemented through
 admin-only `/apps/procurement/*` routes and the existing service boundary, but
@@ -12,10 +12,19 @@ Procurement has no operator capability declaration, operator route/view,
 record-scope contract, or defined `procurement.manage`/`procurement.approve`
 operation mapping.
 
-The required decision is whether operators may see all or scoped requests and
-whether the first slice is read-only review or includes approval, cancellation,
-or PO creation. No new ACL field, operator mutation, supplier policy, route,
-schema, database, or Shell change is authorized until that choice is made.
+The accepted first stage is own requests only, requiring Procurement
+assignment plus explicit `procurement.view`. Exact creator ownership is
+verified from both sanctioned creation paths: both pass the canonical
+authenticated email and persist it to `created_by`. Null/blank/ambiguous rows
+fail closed. Approval, cancellation, PO creation, supplier mutation, and
+receiving remain deferred.
+
+Implementation files: `apps/Procurement/Services/OperatorSurfaceContributionService.php`,
+`apps/Procurement/Services/ProcurementOverviewService.php`,
+`apps/Procurement/Views/operator/requests.php`, Procurement manifest/locales,
+and the generic contributed-focus bridge in Shell. Focused offline probe:
+20/20; PHP lint and diff hygiene pass. No database mutation or production
+operation occurred.
 
 Evidence: `docs/architecture/oh-auto2-proc-002-procurement-workflow-discovery-2026-10-21.md`.
 The completed OH-AUTO2-PROC-001 supplier acceptance and OH-AUTO2-119–135

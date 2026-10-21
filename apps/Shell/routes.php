@@ -21,6 +21,7 @@ require_once __DIR__ . '/Services/BrandIdentityService.php';
 require_once __DIR__ . '/Services/AdminLayerService.php';
 require_once __DIR__ . '/Services/DisplayLayerService.php';
 require_once __DIR__ . '/Services/OperatorLayerService.php';
+require_once __DIR__ . '/Services/OperatorSurfaceContributionRegistry.php';
 require_once __DIR__ . '/Composers/OperatorRoleHomeComposer.php';
 require_once __DIR__ . '/Services/OperatorLayerSidebarService.php';
 require_once __DIR__ . '/Services/LandingPageService.php';
@@ -207,7 +208,7 @@ $router->get('/u', function () {
     static $KNOWN_VIEW_SLUGS = [
         'dashboard', 'work-entry', 'critical', 'recent',
         'parts', 'production', 'demand', 'orders', 'processing', 'preparation',
-        'dispatch', 'coverage', 'qc', 'machines', 'assembly', 'materials', 'alerts', 'notifications', 'messages', 'handoff', 'account', 'preferences', 'tasks', 'sbaio', 'data-exchange', 'hospitality',
+        'dispatch', 'coverage', 'qc', 'machines', 'assembly', 'materials', 'alerts', 'notifications', 'messages', 'handoff', 'account', 'preferences', 'tasks', 'sbaio', 'data-exchange', 'hospitality', 'procurement',
     ];
 
     $username = trim((string)($_GET['u_username'] ?? ''));
@@ -325,7 +326,7 @@ $buildOperatorCanonicalPath = static function (string $username, string $viewPat
     return $path;
 };
 
-$resolveOperatorGetRoute = static function (string $viewPath, string $requiredApp = '') use ($operatorRouteTr, $resolveOperatorSessionHandle, $buildOperatorCanonicalPath): array {
+$resolveOperatorGetRoute = static function (string $viewPath, string $requiredApp = '', bool $allowContributedFocus = false) use ($operatorRouteTr, $resolveOperatorSessionHandle, $buildOperatorCanonicalPath): array {
     \App\Core\Auth::bootSession();
 
     $username = trim((string)($_GET['u_username'] ?? ''));
@@ -409,6 +410,7 @@ $resolveOperatorGetRoute = static function (string $viewPath, string $requiredAp
     }
 
     // Step 3: app assignment — requiredApp gate (explicit DB row, no profile merging).
+    $routeCtx = UserAssignmentContext::context()->resolveUserContext($routeUserArr);
     if ($requiredApp !== '') {
         $appUser = \App\Core\Auth::user();
         $appUserArr = is_array($appUser) ? $appUser : (array)$appUser;
@@ -446,7 +448,8 @@ $resolveOperatorGetRoute = static function (string $viewPath, string $requiredAp
         if ($viewToken === '') {
             $viewToken = 'dashboard';
         }
-        if (!in_array($viewToken, $allowedViews, true)) {
+        $contributedFocusViews = OperatorSurfaceContributionRegistry::focusViewMap($routeCtx);
+        if (!in_array($viewToken, $allowedViews, true) && (!$allowContributedFocus || !isset($contributedFocusViews[$viewToken]))) {
             header('Location: ' . $buildOperatorCanonicalPath($normalized, 'dashboard'), true, 302);
             exit;
         }
@@ -579,6 +582,14 @@ $router->get('/u/dashboard', function () use ($resolveOperatorGetRoute) {
 
     OperatorLayerService::render($operatorRoute['username'], array_merge($_GET, [
         'focus' => 'dashboard',
+    ]), $operatorRoute['canonical_path']);
+    return null;
+});
+
+$router->get('/u/procurement', function () use ($resolveOperatorGetRoute) {
+    $operatorRoute = $resolveOperatorGetRoute('procurement', 'procurement', true);
+    OperatorLayerService::render($operatorRoute['username'], array_merge($_GET, [
+        'focus' => 'procurement',
     ]), $operatorRoute['canonical_path']);
     return null;
 });

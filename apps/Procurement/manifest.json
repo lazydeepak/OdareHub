@@ -37,6 +37,35 @@
       "type": "boot",
       "key": "procurement.bootstrap",
       "handler_file": "bootstrap.php"
+    },
+    {
+      "type": "operator_surface",
+      "key": "procurement.operator.sidebar",
+      "surface": "operator",
+      "region": "sidebar",
+      "provider": "Apps\\Procurement\\Services\\OperatorSurfaceContributionService::contribute",
+      "provider_file": "Services/OperatorSurfaceContributionService.php",
+      "order": 70
+    },
+    {
+      "type": "operator_surface",
+      "key": "procurement.operator.focus_views",
+      "surface": "operator",
+      "region": "focus_views",
+      "provider": "Apps\\Procurement\\Services\\OperatorSurfaceContributionService::contribute",
+      "provider_file": "Services/OperatorSurfaceContributionService.php",
+      "order": 75,
+      "focus_tokens": ["procurement"]
+    },
+    {
+      "type": "operator_surface",
+      "key": "procurement.operator.focus_labels",
+      "surface": "operator",
+      "region": "focus_labels",
+      "provider": "Apps\\Procurement\\Services\\OperatorSurfaceContributionService::contribute",
+      "provider_file": "Services/OperatorSurfaceContributionService.php",
+      "order": 76,
+      "focus_tokens": ["procurement"]
     }
   ],
   "routes": [

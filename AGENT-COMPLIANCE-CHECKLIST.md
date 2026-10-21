@@ -1,5 +1,27 @@
 # AGENT-COMPLIANCE-CHECKLIST
 
+## Session Summary (2026-10-21) — OH-AUTO2-PROC-003 Procurement Operator Request Queue
+
+Implemented the bounded read-only Procurement operator request queue under
+`/u/{username}/procurement`. Ownership is proven across both sanctioned request
+creation paths: each passes the canonical authenticated user email from
+`Auth::user()` and persists it to `procurement_requests.created_by`. The
+Procurement-owned projection uses exact creator matching, excludes blank or
+ambiguous ownership, bounds results to 50, and exposes only reference, status,
+quantity, dates, and latest PO linkage.
+
+The operator contribution requires active Procurement assignment and explicit
+`procurement.view`; manage-only and approve-only contexts contribute nothing.
+Approval, cancellation, PO creation, supplier/receiving mutation, new
+permissions, schema changes, Core changes, and production operations remain
+excluded. Generic Shell changes only enable app-declared contributed focus views
+and preserve the existing operator pipeline.
+
+Validation: focused offline contract probe **20/20**; PHP lint passed for all
+changed PHP files; `git diff --check` passed. No disposable database or
+authenticated HTTP executor was run; no database mutation occurred. Unrelated
+logs, backup, and PHPUnit cache remain preserved.
+
 ## Session Summary (2026-10-21) — OH-AUTO2-PROC-002 Procurement Workflow Discovery
 
 Completed the authorized read-only Procurement assessment at baseline

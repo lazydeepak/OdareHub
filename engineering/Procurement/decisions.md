@@ -4,8 +4,7 @@
 
 ### 2026-10-21 — OH-AUTO2-PROC-002 operator workflow discovery
 
-**Status:** NEEDS DECISION — select operator visibility and operation authority
-before implementation.
+**Status:** Accepted and implemented as `OH-AUTO2-PROC-003`.
 
 The existing Procurement request → purchase-order → receipt chain is an
 admin-only workflow under `/apps/procurement/*`. The highest-value unfinished
@@ -13,17 +12,20 @@ user-facing capability is a bounded operator request review/approval queue under
 `/u/{username}` that reuses the existing request state and PO-linkage service
 boundaries.
 
-Implementation is not currently authorized because no Procurement operator
-capability declaration, record-scope contract, role mapping, or operation
-mapping exists. The owner must decide whether operators have read-only request
-visibility, approval/cancellation authority, or PO creation authority, and how
-that authority relates to the existing `procurement.manage` and
-`procurement.approve` permissions. No new ACL field or speculative operator
-policy is permitted.
+The accepted first stage is creator-owned, read-only request visibility. It
+requires Procurement assignment and explicit `procurement.view`. The exact
+creator email is passed from `Auth::user()` through both sanctioned creation
+paths and is matched exactly by the read-only projection. `procurement.manage`
+does not grant approval; `procurement.approve` is reserved for a separate
+workflow. Null, blank, legacy, or ambiguous ownership fails closed.
+
+No new ACL field, schema field, approval/cancellation/PO mutation, supplier
+mutation, or receiving mutation was added.
 
 Evidence: `docs/architecture/oh-auto2-proc-002-procurement-workflow-discovery-2026-10-21.md`;
-existing supplier, linkage, authorization, status, transaction, and
-supplier-creation records remain accepted and were not reopened.
+focused offline queue probe 20/20; existing supplier, linkage, authorization,
+status, transaction, and supplier-creation records remain accepted and were
+not reopened.
 
 ### 2026-10-16 — OH-AUTO2-119 common supplier eligibility rule
 

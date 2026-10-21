@@ -2,8 +2,8 @@
 
 **Project:** OdareHub
 **Baseline:** `ecf021ba20ee3814730b31f8ea040f0465d26abc`
-**Authorization:** Read-only assessment and documentation
-**Decision:** **NEEDS DECISION**
+**Authorization:** Read-only assessment and bounded implementation
+**Decision:** **IMPLEMENTED — bounded read-only first stage**
 
 ## Executive decision
 
@@ -13,12 +13,10 @@ surface for assigned or otherwise authorized procurement requests, showing
 request state and purchase-order linkage and, if explicitly authorized, the
 existing approval handoff.
 
-This cannot be assigned for implementation under the current evidence. The
-repository has complete admin request/order/receipt workflows, but no
-Procurement operator capability declaration, `/u/*` route, operator view,
-record-scope contract, or defined mapping for `procurement.manage` versus
-`procurement.approve`. Implementing the queue or approval action now would
-invent product and authorization policy.
+The accepted product decision authorizes a read-only first stage: own requests
+only, Procurement assignment plus explicit `procurement.view`, and exact
+creator-to-authenticated-user matching. Approval, cancellation, PO creation,
+supplier changes, and receiving remain deferred.
 
 ## Evidence reviewed
 
@@ -61,25 +59,20 @@ The selected candidate is the smallest useful bridge into purchasing
 operations: it starts from the existing request lifecycle and can later hand
 off to the existing PO conversion boundary without duplicating service logic.
 
-## Required decision before implementation
+## Product decision applied
 
-The product/authority owner must decide:
+The accepted product/authority decision is:
 
-1. Which operator role or assigned-app condition may see Procurement requests.
-2. Whether visibility is all Procurement requests, creator-owned requests,
-   supplier/request scope, or another existing scope—not a new ACL field.
-3. Whether operators may only review status, may approve/cancel, or may also
-   create the PO from an approved request.
-4. Whether `procurement.approve` is the intended approval authority and how it
-   relates to the existing `procurement.manage` app access.
-5. Whether the first slice is read-only queue presentation or includes a
-   mutation; any mutation would require the existing CSRF, transaction, audit,
-   and isolated verification contracts.
+1. Visibility is creator-owned only; no all-record fallback exists.
+2. Access requires Procurement assignment and explicit `procurement.view`.
+3. `procurement.manage` does not grant operator approval authority.
+4. `procurement.approve` is reserved for a separate workflow.
+5. The first slice is read-only queue presentation; mutation is deferred.
 
-## Conditional smallest implementation scope
+## Implemented smallest scope
 
-After those decisions, the smallest safe slice would be one Procurement-owned
-operator capability declaration and one same-user `/u/{username}` request
+The smallest safe slice is one Procurement-owned operator capability
+declaration and one same-user `/u/{username}` request
 queue that consumes a read-only owner projection. It must:
 
 - remain inside `/u/{username}/*`;
@@ -88,14 +81,37 @@ queue that consumes a read-only owner projection. It must:
 - reuse existing request status and PO-linkage fields;
 - avoid direct Shell business logic, new Core fields, schema changes, and
   speculative supplier/receipt behavior; and
-- add mutation only after an explicit operation/permission decision and
-  isolated behavioral proof plan.
+- add no mutation; approval/cancellation/PO creation remain separately gated.
 
-No source implementation is authorized by this assessment.
+The implementation uses the existing operator contribution registry and generic
+contributed-focus rendering bridge. No new permission or schema field was
+added.
+
+## Ownership proof and verification
+
+- `ProcurementDashboardController::createRequest()` passes
+  `Auth::user()['email']` to `ProcurementOverviewService::createRequest()`.
+- `ProcurementDashboardController::intakeManufacturingRequest()` passes the
+  same canonical authenticated email to
+  `intakeFromManufacturingDemand()`.
+- Both sanctioned service paths persist that actor through `nullIfBlank()` into
+  `procurement_requests.created_by`; no other non-test application source path
+  writes this table.
+- The operator projection requires a non-empty authenticated email and uses
+  exact `created_by = ?` matching. Null, blank, legacy, or ambiguous rows are
+  therefore excluded rather than broadened.
+- The provider requires active Procurement assignment and exact
+  `procurement.view`; manage-only and approve-only contexts do not contribute.
+- The SQL projection is bounded to 50 rows and uses only request status,
+  quantity, needed/created dates, reference, and latest PO linkage.
+
+Focused offline contract probe: **20/20**. PHP lint passed for all changed PHP
+files. No disposable database or authenticated HTTP executor was run in this
+slice; those remain the next environment-bound acceptance steps.
 
 ## Exclusions and validation boundary
 
-No database, SQL, browser, HTTP, activation, deployment, or production
+No database mutation, SQL mutation, activation, deployment, or production
 operation was performed. Completed supplier acceptance and transaction work was
 reused as evidence. Manufacturing dispatch, Material restoration, SBAIO
 incident work, and production deployment remain excluded.

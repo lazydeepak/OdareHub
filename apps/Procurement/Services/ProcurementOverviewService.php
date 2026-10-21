@@ -197,6 +197,54 @@ final class ProcurementOverviewService
     }
 
     /**
+     * Read-only operator projection. Ownership is deliberately exact: the
+     * value written by the sanctioned authenticated creation paths must equal
+     * the canonical authenticated user's email. Blank/legacy ownership never
+     * becomes visible through this projection.
+     *
+     * @return array{available:bool,rows:array<int,array<string,mixed>>}
+     */
+    public static function ownedOperatorRequests(string $actorEmail, int $limit = 40): array
+    {
+        $actorEmail = trim($actorEmail);
+        $limit = max(1, min(50, $limit));
+        if ($actorEmail === '') {
+            return ['available' => false, 'rows' => []];
+        }
+
+        $readiness = self::readReadiness();
+        if (($readiness['available'] ?? false) !== true) {
+            return ['available' => false, 'rows' => []];
+        }
+
+        try {
+            $rows = DB::fetchAll(
+                'SELECT r.id, r.request_ref, r.request_status, r.requested_qty,
+                        r.needed_date, r.created_at, po.po_ref, po.po_status
+                 FROM procurement_requests r
+                 LEFT JOIN (
+                     SELECT request_id, MAX(id) AS id
+                     FROM procurement_purchase_orders
+                     WHERE request_id IS NOT NULL
+                     GROUP BY request_id
+                 ) latest_po ON latest_po.request_id = r.id
+                 LEFT JOIN procurement_purchase_orders po ON po.id = latest_po.id
+                 WHERE r.created_by = ?
+                 ORDER BY r.created_at DESC, r.id DESC
+                 LIMIT ' . $limit,
+                [$actorEmail]
+            );
+        } catch (\Throwable) {
+            return ['available' => false, 'rows' => []];
+        }
+
+        return ['available' => true, 'rows' => array_values(array_filter(
+            (array)$rows,
+            static fn ($row): bool => is_array($row) && trim((string)($row['request_ref'] ?? '')) !== ''
+        ))];
+    }
+
+    /**
      * Requests eligible for a new manual purchase-order linkage.
      *
      * Historical/request-workflow listings continue to use latestRequests().

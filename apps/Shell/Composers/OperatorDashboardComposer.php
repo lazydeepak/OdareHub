@@ -93,6 +93,14 @@ final class OperatorDashboardComposer
         $isPrefsFocus = ($focus === 'preferences');
         $isTasksFocus = ($focus === 'tasks');
         $contributedFocusViewMap = OperatorSurfaceContributionRegistry::focusViewMap($data);
+        $knownFocus = $isWorkEntryFocus || $isDataExchangeFocus || $isCriticalFocus || $isRecentFocus
+            || $isPartsFocus || $isPartsDetailFocus || $isProductionFocus || $isDemandFocus
+            || $isOrdersFocus || $isProcessingFocus || $isPreparationFocus || $isDispatchFocus
+            || $isDispatchDetailFocus || $isFulfillmentFocus || $isCoverageFocus || $isQcFocus
+            || $isDispatchAdapterFocus || $isMachinesFocus || $isAssemblyFocus || $isMaterialsFocus
+            || $isSbaioFocus || $isHospitalityFocus || $isAccountFocus || $isNotificationsFocus
+            || $isMessagesFocus || $isHandoffFocus || $isPrefsFocus || $isTasksFocus;
+        $isContributedFocus = !$knownFocus && isset($contributedFocusViewMap[strtolower($focus)]);
         $resolveFocusView = static function (string $focusKey, string $fallbackPath) use ($contributedFocusViewMap): string {
             $normalized = strtolower(trim($focusKey));
             $candidate = trim((string)($contributedFocusViewMap[$normalized] ?? ''));
@@ -171,7 +179,7 @@ final class OperatorDashboardComposer
                     <?php endforeach; unset($__pqa, $__qa); ?>
                 </div>
                 <?php endif; ?>
-                <?php if (!$isWorkEntryFocus && !$isDataExchangeFocus && !$isCriticalFocus && !$isRecentFocus && !$isPartsFocus && !$isPartsDetailFocus && !$isProductionFocus && !$isDemandFocus && !$isOrdersFocus && !$isProcessingFocus && !$isPreparationFocus && !$isDispatchFocus && !$isDispatchDetailFocus && !$isFulfillmentFocus && !$isCoverageFocus && !$isQcFocus && !$isDispatchAdapterFocus && !$isMachinesFocus && !$isAssemblyFocus && !$isMaterialsFocus && !$isSbaioFocus && !$isHospitalityFocus && !$isAccountFocus && !$isNotificationsFocus && !$isMessagesFocus && !$isHandoffFocus && !$isPrefsFocus && !$isTasksFocus): include APP_ROOT . '/apps/Shell/Views/operator/dashboard.php'; endif; ?>
+                <?php if (!$knownFocus && !$isContributedFocus): include APP_ROOT . '/apps/Shell/Views/operator/dashboard.php'; endif; ?>
 
                 <?php if ($isCriticalFocus): include APP_ROOT . '/apps/Shell/Views/operator/critical.php'; endif; ?>
 
@@ -222,6 +230,7 @@ final class OperatorDashboardComposer
                 <?php if ($isHandoffFocus): $__focusView = $resolveFocusView('handoff', APP_ROOT . '/apps/Shell/Views/operator/handoff.php'); include $__focusView; endif; ?>
                 <?php if ($isPrefsFocus): include APP_ROOT . '/apps/Shell/Views/operator/preferences.php'; endif; ?>
                 <?php if ($isTasksFocus): include APP_ROOT . '/apps/Shell/Views/operator/tasks.php'; endif; ?>
+                <?php if ($isContributedFocus): $__focusView = $resolveFocusView($focus, ''); if ($__focusView !== ''): include $__focusView; endif; endif; ?>
 
 
         </div>
