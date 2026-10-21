@@ -1,5 +1,24 @@
 # AGENT-COMPLIANCE-CHECKLIST
 
+## Session Summary (2026-10-21) — OH-AUTO2-PROC-002 Procurement Workflow Discovery
+
+Completed the authorized read-only Procurement assessment at baseline
+`ecf021ba20ee3814730b31f8ea040f0465d26abc`. Reconciled the completed supplier
+acceptance and OH-AUTO2-119–135 integrity work without repeating broad audits.
+The existing request → purchase-order → receipt chain is implemented through
+admin-only `/apps/procurement/*` routes; no Procurement operator capability,
+`/u/*` route/view, record-scope contract, or manage/approve operation mapping
+exists.
+
+Selected exactly one candidate: a bounded operator Procurement request
+review/approval queue. Decision: **NEEDS DECISION**, because product ownership
+must define operator visibility and whether the first slice is read-only,
+approval/cancellation, or PO creation. No implementation, database, SQL,
+browser, HTTP, deployment, Core, Shell, Manufacturing, Material, or SBAIO
+operation occurred. Evidence is recorded in
+`docs/architecture/oh-auto2-proc-002-procurement-workflow-discovery-2026-10-21.md`;
+unrelated Procurement working-tree artifacts were preserved.
+
 ## Session Summary (2026-10-21) — OH-AUTO2-HOSP-005 Authenticated HTTP acceptance
 
 Ran Hospitality HTTP acceptance only against a runner-owned staged source root,

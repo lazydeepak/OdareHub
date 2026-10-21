@@ -1,5 +1,26 @@
 # Procurement — Work
 
+## 2026-10-21 — OH-AUTO2-PROC-002 Procurement Workflow Discovery
+
+**Status: NEEDS DECISION — no implementation authorized.**
+
+Read-only reconciliation selected one concrete unfinished capability: a
+Procurement operator request review/approval queue under `/u/{username}`. The
+existing request → purchase-order → receipt workflow is implemented through
+admin-only `/apps/procurement/*` routes and the existing service boundary, but
+Procurement has no operator capability declaration, operator route/view,
+record-scope contract, or defined `procurement.manage`/`procurement.approve`
+operation mapping.
+
+The required decision is whether operators may see all or scoped requests and
+whether the first slice is read-only review or includes approval, cancellation,
+or PO creation. No new ACL field, operator mutation, supplier policy, route,
+schema, database, or Shell change is authorized until that choice is made.
+
+Evidence: `docs/architecture/oh-auto2-proc-002-procurement-workflow-discovery-2026-10-21.md`.
+The completed OH-AUTO2-PROC-001 supplier acceptance and OH-AUTO2-119–135
+integrity records were reused; no completed audit was repeated.
+
 ## 2026-10-20 — Preserved OH-AUTO1-034 baseline reconciliation
 
 Status: NO CHANGE REQUIRED — NO NEW CONFIRMED DEFECT

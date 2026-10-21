@@ -76,6 +76,13 @@ domain-qualified identifiers going forward.
 | `OH-AUTO2-HOSP-003` | Hospitality | Implemented current-connection reservation identity and one-time operator confirmation; live DB/concurrency/browser acceptance remains blocked |
 | `OH-AUTO2-HOSP-004` | Hospitality | Disposable development runtime acceptance passed; authenticated browser/HTTP acceptance remains unverified and production deployment is separate |
 
+## Qualified assignment records
+
+| Qualified ID | Owner | Baseline | Reconciled state |
+|---|---|---|---|
+| `OH-AUTO2-PROC-001` | Procurement | Historical supplier acceptance baseline | Completed bounded supplier-creation acceptance; live rollback/concurrency evidence remains out of scope |
+| `OH-AUTO2-PROC-002` | Procurement | `ecf021ba20ee3814730b31f8ea040f0465d26abc` | **NEEDS DECISION:** selected operator Procurement request review/approval queue; no implementation authorized |
+
 ## Confirmed collision set
 
 The assignment numbers are not globally unique. The direct collisions requiring

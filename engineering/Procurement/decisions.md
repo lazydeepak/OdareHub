@@ -2,6 +2,29 @@
 
 ## Decision Log
 
+### 2026-10-21 — OH-AUTO2-PROC-002 operator workflow discovery
+
+**Status:** NEEDS DECISION — select operator visibility and operation authority
+before implementation.
+
+The existing Procurement request → purchase-order → receipt chain is an
+admin-only workflow under `/apps/procurement/*`. The highest-value unfinished
+user-facing capability is a bounded operator request review/approval queue under
+`/u/{username}` that reuses the existing request state and PO-linkage service
+boundaries.
+
+Implementation is not currently authorized because no Procurement operator
+capability declaration, record-scope contract, role mapping, or operation
+mapping exists. The owner must decide whether operators have read-only request
+visibility, approval/cancellation authority, or PO creation authority, and how
+that authority relates to the existing `procurement.manage` and
+`procurement.approve` permissions. No new ACL field or speculative operator
+policy is permitted.
+
+Evidence: `docs/architecture/oh-auto2-proc-002-procurement-workflow-discovery-2026-10-21.md`;
+existing supplier, linkage, authorization, status, transaction, and
+supplier-creation records remain accepted and were not reopened.
+
 ### 2026-10-16 — OH-AUTO2-119 common supplier eligibility rule
 
 **Status:** Accepted — apply the existing lifecycle rule consistently
