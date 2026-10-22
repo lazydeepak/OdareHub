@@ -1,5 +1,26 @@
 # AGENT-COMPLIANCE-CHECKLIST
 
+## Session Summary (2026-10-22) — OH-AUTO3-006 Scoped Parts Operator Search
+
+Implemented the conditionally authorized Manufacturing Parts search slice.
+The existing server-side scope predicate remains authoritative and is applied
+before search matching, deterministic ordering, and `LIMIT 500`. Search is
+limited to existing `parts_name`, `parts_number`, and `model` projection
+fields; no unsupported status/category filter was invented.
+
+Invalid, array-shaped, whitespace-only, oversized, and denied searches fail
+closed. Shell forwards existing operator query state and renders a localized
+GET search/clear control; no new route, permission, mutation, schema, Core,
+database, activation, browser, HTTP, or deployment operation occurred.
+
+Evidence: the database-free search probe passed **18/18**; existing Parts
+scope and detail-authority probes passed **14/14** and **21/21**. PHP lint and
+`git diff --check` passed. Architecture gates passed, deletion-family gates
+passed **28/28**, and deployment readiness passed in read-only verify mode.
+Unrelated SBAIO edits, lifecycle logs, Procurement backup, prior Auto 3
+reports, and PHPUnit cache were preserved.
+
+
 ## Session Summary (2026-10-21) — OH-AUTO2-PROC-004 Procurement Runtime Acceptance
 
 Completed authenticated runtime acceptance of the bounded Procurement

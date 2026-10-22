@@ -559,7 +559,8 @@ final class OperatorSurfaceComposer
             ] : [],
             'recent_activity' => $recentActivity,
             'parts_table' => OperatorPartsWorkspaceService::getPartsTable(
-                is_array($this->context['operator_user'] ?? null) ? $this->context['operator_user'] : null
+                is_array($this->context['operator_user'] ?? null) ? $this->context['operator_user'] : null,
+                $currentQuery
             ),
             'part_detail_focus' => $hasManufacturing ? $this->buildPartDetailFocusData() : [],
             'production_focus' => $hasManufacturing ? $this->buildProductionFocusData() : [],

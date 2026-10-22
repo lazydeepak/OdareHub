@@ -15,9 +15,10 @@ final class OperatorPartsWorkspaceService
 {
     /**
      * @param array<string,mixed>|null $user
+     * @param array<string,mixed> $query
      * @return array{rows:array<int,array<string,mixed>>,total_count:int,empty_label:string}
      */
-    public static function getPartsTable(?array $user): array
+    public static function getPartsTable(?array $user, array $query = []): array
     {
         $defaults = ['rows' => [], 'total_count' => 0, 'empty_label' => 'No products found.'];
         $scope = self::authorizedScope($user);
@@ -25,8 +26,20 @@ final class OperatorPartsWorkspaceService
             return $defaults;
         }
 
+        $search = self::normalizeListSearch($query);
+        if ($search === null) {
+            return $defaults;
+        }
+
         try {
             [$where, $params] = self::partRestrictionSql($scope['part_ids']);
+            if ($search !== '') {
+                $like = '%' . self::escapeLike($search) . '%';
+                $where .= ' AND (LOWER(COALESCE(p.parts_name, \'\')) LIKE ? ESCAPE \'\\\\\''
+                    . ' OR LOWER(COALESCE(p.parts_number, \'\')) LIKE ? ESCAPE \'\\\\\''
+                    . ' OR LOWER(COALESCE(p.model, \'\')) LIKE ? ESCAPE \'\\\\\')';
+                array_push($params, $like, $like, $like);
+            }
             $rows = DB::fetchAll(
                 "SELECT
                     p.id,
@@ -53,6 +66,47 @@ final class OperatorPartsWorkspaceService
         } catch (\Throwable) {
             return ['rows' => [], 'total_count' => 0, 'empty_label' => 'Unable to load parts table.'];
         }
+    }
+
+    /**
+     * Apply the same list-search semantics to fixture rows without database
+     * access. Authorization is projected before matching and before limiting.
+     *
+     * @param array<string,mixed> $query
+     * @param array<string,mixed> $scope
+     * @param array<int,array<string,mixed>> $rows
+     * @return array<int,array<string,mixed>>|null
+     */
+    public static function projectFilteredRows(array $query, array $scope, array $rows): ?array
+    {
+        $normalizedScope = self::normalizeScope($scope);
+        $search = self::normalizeListSearch($query);
+        if ($normalizedScope === null || $search === null) {
+            return null;
+        }
+
+        $authorized = self::projectAuthorizedRows($rows, $scope);
+        if ($authorized === null) {
+            return null;
+        }
+        if ($search === '') {
+            return array_slice($authorized, 0, 500);
+        }
+
+        $needle = strtolower($search);
+        $filtered = array_values(array_filter($authorized, static function ($row) use ($needle): bool {
+            if (!is_array($row)) {
+                return false;
+            }
+            $haystack = strtolower(implode(' ', [
+                trim((string)($row['parts_name'] ?? '')),
+                trim((string)($row['parts_number'] ?? '')),
+                trim((string)($row['model'] ?? '')),
+            ]));
+            return str_contains($haystack, $needle);
+        }));
+
+        return array_slice($filtered, 0, 500);
     }
 
     /**
@@ -330,6 +384,31 @@ final class OperatorPartsWorkspaceService
             return null;
         }
         return trim(substr($value, 0, 120));
+    }
+
+    private static function normalizeListSearch(array $query): ?string
+    {
+        if (!array_key_exists('q', $query)) {
+            return '';
+        }
+        if (!is_string($query['q'])) {
+            return null;
+        }
+
+        $raw = $query['q'];
+        $value = trim($raw);
+        if ($value === '' && $raw !== '') {
+            return null;
+        }
+        if (strlen($value) > 80) {
+            return null;
+        }
+        return $value;
+    }
+
+    private static function escapeLike(string $value): string
+    {
+        return str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $value);
     }
 
     /** @return array<string,mixed> */

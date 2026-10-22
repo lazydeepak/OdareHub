@@ -4,6 +4,8 @@
 ?>
 <?php
     $_partsSubUser = htmlspecialchars(rawurlencode((string)($data['username'] ?? '')));
+    $_partsSearchRaw = $currentQuery['q'] ?? '';
+    $_partsSearchValue = is_string($_partsSearchRaw) ? trim($_partsSearchRaw) : '';
 ?>
                     <nav class="operator-subnav" aria-label="<?php echo htmlspecialchars($this->tr('operator.production.subnav.label', 'Production sections')); ?>">
                         <a class="operator-subnav-item" href="/u/<?php echo $_partsSubUser; ?>/production"><?php echo htmlspecialchars($this->tr('operator.production.subnav.production', 'Production')); ?></a>
@@ -15,8 +17,16 @@
                         <a class="operator-subnav-item" href="/u/<?php echo $_partsSubUser; ?>/materials"><?php echo htmlspecialchars($this->tr('operator.production.subnav.materials', 'Materials')); ?></a>
                     </nav>
 <section class="surface-card" aria-label="Parts Table">
-                        <h2 class="surface-title"><?php echo htmlspecialchars($this->tr('operator.parts.table.title', 'Parts Master Data')); ?></h2>
-                        <?php if (!empty($partsTable['rows'])): ?>
+                         <h2 class="surface-title"><?php echo htmlspecialchars($this->tr('operator.parts.table.title', 'Parts Master Data')); ?></h2>
+                         <form method="get" action="<?php echo htmlspecialchars($partsBaseUrl); ?>" class="operator-parts-search" role="search">
+                             <label for="operatorPartsSearch"><?php echo htmlspecialchars($this->tr('common.search', 'Search')); ?></label>
+                             <input id="operatorPartsSearch" type="search" name="q" value="<?php echo htmlspecialchars($_partsSearchValue); ?>" maxlength="80" placeholder="<?php echo htmlspecialchars($this->tr('module.products.search_placeholder', 'Search by part number or name')); ?>">
+                             <button type="submit"><?php echo htmlspecialchars($this->tr('common.search', 'Search')); ?></button>
+                             <?php if (array_key_exists('q', $currentQuery)): ?>
+                                 <a href="<?php echo htmlspecialchars($partsBaseUrl); ?>"><?php echo htmlspecialchars($this->tr('common.clear', 'Clear')); ?></a>
+                             <?php endif; ?>
+                         </form>
+                         <?php if (!empty($partsTable['rows'])): ?>
                             <div class="recent-focus-table-wrap">
                                 <table class="recent-focus-table">
                                     <thead>

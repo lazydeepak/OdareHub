@@ -1,5 +1,22 @@
 # Manufacturing — Work
 
+## 2026-10-22 — OH-AUTO3-006 scoped Parts operator search
+
+- [x] Added bounded server-side `q` search to the existing Parts list across
+  the already projected `parts_name`, `parts_number`, and `model` fields.
+- [x] Preserved the existing Manufacturing scope predicate before filtering,
+  deterministic ordering, and `LIMIT 500`; invalid, array-shaped, blank,
+  oversized, and denied inputs fail closed.
+- [x] Added a database-free regression probe:
+  `apps/Manufacturing/Tests/probe_operator_parts_search_filter.php` —
+  **18/18** assertions. Existing Parts scope and detail-authority probes pass
+  **14/14** and **21/21**.
+- [x] No status/category filter was invented because those fields are not part
+  of the current Parts projection. No route, permission, mutation, schema,
+  database, activation, browser, HTTP, deployment, or Core change occurred.
+- [x] PHP lint, `git diff --check`, architecture gates, deletion-family gates
+  **28/28**, and deployment readiness passed in read-only verify mode.
+
 ## Current Focus
 
 OH-AUTO1-093 scope-aware Processing workspace and mutation gates are complete.

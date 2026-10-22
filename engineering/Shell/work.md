@@ -1,5 +1,17 @@
 # Shell — Work
 
+## 2026-10-22 — OH-AUTO3-006 Parts search composition
+
+- [x] Forwarded the existing operator query state from Shell composition into
+  the Manufacturing-owned Parts projection; Shell does not interpret or grant
+  Parts scope.
+- [x] Added a localized GET search/clear control to the existing operator Parts
+  view, retaining query state without adding mutation controls or routes.
+- [x] Reused existing localization keys and preserved `/u/*` confinement,
+  read-only/display behavior, and current detail authority.
+- [x] Focused Parts search, scope, detail-authority, lint, architecture,
+  deletion-family, deployment-readiness, and diff-hygiene checks passed.
+
 ## Current Focus
 
 OH-AUTO1-094 Processing authority closure is complete. Shell remains the
