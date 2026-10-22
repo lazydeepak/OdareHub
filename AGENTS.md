@@ -6841,3 +6841,23 @@ execution window while traversing the repository; no database, browser,
 activation, deployment, or OH-AUTO2-105B operation occurred. Existing DB-backed
 Hospitality probes were not run. Unrelated Procurement changes, lifecycle logs,
 backup file, and PHPUnit cache remain untouched.
+
+## Session Summary (2026-10-22) — OH-AUTO3-004 SBAIO Customers bounded admin workflow
+
+Implemented the approved, bounded Customers create/list correction in SBAIO.
+The existing Customers routes now enforce the existing `platform_admin` or
+`app_admin` authority role server-side in addition to SBAIO app access, covering
+list, create, report, and export record surfaces. Customer input is normalized
+and validated against the existing schema limits; optional email syntax is
+checked, arbitrary existing status values remain supported, and list reads stay
+bounded and ordered by descending ID. Existing routes, table, persistence
+shape, CSRF, duplicate behavior, audit attribution, and empty-state behavior
+remain otherwise unchanged. UI labels added in the slice are localized in
+EN/JA/NE and list values remain escaped.
+
+Added `apps/SBAIO/modules/Customers/Tests/probe_customers_admin_workflow.php`:
+**24/24** database-free assertions. PHP lint and `git diff --check` pass;
+architecture gates, deletion-family gates **28/28**, and deployment readiness
+pass in read-only verify mode. No database, browser, HTTP, activation,
+deployment, Core, Staff, Leave, Payroll, editing, deletion, import, or new
+route operation occurred. Unrelated working-tree artifacts were preserved.

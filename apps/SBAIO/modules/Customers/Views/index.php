@@ -14,7 +14,7 @@ $suiteActions = [
 $suiteLinks = [['label' => t('sbaio.common.records'), 'value' => (string)count($rows)]];
 $moduleFilters = [
   ['label' => t('sbaio.common.view'), 'value' => t('sbaio.customers.records')],
-  ['label' => t('sbaio.common.sort'), 'value' => 'Newest first'],
+   ['label' => t('sbaio.common.sort'), 'value' => t('sbaio.customers.newest_first')],
 ];
 require APP_ROOT . '/apps/SBAIO/Views/partials/module_page_intro.php';
 require APP_ROOT . '/apps/SBAIO/Views/partials/module_page_feedback.php';
@@ -26,10 +26,10 @@ require APP_ROOT . '/apps/SBAIO/Views/partials/module_page_filters.php';
     <div class="muted mb-10"><?= e(t('sbaio.customers.form_desc')) ?></div>
     <form method="post" action="/apps/sbaio/customers/create" class="grid form-grid-4">
       <input type="hidden" name="csrf" value="<?= e(\App\Core\Auth::csrfToken()) ?>">
-      <label>Customer Name<input class="input" type="text" name="customer_name" required></label>
-      <label>Contact Name<input class="input" type="text" name="contact_name"></label>
+      <label><?= e(t('sbaio.customers.customer_name')) ?><input class="input" type="text" name="customer_name" required></label>
+      <label><?= e(t('sbaio.customers.contact_name')) ?><input class="input" type="text" name="contact_name"></label>
       <label><?= e(t('auth.email')) ?><input class="input" type="email" name="email"></label>
-      <label>Phone<input class="input" type="text" name="phone"></label>
+      <label><?= e(t('sbaio.customers.phone')) ?><input class="input" type="text" name="phone"></label>
       <label><?= e(t('common.status')) ?><input class="input" type="text" name="status" value="active"></label>
       <div class="col-span-full">
         <button class="btn btn-primary" type="submit"><?= e(t('sbaio.customers.create')) ?></button>
@@ -46,7 +46,7 @@ require APP_ROOT . '/apps/SBAIO/Views/partials/module_page_filters.php';
     <h3 class="u-mt-0"><?= e(t('sbaio.customers.records')) ?></h3>
     <div class="table-wrap">
       <table>
-        <thead><tr><th>Customer</th><th>Contact</th><th>Email</th><th> <?= e($tt('common.status_label')) ?> </th></tr></thead>
+       <thead><tr><th><?= e(t('sbaio.customers.customer_name')) ?></th><th><?= e(t('sbaio.customers.contact_name')) ?></th><th><?= e(t('auth.email')) ?></th><th> <?= e($tt('common.status_label')) ?> </th></tr></thead>
         <tbody>
           <?php foreach ($rows as $row): ?>
             <tr>

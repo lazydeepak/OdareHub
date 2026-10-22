@@ -9,21 +9,21 @@ use Plugins\Customers\Controllers\CustomersController;
 require_once __DIR__ . '/Controllers/CustomersController.php';
 
 $router->get('/apps/sbaio/customers', function () use ($view) {
-    Auth::requireAppAccess('sbaio');
+    CustomersController::requireAdministrator();
     Auth::bootSession();
     CustomersController::index($view);
     return null;
 });
 
 $router->post('/apps/sbaio/customers/create', function () {
-    Auth::requireAppAccess('sbaio');
+    CustomersController::requireAdministrator();
     Auth::bootSession();
     CustomersController::create();
     return null;
 });
 
 $router->get('/apps/sbaio/customers/report', function() use ($view) {
-    Auth::requireAppAccess('sbaio');
+    CustomersController::requireAdministrator();
     Auth::bootSession();
     $report = ModuleReportRegistryService::findActiveReport('sbaio.customers.overview');
     if (!is_array($report)) {
@@ -36,7 +36,7 @@ $router->get('/apps/sbaio/customers/report', function() use ($view) {
 });
 
 $router->get('/apps/sbaio/customers/export', function() use ($view) {
-    Auth::requireAppAccess('sbaio');
+    CustomersController::requireAdministrator();
     Auth::bootSession();
     $reportKey = 'sbaio.customers.overview';
     if (strtolower(trim((string)($_GET['format'] ?? ''))) === 'csv') {
@@ -50,4 +50,3 @@ $router->get('/apps/sbaio/customers/export', function() use ($view) {
     $view->render('Customers::export.php', ['report' => $report]);
     return null;
 });
-
