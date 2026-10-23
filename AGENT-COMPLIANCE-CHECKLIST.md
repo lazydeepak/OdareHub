@@ -1,5 +1,25 @@
 # AGENT-COMPLIANCE-CHECKLIST
 
+## Session Summary (2026-10-24) — OH-AUTO3-PROC-001 Procurement Queue Filters
+
+Implemented the accepted bounded Procurement operator filter slice. The
+creator-owned read-only queue now supports request-reference search, the
+established persisted status vocabulary, exact needed-date filtering, and
+inclusive needed-date ranges.
+
+Exact authenticated `created_by` ownership remains the first query predicate;
+additional filters are applied before deterministic ordering and the existing
+bounded limit. Invalid filters fail closed with an empty result. No overdue
+rule was invented because no authoritative overdue contract exists. Latest PO
+linkage, schema-readiness handling, permissions, and read-only behavior remain
+unchanged.
+
+Added localized EN/JA/NE GET controls and same-user reset navigation. No route,
+permission, schema, mutation, Core, database, HTTP, browser, activation, or
+deployment operation occurred. New database-free probe: **31/31**. Unrelated
+SBAIO edits, lifecycle logs, Procurement backup, prior reports, and PHPUnit
+cache were preserved.
+
 ## Session Summary (2026-10-24) — OH-AUTO3-MFG-002 Scoped Machine Workboard Filters
 
 Implemented the authorized bounded machine-workboard filter slice. Shell now

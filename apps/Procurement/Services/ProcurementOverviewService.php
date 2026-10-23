@@ -196,28 +196,98 @@ final class ProcurementOverviewService
         return self::attachTransitions($rows, 'procurement_request');
     }
 
+    /** @var array<int,string> Persisted request status vocabulary. */
+    public const OPERATOR_REQUEST_STATUSES = ['draft', 'approved', 'closed', 'cancelled'];
+
+    /**
+     * Normalize the read-only operator queue filters without applying any
+     * lifecycle meaning. The returned invalid list is intentionally consumed
+     * as a fail-closed empty result by the query method.
+     *
+     * @param array<string,mixed> $input
+     * @return array{request_ref:string,status:string,needed_date:string,needed_from:string,needed_to:string,invalid:array<int,string>}
+     */
+    public static function normalizeOperatorRequestFilters(array $input): array
+    {
+        $invalid = [];
+        $requestRef = self::normalizeOperatorFilterText($input['request_ref'] ?? null, 60, 'request_ref', $invalid);
+        $status = self::normalizeOperatorFilterText($input['status'] ?? null, 30, 'status', $invalid);
+        $neededDate = self::normalizeOperatorFilterDate($input['needed_date'] ?? null, 'needed_date', $invalid);
+        $neededFrom = self::normalizeOperatorFilterDate($input['needed_from'] ?? null, 'needed_from', $invalid);
+        $neededTo = self::normalizeOperatorFilterDate($input['needed_to'] ?? null, 'needed_to', $invalid);
+
+        if ($status !== '' && !in_array(strtolower($status), self::OPERATOR_REQUEST_STATUSES, true)) {
+            $invalid[] = 'status';
+        } else {
+            $status = strtolower($status);
+        }
+        if ($neededDate !== '' && ($neededFrom !== '' || $neededTo !== '')) {
+            $invalid[] = 'needed_date';
+        }
+        if ($neededFrom !== '' && $neededTo !== '' && $neededFrom > $neededTo) {
+            $invalid[] = 'needed_range';
+        }
+
+        return [
+            'request_ref' => $requestRef,
+            'status' => $status,
+            'needed_date' => $neededDate,
+            'needed_from' => $neededFrom,
+            'needed_to' => $neededTo,
+            'invalid' => array_values(array_unique($invalid)),
+        ];
+    }
+
     /**
      * Read-only operator projection. Ownership is deliberately exact: the
      * value written by the sanctioned authenticated creation paths must equal
      * the canonical authenticated user's email. Blank/legacy ownership never
      * becomes visible through this projection.
      *
-     * @return array{available:bool,rows:array<int,array<string,mixed>>}
+     * @param array<string,mixed> $filters
+     * @return array{available:bool,rows:array<int,array<string,mixed>>,filters:array<string,mixed>,invalid_filters:array<int,string>}
      */
-    public static function ownedOperatorRequests(string $actorEmail, int $limit = 40): array
+    public static function ownedOperatorRequests(string $actorEmail, int $limit = 40, array $filters = []): array
     {
         $actorEmail = trim($actorEmail);
         $limit = max(1, min(50, $limit));
+        $normalizedFilters = self::normalizeOperatorRequestFilters($filters);
         if ($actorEmail === '') {
-            return ['available' => false, 'rows' => []];
+            return ['available' => false, 'rows' => [], 'filters' => $normalizedFilters, 'invalid_filters' => []];
         }
 
         $readiness = self::readReadiness();
         if (($readiness['available'] ?? false) !== true) {
-            return ['available' => false, 'rows' => []];
+            return ['available' => false, 'rows' => [], 'filters' => $normalizedFilters, 'invalid_filters' => []];
+        }
+        if ($normalizedFilters['invalid'] !== []) {
+            return ['available' => true, 'rows' => [], 'filters' => $normalizedFilters, 'invalid_filters' => $normalizedFilters['invalid']];
         }
 
         try {
+            $where = ['r.created_by = ?'];
+            $params = [$actorEmail];
+            if ($normalizedFilters['request_ref'] !== '') {
+                $where[] = 'LOWER(r.request_ref) LIKE ?';
+                $params[] = '%' . strtolower($normalizedFilters['request_ref']) . '%';
+            }
+            if ($normalizedFilters['status'] !== '') {
+                $where[] = 'LOWER(COALESCE(r.request_status, \'draft\')) = ?';
+                $params[] = $normalizedFilters['status'];
+            }
+            if ($normalizedFilters['needed_date'] !== '') {
+                $where[] = 'r.needed_date = ?';
+                $params[] = $normalizedFilters['needed_date'];
+            } else {
+                if ($normalizedFilters['needed_from'] !== '') {
+                    $where[] = 'r.needed_date >= ?';
+                    $params[] = $normalizedFilters['needed_from'];
+                }
+                if ($normalizedFilters['needed_to'] !== '') {
+                    $where[] = 'r.needed_date <= ?';
+                    $params[] = $normalizedFilters['needed_to'];
+                }
+            }
             $rows = DB::fetchAll(
                 'SELECT r.id, r.request_ref, r.request_status, r.requested_qty,
                         r.needed_date, r.created_at, po.po_ref, po.po_status
@@ -225,23 +295,68 @@ final class ProcurementOverviewService
                  LEFT JOIN (
                      SELECT request_id, MAX(id) AS id
                      FROM procurement_purchase_orders
-                     WHERE request_id IS NOT NULL
-                     GROUP BY request_id
-                 ) latest_po ON latest_po.request_id = r.id
-                 LEFT JOIN procurement_purchase_orders po ON po.id = latest_po.id
-                 WHERE r.created_by = ?
-                 ORDER BY r.created_at DESC, r.id DESC
-                 LIMIT ' . $limit,
-                [$actorEmail]
+                      WHERE request_id IS NOT NULL
+                      GROUP BY request_id
+                  ) latest_po ON latest_po.request_id = r.id
+                  LEFT JOIN procurement_purchase_orders po ON po.id = latest_po.id
+                  WHERE ' . implode(' AND ', $where) . '
+                  ORDER BY r.created_at DESC, r.id DESC
+                  LIMIT ' . $limit,
+                $params
             );
         } catch (\Throwable) {
-            return ['available' => false, 'rows' => []];
+            return ['available' => false, 'rows' => [], 'filters' => $normalizedFilters, 'invalid_filters' => []];
         }
 
         return ['available' => true, 'rows' => array_values(array_filter(
             (array)$rows,
             static fn ($row): bool => is_array($row) && trim((string)($row['request_ref'] ?? '')) !== ''
-        ))];
+        )), 'filters' => $normalizedFilters, 'invalid_filters' => []];
+    }
+
+    /** @param array<int,string> $invalid */
+    private static function normalizeOperatorFilterText($value, int $maxLength, string $key, array &$invalid): string
+    {
+        if ($value === null || $value === '') {
+            return '';
+        }
+        if (!is_string($value)) {
+            $invalid[] = $key;
+            return '';
+        }
+        if (preg_match('/[\x00-\x1F\x7F]/', $value) === 1) {
+            $invalid[] = $key;
+            return '';
+        }
+        $value = trim($value);
+        if ($value === '') {
+            return '';
+        }
+        if (strlen($value) > $maxLength || preg_match('//u', $value) !== 1) {
+            $invalid[] = $key;
+            return '';
+        }
+        return $value;
+    }
+
+    /** @param array<int,string> $invalid */
+    private static function normalizeOperatorFilterDate($value, string $key, array &$invalid): string
+    {
+        if ($value === null || $value === '') {
+            return '';
+        }
+        if (!is_string($value)) {
+            $invalid[] = $key;
+            return '';
+        }
+        $value = trim($value);
+        $date = \DateTimeImmutable::createFromFormat('!Y-m-d', $value);
+        $errors = \DateTimeImmutable::getLastErrors();
+        if ($value === '' || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $value) || $date === false || ($errors !== false && ($errors['warning_count'] > 0 || $errors['error_count'] > 0)) || $date->format('Y-m-d') !== $value) {
+            $invalid[] = $key;
+            return '';
+        }
+        return $value;
     }
 
     /**

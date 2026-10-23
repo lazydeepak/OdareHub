@@ -1,5 +1,21 @@
 # Procurement — Work
 
+## 2026-10-24 — OH-AUTO3-PROC-001 own-request queue filters
+
+- [x] Added bounded read-only filters for request reference, established request
+  status, exact `needed_date`, and inclusive `needed_from`/`needed_to` ranges.
+- [x] Preserved exact authenticated `created_by` ownership as the first query
+  predicate, followed by filters, deterministic ordering, and the existing
+  bounded result limit. Latest linked PO projection remains unchanged.
+- [x] Invalid, array-shaped, unsupported, control-character, oversized,
+  impossible-date, mixed exact/range, and reversed-range inputs fail closed
+  without returning the full queue. No overdue rule was invented.
+- [x] Added localized EN/JA/NE GET controls and same-user reset navigation;
+  the operator surface remains read-only with no mutation controls.
+- [x] Added `apps/Procurement/Tests/probe_operator_request_queue_filters.php`;
+  database-free coverage passes **31/31**. No database-backed Procurement
+  probes were run.
+
 ## 2026-10-21 — OH-AUTO2-PROC-004 authenticated runtime acceptance
 
 **Status: ACCEPTED — bounded disposable-runtime acceptance complete.**

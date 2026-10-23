@@ -1,5 +1,34 @@
 # Procurement — Decisions
 
+### 2026-10-24 — OH-AUTO3-PROC-001 queue filter contract
+
+**Status:** Implemented and verified under bounded read-only authorization
+
+**Decision**
+
+The existing creator-owned operator request projection may accept bounded
+read-only filters for request reference, the established request status
+vocabulary (`draft`, `approved`, `closed`, `cancelled`), exact `needed_date`,
+and inclusive needed-date ranges. No overdue interpretation is introduced.
+
+The query order is fixed: exact authenticated `created_by` ownership, supplied
+filters, deterministic `created_at DESC, id DESC` ordering, then the existing
+limit. Invalid input fails closed with an empty result and never falls back to
+the unrestricted queue. PO linkage and schema-readiness behavior remain
+unchanged.
+
+**Evidence**
+
+The database-free filter probe passes **31/31**. Existing queue ownership,
+authorization, read-safety, PO-linkage, and mutation boundaries were preserved.
+No database, SQL execution, browser, HTTP, activation, deployment, or live
+Procurement probe was performed.
+
+**Boundaries**
+
+No approval, cancellation, purchase-order, supplier, receiving, route,
+permission, schema, migration, Core, or Auto 1/2 assignment change was made.
+
 ## Decision Log
 
 ### 2026-10-21 — OH-AUTO2-PROC-004 runtime acceptance

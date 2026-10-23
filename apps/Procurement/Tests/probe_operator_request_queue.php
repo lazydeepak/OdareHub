@@ -21,7 +21,7 @@ $check = static function (bool $ok, string $label) use (&$passed, &$failed): voi
 };
 
 $check(str_contains($service, 'public static function ownedOperatorRequests'), 'projection exists');
-$check(str_contains($service, 'WHERE r.created_by = ?'), 'exact creator filter');
+$check(str_contains($service, "\$where = ['r.created_by = ?']") && str_contains($service, 'implode(\' AND \', $where)'), 'exact creator filter');
 $check(str_contains($service, 'LEFT JOIN procurement_purchase_orders'), 'safe PO linkage');
 $check(str_contains($service, 'min(50'), 'bounded limit');
 $check(str_contains($provider, "in_array('procurement', \$apps, true)"), 'assignment gate');
@@ -30,7 +30,7 @@ $check(!str_contains($provider, 'procurement.manage'), 'manage does not grant qu
 $check(!str_contains($provider, 'procurement.approve'), 'approve does not grant queue');
 $check(str_contains($view, 'data-procurement-operator-queue="1"'), 'queue view exists');
 $check(str_contains($view, 'requested_qty') && str_contains($view, 'po_ref'), 'approved fields rendered');
-$check(!str_contains($view, '<form') && !str_contains($view, 'method='), 'queue has no mutation form');
+$check(!str_contains($view, 'method="post"') && !str_contains($view, 'type="submit" name="'), 'queue has no mutation form');
 $check(str_contains($manifest, 'procurement.operator.focus_views'), 'operator focus hook registered');
 $check(str_contains($routes, "\$router->get('/u/procurement'"), 'operator route registered');
 $check(str_contains($routes, 'bool $allowContributedFocus = false'), 'contributed route opt-in is explicit');
