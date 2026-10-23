@@ -19,15 +19,48 @@
                     $mchKpi = (array)($mch['kpi'] ?? []);
                     $mchRunNow = (array)($mch['run_now'] ?? []);
                     $mchDelayed = (array)($mch['delayed_jobs'] ?? []);
-                    $mchWaitingQc = (array)($mch['waiting_qc'] ?? []);
-                    $mchEmpty = (bool)($mch['empty'] ?? true);
+                     $mchWaitingQc = (array)($mch['waiting_qc'] ?? []);
+                     $mchFilters = (array)($mch['filters'] ?? []);
+                     $mchFilterMachines = (array)($mchFilters['machines'] ?? []);
+                     $mchFilterSections = (array)($mchFilters['sections'] ?? []);
+                     $mchInvalidFilters = (array)($mch['invalid_filters'] ?? []);
+                     $mchSelectedMachine = (string)($mch['scope']['machine_id'] ?? '0');
+                     $mchSelectedSection = (string)($mch['scope']['section'] ?? '');
+                     $mchEmpty = (bool)($mch['empty'] ?? true);
                     $mchError = (string)($mch['error'] ?? '');
                     ?>
 <section class="coverage-focus-section" aria-label="<?php echo htmlspecialchars($this->tr('operator.machines.page_title', 'Machines')); ?>">
-                    <div class="coverage-focus-header">
-                        <h2 class="surface-title"><?php echo htmlspecialchars($this->tr('operator.machines.page_title', 'Machines')); ?></h2>
-                    </div>
-                    <?php if ($mchError !== ''): ?><p class="coverage-focus-error"><?php echo htmlspecialchars($mchError); ?></p><?php endif; ?>
+                     <div class="coverage-focus-header">
+                         <h2 class="surface-title"><?php echo htmlspecialchars($this->tr('operator.machines.page_title', 'Machines')); ?></h2>
+                     </div>
+                     <form method="get" action="/u/<?php echo $_mchSubUser; ?>/machines" class="operator-filter-form" aria-label="<?php echo htmlspecialchars($this->tr('operator.machines.filter.title', 'Filter machines')); ?>">
+                         <label>
+                             <span><?php echo htmlspecialchars($this->tr('operator.machines.filter.machine', 'Machine')); ?></span>
+                             <select name="machine_id">
+                                 <option value=""><?php echo htmlspecialchars($this->tr('operator.machines.filter.all_machines', 'All machines')); ?></option>
+                                 <?php foreach ($mchFilterMachines as $mchFilterMachine): ?>
+                                     <?php if (!is_array($mchFilterMachine)) { continue; } ?>
+                                     <?php $mchFilterMachineId = (string)(int)($mchFilterMachine['id'] ?? 0); ?>
+                                     <?php if ($mchFilterMachineId === '0') { continue; } ?>
+                                     <option value="<?php echo htmlspecialchars($mchFilterMachineId, ENT_QUOTES, 'UTF-8'); ?>"<?php echo $mchSelectedMachine === $mchFilterMachineId ? ' selected' : ''; ?>><?php echo htmlspecialchars((string)($mchFilterMachine['machine_no'] ?? $mchFilterMachine['machine_name'] ?? $mchFilterMachineId)); ?></option>
+                                 <?php endforeach; ?>
+                             </select>
+                         </label>
+                         <label>
+                             <span><?php echo htmlspecialchars($this->tr('operator.machines.filter.section', 'Section')); ?></span>
+                             <select name="section">
+                                 <option value=""><?php echo htmlspecialchars($this->tr('operator.machines.filter.all_sections', 'All sections')); ?></option>
+                                 <?php foreach ($mchFilterSections as $mchFilterSection): ?>
+                                     <?php $mchFilterSection = trim((string)$mchFilterSection); if ($mchFilterSection === '') { continue; } ?>
+                                     <option value="<?php echo htmlspecialchars($mchFilterSection, ENT_QUOTES, 'UTF-8'); ?>"<?php echo $mchSelectedSection === $mchFilterSection ? ' selected' : ''; ?>><?php echo htmlspecialchars($mchFilterSection); ?></option>
+                                 <?php endforeach; ?>
+                             </select>
+                         </label>
+                         <button type="submit"><?php echo htmlspecialchars($this->tr('operator.machines.filter.apply', 'Apply')); ?></button>
+                         <a href="/u/<?php echo $_mchSubUser; ?>/machines"><?php echo htmlspecialchars($this->tr('operator.machines.filter.clear', 'Clear')); ?></a>
+                     </form>
+                     <?php if ($mchInvalidFilters !== []): ?><p class="coverage-focus-error"><?php echo htmlspecialchars($this->tr('operator.machines.filter.invalid', 'The selected machine filter is invalid. No work is shown.')); ?></p><?php endif; ?>
+                     <?php if ($mchError !== ''): ?><p class="coverage-focus-error"><?php echo htmlspecialchars($mchError); ?></p><?php endif; ?>
                     <?php if ($mchEmpty && $mchError === ''): ?>
                         <p class="coverage-focus-empty"><?php echo htmlspecialchars($this->tr('operator.machines.empty', 'No machine jobs found for today.')); ?></p>
                     <?php else: ?>

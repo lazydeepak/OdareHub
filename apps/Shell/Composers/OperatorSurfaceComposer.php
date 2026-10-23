@@ -937,9 +937,12 @@ final class OperatorSurfaceComposer
     private function buildMachinesFocusData(): array
     {
         try {
+            $currentQuery = (array)($this->context['current_query'] ?? []);
+            $machineQuery = array_intersect_key($currentQuery, array_flip(['machine_id', 'section']));
             return MachinesAdapter::getData(
                 is_array($this->context['operator_user'] ?? null) ? $this->context['operator_user'] : null,
-                'operator'
+                'operator',
+                $machineQuery
             );
         } catch (\Throwable $e) {
             error_log('OperatorSurfaceComposer::buildMachinesFocusData: ' . $e->getMessage());

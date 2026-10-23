@@ -21,12 +21,15 @@ final class MachinesAdapter
      *   delayed_jobs: array<int,array<string,mixed>>,
      *   waiting_qc: array<int,array<string,mixed>>,
      *   sections: array<int,string>,
+     *   filters: array<string,mixed>,
+     *   scope: array<string,mixed>,
+     *   invalid_filters: array<int,string>,
      *   today: string,
      *   empty: bool,
      *   error: string
      * }
      */
-    public static function getData(?array $user = null, string $surface = 'operator'): array
+    public static function getData(?array $user = null, string $surface = 'operator', array $query = []): array
     {
         $defaults = [
             'kpi' => [
@@ -42,6 +45,9 @@ final class MachinesAdapter
             'delayed_jobs' => [],
             'waiting_qc'   => [],
             'sections'     => [],
+            'filters'      => ['machines' => [], 'sections' => []],
+            'scope'        => ['machine_id' => 0, 'section' => ''],
+            'invalid_filters' => [],
             'today'        => date('Y-m-d'),
             'empty'        => true,
             'error'        => '',
@@ -54,7 +60,7 @@ final class MachinesAdapter
             }
 
             $result = MachineLeaderDashboardService::build(
-                ['date' => date('Y-m-d'), 'surface' => $surface],
+                array_merge($query, ['date' => date('Y-m-d'), 'surface' => $surface]),
                 $surface === 'display' ? null : $user
             );
             if ($surface !== 'display') {
@@ -69,6 +75,9 @@ final class MachinesAdapter
             $defaults['delayed_jobs'] = (array)($result['delayed_jobs'] ?? []);
             $defaults['waiting_qc']   = (array)($result['waiting_qc'] ?? []);
             $defaults['sections']     = (array)($result['sections'] ?? []);
+            $defaults['filters']      = (array)($result['filters'] ?? ['machines' => [], 'sections' => []]);
+            $defaults['scope']        = (array)($result['scope'] ?? ['machine_id' => 0, 'section' => '']);
+            $defaults['invalid_filters'] = (array)($result['invalid_filters'] ?? []);
             $defaults['today']        = (string)($result['today'] ?? date('Y-m-d'));
             $defaults['kpi'] = [
                 'run_now'      => count($defaults['run_now']),

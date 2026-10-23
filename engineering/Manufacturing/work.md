@@ -1,5 +1,21 @@
 # Manufacturing — Work
 
+## 2026-10-24 — OH-AUTO3-MFG-002 scoped machine workboard filters
+
+- [x] Forwarded only the bounded `machine_id` and `section` query keys from
+  Shell composition into the Manufacturing-owned machine projection.
+- [x] Added strict scalar filter normalization: positive decimal machine IDs,
+  existing 120-byte section capacity, valid UTF-8, and control-character
+  rejection. Invalid nonblank filters fail closed with an empty projection.
+- [x] Added localized GET machine/section controls and a same-user clear link;
+  no route, permission, mutation, schema, database, or Core change occurred.
+- [x] Added `apps/Manufacturing/Tests/probe_operator_machine_workboard_filters.php`;
+  focused filter coverage passed **24/24** and existing machine projection
+  coverage passed **27/27**.
+- [x] PHP lint, diff hygiene, Core lock, operator confinement, business
+  app/module contracts, architecture gates **PASS**, deletion-family gates
+  **28/28**, and deployment readiness **PASS** in read-only verify mode.
+
 ## 2026-10-22 — OH-AUTO3-006 scoped Parts operator search
 
 - [x] Added bounded server-side `q` search to the existing Parts list across

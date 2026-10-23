@@ -1,5 +1,31 @@
 # Manufacturing — Decisions
 
+### 2026-10-24 — OH-AUTO3-MFG-002 machine workboard filter boundary
+
+**Status:** Implemented and verified under bounded authorization
+
+**Decision**
+
+Shell transports only the two existing machine-workboard query keys. The
+Manufacturing machine service owns their validation and semantics. Positive
+decimal machine IDs and existing `machines.section` values are accepted;
+invalid nonblank values return an empty filtered projection rather than being
+coerced into an unrestricted workboard. Existing user scope is resolved before
+the filter query, and the existing KPI, ordering, and limit behavior remains
+unchanged for valid filters.
+
+**Evidence**
+
+Database-free machine filter probe: **24/24**; existing machine projection
+probe: **27/27**; PHP lint, architecture, deletion-family, deployment-readiness,
+operator-confinement, and business-app/module checks passed. No database or
+HTTP execution was performed.
+
+**Boundaries**
+
+No new route, permission, scope authority, mutation, schema, migration, Core,
+admin, display, or unrelated Manufacturing workflow change was made.
+
 ## Decision Log
 
 ### 2026-10-20 — OH-AUTO2-MFG-004 Processing status redirect context preservation

@@ -17,8 +17,9 @@ final class MachineLeaderDashboardService
     {
         $today = date('Y-m-d');
         $date = self::normalizeDate((string)($input['date'] ?? $today), $today);
-        $machineId = (int)($input['machine_id'] ?? 0);
-        $section = trim((string)($input['section'] ?? ''));
+        $filters = self::normalizeFilters($input);
+        $machineId = $filters['machine_id'];
+        $section = $filters['section'];
 
         $roleSlug = strtolower(trim((string)($user['role'] ?? '')));
         $email = strtolower(trim((string)($user['email'] ?? '')));
@@ -36,6 +37,19 @@ final class MachineLeaderDashboardService
         if (!$allowProductionTasks) {
             $scopeMachineIds = [-1];
             $scopePartIds = [-1];
+        }
+
+        if (!$filters['valid']) {
+            return self::emptyFilteredProjection(
+                $today,
+                $date,
+                $roleSlug,
+                $machineId,
+                $section,
+                $scopeMachineIds,
+                $scopePartIds,
+                $filters['invalid']
+            );
         }
 
         $scopedMachines = self::fetchScopedMachines($date, $machineId, $section, $email, $scopeMachineIds);
@@ -190,6 +204,115 @@ final class MachineLeaderDashboardService
                 'complete_window' => true,
             ],
             'ownership_board' => HandoffEngine::workboardForOwner('Machine Leader'),
+        ];
+    }
+
+    /**
+     * Normalize only the existing machine-workboard filter vocabulary.
+     * Invalid nonblank input is retained as invalid rather than becoming the
+     * unrestricted zero-value filter.
+     *
+     * @param array<string,mixed> $input
+     * @return array{valid:bool,machine_id:int,section:string,invalid:array<int,string>}
+     */
+    public static function normalizeFilters(array $input): array
+    {
+        $machineId = 0;
+        $section = '';
+        $invalid = [];
+
+        if (array_key_exists('machine_id', $input)) {
+            $rawMachineId = $input['machine_id'];
+            if (is_array($rawMachineId) || is_object($rawMachineId) || is_bool($rawMachineId) || is_float($rawMachineId)) {
+                $invalid[] = 'machine_id';
+            } elseif ($rawMachineId !== null) {
+                $machineText = trim((string)$rawMachineId);
+                if ($machineText !== '') {
+                    $parsedMachineId = filter_var($machineText, FILTER_VALIDATE_INT, [
+                        'options' => ['min_range' => 1],
+                    ]);
+                    if (!preg_match('/^[0-9]+$/', $machineText) || $parsedMachineId === false) {
+                        $invalid[] = 'machine_id';
+                    } else {
+                        $machineId = (int)$parsedMachineId;
+                    }
+                }
+            }
+        }
+
+        if (array_key_exists('section', $input)) {
+            $rawSection = $input['section'];
+            if (is_array($rawSection) || is_object($rawSection) || is_bool($rawSection) || is_float($rawSection)) {
+                $invalid[] = 'section';
+            } elseif ($rawSection !== null) {
+                $section = trim((string)$rawSection);
+                if ($section !== '' && (
+                    strlen($section) > 120
+                    || preg_match('//u', $section) !== 1
+                    || preg_match('/[\x00-\x1F\x7F]/', $section) === 1
+                )) {
+                    $invalid[] = 'section';
+                    $section = '';
+                }
+            }
+        }
+
+        return [
+            'valid' => $invalid === [],
+            'machine_id' => $machineId,
+            'section' => $section,
+            'invalid' => array_values(array_unique($invalid)),
+        ];
+    }
+
+    /**
+     * @param array<int,int> $scopeMachineIds
+     * @param array<int,int> $scopePartIds
+     * @param array<int,string> $invalidFilters
+     * @return array<string,mixed>
+     */
+    private static function emptyFilteredProjection(
+        string $today,
+        string $date,
+        string $roleSlug,
+        int $machineId,
+        string $section,
+        array $scopeMachineIds,
+        array $scopePartIds,
+        array $invalidFilters
+    ): array {
+        return [
+            'today' => $today,
+            'date' => $date,
+            'role_slug' => $roleSlug,
+            'scope' => [
+                'machine_id' => $machineId,
+                'section' => $section,
+                'assignee_mode' => 'invalid_filter',
+                'scope_machine_ids' => $scopeMachineIds,
+                'scope_part_ids' => $scopePartIds,
+            ],
+            'filters' => ['machines' => [], 'sections' => []],
+            'assigned_machines' => [],
+            'run_now' => [],
+            'next_queue' => [],
+            'delayed_jobs' => [],
+            'waiting_qc' => [],
+            'risk_jobs' => [],
+            'kpi' => [
+                'assigned_machines' => 0,
+                'run_now_jobs' => 0,
+                'next_queue_jobs' => 0,
+                'delayed_jobs' => 0,
+                'waiting_qc_jobs' => 0,
+                'risk_jobs' => 0,
+                'today_planned_qty' => null,
+                'today_produced_qty' => null,
+                'today_progress_pct' => 0.0,
+            ],
+            'quantity_provenance' => [],
+            'invalid_filters' => $invalidFilters,
+            'ownership_board' => [],
         ];
     }
 

@@ -1,5 +1,24 @@
 # AGENT-COMPLIANCE-CHECKLIST
 
+## Session Summary (2026-10-24) — OH-AUTO3-MFG-002 Scoped Machine Workboard Filters
+
+Implemented the authorized bounded machine-workboard filter slice. Shell now
+transports only `machine_id` and `section`; Manufacturing validates those
+filters and preserves existing identity scope, ordering, limits, and KPI
+semantics. Invalid nonblank machine or section input fails closed with an empty
+filtered projection rather than becoming an unrestricted request.
+
+The existing `/u/{username}/machines` surface now has localized EN/JA/NE GET
+controls and a same-user clear link. No route, permission, mutation, schema,
+database, HTTP, browser, activation, deployment, or Core operation occurred.
+
+Evidence: new database-free probe **24/24**; existing machine scope projection
+probe **27/27**; PHP lint; `git diff --check`; Core lock, operator confinement,
+and business app/module contracts PASS; architecture gates PASS; deletion-family
+gates **28/28**; deployment readiness PASS in read-only verify mode. Unrelated
+SBAIO edits, lifecycle logs, Procurement backup, prior Auto 3 reports, and
+PHPUnit cache were preserved.
+
 ## Session Summary (2026-10-22) — OH-AUTO3-006 Scoped Parts Operator Search
 
 Implemented the conditionally authorized Manufacturing Parts search slice.
@@ -20,6 +39,49 @@ passed **28/28**, and deployment readiness passed in read-only verify mode.
 Unrelated SBAIO edits, lifecycle logs, Procurement backup, prior Auto 3
 reports, and PHPUnit cache were preserved.
 
+## Session Summary (2026-10-22) — OH-AUTO3-003 Leave Security Containment and Milestone Selection
+
+Completed the read-only OH-AUTO3-003 assessment. OH-AUTO3-002 remains
+**BLOCKED**. Static analysis classified the existing Leave module as
+conditionally reachable when installed/active and assigned: route/app/module
+checks exist, but they do not provide record-level Staff ownership. The Leave
+path still has broad reads, browser-controlled `staff_id` and `leave_status`,
+literal `system` approval attribution, and approved Leave consumption by
+Timecards. No live exploitability or current activation state was claimed.
+
+Containment decision: retain sensitive SBAIO provider suppression and do not
+implement Leave self-service, identity shortcuts, approval workflows, or
+provider restoration. Selected next independent milestone proposal:
+**OH-AUTO3-004 — SBAIO Customers bounded admin create/list workflow**, pending
+Planner acceptance. The proposal requires no Staff/Leave identity, schema,
+Core, Auto 1/2, operator/display, or host-provider change.
+
+Evidence report:
+`docs/architecture/oh-auto3-003-leave-security-containment-and-milestone-selection-2026-10-22.md`.
+
+No code, database, schema, browser, HTTP, module activation, deployment,
+commit, push, or Auto 1/2 work was changed; unrelated working-tree artifacts
+were preserved.
+
+## Session Summary (2026-10-22) — OH-AUTO3-002 SBAIO Staff Identity and Leave Authorization
+
+Completed the read-only OH-AUTO3-002 contract assessment. Verified the local
+OH-AUTO3-001 continuity artifact and Auto 1/2 independence, then traced Auth,
+assignment/module route policy, SBAIO Staff identity fields, Leave routes and
+controller, host-provider suppression, and Timecard Leave consumers.
+
+Decision: **BLOCKED**. No authoritative authenticated-user-to-Staff mapping,
+organization/supervisor scope, owner-bound Leave read/write policy, finite
+lifecycle authority, or sufficient audit history exists. The existing Leave
+path accepts browser-supplied `staff_id` and `leave_status`, exposes broad
+rows, and can mark a request approved by literal `system`; approved rows feed
+Timecard generation. No implementation or workaround was authorized.
+
+Evidence report:
+`docs/architecture/oh-auto3-002-sbaio-staff-identity-leave-authorization-contract-2026-10-22.md`.
+
+No Core, SBAIO runtime, route, schema, database, browser, HTTP, Auto 1/2,
+commit, push, deployment, or unrelated working-tree artifact was changed.
 
 ## Session Summary (2026-10-21) — OH-AUTO2-PROC-004 Procurement Runtime Acceptance
 
@@ -8008,3 +8070,43 @@ backup file, and PHPUnit cache remain untouched.
   evidence.
 - [x] Focused probe:
   `apps/Manufacturing/Tests/probe_operator_processing_redirect_context.php`.
+
+# OH-AUTO3-004 — SBAIO Customers Bounded Admin Create/List (2026-10-22)
+
+- [x] Verified the existing Customers route/controller/service/schema/view
+  contract before implementation; no new route or schema was needed.
+- [x] Added server-side administrator enforcement using existing SBAIO app
+  access plus `platform_admin`/`app_admin` authority roles for list, create,
+  report, and export surfaces.
+- [x] Added schema-supported normalization/validation: required customer name,
+  field length bounds, optional email syntax, preserved arbitrary status values,
+  and the existing active default.
+- [x] Preserved existing insert shape, CSRF enforcement, duplicate behavior,
+  audit attribution, bounded descending-ID list ordering, empty state, and
+  escaped rendered values.
+- [x] Localized changed Customers UI/error labels in EN/JA/NE.
+- [x] Added database-free focused probe:
+  `apps/SBAIO/modules/Customers/Tests/probe_customers_admin_workflow.php` —
+  **24/24** assertions.
+- [x] PHP lint passed for all touched Customers PHP files; `git diff --check`
+  passed.
+- [x] Architecture gates passed; deletion-family gates passed **28/28**;
+  deployment readiness passed in read-only verify mode.
+- [x] No database, SQL, browser, HTTP, activation, deployment, Core, Staff,
+  Leave, Payroll, editing, deletion, import, or new route operation occurred.
+- [x] Unrelated working-tree artifacts were preserved.
+## Session Summary (2026-10-22) — OH-AUTO3-005 Next Functional Milestone Selection
+
+Completed the read-only OH-AUTO3-005 assessment at baseline `84e586c`. Verified
+OH-AUTO3-004 Customers integration, reconciled Auto 1/2 assignments and
+blockers, and compared eight functional candidates across Manufacturing,
+Procurement, Hospitality, Inventory, and SBAIO. Selected exactly one proposed
+next milestone: `OH-AUTO3-MFG-001 — Scoped Parts Operator Search and Filter`.
+
+The proposal is not reserved or implemented. It uses the existing authorized
+Manufacturing Parts projection and same-user detail path, adds no schema,
+route, permission, mutation, Core, database, browser, HTTP, activation,
+deployment, commit, or push operation. SBAIO Leave, Manufacturing Dispatch,
+Procurement mutations, Hospitality higher-risk workflows, and Inventory
+foundation remain blocked or deferred for their documented authorization and
+schema prerequisites. Full assessment: `docs/architecture/oh-auto3-005-next-functional-milestone-selection-2026-10-22.md`.
