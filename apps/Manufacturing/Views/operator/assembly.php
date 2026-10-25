@@ -13,6 +13,8 @@
                     $asmError = (string)($asm['error'] ?? '');
                     $asmToday = (string)($asm['today'] ?? date('Y-m-d'));
                     $asmDays = (int)($asm['days'] ?? 0);
+                    $asmRange = $asmDays === 7 ? '7d' : ($asmDays === 30 ? '30d' : 'today');
+                    $asmRangeQuery = '?date_range=' . rawurlencode($asmRange);
                     // Period label for KPI headings — today vs N-day range
                     $asmPeriodLabel = $asmDays > 0
                         ? $this->tr('operator.assembly.kpi.period_total', 'Period Total', ['days' => $asmDays])
@@ -26,8 +28,8 @@
 ?>
                     <nav class="operator-subnav" aria-label="<?php echo htmlspecialchars($this->tr('operator.processing.subnav.label', 'Processing sections')); ?>">
                         <a class="operator-subnav-item" href="/u/<?php echo $_asmSubUser; ?>/processing"><?php echo htmlspecialchars($this->tr('operator.processing.subnav.hub', 'Overview')); ?></a>
-                        <a class="operator-subnav-item operator-subnav-item--active" href="/u/<?php echo $_asmSubUser; ?>/assembly" aria-current="page"><?php echo htmlspecialchars($this->tr('operator.processing.subnav.assembly', 'Assembly')); ?></a>
-                        <a class="operator-subnav-item" href="/u/<?php echo $_asmSubUser; ?>/qc"><?php echo htmlspecialchars($this->tr('operator.processing.subnav.qc', 'QC')); ?></a>
+                        <a class="operator-subnav-item operator-subnav-item--active" href="/u/<?php echo $_asmSubUser; ?>/assembly<?php echo htmlspecialchars($asmRangeQuery); ?>" aria-current="page"><?php echo htmlspecialchars($this->tr('operator.processing.subnav.assembly', 'Assembly')); ?></a>
+                        <a class="operator-subnav-item" href="/u/<?php echo $_asmSubUser; ?>/qc<?php echo htmlspecialchars($asmRangeQuery); ?>"><?php echo htmlspecialchars($this->tr('operator.processing.subnav.qc', 'QC')); ?></a>
                     </nav>
 <section class="coverage-focus-section" aria-label="<?php echo htmlspecialchars($this->tr('operator.assembly.page_title', 'Assembly')); ?>">
                      <div class="coverage-focus-header">

@@ -141,6 +141,13 @@ namespace {
         $assert(str_contains($view, $path), "{$label} date-range control remains on its same-user route");
     }
 
+    $assert(str_contains($assemblyView, "\$asmRange = \$asmDays === 7 ? '7d' : (\$asmDays === 30 ? '30d' : 'today');") && str_contains($assemblyView, "\$asmRangeQuery = '?date_range=' . rawurlencode(\$asmRange);"), 'Assembly navigation derives an allowlisted date-range query');
+    $assert(str_contains($qcView, "\$qcRange = \$qcDays === 7 ? '7d' : (\$qcDays === 30 ? '30d' : 'today');") && str_contains($qcView, "\$qcRangeQuery = '?date_range=' . rawurlencode(\$qcRange);"), 'QC navigation derives an allowlisted date-range query');
+    $assert(substr_count($assemblyView, '$asmRangeQuery') >= 2 && substr_count($qcView, '$qcRangeQuery') >= 2, 'Assembly and QC sibling links preserve the selected range');
+    $assert(!str_contains($assemblyView, '$_GET') && !str_contains($qcView, '$_GET'), 'Assembly and QC views do not read unvalidated query input directly');
+    $assert(!str_contains($assemblyView, 'return_to') && !str_contains($qcView, 'return_to') && !str_contains($assemblyView, 'redirect_to') && !str_contains($qcView, 'redirect_to'), 'Assembly and QC navigation adds no redirect parameter');
+    $assert(!preg_match('/https?:\/\//i', $assemblyView . $qcView), 'Assembly and QC navigation cannot emit external URLs');
+
     $qcAdapter = (string)file_get_contents(APP_ROOT . '/apps/Manufacturing/Services/OperatorLayerAdapters/QcAdapter.php');
     $assert(str_contains($qcAdapter, "QcLeaderDashboardService::build(['date' => \$refDate], \$user)"), 'QC adapter forwards authenticated operator to existing provider contract');
 

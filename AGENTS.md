@@ -1,5 +1,17 @@
 # AGENTS.md
 
+## Session Summary (2026-10-25) — OH-AUTO3-MFG-UX-003 operator workflow continuity
+
+Assembly and QC operator sub-navigation now preserves the active existing
+`today`/`7d`/`30d` date-range selection across the sibling Assembly and QC
+links. The query is derived server-side from the existing projected day
+value and contains only the allowlisted `date_range` parameter. Focused proof
+passed **22/22**; PHP lint, architecture gates, deletion-family gates
+**28/28**, deployment readiness, and diff hygiene passed. No route,
+authorization, scope, workflow, schema, database, Core, deployment, activation,
+or live HTTP operation occurred; unrelated working-tree artifacts were
+preserved.
+
 ## Session Summary (2026-10-25) — OH-AUTO3-MFG-UX-001 Assembly/QC range control
 
 Added direct localized date-range controls to the Manufacturing operator

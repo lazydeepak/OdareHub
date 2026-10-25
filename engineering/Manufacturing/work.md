@@ -1,5 +1,20 @@
 # Manufacturing — Work
 
+## 2026-10-25 — OH-AUTO3-MFG-UX-003 operator workflow continuity
+
+- [x] Verified the integrated baseline and inspected existing operator workflow
+  navigation for one new context-loss defect.
+- [x] Preserved only the existing allowlisted `date_range` GET values when
+  moving between the Assembly and QC workflow views; the Overview link remains
+  unchanged because that view has no range projection.
+- [x] Added focused positive/negative regression coverage: **22/22**.
+- [x] PHP lint, architecture gates, deletion-family gates **28/28**,
+  deployment readiness, and diff hygiene passed; unrelated working-tree
+  artifacts were preserved.
+- [x] No permissions, lifecycle transitions, schema fields, Core changes,
+  database, route, deployment, activation, or external redirect behavior were
+  introduced.
+
 ## 2026-10-25 — OH-AUTO3-MFG-UX-001 operator Assembly/QC range control
 
 - [x] Selected a concrete usability gap: Assembly and QC already honor the

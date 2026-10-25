@@ -13,14 +13,16 @@
                     $qcEmpty = (bool)($qc['empty'] ?? true);
                     $qcError = (string)($qc['error'] ?? '');
                     $qcDays = (int)($qc['days'] ?? 0);
+                    $qcRange = $qcDays === 7 ? '7d' : ($qcDays === 30 ? '30d' : 'today');
+                    $qcRangeQuery = '?date_range=' . rawurlencode($qcRange);
                     $qcEmptyMsg = $qcDays > 0
                         ? $this->tr('operator.qc.empty.range', 'No QC items found in the selected period.')
                         : $this->tr('operator.qc.empty', 'No QC entries found for today.');
 ?>
                     <nav class="operator-subnav" aria-label="<?php echo htmlspecialchars($this->tr('operator.processing.subnav.label', 'Processing sections')); ?>">
                         <a class="operator-subnav-item" href="/u/<?php echo $_qcSubUser; ?>/processing"><?php echo htmlspecialchars($this->tr('operator.processing.subnav.hub', 'Overview')); ?></a>
-                        <a class="operator-subnav-item" href="/u/<?php echo $_qcSubUser; ?>/assembly"><?php echo htmlspecialchars($this->tr('operator.processing.subnav.assembly', 'Assembly')); ?></a>
-                        <a class="operator-subnav-item operator-subnav-item--active" href="/u/<?php echo $_qcSubUser; ?>/qc" aria-current="page"><?php echo htmlspecialchars($this->tr('operator.processing.subnav.qc', 'QC')); ?></a>
+                        <a class="operator-subnav-item" href="/u/<?php echo $_qcSubUser; ?>/assembly<?php echo htmlspecialchars($qcRangeQuery); ?>"><?php echo htmlspecialchars($this->tr('operator.processing.subnav.assembly', 'Assembly')); ?></a>
+                        <a class="operator-subnav-item operator-subnav-item--active" href="/u/<?php echo $_qcSubUser; ?>/qc<?php echo htmlspecialchars($qcRangeQuery); ?>" aria-current="page"><?php echo htmlspecialchars($this->tr('operator.processing.subnav.qc', 'QC')); ?></a>
                     </nav>
 <section class="coverage-focus-section" aria-label="<?php echo htmlspecialchars($this->tr('operator.qc.page_title', 'QC')); ?>">
                      <div class="coverage-focus-header">

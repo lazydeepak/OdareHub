@@ -1,5 +1,21 @@
 # AGENT-COMPLIANCE-CHECKLIST
 
+## Session Summary (2026-10-25) — OH-AUTO3-MFG-UX-003 operator workflow continuity
+
+Corrected a bounded Manufacturing operator continuity defect: Assembly and QC
+sub-navigation now carries the current existing `today`/`7d`/`30d` date-range
+selection when moving between the Assembly and QC workflow views. The views
+derive the query only from server-projected day values and emit only the
+allowlisted `date_range` parameter; no raw query input or external redirect is
+accepted.
+
+Focused Assembly/QC regression passed **22/22**; PHP lint passed. Architecture
+gates passed, deletion-family gates passed **28/28**, deployment readiness passed
+in read-only verify mode, and `git diff --check` was clean. No route was added
+or removed, no authorization/scope/workflow semantics changed, no Core,
+database, schema, deployment, activation, or live HTTP operation occurred.
+Unrelated working-tree artifacts were preserved.
+
 ## Session Summary (2026-10-25) — OH-AUTO3-MFG-UX-001 Assembly/QC range control
 
 Implemented one bounded Manufacturing operator usability improvement. Assembly
