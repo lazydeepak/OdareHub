@@ -26,6 +26,27 @@ final class HospitalityBoardAdapter
     }
 
     /**
+     * Resolve the exact reservation identity retained by the create redirect.
+     * The caller supplies only a server-side session value; no user query
+     * selector is accepted on the operator surface.
+     *
+     * @return array<string,mixed>|null
+     */
+    public static function createdReservation(int $reservationId): ?array
+    {
+        if ($reservationId <= 0) {
+            return null;
+        }
+
+        try {
+            $reservation = ReservationsService::findById($reservationId);
+            return is_array($reservation) ? $reservation : null;
+        } catch (\Throwable) {
+            return null;
+        }
+    }
+
+    /**
      * Read-only operator payload over existing Hospitality foundation services.
      *
      * @return array<string,mixed>|null

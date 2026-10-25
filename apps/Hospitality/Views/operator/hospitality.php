@@ -48,6 +48,9 @@ $tr = static fn (string $key, string $fallback): string => htmlspecialchars($tra
         unset($_SESSION['operator_hospitality_flash_ok'], $_SESSION['operator_hospitality_flash_err'], $_SESSION['operator_hospitality_created_reservation_id']);
         $csrfToken = Auth::csrfToken();
         $reservationOptions = $canManage ? HospitalityBoardAdapter::reservationFormOptions() : null;
+        $createdReservation = $createdReservationId > 0
+            ? HospitalityBoardAdapter::createdReservation($createdReservationId)
+            : null;
     ?>
     <?php if ($flashOk !== ''): ?>
     <?php
@@ -69,6 +72,46 @@ $tr = static fn (string $key, string $fallback): string => htmlspecialchars($tra
     <?php endif; ?>
     <?php if ($flashErr !== ''): ?>
     <p class="hosp-chip hosp-chip--danger"><?php echo $esc($translate(str_starts_with($flashErr, 'HOSPITALITY_RES_') ? 'hospitality.operator.flash.reservation_create_failed' : 'hospitality.operator.flash.update_failed', 'Unable to update the Hospitality action.')); ?></p>
+    <?php endif; ?>
+
+    <?php if ($flashOk === 'HOSPITALITY_RES_CREATED' && is_array($createdReservation)): ?>
+    <div class="card">
+        <h3><?php echo $tr('hospitality.operator.reservation.created_title', 'Created reservation'); ?></h3>
+        <p class="text-muted"><?php echo $tr('hospitality.operator.reservation.created_note', 'This reservation is shown here so you can continue with it even when its planned arrival is not in the upcoming-arrivals list.'); ?></p>
+        <dl>
+            <dt><?php echo $tr('hospitality.field.reservation_id', 'Reservation ID'); ?></dt>
+            <dd><?php echo $esc((int)($createdReservation['id'] ?? 0)); ?></dd>
+            <dt><?php echo $tr('hospitality.field.guest', 'Guest'); ?></dt>
+            <dd><?php echo $esc($createdReservation['guest_label'] ?? ''); ?></dd>
+            <dt><?php echo $tr('hospitality.field.room', 'Room'); ?></dt>
+            <dd><?php echo $esc(($createdReservation['room_label'] ?? '') !== '' ? $createdReservation['room_label'] : $translate('hospitality.res_unassigned_room', 'Room unassigned')); ?></dd>
+            <dt><?php echo $tr('hospitality.field.check_in_date', 'Arrival (planned)'); ?></dt>
+            <dd><?php echo $esc($createdReservation['check_in_date'] ?? ''); ?></dd>
+            <dt><?php echo $tr('hospitality.field.check_out_date', 'Departure (planned)'); ?></dt>
+            <dd><?php echo $esc($createdReservation['check_out_date'] ?? ''); ?></dd>
+            <dt><?php echo $tr('hospitality.field.status', 'Status'); ?></dt>
+            <dd><?php echo $esc($translate('hospitality.res_status.' . (string)($createdReservation['reservation_status'] ?? ''), (string)($createdReservation['reservation_status'] ?? ''))); ?></dd>
+        </dl>
+        <?php if ($canManage && (string)($createdReservation['reservation_status'] ?? '') === 'booked'): ?>
+        <div class="hosp-inline-form">
+            <form method="post" action="/u/<?php echo $esc($opUsername); ?>/hospitality/front-desk/no-show">
+                <input type="hidden" name="csrf" value="<?php echo $esc($csrfToken); ?>">
+                <input type="hidden" name="reservation_id" value="<?php echo $esc((int)($createdReservation['id'] ?? 0)); ?>">
+                <button class="btn" type="submit"><?php echo $esc($translate('hospitality.res_action.no_show', 'No Show')); ?></button>
+            </form>
+            <form method="post" action="/u/<?php echo $esc($opUsername); ?>/hospitality/front-desk/cancel">
+                <input type="hidden" name="csrf" value="<?php echo $esc($csrfToken); ?>">
+                <input type="hidden" name="reservation_id" value="<?php echo $esc((int)($createdReservation['id'] ?? 0)); ?>">
+                <button class="btn btn-danger" type="submit"><?php echo $esc($translate('hospitality.res_action.cancel', 'Cancel')); ?></button>
+            </form>
+            <form method="post" action="/u/<?php echo $esc($opUsername); ?>/hospitality/front-desk/check-in">
+                <input type="hidden" name="csrf" value="<?php echo $esc($csrfToken); ?>">
+                <input type="hidden" name="reservation_id" value="<?php echo $esc((int)($createdReservation['id'] ?? 0)); ?>">
+                <button class="btn" type="submit"><?php echo $esc($translate('hospitality.res_action.check_in', 'Check in')); ?></button>
+            </form>
+        </div>
+        <?php endif; ?>
+    </div>
     <?php endif; ?>
 
     <?php $summary = HospitalityBoardAdapter::summary(); ?>

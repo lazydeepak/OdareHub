@@ -58,6 +58,34 @@ final class ReservationsService
     }
 
     /**
+     * Read one reservation by its exact identity for the post-create operator
+     * continuation card. This is intentionally narrower than the admin list.
+     *
+     * @return array<string,mixed>|null
+     */
+    public static function findById(int $id): ?array
+    {
+        if ($id <= 0) {
+            return null;
+        }
+        self::requireSchema();
+        $row = DB::fetchOne(
+            'SELECT r.id, r.guest_id, r.room_id, r.check_in_date, r.check_out_date,
+                    r.adults, r.children, r.rate, r.reservation_status,
+                    r.actual_check_in_at, r.actual_check_out_at, r.note,
+                    g.full_name AS guest_label, rm.room_number AS room_label
+             FROM hosp_reservations r
+             LEFT JOIN hosp_guests g ON g.id = r.guest_id
+             LEFT JOIN hosp_rooms rm ON rm.id = r.room_id
+             WHERE r.id = ?
+             LIMIT 1',
+            [$id]
+        );
+
+        return is_array($row) ? $row : null;
+    }
+
+    /**
      * Active guests and rooms for the create form.
      * @return array{guests:array<int,array<string,mixed>>,rooms:array<int,array<string,mixed>>}
      */

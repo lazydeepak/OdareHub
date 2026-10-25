@@ -1,5 +1,28 @@
 # Hospitality — Decisions
 
+## 2026-10-25 — OH-AUTO3-HOSP-001 created-reservation continuation
+
+**Status: Implemented and verified within the bounded Hospitality owner boundary.**
+
+The operator create redirect may continue only through the exact positive
+reservation ID retained in the server-side session. Hospitality now performs a
+bounded joined read for that identity and renders a localized continuation card
+before the normal arrivals board. This preserves valid past-date reservations
+that the arrivals projection intentionally excludes (`check_in_date >=
+CURDATE()`) without changing date validation or lifecycle semantics.
+
+The card reuses the existing jailed check-in, cancel, and no-show routes and
+the existing `hospitality.manage`/CSRF controls. No browser reservation
+selector, new permission, route, schema, shared-app dependency, or Shell
+business logic was added. Missing, invalid, unknown, or unavailable exact
+reads fail closed.
+
+Evidence: database-free continuation probe **21/21**, operator behavioral
+probe **57/57**, input-identity probe **24/24**, PHP lint, operator confinement,
+business-app/module contracts, architecture gates, deletion-family gates
+**28/28**, deployment readiness, and diff hygiene passed. No database, browser,
+HTTP, activation, deployment, commit, or push operation occurred.
+
 ## 2026-10-21 — OH-AUTO2-HOSP-004 disposable runtime acceptance
 
 **Status:** Runtime acceptance passed in an independently attested disposable

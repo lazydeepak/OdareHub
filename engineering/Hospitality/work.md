@@ -1,5 +1,22 @@
 # Hospitality Work Log
 
+## 2026-10-25 — OH-AUTO3-HOSP-001 created-reservation continuation
+
+**Status: Complete — bounded owner-local implementation.**
+
+- [x] Preserved the existing exact created reservation identity and exposed a
+  bounded confirmation/focus card after operator creation, including valid
+  past-date reservations that are intentionally absent from the arrivals board.
+- [x] Reused the existing Hospitality read/service and jailed lifecycle routes;
+  add no route, schema, permission, shared-app, or Core authority.
+- [x] Added database-free source/behavior regression coverage and ran focused
+  lint, architecture, confinement, and diff checks.
+- [x] Continuation probe passed **21/21**; existing operator behavioral and
+  input-integrity probes passed **57/57** and **24/24**.
+- [x] Architecture gates, deletion-family gates **28/28**, and deployment
+  readiness passed in read-only verify mode. No database, browser, HTTP,
+  activation, deployment, commit, or push operation occurred.
+
 ## OH-AUTO2-HOSP-005 — Isolated authenticated HTTP acceptance
 
 Status: Complete. Development-only authenticated HTTP acceptance passed in a
