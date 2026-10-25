@@ -4,6 +4,9 @@ declare(strict_types=1);
 namespace Apps\Manufacturing\Services\OperatorLayerAdapters;
 
 use Plugins\QCEntries\Services\QcLeaderDashboardService;
+use Apps\Manufacturing\Services\ProcessingOperationService;
+
+require_once APP_ROOT . '/apps/Manufacturing/Services/ProcessingOperationService.php';
 
 /**
  * QcAdapter
@@ -15,6 +18,7 @@ final class QcAdapter
 {
     /**
      * @param int $days  0 = due today; 7 = due within last 7 days; 30 = last 30 days
+     * @param array<string,mixed>|null $user  Operator identity when used by /u/*
      * @return array{
      *   kpi: array<string,int>,
      *   run_now: array<int,array<string,mixed>>,
@@ -28,7 +32,7 @@ final class QcAdapter
      *   error: string
      * }
      */
-    public static function getData(int $days = 0): array
+    public static function getData(int $days = 0, ?array $user = null): array
     {
         $defaults = [
             'kpi' => [
@@ -51,12 +55,19 @@ final class QcAdapter
         ];
 
         try {
+            if ($user !== null) {
+                $scope = ProcessingOperationService::operatorReadScope($user);
+                if ($scope === null || $scope['denied'] || !$scope['qc_allowed']) {
+                    return $defaults;
+                }
+            }
+
             // When days > 0, use a start date so the queue shows plans from that lookback window.
             $refDate = $days > 0
                 ? date('Y-m-d', strtotime("-{$days} days"))
                 : date('Y-m-d');
 
-            $result = QcLeaderDashboardService::build(['date' => $refDate], null);
+            $result = QcLeaderDashboardService::build(['date' => $refDate], $user);
             $kpi = (array)($result['kpi'] ?? []);
             $defaults['kpi']           = [
                 'run_now'        => (int)($kpi['run_now'] ?? 0),

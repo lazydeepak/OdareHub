@@ -1,5 +1,35 @@
 # Manufacturing — Decisions
 
+### 2026-10-25 — OH-AUTO3-MFG-OWN-001 active Assembly/QC operator boundary
+
+**Status:** Implemented and verified offline under existing Processing authority
+
+**Decision**
+
+The active `/u/assembly` and `/u/qc` surfaces must use the existing
+Manufacturing operator authority before returning records. The bounded
+correction reuses `ProcessingOperationService`'s established assignment,
+Manufacturing app/module, lane, denied-scope, and `part_ids` decision; it adds
+no permission, scope field, transition, or schema contract.
+
+The Shell composer now passes the authenticated operator to both owner
+adapters. Assembly applies the returned part predicate before its existing
+query limit and fails closed when Assembly authority is absent. QC passes the
+operator through to the existing `QcLeaderDashboardService`, whose established
+part/task filtering then applies; missing or denied QC authority fails closed
+before provider reads.
+
+Unscoped adapter calls retained for non-operator compatibility consumers are
+outside this bounded `/u/*` correction and were not expanded into new runtime
+surfaces.
+
+**Evidence**
+
+`apps/Manufacturing/Tests/probe_operator_assembly_qc_scope.php` passes **8/8**;
+existing Processing scope coverage passes **35/35**. PHP lint and diff hygiene
+pass. No database, schema, Core, route, deployment, activation, or production
+operation occurred.
+
 ### 2026-10-25 — OH-AUTO3-MFG-SCOPE-002 Production operator authorization remediation
 
 **Status:** Implemented and verified offline under accepted SCOPE-001

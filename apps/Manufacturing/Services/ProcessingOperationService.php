@@ -12,6 +12,18 @@ require_once APP_ROOT . '/apps/Manufacturing/modules/MaterialManagement/Services
 final class ProcessingOperationService
 {
     /**
+     * Expose the established operator read authority to owner adapters.
+     * This is the same assignment, module, lane, and part-scope decision used
+     * by the Processing operator projection and mutation boundary.
+     *
+     * @return array{part_ids:array<int,int>,denied:bool,can_mutate:bool,assembly_allowed:bool,qc_allowed:bool}|null
+     */
+    public static function operatorReadScope(?array $user): ?array
+    {
+        return self::operatorScope($user);
+    }
+
+    /**
      * Read-only operator projection. Scope is resolved before any query and
      * the projection deliberately does not call schema initializers.
      *

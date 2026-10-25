@@ -913,7 +913,8 @@ final class OperatorSurfaceComposer
     {
         try {
             $days = $this->resolveDateRangeDays();
-            return QcAdapter::getData($days);
+            $user = Auth::user();
+            return QcAdapter::getData($days, is_array($user) ? $user : null);
         } catch (\Throwable $e) {
             error_log('OperatorSurfaceComposer::buildQcFocusData: ' . $e->getMessage());
             return ['kpi' => [], 'run_now' => [], 'pending_qc' => [], 'failed_recheck' => [], 'ready_dispatch' => [], 'sla' => [], 'today' => date('Y-m-d'), 'days' => 0, 'empty' => true, 'error' => 'operator.common.data_unavailable'];
@@ -959,7 +960,8 @@ final class OperatorSurfaceComposer
     {
         try {
             $days = $this->resolveDateRangeDays();
-            return AssemblyAdapter::getData($days);
+            $user = Auth::user();
+            return AssemblyAdapter::getData($days, is_array($user) ? $user : null);
         } catch (\Throwable $e) {
             error_log('OperatorSurfaceComposer::buildAssemblyFocusData: ' . $e->getMessage());
             return ['kpi' => [], 'today_entries' => [], 'in_progress' => [], 'pending_approval' => [], 'today' => date('Y-m-d'), 'days' => 0, 'empty' => true, 'error' => 'operator.common.data_unavailable'];

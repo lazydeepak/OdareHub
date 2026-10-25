@@ -4,6 +4,9 @@ declare(strict_types=1);
 namespace Apps\Manufacturing\Services\OperatorLayerAdapters;
 
 use App\Core\DB;
+use Apps\Manufacturing\Services\ProcessingOperationService;
+
+require_once APP_ROOT . '/apps/Manufacturing/Services/ProcessingOperationService.php';
 
 /**
  * AssemblyAdapter
@@ -15,6 +18,7 @@ final class AssemblyAdapter
 {
     /**
      * @param int $days  0 = today only; 7 = last 7 days; 30 = last 30 days
+     * @param array<string,mixed>|null $user  Operator identity when used by /u/*
      * @return array{
      *   kpi: array<string,int|float>,
      *   today_entries: array<int,array<string,mixed>>,
@@ -26,7 +30,7 @@ final class AssemblyAdapter
      *   error: string
      * }
      */
-    public static function getData(int $days = 0): array
+    public static function getData(int $days = 0, ?array $user = null): array
     {
         $defaults = [
             'kpi' => [
@@ -48,6 +52,15 @@ final class AssemblyAdapter
         ];
 
         try {
+            if ($user !== null) {
+                $scope = ProcessingOperationService::operatorReadScope($user);
+                if ($scope === null || $scope['denied'] || !$scope['assembly_allowed']) {
+                    return $defaults;
+                }
+            } else {
+                $scope = null;
+            }
+
             $today = date('Y-m-d');
             $defaults['today'] = $today;
 
@@ -57,6 +70,14 @@ final class AssemblyAdapter
             } else {
                 $dateFilter = "ae.assembly_date = ?";
                 $dateParam = $today;
+            }
+
+            $scopeSql = '';
+            $scopeParams = [];
+            if (is_array($scope) && $scope['part_ids'] !== []) {
+                $placeholders = implode(',', array_fill(0, count($scope['part_ids']), '?'));
+                $scopeSql = " AND ae.product_id IN ({$placeholders})";
+                $scopeParams = $scope['part_ids'];
             }
 
             $summary = DB::fetchOne(
@@ -69,8 +90,8 @@ final class AssemblyAdapter
                     COALESCE(SUM(planned_qty), 0) AS planned_qty,
                     COALESCE(SUM(completed_qty), 0) AS completed_qty
                  FROM mfg_assembly_entries ae
-                 WHERE {$dateFilter}",
-                [$dateParam]
+                  WHERE {$dateFilter}{$scopeSql}",
+                array_merge([$dateParam], $scopeParams)
             );
 
             if (is_array($summary)) {
@@ -91,10 +112,10 @@ final class AssemblyAdapter
                         ae.rejected_qty, ae.status, ae.note
                  FROM mfg_assembly_entries ae
                  LEFT JOIN products p ON p.id = ae.product_id
-                 WHERE {$dateFilter}
+                 WHERE {$dateFilter}{$scopeSql}
                  ORDER BY ae.assembly_date DESC, ae.status ASC, ae.id DESC
                  LIMIT 100",
-                [$dateParam]
+                array_merge([$dateParam], $scopeParams)
             ) ?: [];
 
             $defaults['in_progress'] = array_values(array_filter(

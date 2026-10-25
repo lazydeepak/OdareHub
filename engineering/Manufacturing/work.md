@@ -1,5 +1,24 @@
 # Manufacturing — Work
 
+## 2026-10-25 — OH-AUTO3-MFG-OWN-001 active Assembly/QC operator boundary
+
+- [x] Confirmed the integrated Production baseline remains `89aed08d` with
+  `origin/main` parity; completed Production scope work was not reopened.
+- [x] Verified the active `/u/assembly` and `/u/qc` routes previously loaded
+  operator data without passing the authenticated operator to their adapters.
+  Assembly queried `mfg_assembly_entries` without a part predicate and QC
+  passed `null` into the existing provider, bypassing its scope filtering.
+- [x] Reused `ProcessingOperationService`'s established assignment, module,
+  lane, denied-scope, and part-scope decision for active operator reads.
+- [x] Assembly now fails closed before reads when Assembly authority is absent
+  and applies the authorized part predicate before its existing limit. QC now
+  fails closed for denied/missing QC authority and receives the operator in
+  the existing `QcLeaderDashboardService` call.
+- [x] Added `probe_operator_assembly_qc_scope.php`; focused proof passes
+  **8/8** and existing Processing scope proof remains **35/35**.
+- [x] PHP lint and diff hygiene passed. No mutation route, schema, database,
+  Core, deployment, activation, or unrelated artifact operation occurred.
+
 ## 2026-10-25 — OH-AUTO3-MFG-SCOPE-004 strict Production input validation
 
 - [x] Replaced direct `int`/`float` coercion in both existing Shell Production
