@@ -22,6 +22,7 @@ $active = static function (int $userId, int $organizationId, array $extra = []):
         'organization_id' => $organizationId,
         'is_active' => true,
         'is_revoked' => false,
+        'organization_is_active' => true,
     ], $extra);
 };
 
@@ -65,10 +66,30 @@ $assert($duplicate['allowed'] === false && $duplicate['reason_code'] === 'duplic
 $crossUser = OrganizationMembershipResolver::resolve(7, [$active(8, 11)], null, $at);
 $assert($crossUser['allowed'] === false, 'evidence for another user cannot resolve context');
 $assert(OrganizationMembershipResolver::resolve(0, [$active(7, 11)], null, $at)['allowed'] === false, 'invalid authenticated identity fails closed');
-$assert(OrganizationMembershipResolver::resolve(7, [['user_id' => 7, 'organization_id' => 11]], null, $at)['reason_code'] === 'malformed_evidence', 'missing lifecycle evidence fails closed');
-$assert(OrganizationMembershipResolver::resolve(7, [['user_id' => 7, 'organization_id' => 11, 'is_active' => 'yes', 'is_revoked' => false]], null, $at)['reason_code'] === 'malformed_evidence', 'non-strict lifecycle values fail closed');
+$assert(OrganizationMembershipResolver::resolve(7, [['user_id' => 7, 'organization_id' => 11]], null, $at)['reason_code'] === 'organization_evidence_malformed', 'missing lifecycle evidence fails closed');
+$assert(OrganizationMembershipResolver::resolve(7, [['user_id' => 7, 'organization_id' => 11, 'is_active' => 'yes', 'is_revoked' => false]], null, $at)['reason_code'] === 'organization_evidence_malformed', 'non-strict lifecycle values fail closed');
 $assert(OrganizationMembershipResolver::resolve(7, [$active(7, 11, ['valid_until' => 'not-a-date'])], null, $at)['reason_code'] === 'malformed_evidence', 'malformed validity evidence fails closed');
 $assert(OrganizationMembershipResolver::resolve(7, [$active(7, 11, ['membership_key' => ['unsafe']])], null, $at)['reason_code'] === 'malformed_evidence', 'non-scalar membership evidence fails closed');
+
+$assert(
+    OrganizationMembershipResolver::resolve(7, [$active(7, 11, ['organization_is_active' => null])], null, $at)['reason_code'] === 'organization_evidence_malformed',
+    'missing organization lifecycle evidence fails closed'
+);
+$assert(
+    OrganizationMembershipResolver::resolve(7, [$active(7, 11, ['organization_is_active' => 'yes'])], null, $at)['reason_code'] === 'organization_evidence_malformed',
+    'malformed organization lifecycle evidence fails closed'
+);
+$assert(
+    OrganizationMembershipResolver::resolve(7, [$active(7, 11, ['organization_is_active' => false])], null, $at)['reason_code'] === 'organization_inactive',
+    'inactive organization fails closed'
+);
+$assert(
+    OrganizationMembershipResolver::resolve(7, [
+        $active(7, 11),
+        $active(7, 11, ['organization_is_active' => false]),
+    ], 11, $at)['reason_code'] === 'organization_evidence_contradictory',
+    'contradictory organization lifecycle evidence fails closed'
+);
 
 $inferred = OrganizationMembershipResolver::resolve(7, [$active(7, 11, ['email' => 'user@example.test', 'name' => 'User'])], null, $at);
 $assert($inferred['context']?->organizationId() === 11, 'descriptive fields do not alter explicit membership resolution');

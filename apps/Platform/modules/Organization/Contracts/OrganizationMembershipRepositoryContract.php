@@ -14,6 +14,10 @@ use DateTimeInterface;
 interface OrganizationMembershipRepositoryContract
 {
     /**
+     * Evidence includes strict organization lifecycle state from
+     * org_companies.is_active. A missing parent is represented as null and
+     * must be rejected by the Platform resolver.
+     *
      * @return array<int,array<string,mixed>>
      */
     public function listEvidenceForUser(int $userId, DateTimeInterface $observedAt): array;

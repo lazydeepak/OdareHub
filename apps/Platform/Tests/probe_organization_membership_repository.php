@@ -143,9 +143,25 @@ try {
     $check($historical['ok'] === true, 'inactive historical membership is retained');
 
     $evidence = $repository->listEvidenceForUser($userId, new DateTimeImmutable('2026-10-26T12:00:00+00:00'));
+    $check(($evidence[0]['organization_is_active'] ?? null) === 1, 'repository returns authoritative active organization evidence');
     $resolved = OrganizationMembershipResolver::resolve($userId, $evidence, null, new DateTimeImmutable('2026-10-26T12:00:00+00:00'));
     $check($resolved['allowed'] === true && $resolved['context']?->organizationId() === $organizationId, 'repository evidence resolves through pure resolver');
     $check($resolved['context']?->userId() === $userId, 'evidence remains bound to exact users.id');
+
+    DB::query('UPDATE org_companies SET is_active = 0 WHERE id = ?', [$organizationId]);
+    $inactiveEvidence = $repository->listEvidenceForUser($userId, new DateTimeImmutable('2026-10-26T12:00:00+00:00'));
+    $inactiveResolution = OrganizationMembershipResolver::resolve(
+        $userId,
+        $inactiveEvidence,
+        null,
+        new DateTimeImmutable('2026-10-26T12:00:00+00:00')
+    );
+    $check(
+        ($inactiveEvidence[0]['organization_is_active'] ?? null) === 0
+            && $inactiveResolution['reason_code'] === 'organization_inactive',
+        'inactive organization evidence fails closed through repository and resolver'
+    );
+    DB::query('UPDATE org_companies SET is_active = 1 WHERE id = ?', [$organizationId]);
 
     $secondOrganization = $repository->create([
         'user_id' => $userId,

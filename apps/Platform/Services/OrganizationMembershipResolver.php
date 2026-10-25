@@ -37,6 +37,7 @@ final class OrganizationMembershipResolver
 
         $effectiveAt = $at instanceof DateTimeInterface ? $at : new DateTimeImmutable('now');
         $eligible = [];
+        $organizationActivity = [];
 
         foreach ($memberships as $membership) {
             if (!is_array($membership)) {
@@ -55,9 +56,21 @@ final class OrganizationMembershipResolver
             $organizationId = self::positiveId($membership['organization_id'] ?? null);
             $active = self::strictBoolean($membership['is_active'] ?? null);
             $revoked = self::strictBoolean($membership['is_revoked'] ?? null);
+            $organizationIsActive = self::strictBoolean($membership['organization_is_active'] ?? null);
 
-            if ($organizationId === null || $active === null || $revoked === null) {
-                return self::denied('malformed_evidence', 'malformed_evidence');
+            if ($organizationId === null || $active === null || $revoked === null || $organizationIsActive === null) {
+                return self::denied('malformed_evidence', 'organization_evidence_malformed');
+            }
+
+            if (isset($organizationActivity[$organizationId])
+                && $organizationActivity[$organizationId] !== $organizationIsActive
+            ) {
+                return self::denied('malformed_evidence', 'organization_evidence_contradictory');
+            }
+            $organizationActivity[$organizationId] = $organizationIsActive;
+
+            if (!$organizationIsActive) {
+                return self::denied('organization_inactive', 'organization_inactive');
             }
 
             if (!$active || $revoked) {

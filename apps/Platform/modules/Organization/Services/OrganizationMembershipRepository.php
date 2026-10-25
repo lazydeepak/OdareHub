@@ -27,11 +27,12 @@ final class OrganizationMembershipRepository implements OrganizationMembershipRe
         }
 
         $rows = DB::fetchAll(
-            'SELECT id, user_id, organization_id, status, valid_from, valid_until,
-                    revoked_at
-             FROM org_user_memberships
-             WHERE user_id = ?
-             ORDER BY organization_id ASC, id ASC',
+            'SELECT m.id, m.user_id, m.organization_id, m.status, m.valid_from, m.valid_until,
+                    m.revoked_at, o.is_active AS organization_is_active
+             FROM org_user_memberships m
+             LEFT JOIN org_companies o ON o.id = m.organization_id
+             WHERE m.user_id = ?
+             ORDER BY m.organization_id ASC, m.id ASC',
             [$userId]
         );
 
@@ -43,6 +44,12 @@ final class OrganizationMembershipRepository implements OrganizationMembershipRe
                 'organization_id' => (int)($row['organization_id'] ?? 0),
                 'is_active' => (string)($row['status'] ?? '') === 'active',
                 'is_revoked' => (string)($row['status'] ?? '') === 'revoked',
+                // Preserve NULL when the parent organization is missing. The
+                // resolver must distinguish missing evidence from inactive.
+                'organization_is_active' => array_key_exists('organization_is_active', $row)
+                    && $row['organization_is_active'] !== null
+                    ? (int)$row['organization_is_active']
+                    : null,
                 'valid_from' => $row['valid_from'] ?? null,
                 'valid_until' => $row['valid_until'] ?? null,
             ];
