@@ -30,10 +30,10 @@ CREATE TABLE IF NOT EXISTS org_user_memberships (
     CONSTRAINT chk_org_user_membership_revocation
         CHECK (
             (status = 'revoked' AND revoked_at IS NOT NULL)
-            OR (status <> 'revoked' AND revoked_at IS NULL AND revoked_by_user_id IS NULL)
+            OR (status <> 'revoked' AND revoked_at IS NULL)
         ),
     CONSTRAINT chk_org_user_membership_activation
-        CHECK (status <> 'active' OR (activated_at IS NOT NULL AND activated_by_user_id IS NOT NULL)),
+        CHECK (status <> 'active' OR activated_at IS NOT NULL),
     CONSTRAINT fk_org_user_membership_user
         FOREIGN KEY (user_id) REFERENCES users(id)
         ON DELETE RESTRICT ON UPDATE CASCADE,
@@ -42,11 +42,11 @@ CREATE TABLE IF NOT EXISTS org_user_memberships (
         ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT fk_org_user_membership_revoked_by
         FOREIGN KEY (revoked_by_user_id) REFERENCES users(id)
-        ON DELETE SET NULL ON UPDATE CASCADE,
+        ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT fk_org_user_membership_activated_by
         FOREIGN KEY (activated_by_user_id) REFERENCES users(id)
-        ON DELETE SET NULL ON UPDATE CASCADE,
+        ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT fk_org_user_membership_created_by
         FOREIGN KEY (created_by_user_id) REFERENCES users(id)
-        ON DELETE SET NULL ON UPDATE CASCADE
+        ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

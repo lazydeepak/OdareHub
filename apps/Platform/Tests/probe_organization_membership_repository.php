@@ -31,6 +31,18 @@ use App\Services\AppSchemaSyncService;
 use Apps\Platform\Services\OrganizationMembershipResolver;
 use Plugins\Organization\Services\OrganizationMembershipRepository;
 
+if (getenv('OH_ORG_CONCURRENCY_CHILD') === '1') {
+    $childRepository = new OrganizationMembershipRepository();
+    $childResult = $childRepository->create([
+        'user_id' => (int)getenv('OH_ORG_CONCURRENT_USER_ID'),
+        'organization_id' => (int)getenv('OH_ORG_CONCURRENT_ORGANIZATION_ID'),
+        'status' => 'active',
+        'created_by_user_id' => (int)getenv('OH_ORG_ACTOR_USER_ID'),
+    ]);
+    echo json_encode($childResult, JSON_THROW_ON_ERROR) . "\n";
+    exit(($childResult['ok'] ?? false) === true ? 0 : 1);
+}
+
 $passed = 0;
 $failed = 0;
 $pass = static function (string $label) use (&$passed): void {
@@ -159,38 +171,56 @@ try {
     ]);
     $check($unknownParent['ok'] === false && $unknownParent['state'] === 'membership_parent_not_found', 'unknown organization is rejected');
 
-    if (!function_exists('pcntl_fork') || !function_exists('pcntl_waitpid')) {
-        throw new RuntimeException('pcntl fork support is required for concurrency verification');
-    }
     $concurrentUser = $insertUser("org-probe-concurrent-{$suffix}@example.test");
-    $resultBase = sys_get_temp_dir() . '/oh-org-membership-' . $suffix;
+    $childProcesses = [];
+    $childEnvironment = [
+        'PATH' => getenv('PATH') ?: '/usr/bin:/bin',
+        'HOME' => getenv('HOME') ?: '',
+        'TMPDIR' => getenv('TMPDIR') ?: sys_get_temp_dir(),
+        'OH_ORG_REPO' => getenv('OH_ORG_REPO') ?: $repositoryRoot,
+        'OH_ORG_APP_ROOT' => getenv('OH_ORG_APP_ROOT') ?: APP_ROOT,
+        'OH_ORG_DB_PID' => getenv('OH_ORG_DB_PID') ?: '',
+        'OH_ORG_DB_SOCKET' => getenv('OH_ORG_DB_SOCKET') ?: '',
+        'OH_ORG_DB_DATADIR' => getenv('OH_ORG_DB_DATADIR') ?: '',
+        'OH_ORG_DB_RESOURCE_ROOT' => getenv('OH_ORG_DB_RESOURCE_ROOT') ?: '',
+        'OH_ORG_DB_PORT' => getenv('OH_ORG_DB_PORT') ?: '',
+        'OH_ORG_DB_NAME' => getenv('OH_ORG_DB_NAME') ?: '',
+        'OH_ORG_DB_USER' => getenv('OH_ORG_DB_USER') ?: '',
+        'OH_ORG_CONCURRENCY_CHILD' => '1',
+        'OH_ORG_CONCURRENT_USER_ID' => (string)$concurrentUser,
+        'OH_ORG_CONCURRENT_ORGANIZATION_ID' => (string)$otherOrganizationId,
+        'OH_ORG_ACTOR_USER_ID' => (string)$actorId,
+    ];
     for ($index = 0; $index < 2; $index++) {
-        $path = $resultBase . '-' . $index . '.json';
-        $childResultFiles[] = $path;
-        $pid = pcntl_fork();
-        if ($pid === -1) {
-            throw new RuntimeException('pcntl_fork failed');
+        $pipes = [];
+        $process = proc_open(
+            [PHP_BINARY, __FILE__],
+            [1 => ['pipe', 'w'], 2 => ['pipe', 'w']],
+            $pipes,
+            null,
+            $childEnvironment
+        );
+        if (!is_resource($process)) {
+            throw new RuntimeException('could not start concurrency child process');
         }
-        if ($pid === 0) {
-            $childRepository = new OrganizationMembershipRepository();
-            $result = $childRepository->create([
-                'user_id' => $concurrentUser,
-                'organization_id' => $otherOrganizationId,
-                'status' => 'active',
-                'created_by_user_id' => $actorId,
-            ]);
-            file_put_contents($path, json_encode($result, JSON_THROW_ON_ERROR));
-            exit($result['ok'] === true ? 0 : 1);
-        }
-    }
-    $childStatuses = [];
-    for ($index = 0; $index < 2; $index++) {
-        $childPid = pcntl_wait($status);
-        $childStatuses[] = pcntl_wexitstatus($status);
+        $childProcesses[] = ['process' => $process, 'pipes' => $pipes];
     }
     $childResults = [];
-    foreach ($childResultFiles as $path) {
-        $childResults[] = json_decode((string)file_get_contents($path), true);
+    foreach ($childProcesses as $child) {
+        $stdout = stream_get_contents($child['pipes'][1]);
+        $stderr = stream_get_contents($child['pipes'][2]);
+        fclose($child['pipes'][1]);
+        fclose($child['pipes'][2]);
+        $exitCode = proc_close($child['process']);
+        $decoded = json_decode(trim($stdout), true);
+        if (!is_array($decoded)) {
+            throw new RuntimeException(
+                'concurrency child returned invalid JSON (exit ' . $exitCode . '): '
+                . trim($stderr) . ' stdout=' . trim($stdout)
+            );
+        }
+        $decoded['_exit_code'] = $exitCode;
+        $childResults[] = $decoded;
     }
     $successes = count(array_filter($childResults, static fn (array $result): bool => ($result['ok'] ?? false) === true));
     $conflicts = count(array_filter($childResults, static fn (array $result): bool => ($result['state'] ?? '') === 'membership_conflict'));

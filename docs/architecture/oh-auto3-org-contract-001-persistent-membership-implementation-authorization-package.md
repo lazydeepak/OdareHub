@@ -1,7 +1,7 @@
 # OH-AUTO3-ORG-CONTRACT-001 — Persistent Membership Implementation Authorization Package
 
 **Date:** 2026-10-26
-**Status:** Persistence source implemented under development-only authorization; disposable database acceptance remains inconclusive without governed `OH_ORG_*` attestation
+**Status:** Persistence source implemented; governed disposable database verification passed; runtime integration remains separately gated
 **Owner:** Platform Organization
 
 ## 1. Decision boundary
@@ -41,8 +41,8 @@ integration remain separately bounded.
    - does not grant permissions or resolve Staff.
 4. `apps/Platform/Tests/probe_organization_membership_repository.php`
    - disposable-database-only repository and constraint regression probe;
-   - refuses execution unless the isolated source-root/database authorizer is
-     present; current run was inconclusive because attestation was absent.
+    - refuses execution unless the isolated source-root/database authorizer is
+      present; the governed disposable run passed 17/17 assertions.
 
 ### Existing files that must remain unchanged in this slice
 
@@ -83,9 +83,9 @@ Required foreign keys:
 
 - `user_id REFERENCES users(id)` with `ON DELETE RESTRICT ON UPDATE CASCADE`;
 - `organization_id REFERENCES org_companies(id)` with `ON DELETE RESTRICT ON UPDATE CASCADE`;
-- `revoked_by_user_id REFERENCES users(id)` with `ON DELETE SET NULL ON UPDATE CASCADE`;
-- `activated_by_user_id REFERENCES users(id)` with `ON DELETE SET NULL ON UPDATE CASCADE`;
-- `created_by_user_id REFERENCES users(id)` with `ON DELETE SET NULL ON UPDATE CASCADE`.
+- `revoked_by_user_id REFERENCES users(id)` with `ON DELETE RESTRICT ON UPDATE CASCADE`;
+- `activated_by_user_id REFERENCES users(id)` with `ON DELETE RESTRICT ON UPDATE CASCADE`;
+- `created_by_user_id REFERENCES users(id)` with `ON DELETE RESTRICT ON UPDATE CASCADE`.
 
 Organization deletion must not silently erase membership history. User and
 organization lifecycle deletion therefore requires an explicit policy decision
@@ -113,8 +113,12 @@ Database checks and repository validation must enforce:
 
 - `valid_from IS NULL OR valid_until IS NULL OR valid_from < valid_until`;
 - `status='revoked'` requires `revoked_at IS NOT NULL`;
-- `status<>'revoked'` does not carry `revoked_at` or `revoked_by_user_id`;
-- `status='active'` requires server-derived activation time and actor evidence;
+- `status<>'revoked'` does not carry `revoked_at`;
+- `status='active'` requires server-derived activation time; the repository
+  additionally requires a positive activation actor and the foreign key
+  preserves that actor identity;
+- revoked/activation actor non-null requirements are repository-enforced because
+  MySQL 9.6 rejects `CHECK` references to foreign-key columns;
 - active records may be temporally future or expired, but the resolver must
   exclude them outside the window;
 - a new active record cannot overlap an existing active record for the same
@@ -332,7 +336,7 @@ The separately authorized repository probe must prove at minimum:
 | This design document and DB-free contract review | GO for design review |
 | New SQL migration 006 source | GO under development-only authorization; execution remains governed |
 | Repository contract/implementation | GO as Platform-owned persistence source; no runtime caller wired |
-| Disposable DB repository probe | INCONCLUSIVE until isolated disposable-database attestation is supplied |
+| Disposable DB repository probe | PASS: authorizer 24/24; repository probe 17/17 |
 | Auth/session organization-context wiring | BLOCKED; separate Core/Auth boundary approval |
 | ACL organization intersection/query enforcement | BLOCKED; separate ACL runtime approval |
 | SBAIO Staff relation or binding | BLOCKED; SBAIO owner approval and schema contract required |
@@ -344,8 +348,10 @@ The separately authorized repository probe must prove at minimum:
 **GO:** implementation-ready migration/repository source and DB-free resolver
 regression reuse. The repository source is implemented but not runtime-wired.
 
-**INCONCLUSIVE:** disposable schema/repository, concurrency, and rollback
-verification was not executed because governed database attestation was absent.
+**PASS:** fresh runner-owned disposable schema/repository verification,
+two-process concurrency, lifecycle replacement, and rollback-preservation
+evidence passed. The isolated config fingerprint remained unchanged and the
+runner cleaned all disposable resources.
 
 **BLOCKED:** installed schema execution, authenticated integration, ACL,
 Staff, Leave, Timecard, deployment, and activation. No schema, migration,
