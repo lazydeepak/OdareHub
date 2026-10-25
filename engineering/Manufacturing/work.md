@@ -1,5 +1,22 @@
 # Manufacturing — Work
 
+## 2026-10-25 — OH-AUTO3-MFG-UX-001 operator Assembly/QC range control
+
+- [x] Selected a concrete usability gap: Assembly and QC already honor the
+  existing `today`/`7d`/`30d` operator date-range contract, but their active
+  pages exposed no direct range control and required leaving the workflow for
+  Preferences.
+- [x] Added same-user GET controls to the Assembly and QC operator views using
+  only the existing three date-range values and existing adapter day semantics.
+- [x] Added a server-side allowlisted query override in Shell composition;
+  invalid or absent values continue to use the saved operator preference.
+- [x] Preserved authenticated operator forwarding, record scope, permissions,
+  lifecycle behavior, routes, and mutation contracts.
+- [x] Extended `probe_operator_assembly_qc_scope.php`; focused proof passes
+  **16/16**. PHP lint and `git diff --check` pass.
+- [x] No database, schema, route, Core, deployment, activation, or live HTTP
+  operation occurred.
+
 ## 2026-10-25 — OH-AUTO3-MFG-OWN-001 active Assembly/QC operator boundary
 
 - [x] Confirmed the integrated Production baseline remains `89aed08d` with

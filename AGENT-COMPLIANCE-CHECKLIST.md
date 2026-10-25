@@ -1,5 +1,19 @@
 # AGENT-COMPLIANCE-CHECKLIST
 
+## Session Summary (2026-10-25) — OH-AUTO3-MFG-UX-001 Assembly/QC range control
+
+Implemented one bounded Manufacturing operator usability improvement. Assembly
+and QC already consumed the existing operator `today`/`7d`/`30d` date-range
+preference, but operators had no direct control on those pages. Added localized
+same-user GET selectors and a Shell-side allowlisted query override; invalid or
+missing values preserve the saved preference. Existing authenticated operator
+arguments, scope predicates, permissions, lifecycle behavior, routes, and
+mutation contracts remain unchanged.
+
+Focused proof passed **16/16**; PHP lint and `git diff --check` passed. No Core,
+database, schema, route, deployment, activation, live HTTP, or destructive Git
+operation occurred. Unrelated working-tree artifacts were preserved.
+
 ## Session Summary (2026-10-24) — OH-AUTO3-PROC-001 Procurement Queue Filters
 
 Implemented the accepted bounded Procurement operator filter slice. The

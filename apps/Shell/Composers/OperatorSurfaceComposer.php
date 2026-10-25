@@ -129,6 +129,21 @@ final class OperatorSurfaceComposer
         if ($resolved !== null) {
             return $resolved;
         }
+
+        // Assembly and QC may request one of the existing preference ranges
+        // directly from their operator surface. Invalid or absent query
+        // values continue to use the saved operator preference.
+        $query = (array)($this->context['current_query'] ?? []);
+        $requestedRange = $query['date_range'] ?? null;
+        if (is_string($requestedRange) && in_array($requestedRange, ['today', '7d', '30d'], true)) {
+            $resolved = match ($requestedRange) {
+                '7d' => 7,
+                '30d' => 30,
+                default => 0,
+            };
+            return $resolved;
+        }
+
         try {
             $user = Auth::user();
             $userId = (int)(is_array($user) ? ($user['id'] ?? 0) : 0);

@@ -30,9 +30,18 @@
                         <a class="operator-subnav-item" href="/u/<?php echo $_asmSubUser; ?>/qc"><?php echo htmlspecialchars($this->tr('operator.processing.subnav.qc', 'QC')); ?></a>
                     </nav>
 <section class="coverage-focus-section" aria-label="<?php echo htmlspecialchars($this->tr('operator.assembly.page_title', 'Assembly')); ?>">
-                    <div class="coverage-focus-header">
-                        <h2 class="surface-title"><?php echo htmlspecialchars($this->tr('operator.assembly.page_title', 'Assembly')); ?></h2>
-                    </div>
+                     <div class="coverage-focus-header">
+                         <h2 class="surface-title"><?php echo htmlspecialchars($this->tr('operator.assembly.page_title', 'Assembly')); ?></h2>
+                         <form method="get" action="/u/<?php echo $_asmSubUser; ?>/assembly" class="prefs-select-group operator-date-range-form">
+                             <label for="assembly-date-range" class="prefs-profile-label"><?php echo htmlspecialchars($this->tr('operator.workflow.date_range.label', 'View range')); ?></label>
+                             <select id="assembly-date-range" name="date_range" class="prefs-select" aria-label="<?php echo htmlspecialchars($this->tr('operator.workflow.date_range.label', 'View range')); ?>">
+                                 <option value="today"<?php echo $asmDays === 0 ? ' selected' : ''; ?>><?php echo htmlspecialchars($this->tr('operator.workflow.date_range.today', 'Today only')); ?></option>
+                                 <option value="7d"<?php echo $asmDays === 7 ? ' selected' : ''; ?>><?php echo htmlspecialchars($this->tr('operator.workflow.date_range.7d', 'Last 7 days')); ?></option>
+                                 <option value="30d"<?php echo $asmDays === 30 ? ' selected' : ''; ?>><?php echo htmlspecialchars($this->tr('operator.workflow.date_range.30d', 'Last 30 days')); ?></option>
+                             </select>
+                             <button type="submit" class="btn-primary"><?php echo htmlspecialchars($this->tr('operator.workflow.date_range.apply', 'Apply')); ?></button>
+                         </form>
+                     </div>
                     <?php if ($asmError !== ''): ?><p class="coverage-focus-error"><?php echo htmlspecialchars($asmError); ?></p><?php endif; ?>
                     <?php if ($asmEmpty && $asmError === ''): ?>
                         <p class="coverage-focus-empty"><?php echo htmlspecialchars($asmEmptyMsg); ?></p>

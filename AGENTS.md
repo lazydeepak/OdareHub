@@ -1,5 +1,14 @@
 # AGENTS.md
 
+## Session Summary (2026-10-25) — OH-AUTO3-MFG-UX-001 Assembly/QC range control
+
+Added direct localized date-range controls to the Manufacturing operator
+Assembly and QC views for the existing `today`, `7d`, and `30d` contract.
+Shell validates the same-user GET override and falls back to the saved
+preference for invalid or absent values. Focused proof passed **16/16** with
+PHP lint and diff hygiene; no Core, database, schema, route, deployment,
+activation, live HTTP, or destructive Git operation occurred.
+
 ## Session Summary (2026-10-21) — OH-AUTO2-PROC-004 Procurement Runtime Acceptance
 
 Accepted the bounded authenticated Procurement operator request queue in a

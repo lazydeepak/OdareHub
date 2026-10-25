@@ -130,6 +130,16 @@ namespace {
     $composer = (string)file_get_contents(APP_ROOT . '/apps/Shell/Composers/OperatorSurfaceComposer.php');
     $assert(str_contains($composer, 'QcAdapter::getData($days, is_array($user) ? $user : null)'), 'active QC composer passes authenticated operator to adapter');
     $assert(str_contains($composer, 'AssemblyAdapter::getData($days, is_array($user) ? $user : null)'), 'active Assembly composer passes authenticated operator to adapter');
+    $assert(str_contains($composer, "in_array(\$requestedRange, ['today', '7d', '30d'], true)"), 'operator date-range override is restricted to existing values');
+    $assert(str_contains($composer, "'7d' => 7") && str_contains($composer, "'30d' => 30"), 'operator date-range override maps existing ranges to adapter days');
+
+    $assemblyView = (string)file_get_contents(APP_ROOT . '/apps/Manufacturing/Views/operator/assembly.php');
+    $qcView = (string)file_get_contents(APP_ROOT . '/apps/Manufacturing/Views/operator/qc.php');
+    foreach ([['Assembly', $assemblyView, '/assembly'], ['QC', $qcView, '/qc']] as [$label, $view, $path]) {
+        $assert(str_contains($view, 'name="date_range"') && str_contains($view, 'method="get"'), "{$label} exposes a GET date-range control");
+        $assert(str_contains($view, 'value="today"') && str_contains($view, 'value="7d"') && str_contains($view, 'value="30d"'), "{$label} exposes all existing date-range values");
+        $assert(str_contains($view, $path), "{$label} date-range control remains on its same-user route");
+    }
 
     $qcAdapter = (string)file_get_contents(APP_ROOT . '/apps/Manufacturing/Services/OperatorLayerAdapters/QcAdapter.php');
     $assert(str_contains($qcAdapter, "QcLeaderDashboardService::build(['date' => \$refDate], \$user)"), 'QC adapter forwards authenticated operator to existing provider contract');

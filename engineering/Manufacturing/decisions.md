@@ -1,5 +1,28 @@
 # Manufacturing — Decisions
 
+### 2026-10-25 — OH-AUTO3-MFG-UX-001 Assembly/QC range control
+
+**Status:** Implemented and verified offline under the existing operator
+preference contract
+
+**Decision**
+
+Assembly and QC operator views may expose a direct, read-only GET selector for
+the already-supported `today`, `7d`, and `30d` ranges. Shell composition
+validates the query value and maps it to the existing adapter day argument;
+invalid or missing values retain the saved `date_range` preference. The view
+controls remain confined to the same `/u/{username}/assembly` and
+`/u/{username}/qc` routes.
+
+No new preference value, permission, scope rule, lifecycle transition, route,
+schema, or mutation contract is introduced.
+
+**Evidence**
+
+`apps/Manufacturing/Tests/probe_operator_assembly_qc_scope.php` passes
+**16/16**. PHP lint and diff hygiene pass. No database, HTTP, deployment,
+activation, or Core operation occurred.
+
 ### 2026-10-25 — OH-AUTO3-MFG-OWN-001 active Assembly/QC operator boundary
 
 **Status:** Implemented and verified offline under existing Processing authority
