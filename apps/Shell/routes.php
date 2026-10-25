@@ -8,6 +8,7 @@ use Apps\Manufacturing\Services\DemandEngineService;
 use Apps\Manufacturing\Services\DispatchOpsService;
 use Apps\Platform\Services\UserAssignmentContext;
 use Apps\Manufacturing\Services\ProcessingOperationService;
+use Apps\Manufacturing\Services\ProductionOperationService;
 use Apps\Shell\Services\AdminLayerService;
 use Apps\Shell\Services\DisplayLayerService;
 use Apps\Shell\Services\OperatorLayerService;
@@ -37,6 +38,7 @@ require_once __DIR__ . '/Composers/WorkEntryComposer.php';
 require_once __DIR__ . '/Composers/DataExchangeComposer.php';
 require_once __DIR__ . '/Services/DataExchangeService.php';
 require_once APP_ROOT . '/apps/Manufacturing/Services/ProcessingOperationService.php';
+require_once APP_ROOT . '/apps/Manufacturing/Services/ProductionOperationService.php';
 
 $buildEmbeddedOperatorFragmentContext = static function ($user): array {
     $userArray = is_array($user) ? $user : (array)$user;
@@ -886,26 +888,24 @@ $router->post('/u/production/plan/status', function () use ($resolveOperatorPost
     $operatorRoute = $resolveOperatorPostRoute('production', false, 'manufacturing');
     $normalized = $operatorRoute['username'];
 
-    $planId = (int)($_POST['plan_id'] ?? 0);
+    $rawPlanId = $_POST['plan_id'] ?? null;
     $redirectTo = $normalizeOperatorRedirect($normalized, 'production', (string)($_POST['redirect_to'] ?? ''));
 
     try {
         \App\Core\Auth::requireCsrf((string)($_POST['csrf'] ?? ''), $redirectTo);
 
+        $planId = ProductionOperationService::normalizeOperatorId($rawPlanId);
         $newStatus = trim((string)($_POST['new_status'] ?? ''));
-        $allowed = ['In Progress', 'Completed'];
-        if ($planId <= 0 || !in_array($newStatus, $allowed, true)) {
+        $allowed = ['InProgress', 'Completed'];
+        if ($planId === null || !in_array($newStatus, $allowed, true)) {
             throw new \RuntimeException($operatorRouteTr('operator.production.error.invalid_status', 'Invalid plan or status.'));
         }
 
-        DB::query(
-            'UPDATE production_plans SET status = ? WHERE id = ? LIMIT 1',
-            [$newStatus, $planId]
-        );
+        ProductionOperationService::applyOperatorMutation($planId, $newStatus, $operatorRoute['user']);
 
         $_SESSION['operator_production_flash_ok'] = $operatorRouteTr('operator.production.flash.status_updated', 'Status updated.');
     } catch (\Throwable $e) {
-        $_SESSION['operator_production_flash_err'] = $e->getMessage();
+        $_SESSION['operator_production_flash_err'] = $operatorRouteTr('operator.production.error.status_update', 'Unable to update this production plan.');
     }
 
     header('Location: ' . $redirectTo, true, 302);
@@ -916,31 +916,30 @@ $router->post('/u/production/plan/create', function () use ($resolveOperatorPost
     $operatorRoute = $resolveOperatorPostRoute('production', false, 'manufacturing');
     $normalized = $operatorRoute['username'];
 
-    $planDate = trim((string)($_POST['plan_date'] ?? date('Y-m-d')));
-    $machineId = (int)($_POST['machine_id'] ?? 0);
-    $productId = (int)($_POST['product_id'] ?? 0);
+    $rawPlanDate = $_POST['plan_date'] ?? date('Y-m-d');
+    $planDate = is_scalar($rawPlanDate) ? trim((string)$rawPlanDate) : '';
+    $rawMachineId = $_POST['machine_id'] ?? null;
+    $rawProductId = $_POST['product_id'] ?? null;
 
     try {
         \App\Core\Auth::requireCsrf((string)($_POST['csrf'] ?? ''), '/u/' . $normalized . '/production');
 
-        $plannedQty = round((float)($_POST['planned_qty'] ?? 0), 2);
-        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $planDate) || $machineId <= 0 || $productId <= 0 || $plannedQty <= 0) {
+        $machineId = ProductionOperationService::normalizeOperatorId($rawMachineId);
+        $productId = ProductionOperationService::normalizeOperatorId($rawProductId);
+        $plannedQty = ProductionOperationService::normalizeOperatorQuantity($_POST['planned_qty'] ?? null);
+        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $planDate) || $machineId === null || $productId === null || $plannedQty === null || $plannedQty <= 0) {
             throw new \RuntimeException($operatorRouteTr('operator.production.error.required', 'Plan date, machine, part, and planned quantity are required.'));
         }
 
-        $user     = $operatorRoute['user'];
-        $addedBy  = trim((string)($user['email'] ?? $user['username'] ?? 'operator'));
-        $notes    = trim((string)($_POST['notes'] ?? ''));
-        $status   = 'Planned';
-        $planType = 'Manual';
-
-        DB::query(
-            'INSERT INTO production_plans
-                (plan_date, machine_id, product_id, planned_qty, sequence_no, status, plan_type,
-                 coverage_pct, shortage_qty, auto_created, notes, added_by)
-             VALUES (?,?,?,?,?,?,?,?,?,?,?,?)',
-            [$planDate, $machineId, $productId, $plannedQty, 1, $status, $planType, 0, 0, 0, $notes, $addedBy]
-        );
+        $user = $operatorRoute['user'];
+        ProductionOperationService::createOperatorPlan([
+            'plan_date' => $planDate,
+            'machine_id' => $machineId,
+            'product_id' => $productId,
+            'planned_qty' => $plannedQty,
+            'notes' => (string)($_POST['notes'] ?? ''),
+            'added_by' => trim((string)($user['email'] ?? $user['username'] ?? 'operator')),
+        ], $user);
 
         $_SESSION['operator_production_flash_ok'] = $operatorRouteTr('operator.production.flash.created', 'Production plan created.');
     } catch (\Throwable $e) {

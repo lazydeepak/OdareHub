@@ -1,5 +1,69 @@
 # Manufacturing — Work
 
+## 2026-10-25 — OH-AUTO3-MFG-SCOPE-004 strict Production input validation
+
+- [x] Replaced direct `int`/`float` coercion in both existing Shell Production
+  POST routes with Manufacturing-owned raw-input normalizers.
+- [x] Positive identifiers now accept only scalar unsigned decimal integers
+  within platform integer range; partial strings, fractions, signs, exponent
+  notation, arrays, missing values, zero, negative, and overflow values fail
+  closed.
+- [x] Production quantities now reject non-scalar, partial, non-finite,
+  negative, and overflowing values while preserving the existing finite float,
+  zero, rounding, and DECIMAL(14,2) semantics.
+- [x] Extended the isolated Production authorization probe from **14/14** to
+  **39/39**, including malformed identifiers/quantities, overflow, valid
+  values, and route-boundary static assertions.
+- [x] PHP lint and diff hygiene passed. Database, schema, Core, deployment,
+  activation, and production operations remain untouched.
+
+## 2026-10-25 — OH-AUTO3-MFG-SCOPE-002 Production operator authorization remediation
+
+- [x] Re-verified the accepted SCOPE-001 contract against current source. The
+  existing `production` module token, Manufacturing assignment context,
+  `machine_ids`/`part_ids` scope, and mutation profiles are authoritative
+  existing predicates.
+- [x] Added the Manufacturing-owned `ProductionOperationService::operatorFocus`
+  projection. It denies before reads and applies part/machine predicates before
+  grouping, ordering, and limits.
+- [x] Added Manufacturing-owned status and create authorization. Missing,
+  foreign, stale, locked, denied-scope, read-only, and noncanonical legacy
+  records fail closed.
+- [x] Replaced Shell Production direct reads with the Manufacturing projection
+  and replaced direct status/create SQL with Manufacturing delegation. Existing
+  CSRF and same-user redirect handling remain in Shell.
+- [x] Canonical operator targets are `InProgress` and `Completed`; historical
+  `Pending`/spaced `In Progress` values are not silently accepted as canonical
+  mutation states.
+- [x] Added `apps/Manufacturing/Tests/probe_operator_production_authorization.php`;
+  isolated authorization coverage passes **14/14**.
+- [x] PHP lint, existing Manufacturing operator regressions, and diff hygiene
+  passed. No Core, schema, database, deployment, activation, or push operation
+  occurred.
+
+## 2026-10-25 — OH-AUTO3-MFG-SCOPE-001 Production operator authorization contract
+
+- [x] Traced the active Production operator read path through the Shell route,
+  `OperatorSurfaceComposer::buildProductionFocusData()`, and the Production
+  operator view. Direct `daily_orders`/`production_plans` reads are not
+  pre-limit scoped.
+- [x] Traced the active status mutation path. Shell validates CSRF and an
+  opaque plan ID, then directly updates `production_plans.status` without
+  Manufacturing record authorization, owner workflow delegation, approval
+  synchronization, or proven audit-hook execution.
+- [x] Compared `ProductionOperationService::build()` with the completed
+  Processing operator contract. Existing Production row predicates are
+  reusable, but `scopeForUser()` is not an operator authority boundary and
+  must not be reused unchanged.
+- [x] Confirmed the entity workflow candidate transitions are
+  `Planned -> InProgress -> Completed`, while `Pending`, `In Progress`, and
+  `in_progress` remain compatibility values requiring owner confirmation.
+- [x] Created the design-only contract:
+  `docs/architecture/oh-auto3-mfg-scope-001-production-operator-authorization-contract.md`.
+- [x] No runtime, route, schema, database, Core, deployment, activation, or
+  unrelated-owner change was made. Implementation recommendation is
+  **OWNER DECISION REQUIRED**.
+
 ## 2026-10-24 — OH-AUTO3-MFG-002 scoped machine workboard filters
 
 - [x] Forwarded only the bounded `machine_id` and `section` query keys from

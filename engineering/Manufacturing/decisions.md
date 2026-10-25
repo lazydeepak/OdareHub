@@ -1,5 +1,72 @@
 # Manufacturing — Decisions
 
+### 2026-10-25 — OH-AUTO3-MFG-SCOPE-002 Production operator authorization remediation
+
+**Status:** Implemented and verified offline under accepted SCOPE-001
+
+**Decision**
+
+The accepted remediation uses the existing `production` module authority,
+assignment profiles, and machine/part scope. Manufacturing now owns the
+Production operator projection and record-level mutation decision. Shell only
+retains CSRF, same-user redirect, and presentation composition responsibilities.
+
+Status mutations and plan creation delegate through
+`ProductionPlanService`/EntityStore, preserving canonical workflow, approval
+status handling, and hooks. Direct Shell Production reads and writes were
+removed from the active operator path.
+
+Historical `Pending`, spaced `In Progress`, and underscored `in_progress` values
+are not silently treated as canonical mutation states. Only exact canonical
+`Planned -> InProgress -> Completed` actions are emitted and accepted.
+
+**Evidence**
+
+`apps/Manufacturing/Tests/probe_operator_production_authorization.php` passes
+**14/14**. Existing Processing **35/35**, machine **24/24**, Parts **14/14**
+and **18/18**, work/process **23/23**, PHP lint, architecture, deletion-family,
+and deployment-readiness checks are part of delivery validation.
+
+**Boundaries**
+
+No new role, permission, scope field, schema, migration, Core change, database
+operation, route, deployment, activation, or production acceptance was added.
+
+### 2026-10-25 — OH-AUTO3-MFG-SCOPE-001 Production operator authorization contract
+
+**Status:** Contract design complete — implementation requires owner decision
+
+**Decision**
+
+The active Production operator surface has a verified ownership and
+authorization defect. Shell directly reads `daily_orders` and
+`production_plans` without pre-limit operator scope and directly updates a
+Production plan by opaque ID. Manufacturing must own the authorized
+projection, record-level mutation decision, canonical transition validation,
+and delegation through the existing ProductionPlan workflow/entity path.
+
+`ProductionOperationService::build()` provides reusable scoped row-query
+logic, but its administrative `scopeForUser()` method is not sufficient for
+operator admission or mutation authority. `ProductionPlanPolicies` also does
+not provide record scope. The existing Shell mutation bypasses approval-status
+synchronization and owner hooks.
+
+No new role, permission, scope field, schema, audit table, or framework is
+authorized. The exact Production module authority token, empty-scope meaning,
+canonical status aliases, and required EntityStore audit context require
+Manufacturing owner confirmation before implementation.
+
+**Evidence**
+
+See `docs/architecture/oh-auto3-mfg-scope-001-production-operator-authorization-contract.md`.
+Existing Processing, Machines, Parts, and work/process baselines remain
+independently verified; they were not reimplemented.
+
+**Disposition**
+
+**OWNER DECISION REQUIRED.** No Production runtime implementation or cosmetic
+redirect correction should proceed until the authority points are resolved.
+
 ### 2026-10-24 — OH-AUTO3-MFG-002 machine workboard filter boundary
 
 **Status:** Implemented and verified under bounded authorization

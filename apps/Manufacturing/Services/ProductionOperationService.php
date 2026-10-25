@@ -4,9 +4,350 @@ declare(strict_types=1);
 namespace Apps\Manufacturing\Services;
 
 use App\Core\DB;
+use App\Core\EntityContext;
+
+require_once APP_ROOT . '/apps/Manufacturing/modules/ProductionPlans/ProductionPlanService.php';
 
 final class ProductionOperationService
 {
+    /**
+     * Normalize an operator-supplied positive identifier without coercing
+     * malformed input into another record ID.
+     */
+    public static function normalizeOperatorId(mixed $value): ?int
+    {
+        if (is_int($value)) {
+            return $value > 0 ? $value : null;
+        }
+        if (!is_string($value) || preg_match('/^[1-9][0-9]*$/D', $value) !== 1) {
+            return null;
+        }
+
+        $normalized = filter_var($value, FILTER_VALIDATE_INT, [
+            'options' => ['min_range' => 1],
+        ]);
+        return $normalized === false ? null : (int)$normalized;
+    }
+
+    /**
+     * Normalize the existing DECIMAL(14,2) Production quantity contract.
+     * Numeric scientific notation remains compatible with the prior float
+     * boundary, while partial, non-finite, negative, and overflowing values
+     * fail closed before route authorization or mutation.
+     */
+    public static function normalizeOperatorQuantity(mixed $value): ?float
+    {
+        if (is_string($value)) {
+            $value = trim($value);
+            if ($value === '') {
+                return null;
+            }
+        } elseif (!is_int($value) && !is_float($value)) {
+            return null;
+        }
+
+        if (!is_numeric($value)) {
+            return null;
+        }
+        $quantity = (float)$value;
+        $maximum = 999999999999.99;
+        if (!is_finite($quantity) || $quantity < 0 || $quantity > $maximum) {
+            return null;
+        }
+
+        $normalized = round($quantity, 2);
+        return is_finite($normalized) && $normalized <= $maximum ? $normalized : null;
+    }
+
+    /**
+     * Manufacturing-owned Production operator projection. Scope and module
+     * authority are resolved before any Production query is issued.
+     *
+     * @return array<string,mixed>
+     */
+    public static function operatorFocus(string $date, ?array $user): array
+    {
+        $today = date('Y-m-d');
+        $date = preg_match('/^\d{4}-\d{2}-\d{2}$/', $date) ? $date : $today;
+        $scope = self::operatorScope($user);
+        $empty = [
+            'authorized' => false,
+            'can_mutate' => false,
+            'summary' => ['low_coverage' => 0, 'shortage_parts' => 0, 'at_risk_today' => 0, 'overstock_parts' => 0],
+            'coverage_rows' => [],
+            'queue_rows' => [],
+            'products' => [],
+            'machines' => [],
+        ];
+        if ($scope === null || $scope['denied']) {
+            return $empty;
+        }
+
+        try {
+            [$productFilter, $productParams] = self::scopeFilter('d', 'product_id', $scope['part_ids']);
+            [$planFilter, $planParams] = self::scopeFilter('pp', 'product_id', $scope['part_ids']);
+            [$machineFilter, $machineParams] = self::scopeFilter('pp', 'machine_id', $scope['machine_ids']);
+
+            $summaryRow = DB::fetchOne(
+                "SELECT
+                    SUM(CASE WHEN LOWER(COALESCE(coverage_status, '')) = 'low' THEN 1 ELSE 0 END) AS low_coverage,
+                    SUM(CASE WHEN COALESCE(shortage_qty, 0) > 0 THEN 1 ELSE 0 END) AS shortage_parts,
+                    SUM(CASE WHEN LOWER(COALESCE(coverage_status, '')) = 'low' OR COALESCE(shortage_qty, 0) > 0 THEN 1 ELSE 0 END) AS at_risk_today
+                 FROM daily_orders d
+                 WHERE d.order_date = ? {$productFilter}",
+                array_merge([$today], $productParams)
+            ) ?: [];
+
+            $overstockRow = DB::fetchOne(
+                "SELECT COUNT(*) AS c FROM (
+                    SELECT d.product_id FROM daily_orders d
+                    WHERE d.order_date = ? {$productFilter}
+                    GROUP BY d.product_id
+                    HAVING COALESCE(MAX(d.usable_stock_qty), 0) > COALESCE(SUM(d.qty), 0)
+                 ) overstock_sub",
+                array_merge([$today], $productParams)
+            ) ?: [];
+
+            $coverageRows = DB::fetchAll(
+                "SELECT d.product_id AS part_id,
+                        COALESCE(NULLIF(TRIM(p.parts_name), ''), CONCAT('Part #', d.product_id)) AS part_name,
+                        COALESCE(NULLIF(TRIM(p.parts_number), ''), '-') AS part_number,
+                        MIN(COALESCE(d.coverage_pct, 100)) AS coverage_pct,
+                        SUM(COALESCE(d.shortage_qty, 0)) AS shortage_qty
+                 FROM daily_orders d LEFT JOIN products p ON p.id = d.product_id
+                 WHERE d.order_date = ? {$productFilter}
+                   AND (LOWER(COALESCE(d.coverage_status, '')) = 'low' OR COALESCE(d.shortage_qty, 0) > 0)
+                 GROUP BY d.product_id, part_name, part_number
+                 ORDER BY shortage_qty DESC, coverage_pct ASC, part_name ASC LIMIT 8",
+                array_merge([$today], $productParams)
+            );
+
+            $queueRows = DB::fetchAll(
+                "SELECT pp.id, pp.plan_date, pp.planned_qty, pp.status,
+                        COALESCE(pp.coverage_pct, 0) AS coverage_pct,
+                        COALESCE(pp.shortage_qty, 0) AS shortage_qty,
+                        COALESCE(NULLIF(TRIM(p.parts_name), ''), CONCAT('Part #', pp.product_id)) AS part_name,
+                        COALESCE(NULLIF(TRIM(p.parts_number), ''), '-') AS part_number,
+                        COALESCE(NULLIF(TRIM(m.machine_name), ''), COALESCE(NULLIF(TRIM(m.machine_no), ''), '-')) AS machine_label
+                 FROM production_plans pp
+                 LEFT JOIN products p ON p.id = pp.product_id
+                 LEFT JOIN machines m ON m.id = pp.machine_id
+                 WHERE pp.plan_date >= ? {$planFilter} {$machineFilter}
+                 ORDER BY pp.plan_date ASC, pp.id DESC LIMIT 30",
+                array_merge([$today], $planParams, $machineParams)
+            );
+
+            foreach ($queueRows as &$row) {
+                $status = strtolower(trim((string)($row['status'] ?? '')));
+                $row['can_start'] = $scope['can_mutate'] && $status === 'planned';
+                $row['can_complete'] = $scope['can_mutate'] && $status === 'inprogress';
+            }
+            unset($row);
+
+            [$productWhere, $productListParams] = self::scopeFilter('', 'id', $scope['part_ids']);
+            [$machineWhere, $machineListParams] = self::scopeFilter('', 'id', $scope['machine_ids']);
+            $products = DB::fetchAll(
+                "SELECT id, parts_name, parts_number FROM products WHERE {$productWhere} ORDER BY parts_name ASC, id ASC LIMIT 200",
+                $productListParams
+            );
+            $machines = DB::fetchAll(
+                "SELECT id, machine_no, machine_name FROM machines WHERE is_active = 1 AND {$machineWhere} ORDER BY machine_no ASC, machine_name ASC, id ASC",
+                $machineListParams
+            );
+
+            return [
+                'authorized' => true,
+                'can_mutate' => $scope['can_mutate'],
+                'summary' => [
+                    'low_coverage' => (int)($summaryRow['low_coverage'] ?? 0),
+                    'shortage_parts' => (int)($summaryRow['shortage_parts'] ?? 0),
+                    'at_risk_today' => (int)($summaryRow['at_risk_today'] ?? 0),
+                    'overstock_parts' => (int)($overstockRow['c'] ?? 0),
+                ],
+                'coverage_rows' => $coverageRows,
+                'queue_rows' => $queueRows,
+                'products' => $products,
+                'machines' => $machines,
+            ];
+        } catch (\Throwable) {
+            return $empty;
+        }
+    }
+
+    /** @return array{allowed:bool,reason:string} */
+    public static function authorizeOperatorMutation(string $operation, int $recordId, string $newStatus, ?array $user): array
+    {
+        $scope = self::operatorScope($user);
+        $target = self::canonicalOperatorStatus($newStatus);
+        if ($scope === null || $scope['denied'] || !$scope['can_mutate']) {
+            return ['allowed' => false, 'reason' => 'operator_production_unauthorized'];
+        }
+        if (strtolower(trim($operation)) !== 'production_status' || $recordId <= 0 || $target === null) {
+            return ['allowed' => false, 'reason' => 'operator_production_invalid_transition'];
+        }
+
+        [$productSql, $productParams] = self::scopeFilter('pp', 'product_id', $scope['part_ids']);
+        [$machineSql, $machineParams] = self::scopeFilter('pp', 'machine_id', $scope['machine_ids']);
+        $row = DB::fetchOne(
+            "SELECT pp.id, pp.status, pp.locked_at, pp.product_id, pp.machine_id
+             FROM production_plans pp
+             WHERE pp.id = ? {$productSql} {$machineSql} LIMIT 1",
+            array_merge([$recordId], $productParams, $machineParams)
+        );
+        if (!is_array($row)) {
+            return ['allowed' => false, 'reason' => 'operator_production_record_denied'];
+        }
+        if (trim((string)($row['locked_at'] ?? '')) !== '') {
+            return ['allowed' => false, 'reason' => 'operator_production_record_locked'];
+        }
+
+        $current = strtolower(trim((string)($row['status'] ?? '')));
+        $allowed = ($current === 'planned' && $target === 'InProgress')
+            || ($current === 'inprogress' && $target === 'Completed');
+        return ['allowed' => $allowed, 'reason' => $allowed ? '' : 'operator_production_transition_denied'];
+    }
+
+    public static function applyOperatorMutation(int $recordId, string $newStatus, ?array $user): bool
+    {
+        $decision = self::authorizeOperatorMutation('production_status', $recordId, $newStatus, $user);
+        if (!$decision['allowed']) {
+            throw new \RuntimeException((string)$decision['reason']);
+        }
+        return \Plugins\ProductionPlans\ProductionPlanService::quickStatusUpdate(
+            $recordId,
+            self::canonicalOperatorStatus($newStatus) ?? $newStatus,
+            EntityContext::fromUser($user)
+        );
+    }
+
+    /** @return array{allowed:bool,reason:string} */
+    public static function authorizeOperatorCreate(int $machineId, int $productId, ?array $user): array
+    {
+        $scope = self::operatorScope($user);
+        if ($scope === null || $scope['denied'] || !$scope['can_mutate']) {
+            return ['allowed' => false, 'reason' => 'operator_production_unauthorized'];
+        }
+        if ($machineId <= 0 || $productId <= 0
+            || ($scope['machine_ids'] !== [] && !in_array($machineId, $scope['machine_ids'], true))
+            || ($scope['part_ids'] !== [] && !in_array($productId, $scope['part_ids'], true))) {
+            return ['allowed' => false, 'reason' => 'operator_production_record_denied'];
+        }
+        $machine = DB::fetchOne('SELECT id FROM machines WHERE id = ? AND is_active = 1 LIMIT 1', [$machineId]);
+        $product = DB::fetchOne('SELECT id FROM products WHERE id = ? AND is_active = 1 LIMIT 1', [$productId]);
+        if (!is_array($machine) || !is_array($product)) {
+            return ['allowed' => false, 'reason' => 'operator_production_record_missing'];
+        }
+        return ['allowed' => true, 'reason' => ''];
+    }
+
+    /** @param array<string,mixed> $data */
+    public static function createOperatorPlan(array $data, ?array $user): int
+    {
+        $machineId = (int)($data['machine_id'] ?? 0);
+        $productId = (int)($data['product_id'] ?? 0);
+        $decision = self::authorizeOperatorCreate($machineId, $productId, $user);
+        if (!$decision['allowed']) {
+            throw new \RuntimeException((string)$decision['reason']);
+        }
+        return \Plugins\ProductionPlans\ProductionPlanService::create([
+            'plan_date' => (string)($data['plan_date'] ?? date('Y-m-d')),
+            'machine_id' => $machineId,
+            'product_id' => $productId,
+            'planned_qty' => (float)($data['planned_qty'] ?? 0),
+            'sequence_no' => 1,
+            'status' => 'Planned',
+            'plan_type' => 'Manual',
+            'coverage_pct' => 0,
+            'shortage_qty' => 0,
+            'auto_created' => 0,
+            'notes' => trim((string)($data['notes'] ?? '')),
+            'added_by' => trim((string)($data['added_by'] ?? 'operator')),
+        ], EntityContext::fromUser($user));
+    }
+
+    /** @return array{machine_ids:array<int,int>,part_ids:array<int,int>,denied:bool,can_mutate:bool}|null */
+    private static function operatorScope(?array $user): ?array
+    {
+        if (!is_array($user) || (int)($user['id'] ?? 0) <= 0
+            || !function_exists('platform_user_context_contract')
+            || !function_exists('platform_user_access_policy_contract')) {
+            return null;
+        }
+        try {
+            $context = platform_user_context_contract()->resolveUserContext($user);
+            $apps = array_map(static fn($v): string => strtolower(trim((string)$v)), (array)($context['active_assigned_apps'] ?? $context['assigned_apps'] ?? []));
+            $policy = platform_user_access_policy_contract();
+            if (!in_array('manufacturing', $apps, true) || !$policy->isAppEnabled('manufacturing') || !$policy->canAccessModule($user, 'production')) {
+                return null;
+            }
+            $rawScope = (array)($context['scope'] ?? []);
+            foreach (['machine_ids', 'part_ids'] as $key) {
+                if (!array_key_exists($key, $rawScope) || !is_array($rawScope[$key])) return null;
+            }
+            $denied = false;
+            $out = [];
+            foreach (['machine_ids', 'part_ids'] as $key) {
+                $raw = $rawScope[$key];
+                if (count($raw) === 1 && (($raw[0] ?? null) === -1 || (string)($raw[0] ?? '') === '-1')) {
+                    $denied = true;
+                    $out[$key] = [];
+                    continue;
+                }
+                if (in_array(-1, $raw, true) || in_array('-1', array_map('strval', $raw), true)) return null;
+                $values = [];
+                foreach ($raw as $value) {
+                    if (is_int($value) && $value > 0) $values[] = $value;
+                    elseif (is_string($value) && preg_match('/^[1-9][0-9]*$/', $value) === 1) {
+                        $parsed = filter_var($value, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+                        if ($parsed === false) return null;
+                        $values[] = (int)$parsed;
+                    } else return null;
+                }
+                $out[$key] = array_values(array_unique($values));
+                sort($out[$key]);
+            }
+            return [
+                'machine_ids' => $out['machine_ids'],
+                'part_ids' => $out['part_ids'],
+                'denied' => $denied,
+                'can_mutate' => self::canMutateFromAssignmentContext($context),
+            ];
+        } catch (\Throwable) {
+            return null;
+        }
+    }
+
+    private static function canMutateFromAssignmentContext(array $context): bool
+    {
+        $profiles = array_values(array_filter(array_map(static fn($v): string => strtolower(trim((string)$v)), (array)($context['access_profiles'] ?? []))));
+        $roles = array_values(array_filter(array_map(static fn($v): string => strtolower(trim((string)$v)), (array)($context['app_roles'] ?? []))));
+        $duties = $context['duty_codes'] ?? [];
+        $duties = is_string($duties) ? (preg_split('/\s*,\s*/', strtolower(trim($duties))) ?: []) : array_map(static fn($v): string => strtolower(trim((string)$v)), (array)$duties);
+        if (array_intersect(['readonly_observer', 'read_only', 'display', 'materials_readonly'], array_merge($profiles, $roles, $duties)) !== []) return false;
+        foreach (['authority_role', 'account_class'] as $field) if (array_key_exists($field, $context) && !is_string($context[$field])) return false;
+        if (in_array(strtolower(trim((string)($context['authority_role'] ?? ''))), ['tv_display'], true)) return false;
+        if ($profiles === []) return false;
+        return array_intersect(['production_operations', 'production_coordination', 'manufacturing_planning', 'manufacturing_admin'], $profiles) !== []
+            || array_intersect(['production_leader'], $roles) !== [];
+    }
+
+    /** @return array{0:string,1:array<int,int>} */
+    private static function scopeFilter(string $alias, string $column, array $ids): array
+    {
+        if ($ids === []) return ['1=1', []];
+        $qualified = $alias !== '' ? $alias . '.' : '';
+        return [$qualified . $column . ' IN (' . implode(',', array_fill(0, count($ids), '?')) . ')', $ids];
+    }
+
+    private static function canonicalOperatorStatus(string $status): ?string
+    {
+        return match (strtolower(trim($status))) {
+            'inprogress' => 'InProgress',
+            'completed' => 'Completed',
+            default => null,
+        };
+    }
+
     /**
      * @return array<string,mixed>
      */

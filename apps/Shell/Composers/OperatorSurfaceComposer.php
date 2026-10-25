@@ -14,6 +14,7 @@ use Apps\Manufacturing\Services\OperatorLayerAdapters\DispatchAdapter;
 use Apps\Manufacturing\Services\OperatorLayerAdapters\MachinesAdapter;
 use Apps\Manufacturing\Services\OperatorPartsWorkspaceService;
 use Apps\Manufacturing\Services\OperatorLayerAdapters\ProcessingAdapter;
+use Apps\Manufacturing\Services\ProductionOperationService;
 use Apps\Manufacturing\Services\OperatorLayerAdapters\WorkProcessSummaryAdapter;
 use Apps\Manufacturing\Services\OperatorLayerAdapters\MaterialsAdapter;
 use Apps\Shell\Services\OperatorLayerAdapters\PartDetailAdapter;
@@ -30,6 +31,7 @@ use Plugins\Base\Services\NotificationService;
 
 require_once __DIR__ . '/../Services/OperatorSurfaceContributionRegistry.php';
 require_once APP_ROOT . '/apps/Manufacturing/Services/OperatorLayerAdapters/ProcessingAdapter.php';
+require_once APP_ROOT . '/apps/Manufacturing/Services/ProductionOperationService.php';
 require_once APP_ROOT . '/apps/Manufacturing/Services/OperatorLayerAdapters/WorkProcessSummaryAdapter.php';
 require_once __DIR__ . '/../Services/PlatformWidgetBlueprintRuntimeService.php';
 require_once __DIR__ . '/../Services/OperatorLayerWidgetService.php';
@@ -1511,100 +1513,7 @@ final class OperatorSurfaceComposer
     private function buildProductionFocusData(): array
     {
         $today = (new \DateTimeImmutable('today'))->format('Y-m-d');
-        $summary = [
-            'low_coverage' => 0,
-            'shortage_parts' => 0,
-            'at_risk_today' => 0,
-            'overstock_parts' => 0,
-        ];
-
-        $coverageRows = [];
-        $queueRows = [];
-        $products = [];
-        $machines = [];
-
-        try {
-            $summaryRow = DB::fetchOne(
-                "SELECT
-                    SUM(CASE WHEN LOWER(COALESCE(coverage_status, '')) = 'low' THEN 1 ELSE 0 END) AS low_coverage,
-                    SUM(CASE WHEN COALESCE(shortage_qty, 0) > 0 THEN 1 ELSE 0 END) AS shortage_parts,
-                    SUM(CASE WHEN LOWER(COALESCE(coverage_status, '')) = 'low' OR COALESCE(shortage_qty, 0) > 0 THEN 1 ELSE 0 END) AS at_risk_today
-                 FROM daily_orders
-                 WHERE order_date = ?",
-                [$today]
-            ) ?: [];
-
-            $overstockRow = DB::fetchOne(
-                "SELECT COUNT(*) AS c
-                 FROM (
-                    SELECT d.product_id
-                    FROM daily_orders d
-                    WHERE d.order_date = ?
-                    GROUP BY d.product_id
-                    HAVING COALESCE(MAX(d.usable_stock_qty), 0) > COALESCE(SUM(d.qty), 0)
-                 ) overstock_sub",
-                [$today]
-            ) ?: [];
-
-            $summary = [
-                'low_coverage' => (int)($summaryRow['low_coverage'] ?? 0),
-                'shortage_parts' => (int)($summaryRow['shortage_parts'] ?? 0),
-                'at_risk_today' => (int)($summaryRow['at_risk_today'] ?? 0),
-                'overstock_parts' => (int)($overstockRow['c'] ?? 0),
-            ];
-
-            $coverageRows = DB::fetchAll(
-                "SELECT
-                    d.product_id AS part_id,
-                    COALESCE(NULLIF(TRIM(p.parts_name), ''), CONCAT('Part #', d.product_id)) AS part_name,
-                    COALESCE(NULLIF(TRIM(p.parts_number), ''), '-') AS part_number,
-                    MIN(COALESCE(d.coverage_pct, 100)) AS coverage_pct,
-                    SUM(COALESCE(d.shortage_qty, 0)) AS shortage_qty
-                 FROM daily_orders d
-                 LEFT JOIN products p ON p.id = d.product_id
-                 WHERE d.order_date = ?
-                   AND (LOWER(COALESCE(d.coverage_status, '')) = 'low' OR COALESCE(d.shortage_qty, 0) > 0)
-                 GROUP BY d.product_id, part_name, part_number
-                 ORDER BY shortage_qty DESC, coverage_pct ASC, part_name ASC
-                 LIMIT 8",
-                [$today]
-            );
-
-            $queueRows = DB::fetchAll(
-                "SELECT
-                    pp.id,
-                    pp.plan_date,
-                    pp.planned_qty,
-                    pp.status,
-                    COALESCE(pp.coverage_pct, 0) AS coverage_pct,
-                    COALESCE(pp.shortage_qty, 0) AS shortage_qty,
-                    COALESCE(NULLIF(TRIM(p.parts_name), ''), CONCAT('Part #', pp.product_id)) AS part_name,
-                    COALESCE(NULLIF(TRIM(p.parts_number), ''), '-') AS part_number,
-                    COALESCE(NULLIF(TRIM(m.machine_name), ''), COALESCE(NULLIF(TRIM(m.machine_no), ''), '-')) AS machine_label
-                 FROM production_plans pp
-                 LEFT JOIN products p ON p.id = pp.product_id
-                 LEFT JOIN machines m ON m.id = pp.machine_id
-                 WHERE pp.plan_date >= ?
-                 ORDER BY pp.plan_date ASC, pp.id DESC
-                 LIMIT 30",
-                [$today]
-            );
-
-            $products = DB::fetchAll(
-                "SELECT id, parts_name, parts_number
-                 FROM products
-                 ORDER BY parts_name ASC, id ASC
-                 LIMIT 200"
-            );
-
-            $machines = DB::fetchAll(
-                "SELECT id, machine_no, machine_name
-                 FROM machines
-                 ORDER BY machine_no ASC, machine_name ASC, id ASC"
-            );
-        } catch (\Throwable $e) {
-            error_log('OperatorSurfaceComposer::buildProductionFocusData: ' . $e->getMessage());
-        }
+        $projection = ProductionOperationService::operatorFocus($today, Auth::user());
 
         $productionFlash = (string)($_SESSION['operator_production_flash_ok'] ?? '');
         $productionError = (string)($_SESSION['operator_production_flash_err'] ?? '');
@@ -1613,11 +1522,13 @@ final class OperatorSurfaceComposer
         return [
             'title' => $this->tr('operator.production.title', 'Production'),
             'subtitle' => $this->tr('operator.production.subtitle', 'Plans queue, coverage, and quick plan creation in one workspace.'),
-            'summary' => $summary,
-            'coverage_rows' => $coverageRows,
-            'queue_rows' => $queueRows,
-            'products' => $products,
-            'machines' => $machines,
+            'authorized' => !empty($projection['authorized']),
+            'can_mutate' => !empty($projection['can_mutate']),
+            'summary' => (array)($projection['summary'] ?? []),
+            'coverage_rows' => (array)($projection['coverage_rows'] ?? []),
+            'queue_rows' => (array)($projection['queue_rows'] ?? []),
+            'products' => (array)($projection['products'] ?? []),
+            'machines' => (array)($projection['machines'] ?? []),
             'today' => $today,
             'create_action' => '/u/' . urlencode($this->username) . '/production/plan/create',
             'list_url' => '/u/' . $this->username . '/production',

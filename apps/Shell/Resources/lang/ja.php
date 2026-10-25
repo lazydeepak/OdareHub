@@ -251,6 +251,7 @@ return [
     'operator.processing.flash.qc_saved' => '',
     'operator.processing.flash.qc_updated' => '',
     'operator.production.error.invalid_status' => '',
+    'operator.production.error.status_update' => '',
     'operator.production.error.required' => '',
     'operator.production.flash.created' => '',
     'operator.production.flash.status_updated' => '',

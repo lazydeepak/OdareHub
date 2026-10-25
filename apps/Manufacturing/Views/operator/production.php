@@ -46,6 +46,7 @@
                             </div>
                         </div>
 
+                        <?php if (!empty($production['can_mutate'])): ?>
                         <section class="surface-card" aria-label="<?php echo htmlspecialchars($this->tr('operator.production.create.title', 'Create Production Plan')); ?>">
                             <h3 class="work-entry-embed-title"><?php echo htmlspecialchars($this->tr('operator.production.create.title', 'Create Production Plan')); ?></h3>
                             <div class="production-focus-actions u-mb-10">
@@ -100,6 +101,7 @@
                             </form>
                             </div>
                         </section>
+                        <?php endif; ?>
 
                         <div class="recent-focus-table-wrap">
                             <table class="recent-focus-table">
@@ -134,15 +136,15 @@
                                                         $planId = (int)($planRow['id'] ?? 0);
                                                         $productionReturnUrl = '/u/' . urlencode((string)($data['username'] ?? '')) . '/production';
                                                     ?>
-                                                    <?php if ($planStatus === 'planned' || $planStatus === 'pending'): ?>
+                                                    <?php if (!empty($production['can_mutate']) && !empty($planRow['can_start'])): ?>
                                                         <form method="post" action="/u/<?php echo urlencode((string)($data['username'] ?? '')); ?>/production/plan/status" class="u-inline-form">
                                                             <input type="hidden" name="csrf" value="<?php echo htmlspecialchars((string)\App\Core\Auth::csrfToken()); ?>">
                                                             <input type="hidden" name="plan_id" value="<?php echo $planId; ?>">
-                                                            <input type="hidden" name="new_status" value="In Progress">
+                                                            <input type="hidden" name="new_status" value="InProgress">
                                                             <input type="hidden" name="redirect_to" value="<?php echo htmlspecialchars($productionReturnUrl); ?>">
                                                             <button class="btn ok" type="submit"><?php echo htmlspecialchars($this->tr('operator.production.action.start', 'Start')); ?></button>
                                                         </form>
-                                                    <?php elseif ($planStatus === 'in progress' || $planStatus === 'in_progress'): ?>
+                                                    <?php elseif (!empty($production['can_mutate']) && !empty($planRow['can_complete'])): ?>
                                                         <form method="post" action="/u/<?php echo urlencode((string)($data['username'] ?? '')); ?>/production/plan/status" class="u-inline-form">
                                                             <input type="hidden" name="csrf" value="<?php echo htmlspecialchars((string)\App\Core\Auth::csrfToken()); ?>">
                                                             <input type="hidden" name="plan_id" value="<?php echo $planId; ?>">

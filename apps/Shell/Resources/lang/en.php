@@ -251,6 +251,7 @@ return [
     'operator.processing.flash.qc_saved' => 'QC plan saved.',
     'operator.processing.flash.qc_updated' => 'QC plan status updated.',
     'operator.production.error.invalid_status' => 'Invalid plan or status.',
+    'operator.production.error.status_update' => 'Unable to update this production plan.',
     'operator.production.error.required' => 'Plan date, machine, part, and planned quantity are required.',
     'operator.production.flash.created' => 'Production plan created.',
     'operator.production.flash.status_updated' => 'Status updated.',
