@@ -166,8 +166,61 @@ namespace {
     }
     $jaLocale = require __DIR__ . '/../Resources/lang/ja.php';
     $neLocale = require __DIR__ . '/../Resources/lang/ne.php';
-    $assert(($jaLocale['sbaio.customers.title'] ?? '') === '顧客ダッシュボード', 'Japanese Customers title is localized');
-    $assert(($neLocale['sbaio.customers.title'] ?? '') === 'ग्राहक ड्यासबोर्ड', 'Nepali Customers title is localized');
+    $expectedLocalized = [
+        'ja' => [
+            'common.status_label' => 'ステータス',
+            'customers.active_message' => '有効',
+            'customers.by_status_title' => 'ステータス別',
+            'customers.created_column' => '作成日時',
+            'customers.customer_snapshot_title' => '顧客スナップショット',
+            'customers.customers_export_title' => '顧客エクスポート',
+            'customers.customers_report_title' => '顧客レポート',
+            'customers.export_active_message' => 'レポートキーのエクスポートは有効です',
+            'customers.export_unavailable_message' => 'モジュールが無効または未登録のため、エクスポートを利用できません。',
+            'customers.open_link' => 'エクスポートを開く',
+            'customers.report_description' => 'ステータス別集計と連絡先情報を含む顧客マスターのスナップショットです。',
+            'customers.report_key_label' => 'レポートキー',
+            'customers.report_unavailable_message' => '所有モジュールが無効または未登録のため、このレポートは利用できません。',
+            'sbaio.customers.create' => '顧客を作成',
+            'sbaio.customers.created' => '顧客を作成しました。',
+            'sbaio.customers.description' => 'SBAIO の顧客アカウントと関係情報を管理するワークスペースです。',
+            'sbaio.customers.empty_desc' => '顧客情報はまだありません。このモジュールはインストール済みで利用できます。',
+            'sbaio.customers.form_desc' => '売上や経費レポートと並べて顧客連絡先を管理するための画面です。',
+            'sbaio.customers.form_title' => '顧客を追加',
+            'sbaio.customers.records' => '顧客レコード',
+            'sbaio.customers.required' => '顧客名は必須です。',
+            'sbaio.customers.title' => '顧客ダッシュボード',
+        ],
+        'ne' => [
+            'common.status_label' => 'स्थिति',
+            'customers.active_message' => 'सक्रिय',
+            'customers.by_status_title' => 'स्थितिअनुसार',
+            'customers.created_column' => 'सिर्जना गरिएको',
+            'customers.customer_snapshot_title' => 'ग्राहक स्न्यापसट',
+            'customers.customers_export_title' => 'ग्राहक निर्यात',
+            'customers.customers_report_title' => 'ग्राहक रिपोर्ट',
+            'customers.export_active_message' => 'रिपोर्ट कुञ्जीका लागि निर्यात सक्रिय छ',
+            'customers.export_unavailable_message' => 'मोड्युल निष्क्रिय वा दर्ता नभएकाले निर्यात उपलब्ध छैन।',
+            'customers.open_link' => 'निर्यात खोल्नुहोस्',
+            'customers.report_description' => 'स्थिति मिश्रण र सम्पर्क विवरणको उपलब्धतासहित ग्राहक मास्टरको स्न्यापसट।',
+            'customers.report_key_label' => 'रिपोर्ट कुञ्जी',
+            'customers.report_unavailable_message' => 'स्वामी मोड्युल निष्क्रिय वा दर्ता नभएकाले यो रिपोर्ट उपलब्ध छैन।',
+            'sbaio.customers.create' => 'ग्राहक सिर्जना गर्नुहोस्',
+            'sbaio.customers.created' => 'ग्राहक सिर्जना भयो।',
+            'sbaio.customers.description' => 'SBAIO का लागि ग्राहक खाता र सम्बन्ध व्यवस्थापन कार्यक्षेत्र।',
+            'sbaio.customers.empty_desc' => 'अहिलेसम्म ग्राहक रेकर्ड छैनन्। यो मोड्युल स्थापना भएको र तयार छ।',
+            'sbaio.customers.form_desc' => 'बिक्री र खर्च रिपोर्टसँगै ग्राहक सम्पर्कहरू देखाइराख्न यो कार्यक्षेत्र प्रयोग गर्नुहोस्।',
+            'sbaio.customers.form_title' => 'ग्राहक थप्नुहोस्',
+            'sbaio.customers.records' => 'ग्राहक रेकर्डहरू',
+            'sbaio.customers.required' => 'ग्राहकको नाम आवश्यक छ।',
+            'sbaio.customers.title' => 'ग्राहक ड्यासबोर्ड',
+        ],
+    ];
+    foreach (['ja' => $jaLocale, 'ne' => $neLocale] as $locale => $values) {
+        foreach ($expectedLocalized[$locale] as $key => $expected) {
+            $assert(($values[$key] ?? null) === $expected, $locale . ' localizes active Customers key ' . $key);
+        }
+    }
 
     $command = [PHP_BINARY, __FILE__, 'denied'];
     $descriptorSpec = [1 => ['pipe', 'w'], 2 => ['pipe', 'w']];
