@@ -75,6 +75,10 @@ if (is_string($view)) {
     $assert(str_contains($view, 'invalidFilters') && str_contains($view, 'No requests are shown'), 'invalid filters render a truthful fail-closed state');
     $assert(str_contains($view, 'e((string)($normalizedFilters'), 'filter values are escaped in rendered controls');
     $assert(!str_contains($view, '<form method="post"'), 'operator queue remains free of mutation forms');
+    $assert(str_contains($view, '$statusLabel($requestStatus)') && str_contains($view, 'proc.operator.queue.status.'), 'request outcomes use localized status labels');
+    $assert(str_contains($view, '$poStatus') && str_contains($view, 'proc.operator.queue.purchase_order_status'), 'linked purchase-order status is rendered from the existing projection');
+    $assert(str_contains($view, "if (\$poRef === '')") && str_contains($view, 'proc.operator.queue.not_linked'), 'unlinked purchase orders retain an explicit truthful state');
+    $assert(!str_contains($view, "<?= e((string)(\$row['request_status'] ?? '')) ?>"), 'raw request status is not rendered directly');
 }
 
 foreach (['en.php', 'ja.php', 'ne.php'] as $localeFile) {
@@ -82,7 +86,11 @@ foreach (['en.php', 'ja.php', 'ne.php'] as $localeFile) {
     $assert(is_array($locale)
         && isset($locale['proc.operator.queue.filter.title'])
         && isset($locale['proc.operator.queue.status.draft'])
-        && isset($locale['proc.operator.queue.status.cancelled']), 'EN/JA/NE filter and status keys exist: ' . $localeFile);
+        && isset($locale['proc.operator.queue.status.cancelled'])
+        && isset($locale['proc.operator.queue.status.issued'])
+        && isset($locale['proc.operator.queue.status.partial'])
+        && isset($locale['proc.operator.queue.status.unknown'])
+        && isset($locale['proc.operator.queue.purchase_order_status']), 'EN/JA/NE filter and outcome keys exist: ' . $localeFile);
 }
 
 $assert(!str_contains($ownedBody ?? '', 'ensureSchema();'), 'owned operator GET projection does not initialize schema');

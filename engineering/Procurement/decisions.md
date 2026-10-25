@@ -377,3 +377,23 @@ Evidence: restored historical records, source-order review, and repaired
 isolated transaction probe **29/29**. The committed predecessor result was
 26/28 because its invalid-identity simulation was incomplete. No live database
 or concurrency claim is made.
+### 2026-10-25 — OH-AUTO3-PROC-PRODUCT-001 request outcome clarity
+
+**Status:** Implemented and verified as a bounded read-only presentation change
+
+The existing creator-owned operator request queue may render the established
+request status through localized labels and may show the already-projected
+latest purchase-order status when a purchase-order reference exists. Requests
+without a linked purchase order remain explicitly labeled as unlinked. Unknown
+status values retain an escaped fallback label rather than being treated as a
+new workflow state.
+
+This is presentation-only: exact creator ownership, Procurement assignment,
+`procurement.view`, read readiness, filters, ordering, limit, PO linkage, and
+the absence of operator mutation controls remain unchanged. No approval,
+cancellation, purchase-order, supplier, receipt, route, permission, schema,
+cross-domain intake, Core, or database behavior changed.
+
+**Evidence:** `probe_operator_request_queue.php` **20/20**;
+`probe_operator_request_queue_filters.php` **35/35**; PHP lint and diff
+hygiene pass.

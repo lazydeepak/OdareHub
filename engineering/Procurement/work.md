@@ -456,3 +456,15 @@ concurrency behavior remain unverified and are not claimed.
 Acceptance record: historical work and decision entries removed by `1107ca0`
 were restored from `1107ca0^`; no unrelated Procurement working-tree changes,
 logs, backup, or PHPUnit cache were overwritten.
+## 2026-10-25 — OH-AUTO3-PROC-PRODUCT-001 request outcome clarity
+
+**Status: COMPLETE — bounded read-only operator presentation slice.**
+
+- [x] Selected the existing creator-owned operator request queue because its
+  request status and latest linked purchase-order status are already returned
+  by the authorized read projection.
+- [x] Render those authoritative outcomes with localized labels and explicit
+  linked/unlinked purchase-order state; no mutation, permission, route, schema,
+  or cross-domain intake behavior is in scope.
+- [x] Add focused positive/negative presentation regression coverage and run
+  Procurement plus repository validation before integration.

@@ -27,6 +27,13 @@ $statusClass = static function (string $status): string {
         default => 'chip chip--neutral',
     };
 };
+$statusLabel = static function (string $status) use ($tr): string {
+    $normalized = strtolower(trim($status));
+    if ($normalized === '') {
+        return $tr('proc.operator.queue.status.unknown', 'Unknown');
+    }
+    return $tr('proc.operator.queue.status.' . $normalized, ucfirst($normalized));
+};
 ?>
 <section class="card" data-procurement-operator-queue="1">
     <div class="section-head">
@@ -95,11 +102,23 @@ $statusClass = static function (string $status): string {
                     <?php foreach ($rows as $row): ?>
                         <tr>
                             <td><?= e((string)($row['request_ref'] ?? '')) ?></td>
-                            <td><span class="<?= e($statusClass((string)($row['request_status'] ?? ''))) ?>"><?= e((string)($row['request_status'] ?? '')) ?></span></td>
+                            <?php $requestStatus = (string)($row['request_status'] ?? ''); ?>
+                            <td><span class="<?= e($statusClass($requestStatus)) ?>"><?= e($statusLabel($requestStatus)) ?></span></td>
                             <td><?= e((string)($row['requested_qty'] ?? '0')) ?></td>
                             <td><?= e((string)($row['needed_date'] ?? '—')) ?></td>
                             <td><?= e((string)($row['created_at'] ?? '—')) ?></td>
-                            <td><?= e((string)($row['po_ref'] ?? $tr('proc.operator.queue.not_linked', 'Not linked'))) ?></td>
+                            <?php $poRef = trim((string)($row['po_ref'] ?? '')); ?>
+                            <?php $poStatus = (string)($row['po_status'] ?? ''); ?>
+                            <td>
+                                <?php if ($poRef === ''): ?>
+                                    <?= e($tr('proc.operator.queue.not_linked', 'Not linked')) ?>
+                                <?php else: ?>
+                                    <div><?= e($poRef) ?></div>
+                                    <?php if (trim($poStatus) !== ''): ?>
+                                        <span class="<?= e($statusClass($poStatus)) ?>"><?= e($tr('proc.operator.queue.purchase_order_status', 'PO status')) ?>: <?= e($statusLabel($poStatus)) ?></span>
+                                    <?php endif; ?>
+                                <?php endif; ?>
+                            </td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
