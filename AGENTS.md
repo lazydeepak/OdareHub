@@ -1,4 +1,21 @@
 # AGENTS.md
+## Session Summary (2026-10-26) — OH-AUTO3-ORG-CONTEXT-001 authenticated organization context resolver
+
+Implemented the Platform-owned authenticated organization context seam without
+modifying Core/Auth/session, ACL, Shell, routes, SBAIO, or schema. The resolver
+uses the existing Auth `users.id`, requires explicit organization selection,
+reads the existing membership repository contract, and delegates authoritative
+membership/lifecycle validation to the pure resolver. Missing identity,
+selection, repository/authentication evidence, inactive/revoked membership,
+cross-user selection, malformed, duplicate, and contradictory evidence fail
+closed.
+
+Focused probe passed **16/16** and the existing authority probe passed **30/30**;
+PHP lint and diff hygiene passed. Authenticated HTTP/runtime acceptance, ACL
+intersection, Staff binding, Leave/Timecard use, installed database,
+deployment, activation, and production authorization readiness remain separate
+limitations. Unrelated worktree artifacts were preserved.
+
 
 ## Session Summary (2026-10-25) — OH-AUTO3-MFG-UX-003 operator workflow continuity
 

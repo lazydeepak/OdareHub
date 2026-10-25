@@ -1,4 +1,21 @@
 # AGENT-COMPLIANCE-CHECKLIST
+## Session Summary (2026-10-26) — OH-AUTO3-ORG-CONTEXT-001 authenticated organization context resolver
+
+Added `apps/Platform/Services/AuthenticatedOrganizationContextResolver.php` as
+the bounded Platform-only composition seam. It reads the existing authenticated
+Core/Auth `users.id` without changing Core/Auth/session code, requires an
+explicit positive organization selection, loads only repository membership
+evidence, and delegates lifecycle and membership validation to the existing pure
+resolver. Authentication, repository, malformed evidence, inactive/revoked,
+cross-user, duplicate, and unselected-context paths fail closed.
+
+Added `apps/Platform/Tests/probe_authenticated_organization_context.php` with
+**16/16** database-free assertions. Existing authority regression remains
+**30/30**. PHP lint and diff hygiene pass. No ACL, Shell, route, SBAIO,
+Staff/Leave/Timecard, schema, migration, installed database, deployment,
+activation, or production authorization operation occurred. Unrelated working
+tree artifacts were preserved.
+
 
 ## Session Summary (2026-10-25) — OH-AUTO3-MFG-UX-003 operator workflow continuity
 

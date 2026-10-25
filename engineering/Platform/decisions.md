@@ -1,4 +1,23 @@
 # Platform — Decisions
+### 2026-10-26 — OH-AUTO3-ORG-CONTEXT-001 Platform-only authenticated resolver
+
+**Status:** Accepted for bounded implementation and database-free verification; runtime authorization integration remains separately gated
+
+Add `AuthenticatedOrganizationContextResolver` under Platform as the narrow
+composition boundary between existing Core/Auth identity, the existing
+membership repository contract, and the existing pure membership resolver.
+The class reads the authenticated `users.id` from the existing Auth API but
+does not modify Core/Auth/session behavior, call ACL, resolve Staff, or grant
+permissions. A positive organization selection is mandatory, including when
+the user has one eligible membership. Missing identity, unavailable evidence,
+malformed or contradictory lifecycle evidence, inactive/revoked membership,
+cross-user selection, and repository/authentication failures deny closed.
+
+The identity provider is injectable only to make the boundary database-free
+testable; production construction uses the existing Auth API. This seam does
+not authorize ACL intersection, SBAIO Staff binding, Leave/Timecard behavior,
+routes, deployment, activation, or production authorization readiness.
+
 
 ### 2026-10-16 — OH-AUTO2-111 missing-capability containment
 

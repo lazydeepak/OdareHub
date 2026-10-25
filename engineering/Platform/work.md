@@ -1,4 +1,23 @@
 # Platform — Work
+## 2026-10-26 — OH-AUTO3-ORG-CONTEXT-001 authenticated organization context resolver
+
+**Status: Platform-only resolver implemented; focused acceptance pending governed gates and commit.**
+
+- [x] Added an authenticated Platform seam that reads the existing Core/Auth
+  `users.id` without modifying Core/Auth/session code.
+- [x] Required an explicit positive organization selection; no primary-company,
+  assignment, role, branch, email, name, employee-code, or Staff inference is
+  used.
+- [x] Loaded membership evidence through the existing repository contract and
+  delegated lifecycle, validity, duplicate, cross-user, and selection checks to
+  the existing pure resolver.
+- [x] Added database-free positive/negative coverage for authenticated identity,
+  explicit selection, cross-user denial, inactive/revoked membership, missing
+  identity, authentication/repository failure, and duplicate evidence.
+- [ ] Authenticated web/runtime acceptance, ACL intersection, Staff binding,
+  Leave/Timecard use, installed database execution, deployment, and production
+  authorization readiness remain out of scope.
+
 
 ## OH-AUTO1-075 — Completed
 
