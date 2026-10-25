@@ -11,4 +11,5 @@ return [
     'sbaio.customers.contact_name' => '連絡先名',
     'sbaio.customers.phone' => '電話番号',
     'sbaio.customers.newest_first' => '新しい順',
+    'sbaio.customers.title' => '顧客ダッシュボード',
 ];

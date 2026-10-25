@@ -11,4 +11,5 @@ return [
     'sbaio.customers.contact_name' => 'सम्पर्क नाम',
     'sbaio.customers.phone' => 'फोन',
     'sbaio.customers.newest_first' => 'नयाँ पहिले',
+    'sbaio.customers.title' => 'ग्राहक ड्यासबोर्ड',
 ];

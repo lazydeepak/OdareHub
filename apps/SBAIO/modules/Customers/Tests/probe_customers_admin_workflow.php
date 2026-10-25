@@ -164,6 +164,10 @@ namespace {
         $assert(str_contains($localeSource, 'sbaio.customers.admin_required'), $locale . ' has administrator localization');
         $assert(str_contains($localeSource, 'sbaio.customers.customer_name'), $locale . ' has customer field localization');
     }
+    $jaLocale = require __DIR__ . '/../Resources/lang/ja.php';
+    $neLocale = require __DIR__ . '/../Resources/lang/ne.php';
+    $assert(($jaLocale['sbaio.customers.title'] ?? '') === '顧客ダッシュボード', 'Japanese Customers title is localized');
+    $assert(($neLocale['sbaio.customers.title'] ?? '') === 'ग्राहक ड्यासबोर्ड', 'Nepali Customers title is localized');
 
     $command = [PHP_BINARY, __FILE__, 'denied'];
     $descriptorSpec = [1 => ['pipe', 'w'], 2 => ['pipe', 'w']];
