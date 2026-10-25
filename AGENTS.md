@@ -6882,3 +6882,16 @@ architecture gates, deletion-family gates **28/28**, and deployment readiness
 pass in read-only verify mode. No database, browser, HTTP, activation,
 deployment, Core, Staff, Leave, Payroll, editing, deletion, import, or new
 route operation occurred. Unrelated working-tree artifacts were preserved.
+
+## Session Summary (2026-10-25) — OH-AUTO3-PROC-WORKFLOW-001 Procurement workflow handoff
+
+Added the smallest Procurement workflow-completion correction: active PO rows
+now hand off directly to the existing receipt-create form, and the form safely
+preselects the bounded PO query identifier. The existing receipt service remains
+the authority for authorization, CSRF, audit, line ownership, lifecycle, and
+transactions. No new route, policy, schema, database, Core, deployment, or
+activation behavior was introduced.
+
+Handoff proof **13/13**, neighboring Procurement probes, PHP lint, architecture
+gates, deletion-family gates **28/28**, deployment readiness, and diff hygiene
+passed. Unrelated working-tree artifacts remain preserved.

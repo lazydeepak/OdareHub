@@ -110,6 +110,9 @@ $chipClass = static function (string $state): string {
                 <?php else: ?>
                   <span class="muted">-</span>
                 <?php endif; ?>
+                <?php if (in_array($poStatus, ['issued', 'partial'], true)): ?>
+                  <a class="btn" href="/apps/procurement/receipts?po_id=<?= (int)($r['id'] ?? 0) ?>"><?= e(t('proc.receipts.btn_create')) ?></a>
+                <?php endif; ?>
               </td>
             </tr>
           <?php endforeach; ?>

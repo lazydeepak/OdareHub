@@ -1,5 +1,18 @@
 # Procurement — Work
 
+## 2026-10-25 — OH-AUTO3-PROC-WORKFLOW-001 PO-to-receipt handoff
+
+**Status: COMPLETE — bounded workflow handoff integrated.**
+
+- [x] Confirmed the existing request → PO → receipt chain and its service-owned
+  transaction, CSRF, app-access, audit, and status-transition boundaries.
+- [x] Identified the concrete completion gap: the PO list had no handoff to the
+  existing receipt-create route, forcing manual navigation and PO lookup.
+- [x] Added a localized Receive action for issued/partially received POs and
+  bounded GET preselection of the existing receipt form's `po_id` field.
+- [x] Run the focused handoff and neighboring Procurement regression probes,
+  repository gates, and final diff review before integration.
+
 ## 2026-10-24 — OH-AUTO3-PROC-001 own-request queue filters
 
 - [x] Added bounded read-only filters for request reference, established request

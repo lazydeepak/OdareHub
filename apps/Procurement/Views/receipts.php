@@ -2,6 +2,7 @@
 <?php if (!($readiness['available'] ?? false)): require __DIR__ . '/_read_unavailable.php'; return; endif; ?>
 
 <?php $orders = is_array($orders ?? null) ? $orders : []; ?>
+<?php $selectedPoId = (int)($selected_po_id ?? 0); ?>
 
 <?php
 $chipClass = static function (string $state): string {
@@ -43,7 +44,8 @@ $chipClass = static function (string $state): string {
       <select name="po_id" required>
         <option value="">-</option>
         <?php foreach ($orders as $o): ?>
-          <option value="<?= (int)($o['id'] ?? 0) ?>"><?= e((string)($o['po_ref'] ?? '')) ?></option>
+          <?php $orderId = (int)($o['id'] ?? 0); ?>
+          <option value="<?= $orderId ?>"<?= $orderId === $selectedPoId ? ' selected' : '' ?>><?= e((string)($o['po_ref'] ?? '')) ?></option>
         <?php endforeach; ?>
       </select>
     </label>

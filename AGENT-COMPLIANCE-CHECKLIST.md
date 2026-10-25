@@ -8160,3 +8160,16 @@ deployment, commit, or push operation. SBAIO Leave, Manufacturing Dispatch,
 Procurement mutations, Hospitality higher-risk workflows, and Inventory
 foundation remain blocked or deferred for their documented authorization and
 schema prerequisites. Full assessment: `docs/architecture/oh-auto3-005-next-functional-milestone-selection-2026-10-22.md`.
+
+## Session Summary (2026-10-25) — OH-AUTO3-PROC-WORKFLOW-001 Procurement workflow handoff
+
+Completed the bounded Procurement PO-to-receipt workflow correction. Issued and
+partially received purchase-order rows now link to the existing receipt-create
+workflow with bounded server-side `po_id` preselection. Existing receipt
+authorization, CSRF, audit, line ownership, status, and transaction contracts
+remain authoritative; no new route, permission, schema, database, Core,
+deployment, or activation operation occurred.
+
+Focused handoff proof passed **13/13**; neighboring Procurement workflow and
+authorization probes, PHP lint, architecture gates, deletion-family gates
+**28/28**, deployment readiness, and diff hygiene passed. Unrelated staged,

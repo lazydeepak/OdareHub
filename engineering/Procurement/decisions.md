@@ -1,5 +1,19 @@
 # Procurement — Decisions
 
+### 2026-10-25 — OH-AUTO3-PROC-WORKFLOW-001 PO-to-receipt handoff
+
+**Status:** Implemented and verified as a bounded workflow handoff
+
+The existing purchase-order list may hand off issued and partially received
+orders to the existing receipt-create route using a bounded `po_id` query
+selection. The receipt service remains the authority for PO identity, receipt
+quantity, line ownership, status transitions, audit, CSRF, app access, and
+transaction behavior. No new route, permission, status, schema, or persistence
+rule is introduced.
+
+Draft, cancelled, and closed orders do not receive the action. Malformed or
+overflowing query identifiers fail closed to the unselected receipt form.
+
 ### 2026-10-24 — OH-AUTO3-PROC-001 queue filter contract
 
 **Status:** Implemented and verified under bounded read-only authorization

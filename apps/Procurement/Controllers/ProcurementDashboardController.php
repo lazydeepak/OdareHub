@@ -82,10 +82,25 @@ final class ProcurementDashboardController
             'rows' => ProcurementOverviewService::latestReceipts(40),
             'summary' => ProcurementOverviewService::summary(),
             'orders' => ProcurementOverviewService::latestOrders(120),
+            'selected_po_id' => self::positiveQueryId($_GET['po_id'] ?? null),
             'message' => (string)($_GET['ok'] ?? ''),
             'error' => (string)($_GET['err'] ?? ''),
             'readiness' => $readiness,
         ]);
+    }
+
+    private static function positiveQueryId($value): int
+    {
+        if (!is_string($value) || preg_match('/^[1-9][0-9]*$/', $value) !== 1) {
+            return 0;
+        }
+
+        $max = (string)PHP_INT_MAX;
+        if (strlen($value) > strlen($max) || (strlen($value) === strlen($max) && strcmp($value, $max) > 0)) {
+            return 0;
+        }
+
+        return (int)$value;
     }
 
     public static function editSupplier(): void
