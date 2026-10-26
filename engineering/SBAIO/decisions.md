@@ -1,4 +1,19 @@
 # SBAIO — Decisions
+
+### 2026-10-26 — OH-AUTO3-SBAIO-STAFF-SELECTOR-001 containment
+
+**Decision: Suppress unproven Staff names/codes from the Task and Notice administrator creation surfaces until a record-level Staff authorization contract exists.**
+
+The existing `activeStaff()` queries selected Staff IDs, names, and employee
+codes after only the SBAIO app-access gate. Because the repository has no
+authoritative authenticated-user-to-Staff binding or organization/supervisor
+scope, that selector data flow is classified as potential personnel-data
+exposure. The controllers no longer call `activeStaff()` and the views no
+longer render selectors; a localized unavailable state preserves an
+unassigned-only creation path. Existing positive numeric `related_staff_id`
+validation and persistence remain unchanged for separately authorized callers.
+No authorization policy or identity mapping is inferred.
+
 ### 2026-10-26 — OH-AUTO3-SBAIO-NOTICES-REPORT-001 report ownership
 
 **Decision: Assign existing Notice report data preparation to `NoticesService` while retaining route authorization and registry admission in the route.**

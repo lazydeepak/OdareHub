@@ -1,4 +1,20 @@
 # AGENTS.md
+## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-STAFF-SELECTOR-001 selector containment
+
+Contained potential personnel-data exposure in the SBAIO Task and Notice
+administrator creation surfaces. Existing `activeStaff()` calls selected
+Staff ID, full name, and employee code under only SBAIO app access; no
+record-level Staff authorization or authoritative users↔Staff binding exists.
+Both controllers now omit Staff rows and both views omit the Staff selector,
+rendering only a localized unavailable state. Existing `related_staff_id`
+validation and persistence remain unchanged; no policy, identity mapping,
+permission, route, schema, lifecycle, Core/Auth/ACL, or installed DB behavior
+was added.
+
+Containment probe **28/28**, Task integrity **72/72**, Task continuity **34/34**,
+Notice integrity **136/136**, and Notice continuity **37/37** passed. No
+installed database or DB-backed SBAIO probe was executed.
+
 ## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-NOTICES-REPORT-001 report ownership
 
 Completed Notice report service ownership. Existing report SQL/data preparation

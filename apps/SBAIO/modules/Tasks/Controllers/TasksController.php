@@ -98,7 +98,6 @@ final class TasksController
             'moduleTitle' => t('sbaio.tasks.title'),
             'moduleDescription' => t('sbaio.tasks.description'),
             'rows' => $rows,
-            'staffRows' => TasksService::activeStaff(),
             'message' => (string)($_GET['ok'] ?? ''),
             'error' => (string)($_GET['err'] ?? ''),
             'exactTask' => $exactTask,

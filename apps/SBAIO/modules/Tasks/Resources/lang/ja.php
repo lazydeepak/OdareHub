@@ -51,6 +51,7 @@ return [
     'sbaio.tasks.bucket_invalid' => '有効なタスクバケットを入力してください。',
     'sbaio.tasks.bucket_too_long' => 'タスクバケットが長すぎます。',
     'sbaio.tasks.staff_id_invalid' => '有効な関連Staffレコードを選択してください。',
+    'sbaio.tasks.related_staff_unavailable' => 'この画面にはレコード単位のStaff認可契約がないため、関連Staffの選択は利用できません。',
     'sbaio.tasks.related_date_invalid' => '有効な関連日を入力してください。',
     'sbaio.tasks.status_invalid' => '有効なタスクステータスを入力してください。',
     'sbaio.tasks.status_too_long' => 'タスクステータスが長すぎます。',

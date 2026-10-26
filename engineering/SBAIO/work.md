@@ -1,4 +1,27 @@
 # SBAIO — Work
+## 2026-10-26 — OH-AUTO3-SBAIO-STAFF-SELECTOR-001 selector containment
+
+**Status: Contained — offline verification only; no installed database or DB-backed SBAIO probe.**
+
+- [x] Verified the prior data flow: both Task and Notice controllers called
+  `activeStaff()`, whose existing query selected `id`, `full_name`, and
+  `employee_code` from active or NULL-status `sbaio_staff` rows; both views
+  rendered those values in `related_staff_id` selectors.
+- [x] Classified the exposure as **proven potential personnel-data exposure**:
+  existing SBAIO app access was the only gate, while no authoritative
+  users-to-Staff binding, organization scope, supervisor scope, or record-level
+  Staff authorization policy exists.
+- [x] Removed both Staff-row data flows and selectors. The forms now show a
+  localized unavailable state and submit no Staff identifier, so the existing
+  validator preserves the unassigned NULL sentinel.
+- [x] Preserved direct numeric `related_staff_id` validation and persistence;
+  no Staff authorization policy, identity mapping, permission, route, schema,
+  lifecycle, or Core/Auth/ACL behavior was added.
+- [x] Containment probe passed **28/28**; Task input integrity **72/72**,
+  continuity **34/34**, Notice integrity **136/136**, and continuity **37/37**
+  passed. Existing Staff query methods remain available only as uncalled legacy
+  service methods pending an owner-approved authorization contract.
+
 ## 2026-10-26 — OH-AUTO3-SBAIO-NOTICES-REPORT-001 report ownership
 
 **Status: In progress — offline verification only; no installed database or DB-backed SBAIO probe.**

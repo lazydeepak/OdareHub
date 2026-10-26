@@ -51,6 +51,7 @@ return [
     'sbaio.tasks.bucket_invalid' => 'मान्य कार्य बकेट लेख्नुहोस्।',
     'sbaio.tasks.bucket_too_long' => 'कार्य बकेट धेरै लामो छ।',
     'sbaio.tasks.staff_id_invalid' => 'मान्य सम्बन्धित Staff रेकर्ड छान्नुहोस्।',
+    'sbaio.tasks.related_staff_unavailable' => 'यस सतहमा रेकर्ड-स्तरीय Staff अनुमति सम्झौता नभएकाले सम्बन्धित Staff चयन उपलब्ध छैन।',
     'sbaio.tasks.related_date_invalid' => 'मान्य सम्बन्धित मिति लेख्नुहोस्।',
     'sbaio.tasks.status_invalid' => 'मान्य कार्य स्थिति लेख्नुहोस्।',
     'sbaio.tasks.status_too_long' => 'कार्य स्थिति धेरै लामो छ।',

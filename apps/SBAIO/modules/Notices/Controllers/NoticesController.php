@@ -55,7 +55,6 @@ final class NoticesController
             'moduleTitle' => t('sbaio.notices.title'),
             'moduleDescription' => t('sbaio.notices.description'),
             'rows' => NoticesService::recent(),
-            'staffRows' => NoticesService::activeStaff(),
             'message' => (string)($_GET['ok'] ?? ''),
             'error' => (string)($_GET['err'] ?? ''),
             'exactNotice' => $exactNotice,

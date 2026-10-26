@@ -1,7 +1,6 @@
 <?php require APP_ROOT . '/public/views/layouts/admin-wrapper-open.php'; ?>
 <?php
 $rows = is_array($rows ?? null) ? $rows : [];
-$staffRows = is_array($staffRows ?? null) ? $staffRows : [];
 $exactNotice = is_array($exactNotice ?? null) ? $exactNotice : null;
 $exactNoticeId = is_int($exactNoticeId ?? null) ? $exactNoticeId : null;
 $exactNoticeState = is_string($exactNoticeState ?? null) ? $exactNoticeState : null;
@@ -59,14 +58,7 @@ require APP_ROOT . '/apps/SBAIO/Views/partials/module_page_filters.php';
       <label><?= e(t('common.type')) ?><input class="input" type="text" name="notice_type" placeholder="<?= e(t('sbaio.notices.type_placeholder')) ?>"></label>
       <label><?= e(t('sbaio.notices.target_period')) ?><input class="input" type="text" name="target_period" placeholder="<?= e(t('sbaio.notices.period_placeholder')) ?>"></label>
       <label><?= e(t('sbaio.notices.level')) ?><input class="input" type="text" name="notice_level" value="info"></label>
-      <label><?= e(t('sbaio.notices.related_staff')) ?>
-        <select name="related_staff_id">
-          <option value=""><?= e(t('sbaio.common.none')) ?></option>
-          <?php foreach ($staffRows as $staff): ?>
-            <option value="<?= (int)($staff['id'] ?? 0) ?>"><?= e(trim((string)($staff['employee_code'] ?? '') . ' ' . (string)($staff['full_name'] ?? ''))) ?></option>
-          <?php endforeach; ?>
-        </select>
-      </label>
+      <div class="muted" role="note"><?= e(t('sbaio.notices.related_staff_unavailable')) ?></div>
       <label><input type="checkbox" name="requires_ack" value="1"> <?= e(t('sbaio.notices.requires_ack')) ?></label>
       <label><input type="checkbox" name="is_active" value="1" checked> <?= e(t('sbaio.common.active')) ?></label>
       <label class="col-span-full"><?= e(t('sbaio.notices.body')) ?><textarea name="body" rows="4"></textarea></label>

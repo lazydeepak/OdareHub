@@ -6,7 +6,6 @@ $tt = static function (string $key): string {
 ?>
 <?php
 $rows = is_array($rows ?? null) ? $rows : [];
-$staffRows = is_array($staffRows ?? null) ? $staffRows : [];
 $exactTask = is_array($exactTask ?? null) ? $exactTask : null;
 $exactTaskId = is_int($exactTaskId ?? null) ? $exactTaskId : null;
 $exactTaskState = is_string($exactTaskState ?? null) ? $exactTaskState : null;
@@ -116,14 +115,7 @@ require APP_ROOT . '/apps/SBAIO/Views/partials/module_page_filters.php';
       <label>Owner Name<input class="input" type="text" name="owner_name"></label>
       <label>Task Type<input class="input" type="text" name="task_type" placeholder="<?= e(t('sbaio.tasks.type_placeholder')) ?>"></label>
       <label><?= e(t('common.bucket')) ?><input class="input" type="text" name="task_bucket" placeholder="<?= e(t('sbaio.tasks.bucket_placeholder')) ?>"></label>
-      <label>Related Staff
-        <select name="related_staff_id">
-          <option value=""><?= e(t('sbaio.common.none')) ?></option>
-          <?php foreach ($staffRows as $staff): ?>
-            <option value="<?= (int)($staff['id'] ?? 0) ?>"><?= e(trim((string)($staff['employee_code'] ?? '') . ' ' . (string)($staff['full_name'] ?? ''))) ?></option>
-          <?php endforeach; ?>
-        </select>
-      </label>
+      <div class="muted" role="note"><?= e(t('sbaio.tasks.related_staff_unavailable')) ?></div>
       <label>Related Date<input class="input" type="date" name="related_date"></label>
       <label><?= e(t('common.status')) ?><input class="input" type="text" name="task_status" value="open"></label>
       <label><?= e(t('common.priority')) ?><input class="input" type="text" name="priority" value="normal"></label>
