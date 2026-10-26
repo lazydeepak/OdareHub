@@ -1,4 +1,17 @@
 # AGENTS.md
+## Session Summary (2026-10-27) — OH-AUTO3-SBAIO-CSV-ADMISSION-001 CSV admission and projection safety
+
+Closed the SBAIO CSV export admission bypass at the shared
+`ModuleReportRegistryService::streamCsvForReport()` boundary. Existing active
+report admission now runs before source lookup/query/streaming. All 11 CSV
+sources use explicit schema-aligned columns; the unrestricted projection and
+schema-discovery fallback were removed. Existing route authorization and
+Task/Notice privacy exclusions remain unchanged.
+
+Database-free CSV admission/projection probe **244/244** passed. Focused SBAIO
+regressions, PHP lint, architecture gates, deletion family **28/28**, and
+deployment readiness passed. No installed database or DB-backed SBAIO probe ran.
+
 ## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-NOTICES-EXPORT-PRIVACY-001 Notice export privacy
 
 Completed the pending Notice CSV privacy assessment. Notice `body` had no

@@ -12,10 +12,22 @@ final class ModuleReportRegistryService
      * @var array<string,array{table:string,order_by:string,direction:string,filename_prefix:string,columns?:list<string>}>
      */
     private const CSV_REPORT_SOURCES = [
-        'sbaio.attendance.overview' => ['table' => 'sbaio_attendance_daily', 'order_by' => 'id', 'direction' => 'DESC', 'filename_prefix' => 'sbaio-attendance'],
-        'sbaio.customers.overview' => ['table' => 'sbaio_customers', 'order_by' => 'id', 'direction' => 'DESC', 'filename_prefix' => 'sbaio-customers'],
-        'sbaio.expenses.overview' => ['table' => 'sbaio_expenses', 'order_by' => 'id', 'direction' => 'DESC', 'filename_prefix' => 'sbaio-expenses'],
-        'sbaio.leave.overview' => ['table' => 'sbaio_leave_requests', 'order_by' => 'id', 'direction' => 'DESC', 'filename_prefix' => 'sbaio-leave'],
+        'sbaio.attendance.overview' => [
+            'table' => 'sbaio_attendance_daily', 'order_by' => 'id', 'direction' => 'DESC', 'filename_prefix' => 'sbaio-attendance',
+            'columns' => ['id', 'staff_id', 'attendance_date', 'work_start_at', 'work_end_at', 'break_start_at', 'break_end_at', 'day_marker', 'source_label', 'is_manual_correction', 'correction_note', 'created_at', 'updated_at'],
+        ],
+        'sbaio.customers.overview' => [
+            'table' => 'sbaio_customers', 'order_by' => 'id', 'direction' => 'DESC', 'filename_prefix' => 'sbaio-customers',
+            'columns' => ['id', 'customer_name', 'contact_name', 'email', 'phone', 'status', 'created_at', 'updated_at'],
+        ],
+        'sbaio.expenses.overview' => [
+            'table' => 'sbaio_expenses', 'order_by' => 'id', 'direction' => 'DESC', 'filename_prefix' => 'sbaio-expenses',
+            'columns' => ['id', 'expense_ref', 'category_name', 'amount', 'expense_status', 'expense_date', 'created_at', 'updated_at'],
+        ],
+        'sbaio.leave.overview' => [
+            'table' => 'sbaio_leave_requests', 'order_by' => 'id', 'direction' => 'DESC', 'filename_prefix' => 'sbaio-leave',
+            'columns' => ['id', 'staff_id', 'legacy_name_ref', 'leave_code', 'leave_type', 'start_date', 'end_date', 'partial_day_unit', 'leave_status', 'notes', 'approved_by', 'approved_at', 'created_at', 'updated_at'],
+        ],
         'sbaio.notices.overview' => [
             'table' => 'sbaio_notices',
             'order_by' => 'id',
@@ -23,10 +35,22 @@ final class ModuleReportRegistryService
             'filename_prefix' => 'sbaio-notices',
             'columns' => ['id', 'title', 'notice_type', 'target_period', 'requires_ack', 'notice_level', 'is_active', 'created_at', 'updated_at'],
         ],
-        'sbaio.payroll.overview' => ['table' => 'sbaio_payroll_records', 'order_by' => 'id', 'direction' => 'DESC', 'filename_prefix' => 'sbaio-payroll'],
-        'sbaio.sales.overview' => ['table' => 'sbaio_sales', 'order_by' => 'id', 'direction' => 'DESC', 'filename_prefix' => 'sbaio-sales'],
-        'sbaio.schedules.overview' => ['table' => 'sbaio_schedule_assignments', 'order_by' => 'id', 'direction' => 'DESC', 'filename_prefix' => 'sbaio-schedules'],
-        'sbaio.staff.overview' => ['table' => 'sbaio_staff', 'order_by' => 'id', 'direction' => 'DESC', 'filename_prefix' => 'sbaio-staff'],
+        'sbaio.payroll.overview' => [
+            'table' => 'sbaio_payroll_records', 'order_by' => 'id', 'direction' => 'DESC', 'filename_prefix' => 'sbaio-payroll',
+            'columns' => ['id', 'payroll_run_id', 'staff_id', 'legacy_name_ref', 'salary_type', 'salary_rate', 'salary_reference_amount', 'payslip_variant', 'worked_days', 'workday_count', 'worked_minutes', 'worked_hours', 'leave_days', 'holiday_days', 'holiday_work_days', 'overtime_minutes', 'health_insurance_amount', 'pension_insurance_amount', 'employment_insurance_amount', 'social_insurance_total', 'taxable_income_amount', 'income_tax_amount', 'basic_insurance_amount', 'specified_insurance_amount', 'long_term_care_insurance_amount', 'fixed_tax_reduction_amount', 'total_deductions_amount', 'cash_payment_amount', 'dependents_count', 'base_salary_amount', 'hourly_pay_amount', 'gross_amount', 'net_amount', 'payslip_working_days_label', 'payslip_working_time_label', 'calc_notes', 'created_at', 'updated_at'],
+        ],
+        'sbaio.sales.overview' => [
+            'table' => 'sbaio_sales', 'order_by' => 'id', 'direction' => 'DESC', 'filename_prefix' => 'sbaio-sales',
+            'columns' => ['id', 'sale_ref', 'customer_name', 'amount', 'sale_status', 'sale_date', 'created_at', 'updated_at'],
+        ],
+        'sbaio.schedules.overview' => [
+            'table' => 'sbaio_schedule_assignments', 'order_by' => 'id', 'direction' => 'DESC', 'filename_prefix' => 'sbaio-schedules',
+            'columns' => ['id', 'staff_id', 'legacy_name_ref', 'schedule_date', 'template_id', 'expected_start_time', 'expected_end_time', 'break_start_time', 'break_end_time', 'expected_break_minutes', 'day_of_week', 'range_start_date', 'range_end_date', 'job_label', 'scheduled_minutes', 'assignment_status', 'created_at', 'updated_at'],
+        ],
+        'sbaio.staff.overview' => [
+            'table' => 'sbaio_staff', 'order_by' => 'id', 'direction' => 'DESC', 'filename_prefix' => 'sbaio-staff',
+            'columns' => ['id', 'legacy_sn', 'employee_code', 'full_name', 'name_ref', 'email', 'role_label', 'staff_type', 'salary_type', 'salary_rate', 'helper_classification', 'nationality', 'gender', 'date_of_birth', 'employment_status', 'department_name', 'branch_name', 'hire_date', 'join_date', 'exit_date', 'legacy_job_details', 'residence_card_front', 'residence_card_back', 'status', 'created_at', 'updated_at'],
+        ],
         'sbaio.tasks.overview' => [
             'table' => 'sbaio_tasks',
             'order_by' => 'id',
@@ -34,7 +58,10 @@ final class ModuleReportRegistryService
             'filename_prefix' => 'sbaio-tasks',
             'columns' => ['id', 'task_title', 'owner_name', 'task_type', 'task_bucket', 'related_date', 'task_status', 'priority', 'due_date', 'created_at', 'updated_at'],
         ],
-        'sbaio.timecards.overview' => ['table' => 'sbaio_timecards_daily', 'order_by' => 'id', 'direction' => 'DESC', 'filename_prefix' => 'sbaio-timecards'],
+        'sbaio.timecards.overview' => [
+            'table' => 'sbaio_timecards_daily', 'order_by' => 'id', 'direction' => 'DESC', 'filename_prefix' => 'sbaio-timecards',
+            'columns' => ['id', 'staff_id', 'legacy_name_ref', 'work_date', 'attendance_row_id', 'scheduled_start_at', 'scheduled_end_at', 'actual_start_at', 'actual_end_at', 'actual_break_start_at', 'actual_break_end_at', 'break_minutes', 'worked_minutes', 'scheduled_minutes', 'overtime_minutes', 'day_status', 'attendance_marker', 'exception_status', 'salary_type', 'salary_rate', 'daily_salary_amount', 'month_label', 'weekday_label', 'helper_flag', 'leave_type', 'holiday_name', 'approval_status', 'generated_at', 'approved_at', 'created_at', 'updated_at'],
+        ],
     ];
 
     /**
@@ -111,6 +138,11 @@ final class ModuleReportRegistryService
     public static function streamCsvForReport(string $reportKey): bool
     {
         $reportKey = trim($reportKey);
+        if (!is_array(self::findActiveReport($reportKey))) {
+            self::recordCsvExportFailure($reportKey !== '' ? $reportKey : 'unknown', 'CSV report is not active.');
+            return false;
+        }
+
         $source = self::CSV_REPORT_SOURCES[$reportKey] ?? null;
         if (!is_array($source)) {
             self::recordCsvExportFailure($reportKey !== '' ? $reportKey : 'unknown', 'CSV source mapping is not defined.');
@@ -127,13 +159,18 @@ final class ModuleReportRegistryService
             static fn (mixed $column): bool => is_string($column) && preg_match('/^[a-z0-9_]+$/i', $column) === 1
         ));
 
+        if ($columns === []) {
+            self::recordCsvExportFailure($reportKey, 'CSV projection is not defined.');
+            return false;
+        }
+
         if (!preg_match('/^[a-z0-9_]+$/i', $table) || !preg_match('/^[a-z0-9_]+$/i', $orderBy)) {
             self::recordCsvExportFailure($reportKey, 'CSV source validation failed.');
             return false;
         }
 
         try {
-            $select = $columns === [] ? '*' : implode(', ', $columns);
+            $select = implode(', ', $columns);
             $rows = DB::fetchAll(sprintf(
                 'SELECT %s FROM %s ORDER BY %s %s LIMIT 5000',
                 $select,
@@ -143,19 +180,7 @@ final class ModuleReportRegistryService
             ));
 
             $headers = [];
-            if ($columns !== []) {
-                $headers = $columns;
-            } elseif (!empty($rows) && is_array($rows[0])) {
-                $headers = array_keys($rows[0]);
-            } else {
-                $columns = DB::fetchAll(sprintf('SHOW COLUMNS FROM %s', $table));
-                foreach ($columns as $column) {
-                    $name = trim((string)($column['Field'] ?? ''));
-                    if ($name !== '') {
-                        $headers[] = $name;
-                    }
-                }
-            }
+            $headers = $columns;
 
             header('Content-Type: text/csv; charset=utf-8');
             header('Content-Disposition: attachment; filename="' . $filename . '"');

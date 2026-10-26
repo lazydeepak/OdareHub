@@ -1,4 +1,22 @@
 # SBAIO — Decisions
+### 2026-10-27 — OH-AUTO3-SBAIO-CSV-ADMISSION-001 CSV admission and projection safety
+
+**Decision: Centralize existing active-report admission in the CSV stream boundary and require explicit projections for every SBAIO CSV source.**
+
+All eleven module reports already declare the existing `app.sbaio.access`
+permission and `active_only` lifecycle. Their routes retain their existing
+authorization gates, including the established administrator checks for
+Customers and Sales. `streamCsvForReport()` now rejects inactive/unadmitted
+reports before source lookup or streaming, without adding permissions or
+record-level policy.
+
+Every CSV source now declares schema-aligned columns from its install/update
+contract. The generic unrestricted projection and schema-discovery fallback
+were removed. Existing Task and Notice exclusions of `related_staff_id`, and
+the established Notice exclusion of `body`, remain unchanged. No schema,
+lifecycle, organization, Staff identity, Core/Auth/ACL, database, deployment,
+or activation behavior changed.
+
 ### 2026-10-26 — OH-AUTO3-SBAIO-NOTICES-EXPORT-PRIVACY-001 Notice export privacy
 
 **Decision: Do not export Notice `body` from the existing CSV route without an established record-level visibility contract.**

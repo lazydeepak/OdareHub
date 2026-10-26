@@ -1,4 +1,21 @@
 # SBAIO — Work
+## 2026-10-27 — OH-AUTO3-SBAIO-CSV-ADMISSION-001 CSV admission and projection audit
+
+**Status: Complete — offline/static verification only; no installed database or DB-backed SBAIO probe.**
+
+- [x] Admit CSV exports through the existing active-report registry before any
+  source lookup, query, or stream.
+- [x] Replace every unrestricted SBAIO CSV source with an explicit,
+  schema-aligned projection while preserving established fields and prior
+  Task/Notice privacy exclusions.
+- [x] Add database-free coverage for all 11 report sources, routes, manifest
+  permissions, admission ordering, and projection safety.
+- [x] CSV admission/projection probe passed **244/244**. Focused Notice,
+  Task, Staff, Expenses, Customers, and Sales regressions passed; architecture,
+  deletion **28/28**, deployment readiness, PHP lint, and diff hygiene passed.
+- [x] No installed database or DB-backed SBAIO probe ran; unrelated working-tree
+  artifacts remain untouched.
+
 ## 2026-10-26 — OH-AUTO3-SBAIO-NOTICES-EXPORT-PRIVACY-001 Notice export privacy
 
 **Status: Contained — offline verification only; no installed database or DB-backed SBAIO probe.**
