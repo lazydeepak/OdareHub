@@ -377,6 +377,117 @@ final class ProcurementOverviewService
         )), 'filters' => $normalizedFilters, 'invalid_filters' => []];
     }
 
+    /**
+     * Read one creator-owned request trace through its latest linked PO and
+     * bounded receipt history. The request owner is resolved in a derived
+     * table before any linked record is joined; the single query avoids N+1
+     * receipt access and returns one extra row only to prove truncation.
+     *
+     * @return array{available:bool,trace:?array<string,mixed>,invalid_reference:bool}
+     */
+    public static function ownedOperatorRequestTrace(string $actorEmail, string $requestRef, int $receiptLimit = 50): array
+    {
+        $actorEmail = trim($actorEmail);
+        $requestRef = trim($requestRef);
+        $receiptLimit = max(1, min(50, $receiptLimit));
+        if ($actorEmail === '' || $requestRef === ''
+            || strlen($requestRef) > 60
+            || preg_match('/[\x00-\x1F\x7F]/', $requestRef) === 1
+            || preg_match('//u', $requestRef) !== 1
+        ) {
+            return ['available' => true, 'trace' => null, 'invalid_reference' => true];
+        }
+
+        $readiness = self::readReadiness();
+        if (($readiness['available'] ?? false) !== true) {
+            return ['available' => false, 'trace' => null, 'invalid_reference' => false];
+        }
+
+        try {
+            $rows = DB::fetchAll(
+                'SELECT r.id, r.request_ref, r.request_status, r.requested_qty,
+                        r.needed_date, r.created_at,
+                        po.id AS po_id, po.po_ref, po.po_status, po.order_date, po.expected_date,
+                        rc.id AS receipt_id, rc.receipt_ref, rc.received_qty,
+                        rc.receipt_date, rc.receipt_status,
+                        COUNT(rc.id) OVER () AS trace_receipt_count,
+                        COALESCE(SUM(
+                            CASE WHEN LOWER(COALESCE(rc.receipt_status, \'\')) = \'posted\'
+                                 THEN rc.received_qty ELSE 0 END
+                        ) OVER (), 0) AS trace_posted_received_qty
+                 FROM (
+                     SELECT r.id, r.request_ref, r.request_status, r.requested_qty,
+                            r.needed_date, r.created_at
+                     FROM procurement_requests r
+                     WHERE r.created_by = ? AND r.request_ref = ?
+                     LIMIT 1
+                 ) r
+                  LEFT JOIN procurement_purchase_orders po
+                      ON po.request_id = r.id
+                     AND po.id = (
+                         SELECT MAX(po2.id)
+                         FROM procurement_purchase_orders po2
+                         WHERE po2.request_id = r.id
+                     )
+                 LEFT JOIN procurement_receipts rc ON rc.po_id = po.id
+                 ORDER BY rc.id ASC
+                 LIMIT ' . ($receiptLimit + 1),
+                [$actorEmail, $requestRef]
+            );
+        } catch (\Throwable) {
+            return ['available' => false, 'trace' => null, 'invalid_reference' => false];
+        }
+
+        if ($rows === []) {
+            return ['available' => true, 'trace' => null, 'invalid_reference' => false];
+        }
+
+        $first = (array)$rows[0];
+        $receiptCount = max(0, (int)($first['trace_receipt_count'] ?? 0));
+        $truncated = $receiptCount > $receiptLimit;
+        $rows = array_slice($rows, 0, $receiptLimit);
+        $receipts = [];
+        foreach ($rows as $row) {
+            if (!is_array($row) || (int)($row['receipt_id'] ?? 0) <= 0) {
+                continue;
+            }
+            $receipts[] = [
+                'id' => (int)$row['receipt_id'],
+                'receipt_ref' => (string)($row['receipt_ref'] ?? ''),
+                'received_qty' => (string)($row['received_qty'] ?? '0'),
+                'receipt_date' => (string)($row['receipt_date'] ?? ''),
+                'receipt_status' => strtolower(trim((string)($row['receipt_status'] ?? ''))),
+            ];
+        }
+
+        return [
+            'available' => true,
+            'invalid_reference' => false,
+            'trace' => [
+                'request' => [
+                    'id' => (int)($first['id'] ?? 0),
+                    'request_ref' => (string)($first['request_ref'] ?? ''),
+                    'request_status' => strtolower(trim((string)($first['request_status'] ?? ''))),
+                    'requested_qty' => (string)($first['requested_qty'] ?? '0'),
+                    'needed_date' => (string)($first['needed_date'] ?? ''),
+                    'created_at' => (string)($first['created_at'] ?? ''),
+                ],
+                'purchase_order' => (int)($first['po_id'] ?? 0) > 0 ? [
+                    'id' => (int)$first['po_id'],
+                    'po_ref' => (string)($first['po_ref'] ?? ''),
+                    'po_status' => strtolower(trim((string)($first['po_status'] ?? ''))),
+                    'order_date' => (string)($first['order_date'] ?? ''),
+                    'expected_date' => (string)($first['expected_date'] ?? ''),
+                ] : null,
+                'receipts' => $receipts,
+                'receipt_count' => $receiptCount,
+                'posted_received_qty' => (string)($first['trace_posted_received_qty'] ?? '0'),
+                'receipts_truncated' => $truncated,
+                'receipt_limit' => $receiptLimit,
+            ],
+        ];
+    }
+
     /** @param array<int,string> $invalid */
     private static function normalizeOperatorFilterText($value, int $maxLength, string $key, array &$invalid): string
     {
