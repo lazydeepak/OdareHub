@@ -1,4 +1,17 @@
 # SBAIO — Decisions
+### 2026-10-26 — OH-AUTO3-SBAIO-TASKS-INTEGRITY-001 Task input contract
+
+**Decision: Validate and normalize all existing Task creation fields at the SBAIO TasksService boundary without adding Staff authorization, identity binding, lifecycle, route, or schema policy.**
+
+Task title, owner, type, bucket, status, and priority are scalar strings with
+existing schema limits; title remains required, blank optional fields retain
+their defaults, and existing arbitrary status/priority values remain valid.
+Related and due dates must be real `Y-m-d` calendar dates. `related_staff_id`
+accepts only a positive signed-INT-compatible decimal ID; blank/zero sentinels
+remain `NULL`, while malformed, negative, fractional, scientific, boolean,
+array/object, and overflow values fail before SQL. No Staff relationship to
+authenticated users is inferred.
+
 ### 2026-10-26 — OH-AUTO3-SBAIO-EXPENSES-RETRIEVAL-001 exact retrieval and bounded search
 
 **Decision: Keep Expense retrieval inside the existing administrator Expense GET surface and use the established Sales keyset-search contract without adding routes, fuzzy matching, or identity inference.**

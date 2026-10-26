@@ -1,4 +1,16 @@
 # AGENTS.md
+## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-TASKS-INTEGRITY-001 Task input integrity
+
+Prevented malformed Task records and silent Staff-reference coercion. Task
+creation now validates scalar fields, schema lengths, required title, dates,
+defaults, arbitrary existing statuses/priorities, and positive Staff IDs
+before the unchanged INSERT. Blank/zero Staff sentinels remain unassigned;
+no Staff/authenticated-user relationship or authorization policy was added.
+
+Task probe **71/71**, Expenses **91/91**, Customers **195/195**, Sales **225/225**,
+and changed-file lint/diff checks passed. No installed database or DB-backed
+SBAIO probe was executed.
+
 ## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-EXPENSES-RETRIEVAL-001 exact retrieval and bounded search
 
 Completed the Expense record-retrieval workflow without adding routes or

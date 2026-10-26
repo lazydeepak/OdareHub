@@ -1,4 +1,13 @@
 # AGENT-COMPLIANCE-CHECKLIST
+## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-TASKS-INTEGRITY-001 Task input integrity
+
+Closed Task creation coercion defects. All Task fields now pass one strict
+service-owned contract before SQL; related Staff IDs normalize safely without
+introducing Staff/authenticated-user identity rules. Malformed types,
+schema-invalid lengths/dates, and invalid staff IDs perform zero SQL. Task
+probe **71/71**, Expenses **91/91**, Customers **195/195**, and Sales **225/225**
+passed. No installed database or DB-backed SBAIO probe ran.
+
 ## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-EXPENSES-RETRIEVAL-001 exact retrieval and bounded search
 
 Completed Expense retrieval on the existing GET surface. Exact positive-ID

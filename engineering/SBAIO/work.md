@@ -1,4 +1,20 @@
 # SBAIO — Work
+## 2026-10-26 — OH-AUTO3-SBAIO-TASKS-INTEGRITY-001 Task input integrity
+
+**Status: In progress — offline verification only; no installed database or DB-backed SBAIO probe.**
+
+- [x] Reproduced Task creation's unsafe `(string)` and `(int)` coercion of
+  text/date fields and `related_staff_id` before the existing INSERT.
+- [x] Added one TasksService-owned contract for scalar types, schema-aligned
+  lengths, required title, real calendar dates, and preserved blank defaults
+  plus arbitrary existing status/priority values.
+- [x] Related Staff IDs now normalize only positive signed-INT-compatible
+  decimal strings/integers; blank and zero sentinels remain unassigned. No
+  Staff/authenticated-user relationship or authorization policy was inferred.
+- [x] Controller validates raw POST input before service dispatch; malformed
+  payloads perform zero SQL. Task probe passed **71/71**; Expenses **91/91**,
+  Customers **195/195**, and Sales **225/225** remain passing.
+
 ## 2026-10-26 — OH-AUTO3-SBAIO-EXPENSES-RETRIEVAL-001 exact retrieval and search
 
 **Status: In progress — offline verification only; no installed database or DB-backed SBAIO probe.**
