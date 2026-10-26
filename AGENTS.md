@@ -1,4 +1,16 @@
 # AGENTS.md
+## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-NOTICES-CONTINUITY-001 exact-ID continuity
+
+Notice creation now returns a verified generated ID only after same-connection
+transaction commit; insert, identity, and commit failures roll back. The
+existing Notice administrator surface reads exact `notice_id` values through a
+bounded parameterized lookup, with malformed IDs rejected before reads.
+
+Continuity probe **37/37**, Notice integrity **136/136**, Task queue **30/30**,
+Task continuity **34/34**, Task integrity **72/72**, report parity **16/16**,
+Expenses **91/91**, Customers **195/195**, and Sales **225/225** passed. No
+installed database or DB-backed SBAIO probe was executed.
+
 ## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-NOTICES-INTEGRITY-001 Notice input integrity
 
 Notice creation now rejects malformed scalar fields, invalid schema lengths,

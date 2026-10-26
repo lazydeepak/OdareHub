@@ -79,6 +79,41 @@ final class NoticesService
     }
 
     /**
+     * Read one Notice by database-generated identity.
+     *
+     * Body and Staff linkage are intentionally excluded because the existing
+     * Notice authorization contract does not establish their record-level
+     * visibility for this surface.
+     *
+     * @param mixed $id
+     * @return array<string,mixed>|null
+     */
+    public static function findById(mixed $id): ?array
+    {
+        if (!is_int($id) && !is_string($id)) {
+            throw new \InvalidArgumentException('Invalid Notice record ID.');
+        }
+        if (is_int($id)) {
+            $recordId = $id;
+        } elseif (preg_match('/^[1-9][0-9]*$/D', $id)) {
+            $recordId = filter_var($id, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+            if ($recordId === false) {
+                throw new \InvalidArgumentException('Invalid Notice record ID.');
+            }
+        } else {
+            throw new \InvalidArgumentException('Invalid Notice record ID.');
+        }
+        if ($recordId <= 0) {
+            throw new \InvalidArgumentException('Invalid Notice record ID.');
+        }
+
+        return DB::fetchOne(
+            'SELECT id, title, notice_type, target_period, notice_level, requires_ack, is_active, created_at FROM sbaio_notices WHERE id = ? LIMIT 1',
+            [(int)$recordId]
+        );
+    }
+
+    /**
      * @return array<int,array<string,mixed>>
      */
     public static function activeStaff(): array
@@ -91,7 +126,7 @@ final class NoticesService
     /**
      * @param array<string,mixed> $input
      */
-    public static function create(array $input): void
+    public static function create(array $input): int
     {
         $validated = self::validateCreateInput($input);
         if (!$validated['valid']) {
@@ -99,19 +134,58 @@ final class NoticesService
         }
         $values = $validated['values'];
 
-        DB::query(
-            'INSERT INTO sbaio_notices (title, body, notice_type, target_period, related_staff_id, requires_ack, notice_level, is_active) VALUES (?,?,?,?,?,?,?,?)',
-            [
-                self::nullIfBlank($values['title']),
-                self::nullIfBlank($values['body']),
-                self::nullIfBlank($values['notice_type']),
-                self::nullIfBlank($values['target_period']),
-                $values['related_staff_id'],
-                $values['requires_ack'],
-                self::nullIfBlank($values['notice_level']) ?? 'info',
-                $values['is_active'],
-            ]
-        );
+        $db = DB::conn();
+        $transactionStarted = false;
+        try {
+            if ($db->begin_transaction() !== true) {
+                throw new \RuntimeException('Notice transaction could not start.');
+            }
+            $transactionStarted = true;
+
+            DB::query(
+                'INSERT INTO sbaio_notices (title, body, notice_type, target_period, related_staff_id, requires_ack, notice_level, is_active) VALUES (?,?,?,?,?,?,?,?)',
+                [
+                    self::nullIfBlank($values['title']),
+                    self::nullIfBlank($values['body']),
+                    self::nullIfBlank($values['notice_type']),
+                    self::nullIfBlank($values['target_period']),
+                    $values['related_staff_id'],
+                    $values['requires_ack'],
+                    self::nullIfBlank($values['notice_level']) ?? 'info',
+                    $values['is_active'],
+                ]
+            );
+
+            $insertId = $db->insert_id;
+            if (is_int($insertId) && $insertId > 0) {
+                $createdId = $insertId;
+            } elseif (is_string($insertId) && preg_match('/^[1-9][0-9]*$/D', $insertId)) {
+                $normalizedId = filter_var($insertId, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+                if ($normalizedId !== false) {
+                    $createdId = (int)$normalizedId;
+                }
+            }
+            if (!isset($createdId)) {
+                throw new \RuntimeException('Notice insert identity was not available.');
+            }
+
+            if ($db->commit() !== true) {
+                throw new \RuntimeException('Notice transaction commit failed.');
+            }
+
+            return $createdId;
+        } catch (\Throwable $e) {
+            if ($transactionStarted) {
+                try {
+                    if ($db->rollback() !== true) {
+                        throw new \RuntimeException('Notice transaction rollback failed.');
+                    }
+                } catch (\Throwable $rollbackError) {
+                    throw new \RuntimeException('Notice transaction rollback failed.', 0, $e);
+                }
+            }
+            throw $e;
+        }
     }
 
     /** @return string|null */

@@ -12,6 +12,30 @@ final class NoticesController
 {
     public static function index($view): void
     {
+        $currentQuery = is_array($_GET ?? null) ? $_GET : [];
+        $exactNotice = null;
+        $exactNoticeId = null;
+        $exactNoticeState = null;
+        if (array_key_exists('notice_id', $currentQuery)) {
+            $rawNoticeId = $currentQuery['notice_id'];
+            if (is_string($rawNoticeId) && preg_match('/^[1-9][0-9]*$/D', $rawNoticeId)) {
+                $parsedNoticeId = filter_var($rawNoticeId, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+                if ($parsedNoticeId !== false) {
+                    $exactNoticeId = (int)$parsedNoticeId;
+                    try {
+                        $exactNotice = NoticesService::findById($exactNoticeId);
+                        $exactNoticeState = is_array($exactNotice) ? 'found' : 'not_found';
+                    } catch (\Throwable) {
+                        $exactNoticeState = 'unavailable';
+                    }
+                } else {
+                    $exactNoticeState = 'invalid';
+                }
+            } else {
+                $exactNoticeState = 'invalid';
+            }
+        }
+
         $view->render('Notices::index.php', [
             'pageTitle' => t('sbaio.notices.title'),
             'moduleTitle' => t('sbaio.notices.title'),
@@ -20,6 +44,10 @@ final class NoticesController
             'staffRows' => NoticesService::activeStaff(),
             'message' => (string)($_GET['ok'] ?? ''),
             'error' => (string)($_GET['err'] ?? ''),
+            'exactNotice' => $exactNotice,
+            'exactNoticeId' => $exactNoticeId,
+            'exactNoticeState' => $exactNoticeState,
+            'createdRecordId' => ($_GET['ok'] ?? '') !== '' ? $exactNoticeId : null,
         ]);
     }
 
@@ -35,14 +63,19 @@ final class NoticesController
             self::redirect('err', t($messageKey));
         }
 
-        NoticesService::create($validated['values']);
+        $createdId = NoticesService::create($validated['values']);
 
-        self::redirect('ok', t('sbaio.notices.created'));
+        self::redirect('ok', t('sbaio.notices.created_with_id', ['id' => (string)$createdId]), ['notice_id' => $createdId]);
     }
 
-    private static function redirect(string $key, string $message): void
+    /** @param array<string,int|string> $params */
+    private static function redirect(string $key, string $message, array $params = []): void
     {
-        header('Location: /apps/sbaio/notices?' . $key . '=' . rawurlencode($message));
+        $query = [$key => $message];
+        foreach ($params as $paramKey => $paramValue) {
+            $query[$paramKey] = (string)$paramValue;
+        }
+        header('Location: /apps/sbaio/notices?' . http_build_query($query, '', '&', PHP_QUERY_RFC3986));
         exit;
     }
 }

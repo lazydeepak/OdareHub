@@ -1,4 +1,22 @@
 # SBAIO — Work
+## 2026-10-26 — OH-AUTO3-SBAIO-NOTICES-CONTINUITY-001 exact-ID continuity
+
+**Status: In progress — offline verification only; no installed database or DB-backed SBAIO probe.**
+
+- [x] Notice creation now uses the current connection transaction, verifies a
+  positive generated identity before commit, and rolls back insert, identity,
+  and commit failures.
+- [x] The existing `/apps/sbaio/notices` surface carries `notice_id` through
+  the create redirect and performs strict bounded exact-ID retrieval.
+- [x] Exact retrieval exposes only ID, title, type, target period, level,
+  acknowledgment flag, active flag, and creation timestamp. Body and Staff
+  linkage remain intentionally omitted because no established record-level
+  visibility contract supports them.
+- [x] Continuity probe passed **37/37**; Notice integrity **136/136**, Task
+  queue **30/30**, continuity **34/34**, Task integrity **72/72**, report
+  parity **16/16**, Expenses **91/91**, Customers **195/195**, and Sales
+  **225/225** remain passing.
+
 ## 2026-10-26 — OH-AUTO3-SBAIO-NOTICES-INTEGRITY-001 Notice input integrity
 
 **Status: In progress — offline verification only; no installed database or DB-backed SBAIO probe.**

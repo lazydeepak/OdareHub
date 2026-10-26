@@ -8,9 +8,35 @@ declare(strict_types=1);
  * installed/configured database.
  */
 namespace App\Core {
+    final class NoticeInputDbConnection
+    {
+        public int $insert_id = 1;
+
+        public function begin_transaction(): bool
+        {
+            return true;
+        }
+
+        public function commit(): bool
+        {
+            return true;
+        }
+
+        public function rollback(): bool
+        {
+            return true;
+        }
+    }
+
     final class DB
     {
+        public static NoticeInputDbConnection $connection;
         public static array $queries = [];
+
+        public static function conn(): NoticeInputDbConnection
+        {
+            return self::$connection;
+        }
 
         public static function query(string $sql, array $params = []): void
         {
@@ -25,6 +51,7 @@ namespace {
     use App\Core\DB;
     use Plugins\Notices\Services\NoticesService;
 
+    DB::$connection = new \App\Core\NoticeInputDbConnection();
     $assertions = 0;
     $failures = 0;
     $assert = static function (bool $condition, string $message) use (&$assertions, &$failures): void {

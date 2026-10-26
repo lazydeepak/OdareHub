@@ -1,4 +1,17 @@
 # SBAIO — Decisions
+### 2026-10-26 — OH-AUTO3-SBAIO-NOTICES-CONTINUITY-001 exact-ID continuity
+
+**Decision: Reuse the established Task transaction/identity pattern and carry the verified Notice ID through the existing administrator surface.**
+
+Notice creation begins a same-connection transaction, verifies the positive
+generated identity, commits only afterward, and rolls back all failure paths.
+The existing create redirect carries `notice_id`; exact retrieval uses a
+parameterized `WHERE id = ? LIMIT 1` query after existing app authorization.
+The safe record projection intentionally excludes `body` and
+`related_staff_id` because no established record-level visibility evidence
+supports exposing those fields. No route, permission, lifecycle, or schema
+behavior is added.
+
 ### 2026-10-26 — OH-AUTO3-SBAIO-NOTICES-INTEGRITY-001 Notice input contract
 
 **Decision: Validate Notice creation fields at the NoticesService boundary and preserve the existing route, schema, checkbox, and INSERT contracts.**

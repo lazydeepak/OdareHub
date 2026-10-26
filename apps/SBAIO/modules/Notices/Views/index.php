@@ -2,6 +2,10 @@
 <?php
 $rows = is_array($rows ?? null) ? $rows : [];
 $staffRows = is_array($staffRows ?? null) ? $staffRows : [];
+$exactNotice = is_array($exactNotice ?? null) ? $exactNotice : null;
+$exactNoticeId = is_int($exactNoticeId ?? null) ? $exactNoticeId : null;
+$exactNoticeState = is_string($exactNoticeState ?? null) ? $exactNoticeState : null;
+$createdRecordId = is_int($createdRecordId ?? null) ? $createdRecordId : null;
 $suiteActions = [
   ['label' => t('nav.sbaio_dashboard'), 'url' => '/apps/sbaio'],
   ['label' => t('nav.sbaio_tasks'), 'url' => '/apps/sbaio/tasks'],
@@ -16,6 +20,35 @@ require APP_ROOT . '/apps/SBAIO/Views/partials/module_page_intro.php';
 require APP_ROOT . '/apps/SBAIO/Views/partials/module_page_feedback.php';
 require APP_ROOT . '/apps/SBAIO/Views/partials/module_page_filters.php';
 ?>
+<?php if ($createdRecordId !== null): ?>
+  <section class="card u-mb-14" data-sbaio-notices-created-record="1">
+    <a class="btn btn-primary" href="/apps/sbaio/notices?notice_id=<?= e((string)$createdRecordId) ?>"><?= e(t('sbaio.notices.open_created_record')) ?></a>
+  </section>
+<?php endif; ?>
+<?php if ($exactNoticeState !== null): ?>
+  <section class="card u-mb-14" data-sbaio-notices-exact-record="1">
+    <?php if ($exactNoticeState === 'invalid'): ?>
+      <p class="muted" role="alert"><?= e(t('sbaio.notices.record_id_invalid')) ?></p>
+    <?php elseif ($exactNoticeState === 'unavailable'): ?>
+      <p class="muted" role="alert"><?= e(t('sbaio.notices.record_unavailable')) ?></p>
+    <?php elseif ($exactNoticeState === 'not_found'): ?>
+      <p class="muted" role="alert"><?= e(t('sbaio.notices.record_not_found')) ?></p>
+    <?php elseif ($exactNotice !== null): ?>
+      <h3 class="u-mt-0"><?= e(t('sbaio.notices.record_title')) ?></h3>
+      <dl>
+        <dt><?= e(t('sbaio.notices.record_id')) ?></dt><dd><?= e((string)$exactNoticeId) ?></dd>
+        <dt><?= e(t('sbaio.notices.title')) ?></dt><dd><?= e((string)($exactNotice['title'] ?? '')) ?></dd>
+        <dt><?= e(t('common.type')) ?></dt><dd><?= e((string)($exactNotice['notice_type'] ?? '')) ?></dd>
+        <dt><?= e(t('sbaio.notices.target_period')) ?></dt><dd><?= e((string)($exactNotice['target_period'] ?? '')) ?></dd>
+        <dt><?= e(t('sbaio.notices.level')) ?></dt><dd><?= e((string)($exactNotice['notice_level'] ?? '')) ?></dd>
+        <dt><?= e(t('sbaio.notices.ack')) ?></dt><dd><?= !empty($exactNotice['requires_ack']) ? e(t('sbaio.common.yes')) : e(t('sbaio.common.no')) ?></dd>
+        <dt><?= e(t('common.active')) ?></dt><dd><?= !empty($exactNotice['is_active']) ? e(t('sbaio.common.yes')) : e(t('sbaio.common.no')) ?></dd>
+        <dt><?= e(t('common.created')) ?></dt><dd><?= e((string)($exactNotice['created_at'] ?? '')) ?></dd>
+      </dl>
+      <p class="muted"><?= e(t('sbaio.notices.record_scope_note')) ?></p>
+    <?php endif; ?>
+  </section>
+<?php endif; ?>
 <section class="card">
   <div class="card u-mb-14">
     <h3 class="u-mt-0"><?= e(t('sbaio.notices.form_title')) ?></h3>

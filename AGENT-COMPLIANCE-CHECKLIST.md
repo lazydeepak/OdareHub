@@ -1,4 +1,18 @@
 # AGENT-COMPLIANCE-CHECKLIST
+## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-NOTICES-CONTINUITY-001 exact-ID continuity
+
+Completed Notice create-to-record continuity on the existing administrator
+surface. Creation now verifies the same-connection positive generated ID before
+commit and rolls back insert, identity, or commit failures. The redirect
+carries `notice_id`; exact retrieval is strict, read-only, parameterized, and
+administrator-gated before database access. Body and Staff linkage are omitted
+because no record-level visibility contract supports them.
+
+Notice continuity **37/37**, Notice integrity **136/136**, Task queue **30/30**,
+Task continuity **34/34**, Task integrity **72/72**, report parity **16/16**,
+Expenses **91/91**, Customers **195/195**, and Sales **225/225** passed. No
+installed database or DB-backed SBAIO probe ran.
+
 ## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-NOTICES-INTEGRITY-001 Notice input integrity
 
 Hardened existing SBAIO Notice creation against malformed text, Staff IDs,
