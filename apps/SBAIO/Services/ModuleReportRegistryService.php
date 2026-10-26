@@ -21,7 +21,7 @@ final class ModuleReportRegistryService
             'order_by' => 'id',
             'direction' => 'DESC',
             'filename_prefix' => 'sbaio-notices',
-            'columns' => ['id', 'title', 'body', 'notice_type', 'target_period', 'requires_ack', 'notice_level', 'is_active', 'created_at', 'updated_at'],
+            'columns' => ['id', 'title', 'notice_type', 'target_period', 'requires_ack', 'notice_level', 'is_active', 'created_at', 'updated_at'],
         ],
         'sbaio.payroll.overview' => ['table' => 'sbaio_payroll_records', 'order_by' => 'id', 'direction' => 'DESC', 'filename_prefix' => 'sbaio-payroll'],
         'sbaio.sales.overview' => ['table' => 'sbaio_sales', 'order_by' => 'id', 'direction' => 'DESC', 'filename_prefix' => 'sbaio-sales'],

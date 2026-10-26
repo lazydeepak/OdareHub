@@ -1,4 +1,15 @@
 # AGENT-COMPLIANCE-CHECKLIST
+## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-NOTICES-EXPORT-PRIVACY-001 Notice export privacy
+
+Completed the pending Notice CSV privacy assessment. Notice `body` had no
+established record-level export visibility contract: exact retrieval and report
+presentation already excluded it, while the export route had only SBAIO app
+access. The Notice CSV projection now retains authorized metadata and excludes
+both `body` and `related_staff_id`.
+
+Notice export privacy probe **6/6** and combined Staff projection probe **8/8**
+passed. No installed database or DB-backed SBAIO probe was executed.
+
 ## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-STAFF-READ-PROJECTION-001 read projection containment
 
 Completed the Staff-data read-projection audit. Task search and exact reads no

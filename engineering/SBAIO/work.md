@@ -1,4 +1,21 @@
 # SBAIO — Work
+## 2026-10-26 — OH-AUTO3-SBAIO-NOTICES-EXPORT-PRIVACY-001 Notice export privacy
+
+**Status: Contained — offline verification only; no installed database or DB-backed SBAIO probe.**
+
+- [x] Reconciled the prior export projection against Notice privacy evidence.
+  Exact retrieval and report presentation explicitly exclude `body`; the export
+  route has only the existing SBAIO app-access gate and no separate
+  record-level body visibility contract.
+- [x] Classified Notice `body` export as unauthorized/unproven rather than
+  inventing an export permission or broadening application authorization.
+- [x] Notice CSV now retains authorized metadata (`id`, `title`, type, period,
+  acknowledgment, level, active state, and timestamps) while excluding both
+  `body` and `related_staff_id`. Notice persistence and lifecycle behavior are
+  unchanged.
+- [x] Privacy probe passed **6/6**; the combined Staff read-projection probe
+  passed **8/8**. No installed database or DB-backed SBAIO probe ran.
+
 ## 2026-10-26 — OH-AUTO3-SBAIO-STAFF-READ-PROJECTION-001 read projection containment
 
 **Status: Contained — offline verification only; no installed database or DB-backed SBAIO probe.**

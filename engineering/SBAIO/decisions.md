@@ -1,4 +1,16 @@
 # SBAIO — Decisions
+### 2026-10-26 — OH-AUTO3-SBAIO-NOTICES-EXPORT-PRIVACY-001 Notice export privacy
+
+**Decision: Do not export Notice `body` from the existing CSV route without an established record-level visibility contract.**
+
+The Notice exact-read and report contracts already exclude `body`, while the
+CSV route is gated only by existing SBAIO app access. No independent
+authorization evidence establishes body export. The descriptor therefore
+retains the existing Notice metadata fields and omits `body` and
+`related_staff_id`. No export permission, route, schema, lifecycle, or
+authorization policy was added; Notice creation and stored historical data are
+unchanged.
+
 ### 2026-10-26 — OH-AUTO3-SBAIO-STAFF-READ-PROJECTION-001 read projection containment
 
 **Decision: Remove Staff linkage from Task/Notice read and CSV projections where no established authorized consumer contract exists.**
