@@ -44,6 +44,7 @@ foreach (['tasks', 'notices'] as $module) {
     $assert(str_contains($view, 'related_staff_unavailable'), $module . ' view renders localized Staff containment state');
     $assert(str_contains($service, "'related_staff_id' =>"), $module . ' service preserves related_staff_id persistence value');
     $assert(str_contains($service, 'normalizeRelatedStaffId'), $module . ' service preserves direct related_staff_id validation boundary');
+    $assert(str_contains($service, "'related_staff_id_unavailable'"), $module . ' service blocks unauthorized positive Staff association writes');
 }
 
 $locales = [
@@ -72,6 +73,8 @@ $assert(!str_contains($source['tasks_controller'], "'staffRows'"), 'Task control
 $assert(!str_contains($source['notices_controller'], "'staffRows'"), 'Notice controller does not pass Staff rows to the view');
 $assert(str_contains($source['tasks_service'], 'if ($relatedStaffId === false)') && str_contains($source['notices_service'], 'if ($relatedStaffId === false)'), 'invalid supplied Staff IDs remain rejected');
 $assert(str_contains($source['tasks_service'], "'related_staff_id' => \$relatedStaffId") && str_contains($source['notices_service'], "'related_staff_id' => \$relatedStaffId"), 'validated Staff ID persistence contract remains unchanged');
+$assert(str_contains($source['tasks_controller'], "'related_staff_id_unavailable' => 'sbaio.tasks.related_staff_write_unavailable'"), 'Task controller localizes unauthorized Staff association rejection');
+$assert(str_contains($source['notices_controller'], 'related_staff_id_unavailable') && str_contains($source['notices_controller'], 'related_staff_write_unavailable'), 'Notice controller localizes unauthorized Staff association rejection');
 
 echo 'SBAIO Staff selector containment probe: ' . $assertions . ' assertions, ' . $failures . " failures\n";
 exit($failures === 0 ? 0 : 1);

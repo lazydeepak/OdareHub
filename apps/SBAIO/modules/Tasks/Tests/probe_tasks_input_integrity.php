@@ -80,19 +80,18 @@ namespace {
         'owner_name' => '  Operations  ',
         'task_type' => 'follow-up',
         'task_bucket' => 'weekly',
-        'related_staff_id' => '00042',
         'related_date' => '2024-02-29',
         'task_status' => 'legacy-status',
         'priority' => 'urgent',
         'due_date' => '2026-12-31',
     ]);
-    $assert($valid['valid'], 'valid Task scalar input is accepted');
+    $assert($valid['valid'], 'valid unassigned Task scalar input is accepted');
     $assert($valid['values'] === [
         'task_title' => 'Prepare report',
         'owner_name' => 'Operations',
         'task_type' => 'follow-up',
         'task_bucket' => 'weekly',
-        'related_staff_id' => 42,
+        'related_staff_id' => null,
         'related_date' => '2024-02-29',
         'task_status' => 'legacy-status',
         'priority' => 'urgent',
@@ -125,6 +124,10 @@ namespace {
         $result = TasksService::validateCreateInput(['task_title' => 'Staff test', 'related_staff_id' => $staffId]);
         $assert(!$result['valid'] && in_array('related_staff_id_invalid', $result['errors'], true), 'malformed staff ID is rejected without relationship inference');
     }
+    foreach (['42', '00042', 42] as $staffId) {
+        $result = TasksService::validateCreateInput(['task_title' => 'Staff association', 'related_staff_id' => $staffId]);
+        $assert(!$result['valid'] && in_array('related_staff_id_unavailable', $result['errors'], true) && $result['values']['related_staff_id'] === null, 'positive Staff association is rejected without authorization');
+    }
 
     $assert(in_array('task_title_too_long', TasksService::validateCreateInput(['task_title' => str_repeat('T', 191)])['errors'], true), 'task title respects VARCHAR(190)');
     $assert(in_array('owner_name_too_long', TasksService::validateCreateInput(['task_title' => 'T', 'owner_name' => str_repeat('O', 191)])['errors'], true), 'owner name respects VARCHAR(190)');
@@ -149,18 +152,19 @@ namespace {
         'owner_name' => 'Operations',
         'task_type' => 'follow-up',
         'task_bucket' => 'weekly',
-        'related_staff_id' => '42',
+        'related_staff_id' => null,
         'related_date' => '2026-10-26',
         'task_status' => 'legacy-status',
         'priority' => 'urgent',
         'due_date' => '2026-12-31',
     ]);
     $assert(count(DB::$queries) === 1, 'valid Task performs one insert');
-    $assert(DB::$queries[0]['params'] === ['Prepare report', 'Operations', 'follow-up', 'weekly', 42, '2026-10-26', 'legacy-status', 'urgent', '2026-12-31'], 'insert receives exact normalized Task values including integer staff ID');
+    $assert(DB::$queries[0]['params'] === ['Prepare report', 'Operations', 'follow-up', 'weekly', null, '2026-10-26', 'legacy-status', 'urgent', '2026-12-31'], 'unassigned Task INSERT receives the existing NULL Staff sentinel');
     $assert(DB::$connection->events === ['begin', 'commit'], 'valid Task commits the same-connection transaction after identity capture');
 
     foreach ([
         ['task_title' => ['bad'], 'related_staff_id' => '42'],
+        ['task_title' => 'Unauthorized staff', 'related_staff_id' => '42'],
         ['task_title' => 'Bad staff', 'related_staff_id' => ['42']],
         ['task_title' => 'Bad date', 'related_date' => '2026-02-30'],
         ['task_title' => 'Bad status', 'task_status' => ['open']],

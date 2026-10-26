@@ -91,7 +91,7 @@ namespace {
         'owner_name' => 'Operations',
         'task_type' => 'follow-up',
         'task_bucket' => 'weekly',
-        'related_staff_id' => '42',
+        'related_staff_id' => null,
         'related_date' => '2026-10-26',
         'task_status' => 'open',
         'priority' => 'normal',
@@ -105,7 +105,7 @@ namespace {
     $assert($createdId === 417, 'creation returns the same connection positive generated ID');
     $assert(DB::$connection->events === ['begin', 'commit'], 'successful creation commits after insert identity verification');
     $assert(count(DB::$queries) === 1 && DB::$queries[0]['method'] === 'query', 'successful creation performs one insert');
-    $assert(DB::$queries[0]['params'][0] === 'Continuity task' && DB::$queries[0]['params'][4] === 42, 'existing INSERT receives normalized task values');
+    $assert(DB::$queries[0]['params'][0] === 'Continuity task' && DB::$queries[0]['params'][4] === null, 'unassigned creation preserves the existing NULL Staff value');
 
     foreach ([0, '0', -4, '4x', '1.5', '1e2', ['417'], true] as $identity) {
         DB::$queries = [];

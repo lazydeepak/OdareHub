@@ -56,7 +56,9 @@ final class TasksService
 
     /**
      * Validate and normalize the existing Task create payload without
-     * touching persistence or interpreting Staff identity.
+     * touching persistence or interpreting Staff identity. Staff association
+     * writes remain unavailable until a record-level authorization contract
+     * exists.
      *
      * @param array<string,mixed> $input
      * @return array{valid:bool,errors:list<string>,values:array<string,mixed>}
@@ -92,6 +94,9 @@ final class TasksService
         $relatedStaffId = self::normalizeRelatedStaffId($input['related_staff_id'] ?? null);
         if ($relatedStaffId === false) {
             $errors[] = 'related_staff_id_invalid';
+            $relatedStaffId = null;
+        } elseif ($relatedStaffId !== null) {
+            $errors[] = 'related_staff_id_unavailable';
             $relatedStaffId = null;
         }
 

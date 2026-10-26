@@ -1,4 +1,17 @@
 # AGENT-COMPLIANCE-CHECKLIST
+## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-STAFF-WRITE-001 Staff-association write containment
+
+Closed the remaining unauthorized Task/Notice Staff-association write path.
+Positive normalized `related_staff_id` values now fail with
+`related_staff_id_unavailable` before database connection/INSERT. Absent,
+null, empty, and zero values remain unassigned and persist as `NULL`; malformed
+values remain invalid. Historical records, schema, routes, permissions, and
+Core/Auth/ACL boundaries are unchanged.
+
+Staff containment probe **32/32**, Task integrity **76/76**, Notice integrity
+**142/142**, and prior Task/Notice continuity regressions passed. No installed
+database or DB-backed SBAIO probe was executed.
+
 ## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-STAFF-SELECTOR-001 selector containment
 
 Contained potential personnel-data exposure in the SBAIO Task and Notice

@@ -73,14 +73,13 @@ namespace {
         'body' => 'Please review the close checklist.',
         'notice_type' => 'reminder',
         'target_period' => '2026-10',
-        'related_staff_id' => '00042',
         'requires_ack' => '1',
         'notice_level' => 'warning',
         'is_active' => '1',
     ];
     $normalized = NoticesService::validateCreateInput($valid);
     $assert($normalized['valid'] === true && $normalized['errors'] === [], 'valid Notice input is accepted');
-    $assert($normalized['values']['related_staff_id'] === 42, 'positive decimal Staff ID is normalized without coercing malformed input');
+    $assert($normalized['values']['related_staff_id'] === null, 'unassigned Notice input preserves the NULL Staff sentinel');
     $assert($normalized['values']['requires_ack'] === 1 && $normalized['values']['is_active'] === 1, 'string 1 flags normalize to enabled integer flags');
 
     DB::$queries = [];
@@ -91,7 +90,7 @@ namespace {
         'Please review the close checklist.',
         'reminder',
         '2026-10',
-        42,
+        null,
         1,
         'warning',
         1,
@@ -130,6 +129,17 @@ namespace {
             $assert(false, 'malformed Staff ID unexpectedly wrote a Notice');
         } catch (\InvalidArgumentException) {
             $assert(DB::$queries === [], 'malformed Staff ID causes zero database writes');
+        }
+    }
+    foreach (['42', '00042', 42] as $staffId) {
+        DB::$queries = [];
+        $result = NoticesService::validateCreateInput(['title' => 'Staff association', 'related_staff_id' => $staffId]);
+        $assert($result['valid'] === false && in_array('related_staff_id_unavailable', $result['errors'], true) && $result['values']['related_staff_id'] === null, 'positive Staff association is rejected before SQL');
+        try {
+            NoticesService::create(['title' => 'Staff association', 'related_staff_id' => $staffId]);
+            $assert(false, 'unauthorized Staff association unexpectedly wrote a Notice');
+        } catch (\InvalidArgumentException) {
+            $assert(DB::$queries === [], 'unauthorized Staff association causes zero database writes');
         }
     }
     foreach (['', '0', '000', 0] as $unassigned) {

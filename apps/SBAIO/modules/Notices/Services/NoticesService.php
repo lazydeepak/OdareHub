@@ -55,7 +55,9 @@ final class NoticesService
 
     /**
      * Validate and normalize the existing Notice creation payload without
-     * changing its persistence shape or acknowledgment workflow.
+     * changing its persistence shape or acknowledgment workflow. Staff
+     * association writes remain unavailable until a record-level
+     * authorization contract exists.
      *
      * @param array<string,mixed> $input
      * @return array{valid:bool,errors:list<string>,values:array<string,mixed>}
@@ -92,6 +94,9 @@ final class NoticesService
         $relatedStaffId = self::normalizeRelatedStaffId($input['related_staff_id'] ?? null);
         if ($relatedStaffId === false) {
             $errors[] = 'related_staff_id_invalid';
+            $relatedStaffId = null;
+        } elseif ($relatedStaffId !== null) {
+            $errors[] = 'related_staff_id_unavailable';
             $relatedStaffId = null;
         }
 

@@ -13,4 +13,5 @@ return [
     'sbaio.notices.record_id' => 'सूचना ID',
     'sbaio.notices.record_scope_note' => 'यस सतहमा मुख्य भाग र कर्मचारी सम्बन्धको रेकर्ड-स्तरीय दृश्यता सम्झौता नभएकाले ती देखाइँदैनन्।',
     'sbaio.notices.related_staff_unavailable' => 'यस सतहमा रेकर्ड-स्तरीय Staff अनुमति सम्झौता नभएकाले सम्बन्धित Staff चयन उपलब्ध छैन।',
+    'sbaio.notices.related_staff_write_unavailable' => 'रेकर्ड-स्तरीय Staff अनुमति सम्झौता नभएकाले यस सतहमा सम्बन्धित Staff सम्बन्ध तोक्न सकिँदैन।',
 ];

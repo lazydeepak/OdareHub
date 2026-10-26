@@ -127,6 +127,7 @@ final class TasksController
                 'task_bucket_invalid' => 'sbaio.tasks.bucket_invalid',
                 'task_bucket_too_long' => 'sbaio.tasks.bucket_too_long',
                 'related_staff_id_invalid' => 'sbaio.tasks.staff_id_invalid',
+                'related_staff_id_unavailable' => 'sbaio.tasks.related_staff_write_unavailable',
                 'related_date_invalid' => 'sbaio.tasks.related_date_invalid',
                 'task_status_invalid' => 'sbaio.tasks.status_invalid',
                 'task_status_too_long' => 'sbaio.tasks.status_too_long',

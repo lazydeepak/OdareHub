@@ -1,4 +1,22 @@
 # SBAIO — Work
+## 2026-10-26 — OH-AUTO3-SBAIO-STAFF-WRITE-001 Staff-association write containment
+
+**Status: Contained — offline verification only; no installed database or DB-backed SBAIO probe.**
+
+- [x] Verified the remaining write path after selector containment: raw
+  browser-supplied positive `related_staff_id` values were still accepted by
+  both service validators and passed into the existing INSERT parameter list.
+- [x] Task and Notice creation now reject normalized positive Staff IDs with
+  `related_staff_id_unavailable`, before `DB::conn()`/INSERT. Malformed values
+  remain `related_staff_id_invalid`; absent, `null`, empty, and zero sentinels
+  remain valid unassigned input and persist as `NULL`.
+- [x] Historical rows are untouched; the nullable schema and existing INSERT
+  shape remain unchanged. No Staff authorization policy, identity mapping,
+  permission, route, schema, lifecycle, or Core/Auth/ACL behavior was added.
+- [x] Task integrity passed **76/76**, Notice integrity **142/142**, and the
+  Staff containment probe passed **32/32**. Positive-association rejection and
+  unassigned INSERT behavior were verified with database doubles only.
+
 ## 2026-10-26 — OH-AUTO3-SBAIO-STAFF-SELECTOR-001 selector containment
 
 **Status: Contained — offline verification only; no installed database or DB-backed SBAIO probe.**

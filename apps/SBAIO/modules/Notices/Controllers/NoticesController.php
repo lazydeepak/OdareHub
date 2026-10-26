@@ -72,7 +72,9 @@ final class NoticesController
         if (!$validated['valid']) {
             $messageKey = in_array('title_required', $validated['errors'], true)
                 ? 'sbaio.notices.required'
-                : 'sbaio.notices.invalid';
+                : (in_array('related_staff_id_unavailable', $validated['errors'], true)
+                    ? 'sbaio.notices.related_staff_write_unavailable'
+                    : 'sbaio.notices.invalid');
             self::redirect('err', t($messageKey));
         }
 

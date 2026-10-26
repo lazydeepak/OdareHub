@@ -1,4 +1,16 @@
 # SBAIO — Decisions
+### 2026-10-26 — OH-AUTO3-SBAIO-STAFF-WRITE-001 Staff-association write containment
+
+**Decision: Reject positive Staff associations at Task and Notice creation until an owner-approved record-level Staff authorization contract exists.**
+
+Selector containment alone did not close the write boundary: a caller could
+still submit a numeric `related_staff_id` directly. Both service validators now
+accept only unassigned input (absent, `null`, empty, or zero) for this surface;
+positive normalized IDs fail with `related_staff_id_unavailable` before any DB
+connection or INSERT. Malformed values retain `related_staff_id_invalid`.
+The nullable field, INSERT shape, historical rows, and ordinary unassigned
+creation remain unchanged. This does not infer or create Staff authority.
+
 
 ### 2026-10-26 — OH-AUTO3-SBAIO-STAFF-SELECTOR-001 containment
 

@@ -24,6 +24,7 @@ return [
     'sbaio.tasks.bucket_too_long' => 'The task bucket is too long.',
     'sbaio.tasks.staff_id_invalid' => 'Select a valid related Staff record.',
     'sbaio.tasks.related_staff_unavailable' => 'Related Staff selection is unavailable because this surface has no established record-level Staff authorization contract.',
+    'sbaio.tasks.related_staff_write_unavailable' => 'Related Staff association cannot be assigned on this surface because no record-level Staff authorization contract exists.',
     'sbaio.tasks.related_date_invalid' => 'Enter a valid related date.',
     'sbaio.tasks.status_invalid' => 'Enter a valid task status.',
     'sbaio.tasks.status_too_long' => 'The task status is too long.',

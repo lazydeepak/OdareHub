@@ -13,4 +13,5 @@ return [
     'sbaio.notices.record_id' => '通知ID',
     'sbaio.notices.record_scope_note' => 'この画面には本文とスタッフ関連情報のレコード単位の表示権限契約がないため、表示していません。',
     'sbaio.notices.related_staff_unavailable' => 'この画面にはレコード単位のStaff認可契約がないため、関連Staffの選択は利用できません。',
+    'sbaio.notices.related_staff_write_unavailable' => 'レコード単位のStaff認可契約がないため、この画面では関連Staffを設定できません。',
 ];

@@ -34,6 +34,7 @@ return [
     'sbaio.notices.record_scope_note' => 'Body and Staff linkage are not shown because this surface has no established record-level visibility contract for those fields.',
     'sbaio.notices.related_staff' => 'Related Staff',
     'sbaio.notices.related_staff_unavailable' => 'Related Staff selection is unavailable because this surface has no established record-level Staff authorization contract.',
+    'sbaio.notices.related_staff_write_unavailable' => 'Related Staff association cannot be assigned on this surface because no record-level Staff authorization contract exists.',
     'sbaio.notices.requires_ack' => 'Requires Acknowledgement',
     'sbaio.notices.scope_active_feed' => 'Active communication feed',
     'sbaio.notices.target_period' => 'Target Period',
