@@ -7,6 +7,8 @@ use App\Core\DB;
 
 final class ExpensesService
 {
+    private const MAX_SEARCH_LIMIT = 50;
+
     /**
      * Validate and normalize the existing Expense create payload without
      * touching persistence.
@@ -96,6 +98,89 @@ final class ExpensesService
         return DB::fetchAll(
             'SELECT id, expense_ref, category_name, amount, expense_status FROM sbaio_expenses ORDER BY id DESC LIMIT ' . (int)$limit
         );
+    }
+
+    /**
+     * Read one Expense by its database-generated identity.
+     *
+     * @param mixed $id
+     * @return array<string,mixed>|null
+     */
+    public static function findById(mixed $id): ?array
+    {
+        $recordId = self::normalizeRecordId($id);
+        return DB::fetchOne(
+            'SELECT id, expense_ref, category_name, amount, expense_status, expense_date FROM sbaio_expenses WHERE id = ? LIMIT 1',
+            [$recordId]
+        );
+    }
+
+    /**
+     * Search Expense records using exact reference/status and inclusive date
+     * bounds. Results are bounded and continue by an opaque keyset cursor.
+     *
+     * @param array<string,mixed> $filters
+     * @return array{valid:bool,available:bool,rows:array<int,array<string,mixed>>,truncated:bool,limit:int,filters:array{expense_ref:string,status:string,from:string,to:string},next_cursor:?string}
+     */
+    public static function search(array $filters, int $limit = 50, ?string $cursor = null): array
+    {
+        $limit = max(1, min(self::MAX_SEARCH_LIMIT, $limit));
+        $normalized = self::normalizeSearchFilters($filters);
+        $fingerprint = self::searchFilterFingerprint($normalized);
+        $cursorData = self::decodeSearchCursor($cursor, $fingerprint);
+        $where = [];
+        $params = [];
+
+        if ($normalized['expense_ref'] !== '') {
+            $where[] = 'expense_ref = ?';
+            $params[] = $normalized['expense_ref'];
+        }
+        if ($normalized['status'] !== '') {
+            $where[] = 'expense_status = ?';
+            $params[] = $normalized['status'];
+        }
+        if ($normalized['from'] !== '') {
+            $where[] = 'expense_date >= ?';
+            $params[] = $normalized['from'];
+        }
+        if ($normalized['to'] !== '') {
+            $where[] = 'expense_date <= ?';
+            $params[] = $normalized['to'];
+        }
+        if ($cursorData !== null) {
+            if ($cursorData['expense_date'] === null) {
+                $where[] = '(expense_date IS NULL AND id < ?)';
+                $params[] = $cursorData['id'];
+            } else {
+                $where[] = '(expense_date < ? OR expense_date IS NULL OR (expense_date = ? AND id < ?))';
+                $params[] = $cursorData['expense_date'];
+                $params[] = $cursorData['expense_date'];
+                $params[] = $cursorData['id'];
+            }
+        }
+
+        $rows = DB::fetchAll(
+            'SELECT id, expense_ref, category_name, amount, expense_status, expense_date
+             FROM sbaio_expenses'
+            . ($where === [] ? '' : ' WHERE ' . implode(' AND ', $where))
+            . ' ORDER BY expense_date DESC, id DESC LIMIT ' . ($limit + 1),
+            $params
+        );
+        $truncated = count($rows) > $limit;
+        $displayRows = array_values(array_slice($rows, 0, $limit));
+        $nextCursor = $truncated && $displayRows !== []
+            ? self::encodeSearchCursor($displayRows[count($displayRows) - 1], $fingerprint)
+            : null;
+
+        return [
+            'valid' => true,
+            'available' => true,
+            'rows' => $displayRows,
+            'truncated' => $truncated,
+            'limit' => $limit,
+            'filters' => $normalized,
+            'next_cursor' => $nextCursor,
+        ];
     }
 
     /**
@@ -202,6 +287,127 @@ final class ExpensesService
             return null;
         }
         return $input[$key];
+    }
+
+    private static function normalizeRecordId(mixed $id): int
+    {
+        if (is_int($id)) {
+            $recordId = $id;
+        } elseif (is_string($id) && preg_match('/^[1-9][0-9]*$/D', $id)) {
+            $recordId = filter_var($id, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+            if ($recordId === false) {
+                throw new \InvalidArgumentException('Invalid Expense record ID.');
+            }
+        } else {
+            throw new \InvalidArgumentException('Invalid Expense record ID.');
+        }
+        if ($recordId <= 0) {
+            throw new \InvalidArgumentException('Invalid Expense record ID.');
+        }
+        return (int)$recordId;
+    }
+
+    /**
+     * @param array<string,mixed> $filters
+     * @return array{expense_ref:string,status:string,from:string,to:string}
+     */
+    private static function normalizeSearchFilters(array $filters): array
+    {
+        if (array_diff(array_keys($filters), ['expense_ref', 'status', 'from', 'to']) !== []) {
+            throw new \InvalidArgumentException('SBAIO_EXPENSES_SEARCH_FILTER_INVALID');
+        }
+        $expenseRef = $filters['expense_ref'] ?? '';
+        $status = $filters['status'] ?? '';
+        $from = $filters['from'] ?? '';
+        $to = $filters['to'] ?? '';
+        foreach ([$expenseRef, $status, $from, $to] as $value) {
+            if (!is_string($value)) {
+                throw new \InvalidArgumentException('SBAIO_EXPENSES_SEARCH_FILTER_INVALID');
+            }
+        }
+
+        $expenseRef = trim($expenseRef);
+        $status = trim($status);
+        $from = trim($from);
+        $to = trim($to);
+        if (strlen($expenseRef) > 80
+            || strlen($status) > 40
+            || ($from !== '' && !self::isCalendarDate($from))
+            || ($to !== '' && !self::isCalendarDate($to))
+            || ($from !== '' && $to !== '' && $from > $to)) {
+            throw new \InvalidArgumentException('SBAIO_EXPENSES_SEARCH_FILTER_INVALID');
+        }
+
+        return ['expense_ref' => $expenseRef, 'status' => $status, 'from' => $from, 'to' => $to];
+    }
+
+    /** @param array{expense_ref:string,status:string,from:string,to:string} $filters */
+    private static function searchFilterFingerprint(array $filters): string
+    {
+        return hash('sha256', (string)json_encode($filters, JSON_UNESCAPED_SLASHES));
+    }
+
+    /** @return array{expense_date:?string,id:int}|null */
+    private static function decodeSearchCursor(?string $cursor, string $fingerprint): ?array
+    {
+        if ($cursor === null || trim($cursor) === '') {
+            return null;
+        }
+        if (!preg_match('/^[A-Za-z0-9_-]+$/D', $cursor) || (strlen($cursor) % 4) === 1) {
+            throw new \InvalidArgumentException('SBAIO_EXPENSES_SEARCH_CURSOR_INVALID');
+        }
+
+        $encoded = strtr($cursor, '-_', '+/');
+        $encoded .= str_repeat('=', (4 - (strlen($encoded) % 4)) % 4);
+        $json = base64_decode($encoded, true);
+        if ($json === false) {
+            throw new \InvalidArgumentException('SBAIO_EXPENSES_SEARCH_CURSOR_INVALID');
+        }
+        try {
+            $payload = json_decode($json, true, 8, JSON_THROW_ON_ERROR);
+        } catch (\JsonException) {
+            throw new \InvalidArgumentException('SBAIO_EXPENSES_SEARCH_CURSOR_INVALID');
+        }
+        if (!is_array($payload)
+            || array_diff(array_keys($payload), ['v', 'expense_date', 'id', 'fingerprint']) !== []
+            || count($payload) !== 4
+            || ($payload['v'] ?? null) !== 1
+            || !is_string($payload['fingerprint'] ?? null)
+            || !hash_equals($fingerprint, $payload['fingerprint'])
+        ) {
+            throw new \InvalidArgumentException('SBAIO_EXPENSES_SEARCH_CURSOR_INVALID');
+        }
+
+        $expenseDate = $payload['expense_date'] ?? null;
+        if ($expenseDate !== null && (!is_string($expenseDate) || !self::isCalendarDate($expenseDate))) {
+            throw new \InvalidArgumentException('SBAIO_EXPENSES_SEARCH_CURSOR_INVALID');
+        }
+        $id = $payload['id'] ?? null;
+        if (!is_int($id) || $id < 1) {
+            throw new \InvalidArgumentException('SBAIO_EXPENSES_SEARCH_CURSOR_INVALID');
+        }
+
+        return ['expense_date' => $expenseDate, 'id' => $id];
+    }
+
+    /** @param array<string,mixed> $row */
+    private static function encodeSearchCursor(array $row, string $fingerprint): string
+    {
+        $id = $row['id'] ?? null;
+        if (is_string($id) && ctype_digit($id)) {
+            $id = (int)$id;
+        }
+        $expenseDate = $row['expense_date'] ?? null;
+        if (!is_int($id) || $id < 1 || ($expenseDate !== null && (!is_string($expenseDate) || !self::isCalendarDate($expenseDate)))) {
+            throw new \UnexpectedValueException('SBAIO_EXPENSES_SEARCH_ROW_INVALID');
+        }
+        $json = json_encode([
+            'v' => 1,
+            'expense_date' => $expenseDate,
+            'id' => $id,
+            'fingerprint' => $fingerprint,
+        ], JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
+        return rtrim(strtr(base64_encode($json), '+/', '-_'), '=');
     }
 
     private static function isCalendarDate(string $value): bool

@@ -12,11 +12,67 @@ final class ExpensesController
 {
     public static function index($view): void
     {
+        $currentQuery = $_GET;
+        $rows = ExpensesService::recent();
+        $searchResult = null;
+        $exactExpense = null;
+        $exactExpenseId = null;
+        $exactExpenseState = null;
+
+        if (array_key_exists('expense_id', $_GET)) {
+            $rawId = $_GET['expense_id'];
+            if (!is_int($rawId) && !is_string($rawId)) {
+                $exactExpenseState = 'invalid';
+            } else {
+                try {
+                    $exactExpenseId = is_int($rawId) ? $rawId : (int)$rawId;
+                    $exactExpense = ExpensesService::findById($rawId);
+                    $exactExpenseState = $exactExpense === null ? 'not_found' : 'found';
+                } catch (\InvalidArgumentException) {
+                    $exactExpenseState = 'invalid';
+                    $exactExpenseId = null;
+                } catch (\Throwable) {
+                    $exactExpenseState = 'unavailable';
+                }
+            }
+        }
+
+        if (array_key_exists('expenses_search', $_GET)) {
+            if ($_GET['expenses_search'] !== '1') {
+                $searchResult = self::invalidSearchResult();
+            } else {
+                try {
+                    $cursor = $_GET['expenses_cursor'] ?? null;
+                    if ($cursor !== null && !is_string($cursor)) {
+                        throw new \InvalidArgumentException('Invalid Expense search cursor.');
+                    }
+                    $searchResult = ExpensesService::search([
+                        'expense_ref' => $_GET['expense_ref'] ?? '',
+                        'status' => $_GET['expense_status'] ?? '',
+                        'from' => $_GET['expense_from'] ?? '',
+                        'to' => $_GET['expense_to'] ?? '',
+                    ], 50, $cursor);
+                    $rows = (array)($searchResult['rows'] ?? []);
+                } catch (\InvalidArgumentException) {
+                    $searchResult = self::invalidSearchResult();
+                    $rows = [];
+                } catch (\Throwable) {
+                    $searchResult = self::unavailableSearchResult();
+                    $rows = [];
+                }
+            }
+        }
+
         $view->render('Expenses::index.php', [
             'pageTitle' => t('sbaio.expenses.title'),
             'moduleTitle' => t('sbaio.expenses.title'),
             'moduleDescription' => t('sbaio.expenses.description'),
-            'rows' => ExpensesService::recent(),
+            'rows' => $rows,
+            'currentQuery' => $currentQuery,
+            'searchResult' => $searchResult,
+            'exactExpense' => $exactExpense,
+            'exactExpenseId' => $exactExpenseId,
+            'exactExpenseState' => $exactExpenseState,
             'message' => (string)($_GET['ok'] ?? ''),
             'error' => (string)($_GET['err'] ?? ''),
         ]);
@@ -49,9 +105,23 @@ final class ExpensesController
         self::redirect('ok', t('sbaio.expenses.created_with_id', ['id' => (string)$createdId]), ['expense_id' => $createdId]);
     }
 
-    private static function redirect(string $key, string $message): void
+    /** @return array<string,mixed> */
+    private static function invalidSearchResult(): array
     {
-        header('Location: /apps/sbaio/expenses?' . $key . '=' . rawurlencode($message));
+        return ['valid' => false, 'available' => true, 'rows' => [], 'truncated' => false, 'limit' => 50, 'filters' => [], 'next_cursor' => null];
+    }
+
+    /** @return array<string,mixed> */
+    private static function unavailableSearchResult(): array
+    {
+        return ['valid' => true, 'available' => false, 'rows' => [], 'truncated' => false, 'limit' => 50, 'filters' => [], 'next_cursor' => null];
+    }
+
+    /** @param array<string,int|string> $params */
+    private static function redirect(string $key, string $message, array $params = []): void
+    {
+        $query = array_merge([$key => $message], $params);
+        header('Location: /apps/sbaio/expenses?' . http_build_query($query, '', '&', PHP_QUERY_RFC3986));
         exit;
     }
 }

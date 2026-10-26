@@ -1,4 +1,13 @@
 # AGENT-COMPLIANCE-CHECKLIST
+## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-EXPENSES-RETRIEVAL-001 exact retrieval and bounded search
+
+Completed Expense retrieval on the existing GET surface. Exact positive-ID
+reads use `WHERE id = ? LIMIT 1`; historical search uses exact filters,
+deterministic date/ID keyset pagination, filter-bound opaque cursors, explicit
+NULL-date continuation, and a 50-row cap. Expense probe **91/91**, Customers
+**195/195**, Sales **225/225**, architecture/deletion/deployment checks, lint,
+and diff hygiene passed. No installed database or DB-backed SBAIO probe ran.
+
 ## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-EXPENSES-DURABILITY-001 transactional identity
 
 Expense creation now uses the established same-connection transaction pattern:

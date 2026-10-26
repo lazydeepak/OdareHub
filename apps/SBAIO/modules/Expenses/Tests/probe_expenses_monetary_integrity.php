@@ -37,6 +37,8 @@ namespace App\Core {
     final class DB
     {
         public static array $queries = [];
+        public static array $readQueries = [];
+        public static array $readRows = [];
         public static array $transactionEvents = [];
         public static ?ExpenseConnectionDouble $connection = null;
         public static bool $queryShouldFail = false;
@@ -52,6 +54,18 @@ namespace App\Core {
                 throw new \RuntimeException('Simulated insert failure.');
             }
             self::$queries[] = ['sql' => $sql, 'params' => $params];
+        }
+
+        public static function fetchAll(string $sql, array $params = []): array
+        {
+            self::$readQueries[] = ['sql' => $sql, 'params' => $params];
+            return self::$readRows;
+        }
+
+        public static function fetchOne(string $sql, array $params = []): ?array
+        {
+            $rows = self::fetchAll($sql, $params);
+            return $rows[0] ?? null;
         }
     }
 }
@@ -74,6 +88,8 @@ namespace {
 
     $serviceSource = file_get_contents(__DIR__ . '/../Services/ExpensesService.php') ?: '';
     $controllerSource = file_get_contents(__DIR__ . '/../Controllers/ExpensesController.php') ?: '';
+    $routesSource = file_get_contents(__DIR__ . '/../routes.php') ?: '';
+    $viewSource = file_get_contents(__DIR__ . '/../Views/index.php') ?: '';
 
     foreach ([
         ['9999999999.99', '9999999999.99'],
@@ -94,6 +110,10 @@ namespace {
     $assert(!str_contains($serviceSource, '(float)'), 'Expense monetary validation contains no float conversion');
     $assert(str_contains($serviceSource, 'DECIMAL(12,2)') || str_contains(file_get_contents(__DIR__ . '/../install.php') ?: '', 'DECIMAL(12,2)'), 'validation is aligned with the existing DECIMAL(12,2) schema');
     $assert(str_contains($serviceSource, 'public static function validateCreateInput') && str_contains($controllerSource, 'ExpensesService::validateCreateInput($_POST)'), 'service and controller share one complete input contract');
+    $assert(str_contains($serviceSource, 'public static function findById') && str_contains($serviceSource, 'WHERE id = ? LIMIT 1'), 'Expense service owns exact-ID retrieval with a parameterized identity predicate');
+    $assert(str_contains($serviceSource, 'public static function search') && str_contains($serviceSource, 'ORDER BY expense_date DESC, id DESC') && str_contains($serviceSource, 'MAX_SEARCH_LIMIT = 50'), 'Expense service owns bounded deterministic historical search');
+    $assert(str_contains($routesSource, "Auth::requireAppAccess('sbaio')") && strpos($routesSource, "Auth::requireAppAccess('sbaio')") < strpos($routesSource, 'ExpensesController::index'), 'existing SBAIO app authorization remains before Expense retrieval');
+    $assert(str_contains($controllerSource, 'ExpensesService::findById') && str_contains($controllerSource, 'ExpensesService::search') && str_contains($viewSource, 'data-sbaio-expenses-exact-record') && str_contains($viewSource, 'data-sbaio-expenses-search'), 'controller and existing Expense surface expose exact retrieval and bounded search');
 
     $validInput = ExpensesService::validateCreateInput([
         'expense_ref' => '  EXP-001  ',
@@ -142,6 +162,53 @@ namespace {
     $assert(DB::$transactionEvents === ['begin', 'commit'], 'successful expense creation commits after identity verification');
     $assert(DB::$queries[0]['params'][2] === '1234.50' && is_string(DB::$queries[0]['params'][2]), 'insert receives the exact normalized decimal string');
     $assert(DB::$queries[0]['params'] === ['EXP-001', 'Travel', '1234.50', 'submitted', '2026-10-26'], 'insert receives the complete normalized Expense contract');
+
+    DB::$readRows = [[
+        'id' => 417,
+        'expense_ref' => 'EXP-001',
+        'category_name' => 'Travel',
+        'amount' => '1234.50',
+        'expense_status' => 'submitted',
+        'expense_date' => '2026-10-26',
+    ]];
+    DB::$readQueries = [];
+    $exact = ExpensesService::findById('417');
+    $assert($exact !== null && $exact['id'] === 417, 'exact-ID retrieval returns the requested record identity');
+    $assert(count(DB::$readQueries) === 1 && DB::$readQueries[0]['params'] === [417] && str_contains(DB::$readQueries[0]['sql'], 'WHERE id = ? LIMIT 1'), 'exact retrieval uses only the positive parameterized ID predicate');
+    DB::$readQueries = [];
+    try {
+        ExpensesService::findById('417x');
+        $assert(false, 'malformed exact Expense ID unexpectedly reached a read');
+    } catch (\InvalidArgumentException) {
+        $assert(DB::$readQueries === [], 'malformed exact Expense ID is rejected before SQL');
+    }
+
+    DB::$readRows = [
+        ['id' => 12, 'expense_ref' => 'A', 'category_name' => null, 'amount' => '1.00', 'expense_status' => 'legacy', 'expense_date' => '2026-01-02'],
+        ['id' => 11, 'expense_ref' => 'B', 'category_name' => null, 'amount' => '2.00', 'expense_status' => 'submitted', 'expense_date' => null],
+        ['id' => 10, 'expense_ref' => 'C', 'category_name' => null, 'amount' => '3.00', 'expense_status' => 'legacy', 'expense_date' => null],
+    ];
+    DB::$readQueries = [];
+    $search = ExpensesService::search(['expense_ref' => 'A', 'status' => 'legacy', 'from' => '2026-01-01', 'to' => '2026-12-31'], 2);
+    $assert($search['valid'] && count($search['rows']) === 2 && $search['truncated'] === true && is_string($search['next_cursor']), 'historical search is capped and returns an opaque continuation cursor');
+    $assert(str_contains(DB::$readQueries[0]['sql'], 'expense_ref = ?') && str_contains(DB::$readQueries[0]['sql'], 'expense_status = ?') && str_contains(DB::$readQueries[0]['sql'], 'expense_date >= ?') && str_contains(DB::$readQueries[0]['sql'], 'expense_date <= ?') && str_contains(DB::$readQueries[0]['sql'], 'ORDER BY expense_date DESC, id DESC LIMIT 3'), 'historical search uses exact filters, inclusive date bounds, and limit plus one');
+    $assert(DB::$readQueries[0]['params'] === ['A', 'legacy', '2026-01-01', '2026-12-31'], 'historical search binds exact filters without identity inference');
+
+    DB::$readRows = [];
+    DB::$readQueries = [];
+    $nullCursorSearch = ExpensesService::search(['expense_ref' => 'A', 'status' => 'legacy', 'from' => '2026-01-01', 'to' => '2026-12-31'], 2, $search['next_cursor']);
+    $assert($nullCursorSearch['valid'] && str_contains(DB::$readQueries[0]['sql'], '(expense_date IS NULL AND id < ?)') && DB::$readQueries[0]['params'] === ['A', 'legacy', '2026-01-01', '2026-12-31', 11], 'NULL-date cursor continuation uses explicit NULL predicate and ID tie-break');
+
+    DB::$readQueries = [];
+    try {
+        ExpensesService::search(['expense_ref' => 'DIFFERENT'], 2, $search['next_cursor']);
+        $assert(false, 'filter-changed cursor unexpectedly succeeded');
+    } catch (\InvalidArgumentException) {
+        $assert(DB::$readQueries === [], 'filter-changed cursor fails closed before SQL');
+    }
+    DB::$readQueries = [];
+    $capped = ExpensesService::search([], 999);
+    $assert(str_contains(DB::$readQueries[0]['sql'], 'LIMIT 51') && $capped['limit'] === 50, 'historical search hard-caps requested limits at 50');
 
     DB::$connection->insert_id = 0;
     DB::$queries = [];

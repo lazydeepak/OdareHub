@@ -1,4 +1,16 @@
 # SBAIO — Decisions
+### 2026-10-26 — OH-AUTO3-SBAIO-EXPENSES-RETRIEVAL-001 exact retrieval and bounded search
+
+**Decision: Keep Expense retrieval inside the existing administrator Expense GET surface and use the established Sales keyset-search contract without adding routes, fuzzy matching, or identity inference.**
+
+Exact retrieval accepts only a positive decimal database ID and uses a
+parameterized `WHERE id = ? LIMIT 1` read. Historical search accepts exact
+reference/status values and inclusive calendar-date bounds, orders by
+`expense_date DESC, id DESC`, fetches one overflow row, caps pages at 50, and
+binds opaque cursors to the normalized filters. Cursor continuation explicitly
+handles NULL dates; malformed or filter-changed cursors fail closed before SQL.
+Existing SBAIO app authorization remains the route boundary.
+
 ### 2026-10-26 — OH-AUTO3-SBAIO-EXPENSES-DURABILITY-001 transaction and identity
 
 **Decision: Adopt the established Sales/Customers same-connection transaction boundary for Expense creation and return only the verified positive generated ID after commit.**

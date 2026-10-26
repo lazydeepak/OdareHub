@@ -1,4 +1,21 @@
 # SBAIO — Work
+## 2026-10-26 — OH-AUTO3-SBAIO-EXPENSES-RETRIEVAL-001 exact retrieval and search
+
+**Status: In progress — offline verification only; no installed database or DB-backed SBAIO probe.**
+
+- [x] Confirmed the pre-change Expense page exposed only the recent `id DESC`
+  list; it had no exact-ID reader or bounded historical search.
+- [x] Added exact positive-ID retrieval through `WHERE id = ? LIMIT 1`, with
+  malformed IDs rejected before reads and existing SBAIO app authorization
+  retained before controller access.
+- [x] Added exact reference/status/date-range search with deterministic
+  `expense_date DESC, id DESC` keyset pagination, opaque filter-bound cursors,
+  explicit NULL-date continuation, and a hard 50-row page cap.
+- [x] Existing creation confirmation, statuses, monetary precision,
+  reporting/export routes, and mutation boundaries remain unchanged.
+- [x] Expense retrieval probe passed **91/91**; Customers **195/195** and Sales
+  **225/225** remain passing.
+
 ## 2026-10-26 — OH-AUTO3-SBAIO-EXPENSES-DURABILITY-001 transactional identity
 
 **Status: In progress — offline verification only; no installed database or DB-backed SBAIO probe.**

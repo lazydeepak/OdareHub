@@ -1,4 +1,18 @@
 # AGENTS.md
+## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-EXPENSES-RETRIEVAL-001 exact retrieval and bounded search
+
+Completed the Expense record-retrieval workflow without adding routes or
+mutation behavior. Exact positive-ID reads use a parameterized `WHERE id = ?
+LIMIT 1` path behind existing SBAIO app access; historical search is bounded
+to 50 rows with exact reference/status/date filters, deterministic
+`expense_date DESC, id DESC` keyset cursors, filter fingerprints, and explicit
+NULL-date continuation. Creation, statuses, monetary precision, reporting,
+exports, Customers, and Sales remain unchanged.
+
+Expense retrieval probe **91/91**, Customers **195/195**, Sales **225/225**,
+architecture/deletion/deployment checks, lint, and diff hygiene passed. No
+installed database or DB-backed SBAIO probe was executed.
+
 ## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-EXPENSES-DURABILITY-001 transactional identity
 
 Expense creation now begins a same-connection transaction, verifies the
