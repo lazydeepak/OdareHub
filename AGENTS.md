@@ -1,4 +1,16 @@
 # AGENTS.md
+## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-NOTICES-INTEGRITY-001 Notice input integrity
+
+Notice creation now rejects malformed scalar fields, invalid schema lengths,
+silent Staff-ID coercion, and non-`0/1` acknowledgment or active flags before
+the existing INSERT. Existing route authorization, schema, checkbox semantics,
+and Notice behavior remain unchanged.
+
+Notice integrity probe **136/136**, Task queue **30/30**, continuity **34/34**,
+Task integrity **72/72**, report parity **16/16**, Expenses **91/91**,
+Customers **195/195**, and Sales **225/225** passed. No installed database or
+DB-backed SBAIO probe was executed.
+
 ## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-TASKS-DUE-PARITY-001 report/queue due parity
 
 Aligned the Task dashboard report's seven-day due aggregate with the

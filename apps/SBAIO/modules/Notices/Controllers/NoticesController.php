@@ -27,12 +27,15 @@ final class NoticesController
     {
         Auth::requireCsrf((string)($_POST['csrf'] ?? ''));
 
-        $title = trim((string)($_POST['title'] ?? ''));
-        if ($title === '') {
-            self::redirect('err', t('sbaio.notices.required'));
+        $validated = NoticesService::validateCreateInput($_POST);
+        if (!$validated['valid']) {
+            $messageKey = in_array('title_required', $validated['errors'], true)
+                ? 'sbaio.notices.required'
+                : 'sbaio.notices.invalid';
+            self::redirect('err', t($messageKey));
         }
 
-        NoticesService::create($_POST);
+        NoticesService::create($validated['values']);
 
         self::redirect('ok', t('sbaio.notices.created'));
     }

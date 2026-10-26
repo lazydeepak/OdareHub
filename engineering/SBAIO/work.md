@@ -1,4 +1,21 @@
 # SBAIO — Work
+## 2026-10-26 — OH-AUTO3-SBAIO-NOTICES-INTEGRITY-001 Notice input integrity
+
+**Status: In progress — offline verification only; no installed database or DB-backed SBAIO probe.**
+
+- [x] Reproduced Notice creation's silent string/integer coercion for text,
+  acknowledgment/active flags, and `related_staff_id`.
+- [x] Added NoticesService-owned scalar, schema-length, required-title,
+  positive Staff-ID, and exact binary-flag validation while preserving the
+  existing INSERT shape and checkbox semantics (`1` or absent).
+- [x] Malformed supplied arrays, objects, booleans, numbers, malformed Staff
+  IDs, and non-`0/1` flags fail before `DB::query`; blank/zero Staff sentinels
+  remain unassigned.
+- [x] Notice integrity probe passed **136/136**; Task queue **30/30**,
+  continuity **34/34**, Task integrity **72/72**, report parity **16/16**,
+  Expenses **91/91**, Customers **195/195**, and Sales **225/225** remain
+  passing.
+
 ## 2026-10-26 — OH-AUTO3-SBAIO-TASKS-DUE-PARITY-001 report/queue due parity
 
 **Status: In progress — offline verification only; no installed database or DB-backed SBAIO probe.**

@@ -23,6 +23,7 @@ return [
     'sbaio.notices.form_desc' => 'Use notices for payroll-close reminders, approval follow-up, and missing punch alerts.',
     'sbaio.notices.form_title' => 'Publish Notice',
     'sbaio.notices.level' => 'Level',
+    'sbaio.notices.invalid' => 'Enter valid notice details.',
     'sbaio.notices.related_staff' => 'Related Staff',
     'sbaio.notices.requires_ack' => 'Requires Acknowledgement',
     'sbaio.notices.scope_active_feed' => 'Active communication feed',

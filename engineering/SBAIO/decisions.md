@@ -1,4 +1,17 @@
 # SBAIO — Decisions
+### 2026-10-26 — OH-AUTO3-SBAIO-NOTICES-INTEGRITY-001 Notice input contract
+
+**Decision: Validate Notice creation fields at the NoticesService boundary and preserve the existing route, schema, checkbox, and INSERT contracts.**
+
+Title/body/type/period/level inputs must be supplied as strings and respect
+the existing schema limits; title remains required and blank optional values
+retain their current defaults. `related_staff_id` accepts only positive
+signed-INT-compatible decimal IDs, with blank/zero sentinels remaining NULL.
+`requires_ack` and `is_active` accept only exact scalar `0`/`1` values (or
+absent checkbox fields), preventing truthiness-based flag coercion. No new
+acknowledgment workflow, lifecycle, Staff policy, or authorization rule was
+added.
+
 ### 2026-10-26 — OH-AUTO3-SBAIO-TASKS-DUE-PARITY-001 report/queue due parity
 
 **Decision: Make the Task report's `due_7d` aggregate use the existing actionable queue's upcoming predicate, while retaining the report's separate snapshot ordering.**

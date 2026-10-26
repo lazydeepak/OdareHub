@@ -1,4 +1,15 @@
 # AGENT-COMPLIANCE-CHECKLIST
+## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-NOTICES-INTEGRITY-001 Notice input integrity
+
+Hardened existing SBAIO Notice creation against malformed text, Staff IDs,
+acknowledgment flags, and active flags. Validation occurs before the unchanged
+INSERT; malformed values cannot be silently coerced or reach the database.
+
+Notice integrity probe **136/136**, Task queue **30/30**, continuity **34/34**,
+Task integrity **72/72**, report parity **16/16**, Expenses **91/91**,
+Customers **195/195**, and Sales **225/225** passed. No installed database or
+DB-backed SBAIO probe ran.
+
 ## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-TASKS-DUE-PARITY-001 report/queue due parity
 
 Reconciled the Task dashboard report with the actionable queue. The report's
