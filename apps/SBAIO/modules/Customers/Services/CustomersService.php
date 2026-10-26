@@ -8,6 +8,7 @@ use App\Core\DB;
 final class CustomersService
 {
     private const MAX_LIST_LIMIT = 25;
+    private const MAX_SEARCH_LIMIT = 50;
 
     /**
      * Validate and normalize the existing customer create payload without
@@ -218,6 +219,210 @@ final class CustomersService
             'SELECT id, customer_name, contact_name, email, phone, status FROM sbaio_customers WHERE id = ? LIMIT 1',
             [(int)$recordId]
         );
+    }
+
+    /**
+     * Search historical Customers using exact scalar filters only. An empty
+     * filter set is rejected so this path cannot become unrestricted browsing.
+     * The read is bounded and uses forward keyset pagination.
+     *
+     * @param array<string,mixed> $filters
+     * @return array{valid:bool,available:bool,rows:array<int,array<string,mixed>>,truncated:bool,limit:int,filters:array{customer_name:string,email:string,phone:string,status:string,from:string,to:string},next_cursor:?string}
+     */
+    public static function search(array $filters, int $limit = 50, ?string $cursor = null): array
+    {
+        $limit = max(1, min(self::MAX_SEARCH_LIMIT, $limit));
+        $normalized = self::normalizeSearchFilters($filters);
+        $fingerprint = self::searchFilterFingerprint($normalized);
+        $cursorData = self::decodeSearchCursor($cursor, $fingerprint);
+        $where = [];
+        $params = [];
+
+        if ($normalized['customer_name'] !== '') {
+            $where[] = 'customer_name = ?';
+            $params[] = $normalized['customer_name'];
+        }
+        if ($normalized['email'] !== '') {
+            $where[] = 'email = ?';
+            $params[] = $normalized['email'];
+        }
+        if ($normalized['phone'] !== '') {
+            $where[] = 'phone = ?';
+            $params[] = $normalized['phone'];
+        }
+        if ($normalized['status'] !== '') {
+            $where[] = 'status = ?';
+            $params[] = $normalized['status'];
+        }
+        if ($normalized['from'] !== '') {
+            $where[] = 'created_at >= ?';
+            $params[] = $normalized['from'] . ' 00:00:00';
+        }
+        if ($normalized['to'] !== '') {
+            $where[] = 'created_at < DATE_ADD(?, INTERVAL 1 DAY)';
+            $params[] = $normalized['to'] . ' 00:00:00';
+        }
+        if ($cursorData !== null) {
+            if ($cursorData['created_at'] === null) {
+                $where[] = '(created_at IS NULL AND id < ?)';
+                $params[] = $cursorData['id'];
+            } else {
+                $where[] = '(created_at < ? OR created_at IS NULL OR (created_at = ? AND id < ?))';
+                $params[] = $cursorData['created_at'];
+                $params[] = $cursorData['created_at'];
+                $params[] = $cursorData['id'];
+            }
+        }
+
+        $rows = DB::fetchAll(
+            'SELECT id, customer_name, contact_name, email, phone, status, created_at
+             FROM sbaio_customers'
+            . ($where === [] ? '' : ' WHERE ' . implode(' AND ', $where))
+            . ' ORDER BY created_at DESC, id DESC LIMIT ' . ($limit + 1),
+            $params
+        );
+        $truncated = count($rows) > $limit;
+        $displayRows = array_values(array_slice($rows, 0, $limit));
+        $nextCursor = $truncated && $displayRows !== []
+            ? self::encodeSearchCursor($displayRows[count($displayRows) - 1], $fingerprint)
+            : null;
+
+        return [
+            'valid' => true,
+            'available' => true,
+            'rows' => $displayRows,
+            'truncated' => $truncated,
+            'limit' => $limit,
+            'filters' => $normalized,
+            'next_cursor' => $nextCursor,
+        ];
+    }
+
+    /**
+     * @param array<string,mixed> $filters
+     * @return array{customer_name:string,email:string,phone:string,status:string,from:string,to:string}
+     */
+    private static function normalizeSearchFilters(array $filters): array
+    {
+        $allowed = ['customer_name', 'email', 'phone', 'status', 'from', 'to'];
+        if (array_diff(array_keys($filters), $allowed) !== []) {
+            throw new \InvalidArgumentException('SBAIO_CUSTOMERS_SEARCH_FILTER_INVALID');
+        }
+        $values = [];
+        foreach ($allowed as $key) {
+            $value = $filters[$key] ?? '';
+            if (!is_string($value)) {
+                throw new \InvalidArgumentException('SBAIO_CUSTOMERS_SEARCH_FILTER_INVALID');
+            }
+            $values[$key] = trim($value);
+        }
+        if ($values['customer_name'] === ''
+            && $values['email'] === ''
+            && $values['phone'] === ''
+            && $values['status'] === ''
+            && $values['from'] === ''
+            && $values['to'] === '') {
+            throw new \InvalidArgumentException('SBAIO_CUSTOMERS_SEARCH_FILTER_REQUIRED');
+        }
+        if (strlen($values['customer_name']) > 160
+            || strlen($values['email']) > 254
+            || strlen($values['phone']) > 80
+            || strlen($values['status']) > 40
+            || ($values['from'] !== '' && !self::isCalendarDate($values['from']))
+            || ($values['to'] !== '' && !self::isCalendarDate($values['to']))
+            || ($values['from'] !== '' && $values['to'] !== '' && $values['from'] > $values['to'])) {
+            throw new \InvalidArgumentException('SBAIO_CUSTOMERS_SEARCH_FILTER_INVALID');
+        }
+
+        return $values;
+    }
+
+    /** @param array{customer_name:string,email:string,phone:string,status:string,from:string,to:string} $filters */
+    private static function searchFilterFingerprint(array $filters): string
+    {
+        return hash('sha256', (string)json_encode($filters, JSON_UNESCAPED_SLASHES));
+    }
+
+    /**
+     * @return array{created_at:?string,id:int}|null
+     */
+    private static function decodeSearchCursor(?string $cursor, string $fingerprint): ?array
+    {
+        if ($cursor === null || trim($cursor) === '') {
+            return null;
+        }
+        if (!preg_match('/^[A-Za-z0-9_-]+$/D', $cursor) || (strlen($cursor) % 4) === 1) {
+            throw new \InvalidArgumentException('SBAIO_CUSTOMERS_SEARCH_CURSOR_INVALID');
+        }
+        $encoded = strtr($cursor, '-_', '+/');
+        $encoded .= str_repeat('=', (4 - (strlen($encoded) % 4)) % 4);
+        $json = base64_decode($encoded, true);
+        if ($json === false) {
+            throw new \InvalidArgumentException('SBAIO_CUSTOMERS_SEARCH_CURSOR_INVALID');
+        }
+        try {
+            $payload = json_decode($json, true, 8, JSON_THROW_ON_ERROR);
+        } catch (\JsonException) {
+            throw new \InvalidArgumentException('SBAIO_CUSTOMERS_SEARCH_CURSOR_INVALID');
+        }
+        if (!is_array($payload)
+            || array_diff(array_keys($payload), ['v', 'created_at', 'id', 'fingerprint']) !== []
+            || count($payload) !== 4
+            || ($payload['v'] ?? null) !== 1
+            || !is_string($payload['fingerprint'] ?? null)
+            || !hash_equals($fingerprint, $payload['fingerprint'])) {
+            throw new \InvalidArgumentException('SBAIO_CUSTOMERS_SEARCH_CURSOR_INVALID');
+        }
+        $createdAt = $payload['created_at'] ?? null;
+        if ($createdAt !== null && (!is_string($createdAt) || !self::isDateTime($createdAt))) {
+            throw new \InvalidArgumentException('SBAIO_CUSTOMERS_SEARCH_CURSOR_INVALID');
+        }
+        $id = $payload['id'] ?? null;
+        if (!is_int($id) || $id < 1) {
+            throw new \InvalidArgumentException('SBAIO_CUSTOMERS_SEARCH_CURSOR_INVALID');
+        }
+        return ['created_at' => $createdAt, 'id' => $id];
+    }
+
+    /** @param array<string,mixed> $row */
+    private static function encodeSearchCursor(array $row, string $fingerprint): string
+    {
+        $id = $row['id'] ?? null;
+        if (is_string($id) && ctype_digit($id)) {
+            $id = (int)$id;
+        }
+        $createdAt = $row['created_at'] ?? null;
+        if (!is_int($id) || $id < 1 || ($createdAt !== null && (!is_string($createdAt) || !self::isDateTime($createdAt)))) {
+            throw new \UnexpectedValueException('SBAIO_CUSTOMERS_SEARCH_ROW_INVALID');
+        }
+        $json = json_encode([
+            'v' => 1,
+            'created_at' => $createdAt,
+            'id' => $id,
+            'fingerprint' => $fingerprint,
+        ], JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
+        return rtrim(strtr(base64_encode($json), '+/', '-_'), '=');
+    }
+
+    private static function isCalendarDate(string $value): bool
+    {
+        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/D', $value)) {
+            return false;
+        }
+        $date = \DateTimeImmutable::createFromFormat('!Y-m-d', $value);
+        $errors = \DateTimeImmutable::getLastErrors();
+        return $date !== false
+            && ($errors === false || ((int)($errors['warning_count'] ?? 0) === 0 && (int)($errors['error_count'] ?? 0) === 0))
+            && $date->format('Y-m-d') === $value;
+    }
+
+    private static function isDateTime(string $value): bool
+    {
+        $date = \DateTimeImmutable::createFromFormat('!Y-m-d H:i:s', $value);
+        $errors = \DateTimeImmutable::getLastErrors();
+        return $date !== false
+            && ($errors === false || ((int)($errors['warning_count'] ?? 0) === 0 && (int)($errors['error_count'] ?? 0) === 0))
+            && $date->format('Y-m-d H:i:s') === $value;
     }
 
     private static function nullIfBlank(string $value): ?string

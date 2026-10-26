@@ -1,4 +1,14 @@
 # AGENT-COMPLIANCE-CHECKLIST
+## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-CUSTOMERS-SEARCH-001 bounded historical discovery
+
+Added bounded historical Customer discovery on the existing administrator
+surface. Exact name/email/phone/status and inclusive creation-date filters are
+validated before reads; opaque cursors preserve filters and deterministic
+`created_at DESC, id DESC` ordering, including explicit NULL-date handling.
+Malformed or filter-mismatched cursors fail closed. Customers passed **193/193**
+and Sales **225/225** in database-free probes. No installed database or
+DB-backed SBAIO probe ran.
+
 ## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-CUSTOMERS-REPORT-001 report ownership
 
 Moved the existing Customers report reads into `CustomersService::reportData()`

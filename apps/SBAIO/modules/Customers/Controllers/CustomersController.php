@@ -52,12 +52,36 @@ final class CustomersController
                 $exactCustomerState = 'invalid';
             }
         }
+        $searchRequested = ($currentQuery['customer_search'] ?? '') === '1';
+        $searchResult = null;
+        if ($searchRequested) {
+            try {
+                $searchResult = CustomersService::search([
+                    'customer_name' => $currentQuery['customer_name_exact'] ?? '',
+                    'email' => $currentQuery['customer_email_exact'] ?? '',
+                    'phone' => $currentQuery['customer_phone_exact'] ?? '',
+                    'status' => $currentQuery['customer_status_exact'] ?? '',
+                    'from' => $currentQuery['customer_from'] ?? '',
+                    'to' => $currentQuery['customer_to'] ?? '',
+                ], 50, is_string($currentQuery['customer_cursor'] ?? null)
+                    ? $currentQuery['customer_cursor']
+                    : (($currentQuery['customer_cursor'] ?? null) === null ? null : '[invalid]'));
+            } catch (\InvalidArgumentException) {
+                $searchResult = ['valid' => false, 'available' => true, 'rows' => [], 'truncated' => false, 'limit' => 50, 'filters' => [], 'next_cursor' => null];
+            } catch (\Throwable) {
+                $searchResult = ['valid' => true, 'available' => false, 'rows' => [], 'truncated' => false, 'limit' => 50, 'filters' => [], 'next_cursor' => null];
+            }
+            $rows = (array)($searchResult['rows'] ?? []);
+        } else {
+            $rows = CustomersService::recent();
+        }
         $view->render('Customers::index.php', [
             'pageTitle' => t('sbaio.customers.title'),
             'moduleTitle' => t('sbaio.customers.title'),
             'moduleDescription' => t('sbaio.customers.description'),
-            'rows' => CustomersService::recent(),
+            'rows' => $rows,
             'currentQuery' => $currentQuery,
+            'searchResult' => $searchResult,
             'message' => (string)($currentQuery['ok'] ?? ''),
             'error' => (string)($currentQuery['err'] ?? ''),
             'exactCustomer' => $exactCustomer,

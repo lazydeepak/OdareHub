@@ -1,4 +1,20 @@
 # SBAIO — Work
+## 2026-10-26 — OH-AUTO3-SBAIO-CUSTOMERS-SEARCH-001 bounded historical discovery
+
+**Status: In progress — offline verification only; no installed database or DB-backed SBAIO probe.**
+
+- [x] Confirmed the Customers surface had only the bounded recent list and
+  exact-ID retrieval; no historical search capability existed.
+- [x] Added Customers-owned exact filters for name, email, phone, status, and
+  inclusive creation-date bounds. Empty filters, malformed scalars/dates, and
+  reversed ranges fail before any database read.
+- [x] Added opaque forward keyset cursors bound to normalized filters, with
+  deterministic `created_at DESC, id DESC` ordering, explicit NULL-date
+  continuation, and a bounded 50-row page plus overflow row.
+- [x] Integrated search into the existing administrator Customers page without
+  adding a route or changing creation, exact-ID, reporting, export, or Sales
+  behavior. Customers passed **193/193** and Sales **225/225**.
+
 ## 2026-10-26 — OH-AUTO3-SBAIO-CUSTOMERS-REPORT-001 report service ownership
 
 **Status: In progress — offline verification only; no installed database or DB-backed SBAIO probe.**

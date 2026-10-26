@@ -319,6 +319,61 @@ namespace {
     $assert($unavailableReportData['summary']['total'] === 0 && $unavailableReportData['byStatus'] === [] && $unavailableReportData['recent'] === [], 'customer report keeps the existing default payload on read failure');
     DB::$fetchOneFailure = false;
 
+    // Historical discovery is exact-filter-only, bounded, deterministic, and
+    // cursor-bound. Invalid filters/cursors must not reach the database.
+    DB::$queries = [];
+    DB::$fetchAllRows = [[
+        ['id' => 30, 'customer_name' => 'Acme', 'contact_name' => 'A', 'email' => 'a@example.test', 'phone' => '111', 'status' => 'active', 'created_at' => '2026-01-03 12:00:00'],
+        ['id' => 29, 'customer_name' => 'Acme', 'contact_name' => 'B', 'email' => 'b@example.test', 'phone' => '222', 'status' => 'active', 'created_at' => '2026-01-02 12:00:00'],
+        ['id' => 28, 'customer_name' => 'Acme', 'contact_name' => 'C', 'email' => 'c@example.test', 'phone' => '333', 'status' => 'active', 'created_at' => '2026-01-01 12:00:00'],
+    ]];
+    $firstSearch = CustomersService::search(['customer_name' => ' Acme ', 'from' => '2026-01-01', 'to' => '2026-01-31'], 2);
+    $assert($firstSearch['valid'] === true && $firstSearch['truncated'] === true && count($firstSearch['rows']) === 2, 'customer search returns a bounded first page with overflow detection');
+    $assert($firstSearch['rows'][0]['id'] === 30 && $firstSearch['rows'][1]['id'] === 29, 'customer search preserves created_at DESC and id DESC ordering');
+    $assert(is_string($firstSearch['next_cursor']) && $firstSearch['next_cursor'] !== '', 'customer search emits an opaque next cursor');
+    $assert(str_contains(DB::$queries[0]['sql'], 'customer_name = ?') && str_contains(DB::$queries[0]['sql'], 'created_at >= ?') && str_contains(DB::$queries[0]['sql'], 'created_at < DATE_ADD(?, INTERVAL 1 DAY)') && str_contains(DB::$queries[0]['sql'], 'ORDER BY created_at DESC, id DESC LIMIT 3'), 'customer search uses exact predicates, inclusive date bounds, and one overflow row');
+    $assert(DB::$queries[0]['params'] === ['Acme', '2026-01-01 00:00:00', '2026-01-31 00:00:00'], 'customer search trims filters and binds all values as parameters');
+
+    DB::$queries = [];
+    DB::$fetchAllRows = [[
+        ['id' => 28, 'customer_name' => 'Acme', 'contact_name' => 'C', 'email' => 'c@example.test', 'phone' => '333', 'status' => 'active', 'created_at' => '2026-01-01 00:00:00'],
+    ]];
+    $secondSearch = CustomersService::search(['customer_name' => 'Acme', 'from' => '2026-01-01', 'to' => '2026-01-31'], 2, $firstSearch['next_cursor']);
+    $assert($secondSearch['rows'][0]['id'] === 28 && $secondSearch['next_cursor'] === null, 'customer search cursor advances without duplicating the boundary row');
+    $assert(str_contains(DB::$queries[0]['sql'], 'created_at < ? OR created_at IS NULL OR (created_at = ? AND id < ?)'), 'customer cursor adds the strict keyset continuation predicate');
+
+    foreach ([
+        [],
+        ['customer_name' => ['Acme']],
+        ['from' => '2026-02-30'],
+        ['from' => '2026-02-02', 'to' => '2026-02-01'],
+        ['customer_status' => 'active'],
+    ] as $invalidFilters) {
+        DB::$queries = [];
+        try {
+            CustomersService::search($invalidFilters);
+            $assert(false, 'invalid customer search filter unexpectedly succeeded');
+        } catch (\InvalidArgumentException) {
+            $assert(DB::$queries === [], 'invalid customer search filter is rejected before database access');
+        }
+    }
+    foreach ([$firstSearch['next_cursor'] . 'tampered', '!', 'eyJ2IjoyfQ'] as $invalidCursor) {
+        DB::$queries = [];
+        try {
+            CustomersService::search(['customer_name' => 'Acme'], 2, $invalidCursor);
+            $assert(false, 'invalid customer search cursor unexpectedly succeeded');
+        } catch (\InvalidArgumentException) {
+            $assert(DB::$queries === [], 'invalid customer search cursor is rejected before database access');
+        }
+    }
+    DB::$queries = [];
+    try {
+        CustomersService::search(['customer_name' => 'Other'], 2, $firstSearch['next_cursor']);
+        $assert(false, 'filter-mismatched customer cursor unexpectedly succeeded');
+    } catch (\InvalidArgumentException) {
+        $assert(DB::$queries === [], 'filter-mismatched customer cursor is rejected before database access');
+    }
+
     $source = file_get_contents(__DIR__ . '/../Views/index.php') ?: '';
     $reportSource = file_get_contents(__DIR__ . '/../Views/report.php') ?: '';
     $routes = file_get_contents(__DIR__ . '/../routes.php') ?: '';
@@ -330,12 +385,19 @@ namespace {
     $assert(str_contains($controllerSource, 'CustomersService::findById') && str_contains($controllerSource, "'customer_id' => \$createdId"), 'post-create redirect carries the exact generated customer ID');
     $assert(str_contains($serviceSource, 'public static function findById') && str_contains($serviceSource, 'WHERE id = ? LIMIT 1') && str_contains($serviceSource, 'begin_transaction'), 'customer service owns exact read and transaction identity guarantees');
     $assert(str_contains($serviceSource, 'public static function reportData'), 'Customers service owns the report read contract');
+    $assert(str_contains($serviceSource, 'public static function search') && str_contains($serviceSource, 'customer_name = ?') && str_contains($serviceSource, 'searchFilterFingerprint'), 'Customers service owns exact-filter historical discovery and cursor binding');
+    $assert(str_contains($controllerSource, "CustomersService::search(") && str_contains($controllerSource, "'customer_search'") && str_contains($source, 'customer_cursor'), 'existing Customers administration surface carries bounded search state');
+    $assert(strpos($controllerSource, 'self::requireAdministrator();') < strpos($controllerSource, 'CustomersService::search('), 'administrator authorization precedes customer historical search');
+    $assert(!str_contains($serviceSource . $source, ' LIKE ') && !str_contains($serviceSource . $source, 'latest-row'), 'customer discovery has no fuzzy matching or latest-row inference');
     $assert(!str_contains($reportSource, 'DB::') && !str_contains($reportSource, 'sbaio_customers') && !str_contains($reportSource, 'ModuleReportRegistryService'), 'Customers report view performs zero database and registry operations');
     $assert(str_contains($controllerSource, "'reportData' => CustomersService::reportData()") && str_contains($routes, 'CustomersController::report($view, $report)'), 'controller supplies prepared report data after registry admission');
     $assert(strpos($routes, 'CustomersController::requireAdministrator()') < strpos($routes, 'ModuleReportRegistryService::findActiveReport') && strpos($routes, 'ModuleReportRegistryService::findActiveReport') < strpos($routes, 'CustomersController::report($view, $report)'), 'report authorization and registry admission precede data preparation and rendering');
     $assert(!str_contains($controllerSource . $serviceSource, 'latest') && !str_contains($controllerSource . $serviceSource, 'ORDER BY id DESC LIMIT 1'), 'customer identity does not use latest-row inference');
     foreach (['open_created_record', 'open_record', 'record_title', 'record_id', 'record_customer_name', 'record_contact_name', 'record_email', 'record_phone', 'record_status', 'record_id_invalid', 'record_not_found', 'record_unavailable'] as $key) {
         $assert(str_contains($source, 'sbaio.customers.' . $key), 'Customers view uses localized exact-record key ' . $key);
+    }
+    foreach (['search_title', 'search_note', 'search_name', 'search_email', 'search_phone', 'search_status', 'search_from', 'search_to', 'search_submit', 'search_invalid', 'search_unavailable', 'search_no_results', 'search_limited', 'search_next', 'search_created'] as $key) {
+        $assert(str_contains($source, 'sbaio.customers.' . $key), 'Customers view uses localized search key ' . $key);
     }
     $assert(substr_count($routes, 'CustomersController::requireAdministrator()') === 4, 'all customer record routes require administrator authority');
     $assert(!str_contains($source . $routes, 'staff_id') && !str_contains($source . $routes, 'leave_status'), 'Customers surface has no Staff or Leave coupling');

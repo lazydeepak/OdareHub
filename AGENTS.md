@@ -1,4 +1,17 @@
 # AGENTS.md
+## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-CUSTOMERS-SEARCH-001 bounded historical discovery
+
+Added bounded exact-filter Customer historical discovery to the existing
+administrator surface. Forward opaque cursors preserve exact filters and the
+`created_at DESC, id DESC` order, including explicit NULL-date handling;
+malformed and changed-filter cursors fail closed before reads. No new route,
+permission, lifecycle, schema, Core/Auth/ACL, organization, Staff, Leave,
+Timecard, reporting, export, or Sales behavior changed.
+
+Customers regression **193/193**, Sales **225/225**, and changed-file lint/diff
+checks passed. Architecture/deletion/deployment validation remains pending;
+no installed database or DB-backed SBAIO probe was executed.
+
 ## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-CUSTOMERS-REPORT-001 report ownership
 
 Completed Customers report service ownership. The existing report SQL and

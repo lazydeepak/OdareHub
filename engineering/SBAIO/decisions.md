@@ -1,4 +1,18 @@
 # SBAIO — Decisions
+### 2026-10-26 — OH-AUTO3-SBAIO-CUSTOMERS-SEARCH-001 bounded historical discovery
+
+**Decision: Extend `CustomersService` and the existing administrator Customers page with exact-filter forward keyset search; do not add a route, generic search framework, fuzzy matching, or unfiltered historical browse.**
+
+Search accepts exact `customer_name`, `email`, `phone`, and `status` values,
+plus inclusive `created_at` calendar-date bounds. At least one filter is
+required. Each scalar/date/range and cursor is validated before database
+access. The cursor carries version, the last `created_at` (including NULL),
+positive ID, and a SHA-256 normalized-filter fingerprint. Results preserve
+`created_at DESC, id DESC`, fetch one overflow row, and expose at most 50
+records. Existing administrator authorization remains before search; no
+permission, lifecycle, schema, mutation, cross-domain, Core/Auth/ACL,
+organization, Staff, Leave, or Timecard behavior changes.
+
 ### 2026-10-26 — OH-AUTO3-SBAIO-CUSTOMERS-REPORT-001 report read ownership
 
 **Decision: Keep Customers report data reads in `CustomersService`, with the existing route retaining administrator authorization and active report-registry admission before controller/view rendering.**
