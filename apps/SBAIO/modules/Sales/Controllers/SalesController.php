@@ -39,11 +39,11 @@ final class SalesController
                     'status' => $currentQuery['sale_status'] ?? '',
                     'from' => $currentQuery['sale_from'] ?? '',
                     'to' => $currentQuery['sale_to'] ?? '',
-                ]);
+                ], 50, is_string($currentQuery['sales_cursor'] ?? null) ? $currentQuery['sales_cursor'] : (($currentQuery['sales_cursor'] ?? null) === null ? null : '[invalid]'));
             } catch (\InvalidArgumentException) {
-                $searchResult = ['valid' => false, 'available' => true, 'rows' => [], 'truncated' => false, 'limit' => 50, 'filters' => []];
+                $searchResult = ['valid' => false, 'available' => true, 'rows' => [], 'truncated' => false, 'limit' => 50, 'filters' => [], 'next_cursor' => null];
             } catch (\Throwable) {
-                $searchResult = ['valid' => true, 'available' => false, 'rows' => [], 'truncated' => false, 'limit' => 50, 'filters' => []];
+                $searchResult = ['valid' => true, 'available' => false, 'rows' => [], 'truncated' => false, 'limit' => 50, 'filters' => [], 'next_cursor' => null];
             }
             $rows = (array)($searchResult['rows'] ?? []);
         } else {

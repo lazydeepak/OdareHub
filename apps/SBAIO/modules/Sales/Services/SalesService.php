@@ -116,12 +116,14 @@ final class SalesService
      * inclusive sale-date filters. The read is bounded and deterministic.
      *
      * @param array<string,mixed> $filters
-     * @return array{valid:bool,available:bool,rows:array<int,array<string,mixed>>,truncated:bool,limit:int,filters:array{sale_ref:string,status:string,from:string,to:string}}
+     * @return array{valid:bool,available:bool,rows:array<int,array<string,mixed>>,truncated:bool,limit:int,filters:array{sale_ref:string,status:string,from:string,to:string},next_cursor:?string}
      */
-    public static function search(array $filters, int $limit = 50): array
+    public static function search(array $filters, int $limit = 50, ?string $cursor = null): array
     {
         $limit = max(1, min(self::MAX_SEARCH_LIMIT, $limit));
         $normalized = self::normalizeSearchFilters($filters);
+        $fingerprint = self::searchFilterFingerprint($normalized);
+        $cursorData = self::decodeSearchCursor($cursor, $fingerprint);
         $where = [];
         $params = [];
 
@@ -141,6 +143,17 @@ final class SalesService
             $where[] = 'sale_date <= ?';
             $params[] = $normalized['to'];
         }
+        if ($cursorData !== null) {
+            if ($cursorData['sale_date'] === null) {
+                $where[] = '(sale_date IS NULL AND id < ?)';
+                $params[] = $cursorData['id'];
+            } else {
+                $where[] = '(sale_date < ? OR sale_date IS NULL OR (sale_date = ? AND id < ?))';
+                $params[] = $cursorData['sale_date'];
+                $params[] = $cursorData['sale_date'];
+                $params[] = $cursorData['id'];
+            }
+        }
 
         $rows = DB::fetchAll(
             'SELECT id, sale_ref, customer_name, amount, sale_status, sale_date
@@ -150,14 +163,19 @@ final class SalesService
             $params
         );
         $truncated = count($rows) > $limit;
+        $displayRows = array_values(array_slice($rows, 0, $limit));
+        $nextCursor = $truncated && $displayRows !== []
+            ? self::encodeSearchCursor($displayRows[count($displayRows) - 1], $fingerprint)
+            : null;
 
         return [
             'valid' => true,
             'available' => true,
-            'rows' => array_values(array_slice($rows, 0, $limit)),
+            'rows' => $displayRows,
             'truncated' => $truncated,
             'limit' => $limit,
             'filters' => $normalized,
+            'next_cursor' => $nextCursor,
         ];
     }
 
@@ -280,6 +298,77 @@ final class SalesService
         }
 
         return ['sale_ref' => $saleRef, 'status' => $status, 'from' => $from, 'to' => $to];
+    }
+
+    /** @param array{sale_ref:string,status:string,from:string,to:string} $filters */
+    private static function searchFilterFingerprint(array $filters): string
+    {
+        return hash('sha256', (string)json_encode($filters, JSON_UNESCAPED_SLASHES));
+    }
+
+    /**
+     * @return array{sale_date:?string,id:int}|null
+     */
+    private static function decodeSearchCursor(?string $cursor, string $fingerprint): ?array
+    {
+        if ($cursor === null || trim($cursor) === '') {
+            return null;
+        }
+        if (!preg_match('/^[A-Za-z0-9_-]+$/D', $cursor) || (strlen($cursor) % 4) === 1) {
+            throw new \InvalidArgumentException('SBAIO_SALES_SEARCH_CURSOR_INVALID');
+        }
+
+        $encoded = strtr($cursor, '-_', '+/');
+        $encoded .= str_repeat('=', (4 - (strlen($encoded) % 4)) % 4);
+        $json = base64_decode($encoded, true);
+        if ($json === false) {
+            throw new \InvalidArgumentException('SBAIO_SALES_SEARCH_CURSOR_INVALID');
+        }
+        try {
+            $payload = json_decode($json, true, 8, JSON_THROW_ON_ERROR);
+        } catch (\JsonException) {
+            throw new \InvalidArgumentException('SBAIO_SALES_SEARCH_CURSOR_INVALID');
+        }
+        if (!is_array($payload)
+            || array_diff(array_keys($payload), ['v', 'sale_date', 'id', 'fingerprint']) !== []
+            || count($payload) !== 4
+            || ($payload['v'] ?? null) !== 1
+            || !is_string($payload['fingerprint'] ?? null)
+            || !hash_equals($fingerprint, $payload['fingerprint'])
+        ) {
+            throw new \InvalidArgumentException('SBAIO_SALES_SEARCH_CURSOR_INVALID');
+        }
+
+        $saleDate = $payload['sale_date'] ?? null;
+        if ($saleDate !== null && (!is_string($saleDate) || !self::isCalendarDate($saleDate))) {
+            throw new \InvalidArgumentException('SBAIO_SALES_SEARCH_CURSOR_INVALID');
+        }
+        $id = $payload['id'] ?? null;
+        if (!is_int($id) || $id < 1) {
+            throw new \InvalidArgumentException('SBAIO_SALES_SEARCH_CURSOR_INVALID');
+        }
+
+        return ['sale_date' => $saleDate, 'id' => $id];
+    }
+
+    /** @param array<string,mixed> $row */
+    private static function encodeSearchCursor(array $row, string $fingerprint): string
+    {
+        $id = $row['id'] ?? null;
+        if (is_string($id) && ctype_digit($id)) {
+            $id = (int)$id;
+        }
+        $saleDate = $row['sale_date'] ?? null;
+        if (!is_int($id) || $id < 1 || ($saleDate !== null && (!is_string($saleDate) || !self::isCalendarDate($saleDate)))) {
+            throw new \UnexpectedValueException('SBAIO_SALES_SEARCH_ROW_INVALID');
+        }
+        $json = json_encode([
+            'v' => 1,
+            'sale_date' => $saleDate,
+            'id' => $id,
+            'fingerprint' => $fingerprint,
+        ], JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
+        return rtrim(strtr(base64_encode($json), '+/', '-_'), '=');
     }
 
     private static function normalizeDecimal(string $value): ?string

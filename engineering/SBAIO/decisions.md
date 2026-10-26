@@ -1,5 +1,23 @@
 # SBAIO — Decisions
 
+### 2026-10-26 — OH-AUTO3-SBAIO-SALES-PAGING-001 forward keyset contract
+
+**Decision: Use a Sales-owned opaque forward keyset cursor; do not add a generic pagination framework or route.**
+
+The cursor records version, the last displayed `sale_date` (including NULL),
+the last displayed positive `id`, and a SHA-256 fingerprint of normalized
+`sale_ref`, status, and inclusive date filters. It is decoded and validated
+before database access. A changed filter set, malformed structure, invalid
+calendar date, invalid ID, or invalid fingerprint fails closed without a read.
+
+The next-page predicate preserves the existing order: non-NULL cursors use
+`sale_date < cursor_date OR sale_date IS NULL OR (sale_date = cursor_date AND
+id < cursor_id)`; NULL cursors use `sale_date IS NULL AND id < cursor_id`.
+Values remain parameterized and each page fetches at most 51 rows to display
+50. Existing authorization, filters, reports, exports, routes, schema,
+mutations, and lifecycle semantics remain unchanged.
+
+
 ### 2026-10-26 — OH-AUTO3-SBAIO-SALES-SEARCH-001 bounded retrieval contract
 
 **Decision: Extend the existing Sales-owned read service rather than introduce a generic search framework or new route.**

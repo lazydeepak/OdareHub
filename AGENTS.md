@@ -1,5 +1,21 @@
 # AGENTS.md
 
+## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-SALES-PAGING-001 keyset pagination
+
+Completed the bounded Sales historical retrieval slice. Forward opaque keyset
+cursors preserve exact filters and the existing date/ID ordering, including
+explicit NULL-date handling. Cursor structure, calendar date, positive ID, and
+filter fingerprint are validated before reads; malformed or changed-filter
+cursors fail closed. No route, permission, lifecycle, schema, mutation,
+reporting, export, Core/Auth/ACL, organization, Staff, Leave, or Timecard
+behavior changed.
+
+Sales regression **146/146** and changed-file lint/diff checks passed. Final
+architecture/deletion/deployment validation remains pending; no installed
+database or DB-backed SBAIO probe was executed. Unrelated artifacts remain
+preserved.
+
+
 ## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-SALES-SEARCH-001 bounded Sales search
 
 Implemented the bounded Sales-owned administrator search slice. Exact

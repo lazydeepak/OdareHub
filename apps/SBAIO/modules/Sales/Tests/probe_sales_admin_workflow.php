@@ -117,6 +117,7 @@ namespace {
 
     $serviceSource = file_get_contents(__DIR__ . '/../Services/SalesService.php') ?: '';
     $controllerSource = file_get_contents(__DIR__ . '/../Controllers/SalesController.php') ?: '';
+    $indexSource = file_get_contents(__DIR__ . '/../Views/index.php') ?: '';
     $routesSource = file_get_contents(__DIR__ . '/../routes.php') ?: '';
     $reportSource = file_get_contents(__DIR__ . '/../Views/report.php') ?: '';
     $exportSource = file_get_contents(__DIR__ . '/../Views/export.php') ?: '';
@@ -275,6 +276,69 @@ namespace {
     $assert(str_contains(DB::$queries[0]['sql'], 'ORDER BY sale_date DESC, id DESC LIMIT 51'), 'search uses deterministic ordering and one-row overflow bound');
     $assert($search['rows'][0]['sale_date'] === '2022-01-15', 'search can retrieve a historical sale outside the recent listing window');
 
+    $firstPageRows = [];
+    for ($id = 100; $id >= 50; $id--) {
+        $firstPageRows[] = [
+            'id' => $id,
+            'sale_ref' => 'PAGE-' . $id,
+            'customer_name' => 'Customer',
+            'amount' => '1.00',
+            'sale_status' => 'open',
+            'sale_date' => $id === 51 ? '2024-01-01' : '2024-01-02',
+        ];
+    }
+    $secondPageRows = [];
+    for ($id = 50; $id >= 1; $id--) {
+        $secondPageRows[] = ['id' => $id, 'sale_ref' => 'PAGE-' . $id, 'customer_name' => 'Customer', 'amount' => '1.00', 'sale_status' => 'open', 'sale_date' => '2024-01-01'];
+    }
+    DB::$queries = [];
+    DB::$fetchAllRows = [$firstPageRows, $secondPageRows];
+    $pageOne = SalesService::search(['status' => 'open']);
+    $pageTwo = SalesService::search(['status' => 'open'], 50, $pageOne['next_cursor']);
+    $pageOneIds = array_column($pageOne['rows'], 'id');
+    $pageTwoIds = array_column($pageTwo['rows'], 'id');
+    $assert($pageOne['next_cursor'] !== null && $pageTwo['next_cursor'] === null, 'forward keyset pagination exposes only a next cursor when another page exists');
+    $assert($pageOneIds === range(100, 51) && $pageTwoIds === range(50, 1), 'keyset pages preserve duplicate-date ordering without skipped records');
+    $assert(array_intersect($pageOneIds, $pageTwoIds) === [], 'keyset pages do not duplicate records at the boundary');
+    $assert(str_contains(DB::$queries[1]['sql'], '(sale_date < ? OR sale_date IS NULL OR (sale_date = ? AND id < ?))') && DB::$queries[1]['params'] === ['open', '2024-01-01', '2024-01-01', 51], 'non-null cursor uses the exact descending keyset predicate');
+
+    $nullPageRows = [];
+    for ($id = 51; $id >= 1; $id--) {
+        $nullPageRows[] = ['id' => $id, 'sale_ref' => 'NULL-' . $id, 'customer_name' => 'Customer', 'amount' => '1.00', 'sale_status' => 'open', 'sale_date' => null];
+    }
+    DB::$queries = [];
+    DB::$fetchAllRows = [$nullPageRows, [['id' => 1, 'sale_ref' => 'NULL-1', 'customer_name' => 'Customer', 'amount' => '1.00', 'sale_status' => 'open', 'sale_date' => null]]];
+    $nullPageOne = SalesService::search(['status' => 'open']);
+    $nullPageTwo = SalesService::search(['status' => 'open'], 50, $nullPageOne['next_cursor']);
+    $assert($nullPageOne['next_cursor'] !== null && $nullPageTwo['rows'][0]['id'] === 1 && $nullPageTwo['next_cursor'] === null, 'NULL-date cursor reaches the final NULL-date record');
+    $assert(str_contains(DB::$queries[1]['sql'], '(sale_date IS NULL AND id < ?)') && DB::$queries[1]['params'] === ['open', 2], 'NULL-date cursor uses an explicit NULL ordering predicate');
+
+    $emptyFingerprint = hash('sha256', (string)json_encode(['sale_ref' => '', 'status' => '', 'from' => '', 'to' => ''], JSON_UNESCAPED_SLASHES));
+    $encodeCursor = static function (array $payload): string {
+        return rtrim(strtr(base64_encode((string)json_encode($payload, JSON_UNESCAPED_SLASHES)), '+/', '-_'), '=');
+    };
+    foreach ([
+        'not-a-cursor',
+        $encodeCursor(['v' => 1, 'sale_date' => '2023-02-29', 'id' => 1, 'fingerprint' => $emptyFingerprint]),
+        $encodeCursor(['v' => 1, 'sale_date' => null, 'id' => 0, 'fingerprint' => $emptyFingerprint]),
+        $encodeCursor(['v' => 1, 'sale_date' => null, 'id' => 1, 'fingerprint' => str_repeat('0', 64)]),
+    ] as $invalidCursor) {
+        DB::$queries = [];
+        try {
+            SalesService::search([], 50, $invalidCursor);
+            $assert(false, 'invalid cursor unexpectedly succeeded');
+        } catch (\InvalidArgumentException) {
+            $assert(DB::$queries === [], 'malformed cursor is rejected before database access');
+        }
+    }
+    DB::$queries = [];
+    try {
+        SalesService::search(['status' => 'won'], 50, $nullPageOne['next_cursor']);
+        $assert(false, 'cursor with changed filters unexpectedly succeeded');
+    } catch (\InvalidArgumentException) {
+        $assert(DB::$queries === [], 'changed filters invalidate the cursor before database access');
+    }
+
     DB::$queries = [];
     DB::$fetchAllRows = [[]];
     $statusOnly = SalesService::search(['status' => 'won']);
@@ -298,6 +362,7 @@ namespace {
         }
     }
     $assert(str_contains($controllerSource, 'self::requireAdministrator();') && strpos($controllerSource, 'self::requireAdministrator();') < strpos($controllerSource, 'SalesService::search'), 'Sales search authorization precedes service/database access');
+    $assert(str_contains($indexSource, "'sales_cursor'") && str_contains($indexSource, 'http_build_query') && str_contains($indexSource, "'sbaio.sales.search_next'"), 'Sales view preserves filters and exposes the forward cursor link');
 
     DB::$queries = [];
     DB::$fetchOneRows = [[
@@ -355,6 +420,7 @@ namespace {
             'sbaio.sales.search_customer',
             'sbaio.sales.search_sale_date',
             'sbaio.sales.search_amount',
+            'sbaio.sales.search_next',
         ] as $key) {
             $assert(is_array($localeValues) && trim((string)($localeValues[$key] ?? '')) !== '', "{$locale} localizes {$key}");
         }

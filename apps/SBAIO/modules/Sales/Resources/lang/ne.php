@@ -29,4 +29,5 @@ return [
     'sbaio.sales.search_customer' => 'ग्राहक',
     'sbaio.sales.search_sale_date' => 'बिक्री मिति',
     'sbaio.sales.search_amount' => 'रकम',
+    'sbaio.sales.search_next' => 'अर्को पृष्ठ',
 ];

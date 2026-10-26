@@ -9,6 +9,21 @@ $rows = is_array($rows ?? null) ? $rows : [];
 $currentQuery = is_array($currentQuery ?? null) ? $currentQuery : [];
 $searchResult = is_array($searchResult ?? null) ? $searchResult : null;
 $saleStatusOptions = is_array($saleStatusOptions ?? null) ? $saleStatusOptions : [];
+$nextSearchUrl = null;
+if (is_string($searchResult['next_cursor'] ?? null) && $searchResult['next_cursor'] !== '') {
+  $nextParams = ['sales_search' => '1', 'sales_cursor' => $searchResult['next_cursor']];
+  foreach ([
+    'sale_ref' => 'sale_ref',
+    'status' => 'sale_status',
+    'from' => 'sale_from',
+    'to' => 'sale_to',
+  ] as $filterKey => $queryKey) {
+    if (is_string($searchResult['filters'][$filterKey] ?? null) && $searchResult['filters'][$filterKey] !== '') {
+      $nextParams[$queryKey] = $searchResult['filters'][$filterKey];
+    }
+  }
+  $nextSearchUrl = '/apps/sbaio/sales?' . http_build_query($nextParams, '', '&', PHP_QUERY_RFC3986);
+}
 $suiteActions = [
   ['label' => t('nav.sbaio_dashboard'), 'url' => '/apps/sbaio'],
   ['label' => t('nav.sbaio_customers'), 'url' => '/apps/sbaio/customers'],
@@ -57,7 +72,9 @@ require APP_ROOT . '/apps/SBAIO/Views/partials/module_page_filters.php';
             <td><?= e((string)($row['sale_status'] ?? '')) ?></td>
           </tr><?php endforeach; ?>
         </tbody></table></div>
-        <?php if (($searchResult['truncated'] ?? false) === true): ?><p class="muted"><?= e(str_replace('{limit}', (string)($searchResult['limit'] ?? 50), t('sbaio.sales.search_limited'))) ?></p><?php endif; ?>
+        <?php if (($searchResult['truncated'] ?? false) === true): ?>
+          <p class="muted"><?= e(str_replace('{limit}', (string)($searchResult['limit'] ?? 50), t('sbaio.sales.search_limited'))) ?><?php if ($nextSearchUrl !== null): ?> <a href="<?= e($nextSearchUrl) ?>"><?= e(t('sbaio.sales.search_next')) ?></a><?php endif; ?></p>
+        <?php endif; ?>
       <?php endif; ?>
     <?php endif; ?>
   </div>

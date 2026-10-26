@@ -29,4 +29,5 @@ return [
     'sbaio.sales.search_customer' => '顧客',
     'sbaio.sales.search_sale_date' => '販売日',
     'sbaio.sales.search_amount' => '金額',
+    'sbaio.sales.search_next' => '次のページ',
 ];

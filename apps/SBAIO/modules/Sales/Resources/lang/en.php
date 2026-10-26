@@ -50,4 +50,5 @@ return [
     'sbaio.sales.search_customer' => 'Customer',
     'sbaio.sales.search_sale_date' => 'Sale date',
     'sbaio.sales.search_amount' => 'Amount',
+    'sbaio.sales.search_next' => 'Next page',
 ];

@@ -1,5 +1,20 @@
 # AGENT-COMPLIANCE-CHECKLIST
 
+## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-SALES-PAGING-001 keyset pagination
+
+Extended the Sales-owned administrator search with forward keyset pagination.
+Opaque cursors validate version, date, positive record ID, and normalized-filter
+fingerprint before database access. Existing `sale_date DESC, id DESC` ordering
+is preserved for duplicate and NULL dates; each page remains parameterized and
+bounded to 50 displayed rows with a `LIMIT 51` overflow check. Existing
+administrator authorization, filters, reports, exports, routes, schema,
+mutations, and lifecycle behavior remain unchanged.
+
+Sales regression passed **146/146**; changed-file PHP lint and diff hygiene
+passed. No installed database, DB-backed SBAIO probe, deployment, activation,
+or unrelated artifact operation occurred.
+
+
 ## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-SALES-SEARCH-001 bounded Sales search
 
 Added bounded Sales administrator search for exact sale-reference lookup,

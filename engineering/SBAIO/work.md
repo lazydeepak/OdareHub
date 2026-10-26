@@ -1,5 +1,25 @@
 # SBAIO — Work
 
+## 2026-10-26 — OH-AUTO3-SBAIO-SALES-PAGING-001 keyset pagination
+
+**Status: Complete for offline verification; database-backed SBAIO probes remain environment-bound.**
+
+- [x] Confirmed the integrated Sales search exposed only the first 50 matching
+  rows; its overflow flag did not provide access to later records.
+- [x] Added Sales-owned forward keyset pagination over the existing
+  `sale_date DESC, id DESC` order. Opaque cursors bind the last date/id and a
+  normalized-filter fingerprint; NULL dates use an explicit final-segment
+  predicate.
+- [x] Preserved exact reference, status, and inclusive date filters across
+  pages, strict cursor validation before reads, parameterized SQL, `LIMIT 51`,
+  and the existing administrator boundary.
+- [x] Sales regression passed **146/146**; changed-file PHP lint and diff
+  hygiene passed. Architecture, deletion-family, and deployment-readiness
+  verification remain part of final integration validation.
+- [x] No installed database, DB-backed SBAIO probe, deployment, activation, or
+  unrelated artifact operation occurred.
+
+
 ## 2026-10-26 — OH-AUTO3-SBAIO-SALES-SEARCH-001 bounded Sales search
 
 **Status: Complete for offline verification; database-backed SBAIO probes remain environment-bound.**
