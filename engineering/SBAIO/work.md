@@ -1,4 +1,21 @@
 # SBAIO — Work
+## 2026-10-26 — OH-AUTO3-SBAIO-NOTICES-REPORT-001 report ownership
+
+**Status: In progress — offline verification only; no installed database or DB-backed SBAIO probe.**
+
+- [x] Moved the existing four Notice report reads and default payload into
+  `NoticesService::reportData()` without changing metrics, predicates,
+  ordering, limits, or failure behavior.
+- [x] The existing authorized route still admits the active registry report;
+  `NoticesController::report()` now supplies the owner-prepared payload.
+- [x] `Views/report.php` now performs presentation only: zero database and
+  registry operations. Existing report privacy remains intact; body and Staff
+  linkage are not selected or rendered.
+- [x] Report ownership probe passed **18/18**; Notice continuity **37/37**,
+  integrity **136/136**, Task queue **30/30**, continuity **34/34**, Task
+  integrity **72/72**, report parity **16/16**, Expenses **91/91**,
+  Customers **195/195**, and Sales **225/225** remain passing.
+
 ## 2026-10-26 — OH-AUTO3-SBAIO-NOTICES-CONTINUITY-001 exact-ID continuity
 
 **Status: In progress — offline verification only; no installed database or DB-backed SBAIO probe.**

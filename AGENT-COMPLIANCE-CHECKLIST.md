@@ -1,4 +1,17 @@
 # AGENT-COMPLIANCE-CHECKLIST
+## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-NOTICES-REPORT-001 report ownership
+
+Completed Notices report service ownership. Existing report SQL/data
+preparation now live in `NoticesService::reportData()`; the presentation view
+performs no database or registry operations. Route app authorization and active
+report admission remain unchanged before controller rendering. Notice privacy
+boundaries remain intact.
+
+Report ownership probe **18/18**, Notice continuity **37/37**, integrity
+**136/136**, Tasks **30/30**, **34/34**, **72/72**, **16/16**, Expenses
+**91/91**, Customers **195/195**, and Sales **225/225** passed. No installed
+database or DB-backed SBAIO probe ran.
+
 ## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-NOTICES-CONTINUITY-001 exact-ID continuity
 
 Completed Notice create-to-record continuity on the existing administrator

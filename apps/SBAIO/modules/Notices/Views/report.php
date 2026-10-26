@@ -2,44 +2,12 @@
 $tt = static function (string $key): string {
   return t($key);
 };
-require_once APP_ROOT . '/apps/SBAIO/Services/ModuleReportRegistryService.php';
-
-use App\Core\DB;
-
-$report = $report ?? \Apps\SBAIO\Services\ModuleReportRegistryService::findActiveReport('sbaio.notices.overview');
-
-$summary = ['total'=>0,'active'=>0,'ack_required'=>0,'new_30d'=>0];
-$byType = [];
-$byLevel = [];
-$recent = [];
-
-if (is_array($report)) {
-    try {
-        $row = DB::fetchOne(
-            "SELECT COUNT(*) AS total,
-                    COALESCE(SUM(CASE WHEN is_active=1 THEN 1 ELSE 0 END),0) AS active,
-                    COALESCE(SUM(CASE WHEN requires_ack=1 THEN 1 ELSE 0 END),0) AS ack_required,
-                    COALESCE(SUM(CASE WHEN created_at >= DATE_SUB(CURDATE(), INTERVAL 30 DAY) THEN 1 ELSE 0 END),0) AS new_30d
-             FROM sbaio_notices"
-        );
-        if (is_array($row)) { $summary = array_merge($summary, $row); }
-
-        $byType = DB::fetchAll(
-            "SELECT COALESCE(NULLIF(notice_type,''),'(none)') AS notice_type, COUNT(*) AS n
-             FROM sbaio_notices GROUP BY notice_type ORDER BY n DESC"
-        ) ?: [];
-
-        $byLevel = DB::fetchAll(
-            "SELECT COALESCE(NULLIF(notice_level,''),'(none)') AS notice_level, COUNT(*) AS n
-             FROM sbaio_notices GROUP BY notice_level ORDER BY n DESC"
-        ) ?: [];
-
-        $recent = DB::fetchAll(
-            "SELECT id, title, notice_type, notice_level, is_active, requires_ack, created_at
-             FROM sbaio_notices ORDER BY created_at DESC, id DESC LIMIT 25"
-        ) ?: [];
-    } catch (\Throwable $e) {}
-}
+$report = is_array($report ?? null) ? $report : null;
+$reportData = is_array($reportData ?? null) ? $reportData : [];
+$summary = is_array($reportData['summary'] ?? null) ? $reportData['summary'] : [];
+$byType = is_array($reportData['byType'] ?? null) ? $reportData['byType'] : [];
+$byLevel = is_array($reportData['byLevel'] ?? null) ? $reportData['byLevel'] : [];
+$recent = is_array($reportData['recent'] ?? null) ? $reportData['recent'] : [];
 ?>
 <?php require APP_ROOT . '/public/views/layouts/admin-wrapper-open.php'; ?>
 

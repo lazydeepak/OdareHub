@@ -8,6 +8,52 @@ use App\Core\DB;
 final class NoticesService
 {
     /**
+     * Build the existing Notice overview report payload without changing its
+     * metrics, predicates, ordering, limits, or default-on-error behavior.
+     *
+     * @return array{summary:array<string,mixed>,byType:array<int,array<string,mixed>>,byLevel:array<int,array<string,mixed>>,recent:array<int,array<string,mixed>>}
+     */
+    public static function reportData(): array
+    {
+        $summary = ['total'=>0,'active'=>0,'ack_required'=>0,'new_30d'=>0];
+        $byType = [];
+        $byLevel = [];
+        $recent = [];
+
+        try {
+            $row = DB::fetchOne(
+                "SELECT COUNT(*) AS total,
+                        COALESCE(SUM(CASE WHEN is_active=1 THEN 1 ELSE 0 END),0) AS active,
+                        COALESCE(SUM(CASE WHEN requires_ack=1 THEN 1 ELSE 0 END),0) AS ack_required,
+                        COALESCE(SUM(CASE WHEN created_at >= DATE_SUB(CURDATE(), INTERVAL 30 DAY) THEN 1 ELSE 0 END),0) AS new_30d
+                 FROM sbaio_notices"
+            );
+            if (is_array($row)) {
+                $summary = array_merge($summary, $row);
+            }
+
+            $byType = DB::fetchAll(
+                "SELECT COALESCE(NULLIF(notice_type,''),'(none)') AS notice_type, COUNT(*) AS n
+                 FROM sbaio_notices GROUP BY notice_type ORDER BY n DESC"
+            ) ?: [];
+
+            $byLevel = DB::fetchAll(
+                "SELECT COALESCE(NULLIF(notice_level,''),'(none)') AS notice_level, COUNT(*) AS n
+                 FROM sbaio_notices GROUP BY notice_level ORDER BY n DESC"
+            ) ?: [];
+
+            $recent = DB::fetchAll(
+                "SELECT id, title, notice_type, notice_level, is_active, requires_ack, created_at
+                 FROM sbaio_notices ORDER BY created_at DESC, id DESC LIMIT 25"
+            ) ?: [];
+        } catch (\Throwable) {
+            // Preserve the existing report view's fail-closed/default payload.
+        }
+
+        return compact('summary', 'byType', 'byLevel', 'recent');
+    }
+
+    /**
      * Validate and normalize the existing Notice creation payload without
      * changing its persistence shape or acknowledgment workflow.
      *

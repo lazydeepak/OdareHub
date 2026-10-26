@@ -10,6 +10,20 @@ require_once __DIR__ . '/../Services/NoticesService.php';
 
 final class NoticesController
 {
+    /**
+     * Supply admitted report metadata and owner-prepared data to the view.
+     * Route authorization and report admission remain in the module route.
+     *
+     * @param array<string,mixed> $report
+     */
+    public static function report($view, array $report): void
+    {
+        $view->render('Notices::report.php', [
+            'report' => $report,
+            'reportData' => NoticesService::reportData(),
+        ]);
+    }
+
     public static function index($view): void
     {
         $currentQuery = is_array($_GET ?? null) ? $_GET : [];

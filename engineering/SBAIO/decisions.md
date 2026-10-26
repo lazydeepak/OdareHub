@@ -1,4 +1,15 @@
 # SBAIO — Decisions
+### 2026-10-26 — OH-AUTO3-SBAIO-NOTICES-REPORT-001 report ownership
+
+**Decision: Assign existing Notice report data preparation to `NoticesService` while retaining route authorization and registry admission in the route.**
+
+`NoticesService::reportData()` owns the unchanged four-read SQL contract and
+default payload. `NoticesController::report()` passes the admitted descriptor
+and prepared data to the presentation view. The view performs no database or
+registry operations and retains the existing report projection, which excludes
+Notice body and Staff linkage. No generic reporting framework or new metric was
+introduced.
+
 ### 2026-10-26 — OH-AUTO3-SBAIO-NOTICES-CONTINUITY-001 exact-ID continuity
 
 **Decision: Reuse the established Task transaction/identity pattern and carry the verified Notice ID through the existing administrator surface.**

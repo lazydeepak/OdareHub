@@ -31,7 +31,7 @@ $router->get('/apps/sbaio/notices/report', function() use ($view) {
         echo 'Report unavailable';
         return null;
     }
-    $view->render('Notices::report.php', ['report' => $report]);
+    NoticesController::report($view, $report);
     return null;
 });
 
@@ -50,4 +50,3 @@ $router->get('/apps/sbaio/notices/export', function() use ($view) {
     $view->render('Notices::export.php', ['report' => $report]);
     return null;
 });
-
