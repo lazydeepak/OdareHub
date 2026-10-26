@@ -39,6 +39,21 @@ final class SalesController
         ]);
     }
 
+    /**
+     * Supply the admitted report descriptor and owner-prepared data to the
+     * presentation view. Route authorization and report admission remain
+     * unchanged in the module route.
+     *
+     * @param array<string,mixed> $report
+     */
+    public static function report($view, array $report): void
+    {
+        $view->render('Sales::report.php', [
+            'report' => $report,
+            'reportData' => SalesService::reportData(),
+        ]);
+    }
+
     public static function create(): void
     {
         self::requireAdministrator();

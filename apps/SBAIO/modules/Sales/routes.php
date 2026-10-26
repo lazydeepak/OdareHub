@@ -31,7 +31,7 @@ $router->get('/apps/sbaio/sales/report', function() use ($view) {
         echo 'Report unavailable';
         return null;
     }
-    $view->render('Sales::report.php', ['report' => $report]);
+    SalesController::report($view, $report);
     return null;
 });
 

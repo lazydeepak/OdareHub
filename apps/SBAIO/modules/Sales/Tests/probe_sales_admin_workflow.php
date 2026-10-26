@@ -40,10 +40,29 @@ namespace App\Core {
     {
         public static array $queries = [];
         public static array $rows = [];
+        public static array $fetchOneRows = [];
+        public static array $fetchAllRows = [];
+        public static bool $throw = false;
+
+        public static function fetchOne(string $sql, array $params = []): ?array
+        {
+            if (self::$throw) {
+                throw new \RuntimeException('report read failed');
+            }
+            self::$queries[] = ['method' => 'fetchOne', 'sql' => $sql, 'params' => $params];
+            $row = array_shift(self::$fetchOneRows);
+            return is_array($row) ? $row : null;
+        }
 
         public static function fetchAll(string $sql, array $params = []): array
         {
+            if (self::$throw) {
+                throw new \RuntimeException('report read failed');
+            }
             self::$queries[] = ['method' => 'fetchAll', 'sql' => $sql, 'params' => $params];
+            if (self::$fetchAllRows !== []) {
+                return (array)array_shift(self::$fetchAllRows);
+            }
             return self::$rows;
         }
 
@@ -227,13 +246,46 @@ namespace {
 
     // List/report/export and lifecycle contracts remain bounded and guarded.
     DB::$queries = [];
+    DB::$fetchOneRows = [];
+    DB::$fetchAllRows = [];
+    DB::$throw = false;
     DB::$rows = [['id' => 9, 'sale_ref' => 'NEWEST']];
     $rows = SalesService::recent(1000);
     $assert($rows === DB::$rows, 'recent returns repository rows unchanged');
     $assert(str_contains(DB::$queries[0]['sql'], 'ORDER BY id DESC LIMIT 25'), 'recent remains deterministically bounded');
+
+    DB::$queries = [];
+    DB::$fetchOneRows = [[
+        'total' => 4,
+        'amount' => '125.50',
+        'month' => 2,
+        'month_amount' => '75.50',
+        'closed' => 1,
+        'open' => 2,
+    ]];
+    DB::$fetchAllRows = [
+        [['sale_status' => 'open', 'n' => 2, 'amount' => '50.00']],
+        [['customer_name' => 'Acme', 'n' => 2, 'amount' => '75.50']],
+        [['id' => 9, 'sale_ref' => 'NEWEST', 'sale_date' => '2024-01-01', 'customer_name' => 'Acme', 'amount' => '25.50', 'sale_status' => 'open']],
+    ];
+    $reportData = SalesService::reportData();
+    $assert($reportData['summary']['total'] === 4 && $reportData['summary']['amount'] === '125.50', 'report summary output preserves prepared aggregate values');
+    $assert($reportData['byStatus'][0]['sale_status'] === 'open' && $reportData['topCustomers'][0]['customer_name'] === 'Acme' && $reportData['recent'][0]['id'] === 9, 'report collections preserve status/customer/recent output shape');
+    $assert(count(DB::$queries) === 4 && DB::$queries[0]['method'] === 'fetchOne', 'report performs exactly the existing four reads in order');
+    $assert(str_contains(DB::$queries[0]['sql'], 'DATE_SUB(CURDATE(), INTERVAL 90 DAY)') && str_contains(DB::$queries[1]['sql'], 'GROUP BY sale_status ORDER BY n DESC'), 'report summary/status predicates and ordering are preserved');
+    $assert(str_contains(DB::$queries[2]['sql'], 'GROUP BY customer_name ORDER BY amount DESC LIMIT 15') && str_contains(DB::$queries[3]['sql'], 'ORDER BY sale_date DESC, id DESC LIMIT 25'), 'report customer/recent bounds and ordering are preserved');
+    DB::$throw = true;
+    $unavailableData = SalesService::reportData();
+    $assert($unavailableData['summary']['total'] === 0 && $unavailableData['byStatus'] === [] && $unavailableData['topCustomers'] === [] && $unavailableData['recent'] === [], 'report read failure preserves existing default output behavior');
+    DB::$throw = false;
+
     $assert(substr_count($routesSource, 'SalesController::requireAdministrator()') === 4, 'all four Sales routes require administrator authority');
+    $assert(str_contains($routesSource, 'SalesController::report($view, $report)'), 'report route supplies admitted report data through the controller');
+    $assert(strpos($routesSource, 'SalesController::requireAdministrator()') < strpos($routesSource, 'ModuleReportRegistryService::findActiveReport') && strpos($routesSource, 'ModuleReportRegistryService::findActiveReport') < strpos($routesSource, 'SalesController::report'), 'report authorization and admission precede data preparation');
     $assert(str_contains($controllerSource, 'Auth::requireCsrf'), 'create controller retains CSRF enforcement');
-    $assert(str_contains($reportSource, 'sbaio_sales') && str_contains($reportSource, 'GROUP BY sale_status'), 'report remains Sales-owned and status-grouped');
+    $assert(str_contains($controllerSource, "'reportData' => SalesService::reportData()"), 'controller supplies prepared Sales report data');
+    $assert(str_contains($serviceSource, 'public static function reportData'), 'Sales service owns the report read contract');
+    $assert(!str_contains($reportSource, 'DB::') && !str_contains($reportSource, 'sbaio_sales') && !str_contains($reportSource, 'ModuleReportRegistryService'), 'report view performs no database or registry operations');
     $assert(str_contains($exportSource, 'sbaio.sales.overview'), 'export remains bound to the existing report key');
     $assert(str_contains($registrySource, "'sbaio.sales.overview'"), 'report registry retains Sales source');
 

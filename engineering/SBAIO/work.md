@@ -1,5 +1,24 @@
 # SBAIO — Work
 
+## 2026-10-26 — OH-AUTO3-SBAIO-SALES-REPORT-001 report read extraction
+
+**Status: Implemented and verified offline; database-backed Sales probes remain environment-bound.**
+
+- [x] Moved the Sales report's summary, status distribution, customer ranking,
+  and recent-sales reads into `SalesService::reportData()` without changing
+  predicates, aggregation, ordering, limits, or default-on-error behavior.
+- [x] Existing administrator authorization and active report admission remain
+  in the existing report route before the controller prepares data; no route,
+  permission, report capability, schema, mutation, or export change was added.
+- [x] `Views/report.php` now consumes only the admitted report descriptor and
+  prepared payload; it contains no database or registry operation.
+- [x] Sales admin workflow probe passed **76/76**; neighboring Customers
+  regression passed **68/68**; PHP lint, architecture gates, deletion-family
+  gates **28/28**, and diff hygiene passed.
+- [ ] Database-backed SBAIO probes remain blocked by the disposable-entry guard;
+  no installed database, deployment, activation, or production operation was performed.
+
+
 ## 2026-10-16 — OH-AUTO2-105B authorized assessment prerequisite result
 
 - [x] Verified target identity non-destructively from the existing configuration

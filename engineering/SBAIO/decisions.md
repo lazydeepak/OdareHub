@@ -1,5 +1,22 @@
 # SBAIO — Decisions
 
+### 2026-10-26 — OH-AUTO3-SBAIO-SALES-REPORT-001 report read ownership
+
+**Decision: Keep Sales report query ownership in `SalesService`, with the route/controller supplying a prepared payload to the view.**
+
+The existing report route continues to enforce the administrator guard and
+active `sbaio.sales.overview` registry admission before invoking the controller
+render handoff. `SalesService::reportData()` retains the four existing reads:
+the 90-day aggregate, 90-day status grouping, 90-day customer ranking limited
+to 15 rows, and recent sales ordered by date/id limited to 25 rows. Its
+default-on-error result matches the former view behavior.
+
+The report view is presentation-only and no longer imports or calls DB or
+report-registry services. This is a Sales-owned extraction, not a generic
+reporting framework; no widget type, placement zone, interaction profile,
+admin/operator/display contribution, or canonical route changed.
+
+
 ### 2026-10-16 — OH-AUTO2-105S DB-backed probe admission
 
 **Status:** Accepted — reuse the existing disposable entry-point guard

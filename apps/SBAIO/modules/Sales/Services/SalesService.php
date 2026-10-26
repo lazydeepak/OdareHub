@@ -110,6 +110,57 @@ final class SalesService
     }
 
     /**
+     * Build the existing Sales overview report payload without changing its
+     * predicates, aggregation, ordering, limits, or default-on-error behavior.
+     *
+     * @return array{summary:array<string,mixed>,byStatus:array<int,array<string,mixed>>,topCustomers:array<int,array<string,mixed>>,recent:array<int,array<string,mixed>>}
+     */
+    public static function reportData(): array
+    {
+        $summary = ['total'=>0,'amount'=>0.0,'month'=>0,'month_amount'=>0.0,'closed'=>0,'open'=>0];
+        $byStatus = [];
+        $topCustomers = [];
+        $recent = [];
+
+        try {
+            $row = DB::fetchOne(
+                "SELECT COUNT(*) AS total,
+                        COALESCE(SUM(amount),0) AS amount,
+                        COALESCE(SUM(CASE WHEN sale_date >= DATE_FORMAT(CURDATE(),'%Y-%m-01') THEN 1 ELSE 0 END),0) AS month,
+                        COALESCE(SUM(CASE WHEN sale_date >= DATE_FORMAT(CURDATE(),'%Y-%m-01') THEN amount ELSE 0 END),0) AS month_amount,
+                        COALESCE(SUM(CASE WHEN LOWER(COALESCE(sale_status,'')) IN ('closed','completed','won') THEN 1 ELSE 0 END),0) AS closed,
+                        COALESCE(SUM(CASE WHEN LOWER(COALESCE(sale_status,'')) IN ('open','pending','draft') THEN 1 ELSE 0 END),0) AS open
+                 FROM sbaio_sales
+                 WHERE sale_date >= DATE_SUB(CURDATE(), INTERVAL 90 DAY)"
+            );
+            if (is_array($row)) { $summary = array_merge($summary, $row); }
+
+            $byStatus = DB::fetchAll(
+                "SELECT COALESCE(NULLIF(sale_status,''),'(none)') AS sale_status, COUNT(*) AS n,
+                        COALESCE(SUM(amount),0) AS amount
+                 FROM sbaio_sales WHERE sale_date >= DATE_SUB(CURDATE(), INTERVAL 90 DAY)
+                 GROUP BY sale_status ORDER BY n DESC"
+            ) ?: [];
+
+            $topCustomers = DB::fetchAll(
+                "SELECT COALESCE(NULLIF(customer_name,''),'(none)') AS customer_name, COUNT(*) AS n,
+                        COALESCE(SUM(amount),0) AS amount
+                 FROM sbaio_sales WHERE sale_date >= DATE_SUB(CURDATE(), INTERVAL 90 DAY)
+                 GROUP BY customer_name ORDER BY amount DESC LIMIT 15"
+            ) ?: [];
+
+            $recent = DB::fetchAll(
+                "SELECT id, sale_ref, sale_date, customer_name, amount, sale_status
+                 FROM sbaio_sales ORDER BY sale_date DESC, id DESC LIMIT 25"
+            ) ?: [];
+        } catch (\Throwable) {
+            // Preserve the report view's existing fail-closed/default payload.
+        }
+
+        return compact('summary', 'byStatus', 'topCustomers', 'recent');
+    }
+
+    /**
      * @param array<string,mixed> $input
      */
     public static function create(array $input): void
