@@ -1,4 +1,13 @@
 # AGENT-COMPLIANCE-CHECKLIST
+## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-CUSTOMERS-REPORT-001 report ownership
+
+Moved the existing Customers report reads into `CustomersService::reportData()`
+without changing SQL contracts, metrics, ordering, limits, or fail-closed
+defaults. Administrator authorization and active registry admission remain in
+the route before controller data preparation. `Views/report.php` now performs
+zero database or registry operations. Customers passed **160/160** and Sales
+**225/225** in database-free probes.
+
 ## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-CUSTOMERS-CONTINUITY-001 exact-ID continuity
 
 Completed reliable SBAIO Customer create-to-record continuity. Customer

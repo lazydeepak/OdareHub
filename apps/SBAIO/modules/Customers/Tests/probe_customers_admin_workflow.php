@@ -67,7 +67,9 @@ namespace App\Core {
     {
         public static array $queries = [];
         public static array $rows = [];
+        public static ?array $fetchAllRows = null;
         public static array $fetchOneRows = [];
+        public static bool $fetchOneFailure = false;
         public static bool $queryFailure = false;
         public static ?ConnectionDouble $connection = null;
 
@@ -79,6 +81,9 @@ namespace App\Core {
         public static function fetchAll(string $sql, array $params = []): array
         {
             self::$queries[] = ['method' => 'fetchAll', 'sql' => $sql, 'params' => $params];
+            if (self::$fetchAllRows !== null) {
+                return array_shift(self::$fetchAllRows) ?: [];
+            }
             return self::$rows;
         }
 
@@ -93,6 +98,9 @@ namespace App\Core {
         public static function fetchOne(string $sql, array $params = []): ?array
         {
             self::$queries[] = ['method' => 'fetchOne', 'sql' => $sql, 'params' => $params];
+            if (self::$fetchOneFailure) {
+                throw new \RuntimeException('report read failed');
+            }
             return array_shift(self::$fetchOneRows) ?: null;
         }
     }
@@ -285,7 +293,34 @@ namespace {
     $assert($rows === DB::$rows, 'recent returns repository rows unchanged');
     $assert(str_contains(DB::$queries[0]['sql'], 'ORDER BY id DESC LIMIT 25'), 'recent uses deterministic bounded ordering');
 
+    DB::$queries = [];
+    DB::$fetchOneRows = [[
+        'total' => 4,
+        'active' => 3,
+        'new_30d' => 2,
+        'with_email' => 3,
+        'with_phone' => 2,
+    ]];
+    DB::$fetchAllRows = [
+        [['status' => 'active', 'n' => 3]],
+        [['id' => 9, 'customer_name' => 'Newest', 'contact_name' => 'Jane', 'email' => 'jane@example.test', 'phone' => '+1 555 0100', 'status' => 'active', 'created_at' => '2024-01-01']],
+    ];
+    $reportData = CustomersService::reportData();
+    $assert($reportData['summary']['total'] === 4 && $reportData['summary']['active'] === 3, 'customer report summary preserves prepared aggregate values');
+    $assert($reportData['byStatus'][0]['status'] === 'active' && $reportData['recent'][0]['id'] === 9, 'customer report collections preserve existing output shape');
+    $assert(count(DB::$queries) === 3 && DB::$queries[0]['method'] === 'fetchOne', 'customer report performs exactly the existing three reads in order');
+    $assert(str_contains(DB::$queries[0]['sql'], 'DATE_SUB(CURDATE(), INTERVAL 30 DAY)') && str_contains(DB::$queries[1]['sql'], 'GROUP BY status ORDER BY n DESC') && str_contains(DB::$queries[2]['sql'], 'ORDER BY created_at DESC, id DESC LIMIT 25'), 'customer report preserves exact aggregate, status, and recent SQL contracts');
+
+    DB::$queries = [];
+    DB::$fetchOneRows = [];
+    DB::$fetchAllRows = null;
+    DB::$fetchOneFailure = true;
+    $unavailableReportData = CustomersService::reportData();
+    $assert($unavailableReportData['summary']['total'] === 0 && $unavailableReportData['byStatus'] === [] && $unavailableReportData['recent'] === [], 'customer report keeps the existing default payload on read failure');
+    DB::$fetchOneFailure = false;
+
     $source = file_get_contents(__DIR__ . '/../Views/index.php') ?: '';
+    $reportSource = file_get_contents(__DIR__ . '/../Views/report.php') ?: '';
     $routes = file_get_contents(__DIR__ . '/../routes.php') ?: '';
     $assert(str_contains($source, 'e((string)($row[\'customer_name\'] ?? \'\'))'), 'list customer values are escaped');
     $serviceSource = file_get_contents(__DIR__ . '/../Services/CustomersService.php') ?: '';
@@ -294,6 +329,10 @@ namespace {
     $assert(str_contains($controllerSource, 'CustomersService::validateCreateInput($_POST)') && strpos($controllerSource, 'CustomersService::validateCreateInput($_POST)') < strpos($controllerSource, 'CustomersService::create($validated[\'values\'])'), 'controller validates the raw POST payload before persistence dispatch');
     $assert(str_contains($controllerSource, 'CustomersService::findById') && str_contains($controllerSource, "'customer_id' => \$createdId"), 'post-create redirect carries the exact generated customer ID');
     $assert(str_contains($serviceSource, 'public static function findById') && str_contains($serviceSource, 'WHERE id = ? LIMIT 1') && str_contains($serviceSource, 'begin_transaction'), 'customer service owns exact read and transaction identity guarantees');
+    $assert(str_contains($serviceSource, 'public static function reportData'), 'Customers service owns the report read contract');
+    $assert(!str_contains($reportSource, 'DB::') && !str_contains($reportSource, 'sbaio_customers') && !str_contains($reportSource, 'ModuleReportRegistryService'), 'Customers report view performs zero database and registry operations');
+    $assert(str_contains($controllerSource, "'reportData' => CustomersService::reportData()") && str_contains($routes, 'CustomersController::report($view, $report)'), 'controller supplies prepared report data after registry admission');
+    $assert(strpos($routes, 'CustomersController::requireAdministrator()') < strpos($routes, 'ModuleReportRegistryService::findActiveReport') && strpos($routes, 'ModuleReportRegistryService::findActiveReport') < strpos($routes, 'CustomersController::report($view, $report)'), 'report authorization and registry admission precede data preparation and rendering');
     $assert(!str_contains($controllerSource . $serviceSource, 'latest') && !str_contains($controllerSource . $serviceSource, 'ORDER BY id DESC LIMIT 1'), 'customer identity does not use latest-row inference');
     foreach (['open_created_record', 'open_record', 'record_title', 'record_id', 'record_customer_name', 'record_contact_name', 'record_email', 'record_phone', 'record_status', 'record_id_invalid', 'record_not_found', 'record_unavailable'] as $key) {
         $assert(str_contains($source, 'sbaio.customers.' . $key), 'Customers view uses localized exact-record key ' . $key);

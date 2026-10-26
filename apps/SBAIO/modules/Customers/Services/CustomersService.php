@@ -88,6 +88,46 @@ final class CustomersService
     }
 
     /**
+     * Build the existing Customers overview report payload without changing
+     * its predicates, aggregation, ordering, limits, or default-on-error
+     * behavior.
+     *
+     * @return array{summary:array<string,mixed>,byStatus:array<int,array<string,mixed>>,recent:array<int,array<string,mixed>>}
+     */
+    public static function reportData(): array
+    {
+        $summary = ['total'=>0,'active'=>0,'new_30d'=>0,'with_email'=>0,'with_phone'=>0];
+        $byStatus = [];
+        $recent = [];
+
+        try {
+            $row = DB::fetchOne(
+                "SELECT COUNT(*) AS total,
+                        COALESCE(SUM(CASE WHEN LOWER(COALESCE(status,''))='active' THEN 1 ELSE 0 END),0) AS active,
+                        COALESCE(SUM(CASE WHEN created_at >= DATE_SUB(CURDATE(), INTERVAL 30 DAY) THEN 1 ELSE 0 END),0) AS new_30d,
+                        COALESCE(SUM(CASE WHEN COALESCE(email,'') <> '' THEN 1 ELSE 0 END),0) AS with_email,
+                        COALESCE(SUM(CASE WHEN COALESCE(phone,'') <> '' THEN 1 ELSE 0 END),0) AS with_phone
+                 FROM sbaio_customers"
+            );
+            if (is_array($row)) { $summary = array_merge($summary, $row); }
+
+            $byStatus = DB::fetchAll(
+                "SELECT COALESCE(NULLIF(status,''),'(none)') AS status, COUNT(*) AS n
+                 FROM sbaio_customers GROUP BY status ORDER BY n DESC"
+            ) ?: [];
+
+            $recent = DB::fetchAll(
+                "SELECT id, customer_name, contact_name, email, phone, status, created_at
+                 FROM sbaio_customers ORDER BY created_at DESC, id DESC LIMIT 25"
+            ) ?: [];
+        } catch (\Throwable) {
+            // Preserve the report view's existing fail-closed/default payload.
+        }
+
+        return compact('summary', 'byStatus', 'recent');
+    }
+
+    /**
      * @param array<string,mixed> $input
      */
     public static function create(array $input): int

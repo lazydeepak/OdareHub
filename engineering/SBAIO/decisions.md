@@ -1,4 +1,16 @@
 # SBAIO — Decisions
+### 2026-10-26 — OH-AUTO3-SBAIO-CUSTOMERS-REPORT-001 report read ownership
+
+**Decision: Keep Customers report data reads in `CustomersService`, with the existing route retaining administrator authorization and active report-registry admission before controller/view rendering.**
+
+`CustomersService::reportData()` preserves the existing summary aggregate,
+status grouping, and recent-customer queries exactly, including their
+predicates, ordering, limit, and default-on-error payload. The controller
+passes the admitted report descriptor and prepared payload to the view. The
+view no longer imports or calls `DB` or `ModuleReportRegistryService`; no new
+report capability, metric, route, permission, schema, or generic reporting
+framework is introduced.
+
 ### 2026-10-26 — OH-AUTO3-SBAIO-CUSTOMERS-CONTINUITY-001 exact identity contract
 
 **Decision: Extend the existing administrator Customers page with a read-only exact-ID view and make creation return the verified generated identity; do not add a route or infer records from customer fields/order.**

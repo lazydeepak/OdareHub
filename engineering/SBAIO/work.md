@@ -1,4 +1,17 @@
 # SBAIO — Work
+## 2026-10-26 — OH-AUTO3-SBAIO-CUSTOMERS-REPORT-001 report service ownership
+
+**Status: In progress — offline verification only; no installed database or DB-backed SBAIO probe.**
+
+- [x] Confirmed the Customers report view performed the summary, status, and
+  recent-record reads directly and could also resolve report metadata itself.
+- [x] Moved the existing three report reads, SQL predicates, ordering, limits,
+  and default-on-error payload into `CustomersService::reportData()`.
+- [x] The admitted report route now hands metadata and prepared data through
+  `CustomersController`; the presentation view performs zero database and
+  registry operations.
+- [x] Customers regression passed **160/160** and Sales **225/225**.
+
 ## 2026-10-26 — OH-AUTO3-SBAIO-CUSTOMERS-CONTINUITY-001 exact-ID continuity
 
 **Status: Complete for offline verification; no installed database or DB-backed SBAIO probe.**

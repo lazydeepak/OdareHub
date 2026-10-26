@@ -2,39 +2,13 @@
 $tt = static function (string $key): string {
   return t($key);
 };
-require_once APP_ROOT . '/apps/SBAIO/Services/ModuleReportRegistryService.php';
 
-use App\Core\DB;
+$report = is_array($report ?? null) ? $report : null;
+$reportData = is_array($reportData ?? null) ? $reportData : [];
 
-$report = $report ?? \Apps\SBAIO\Services\ModuleReportRegistryService::findActiveReport('sbaio.customers.overview');
-
-$summary = ['total'=>0,'active'=>0,'new_30d'=>0,'with_email'=>0,'with_phone'=>0];
-$byStatus = [];
-$recent = [];
-
-if (is_array($report)) {
-    try {
-        $row = DB::fetchOne(
-            "SELECT COUNT(*) AS total,
-                    COALESCE(SUM(CASE WHEN LOWER(COALESCE(status,''))='active' THEN 1 ELSE 0 END),0) AS active,
-                    COALESCE(SUM(CASE WHEN created_at >= DATE_SUB(CURDATE(), INTERVAL 30 DAY) THEN 1 ELSE 0 END),0) AS new_30d,
-                    COALESCE(SUM(CASE WHEN COALESCE(email,'') <> '' THEN 1 ELSE 0 END),0) AS with_email,
-                    COALESCE(SUM(CASE WHEN COALESCE(phone,'') <> '' THEN 1 ELSE 0 END),0) AS with_phone
-             FROM sbaio_customers"
-        );
-        if (is_array($row)) { $summary = array_merge($summary, $row); }
-
-        $byStatus = DB::fetchAll(
-            "SELECT COALESCE(NULLIF(status,''),'(none)') AS status, COUNT(*) AS n
-             FROM sbaio_customers GROUP BY status ORDER BY n DESC"
-        ) ?: [];
-
-        $recent = DB::fetchAll(
-            "SELECT id, customer_name, contact_name, email, phone, status, created_at
-             FROM sbaio_customers ORDER BY created_at DESC, id DESC LIMIT 25"
-        ) ?: [];
-    } catch (\Throwable $e) {}
-}
+$summary = is_array($reportData['summary'] ?? null) ? $reportData['summary'] : ['total'=>0,'active'=>0,'new_30d'=>0,'with_email'=>0,'with_phone'=>0];
+$byStatus = is_array($reportData['byStatus'] ?? null) ? $reportData['byStatus'] : [];
+$recent = is_array($reportData['recent'] ?? null) ? $reportData['recent'] : [];
 ?>
 <?php require APP_ROOT . '/public/views/layouts/admin-wrapper-open.php'; ?>
 

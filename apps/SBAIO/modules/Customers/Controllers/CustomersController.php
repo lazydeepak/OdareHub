@@ -88,6 +88,19 @@ final class CustomersController
         self::redirect('ok', t('sbaio.customers.created'), ['customer_id' => $createdId]);
     }
 
+    /**
+     * Supply admitted report metadata and owner-prepared data to the view.
+     *
+     * @param array<string,mixed> $report
+     */
+    public static function report($view, array $report): void
+    {
+        $view->render('Customers::report.php', [
+            'report' => $report,
+            'reportData' => CustomersService::reportData(),
+        ]);
+    }
+
     /** @param array<string,int|string> $params */
     private static function redirect(string $key, string $message, array $params = []): void
     {

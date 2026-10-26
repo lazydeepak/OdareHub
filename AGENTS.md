@@ -1,4 +1,18 @@
 # AGENTS.md
+## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-CUSTOMERS-REPORT-001 report ownership
+
+Completed Customers report service ownership. The existing report SQL and
+default payload now live in `CustomersService::reportData()`, while the route
+still authorizes administrators and admits the active registry report before
+controller preparation. The presentation view performs no database or registry
+operations. No new report capability, metric, route, permission, schema,
+Core/Auth/ACL, organization, Staff, Leave, Timecard, or Customer/Sales behavior
+was added or changed.
+
+Customers regression **160/160**, Sales **225/225**, changed-file lint/diff
+checks, architecture gates, deletion-family gates **28/28**, and deployment
+readiness passed. No installed database or DB-backed SBAIO probe was executed.
+
 ## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-CUSTOMERS-CONTINUITY-001 exact-ID continuity
 
 Completed SBAIO Customer create-to-record continuity on the existing
