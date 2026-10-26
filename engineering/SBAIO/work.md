@@ -1,4 +1,20 @@
 # SBAIO — Work
+## 2026-10-26 — OH-AUTO3-SBAIO-SALES-CREATE-001 exact created identity
+
+**Status: Complete for offline verification; database-backed SBAIO probes remain environment-bound.**
+
+- [x] Confirmed the prior Sales create flow returned no identity and redirected
+  with a generic confirmation.
+- [x] Sales creation now returns the current connection's positive generated
+  `insert_id`; invalid identity evidence and insert failures fail closed before
+  any success redirect.
+- [x] The existing post-create redirect now carries a localized ID-bearing
+  confirmation, with EN/JA/NE coverage. Existing administrator, CSRF,
+  validation, search, pagination, report, export, route, schema, and lifecycle
+  behavior remains unchanged.
+- [x] Sales regression passed **163/163**; changed-file PHP lint and diff
+  hygiene passed. No installed database or DB-backed SBAIO probe was executed.
+
 
 ## 2026-10-26 — OH-AUTO3-SBAIO-SALES-PAGING-001 keyset pagination
 

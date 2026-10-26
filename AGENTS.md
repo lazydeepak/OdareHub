@@ -1,4 +1,18 @@
 # AGENTS.md
+## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-SALES-CREATE-001 exact created identity
+
+Implemented exact SBAIO Sales creation identity handling. The existing insert
+now returns the same connection's strictly positive generated ID; malformed or
+missing identity evidence and insert failures cannot redirect success. The
+existing post-create flow shows a localized ID-bearing confirmation in EN/JA/NE.
+No route, permission, lifecycle, schema, mutation, report, export, Core/Auth/
+ACL, organization, Staff, Leave, or Timecard behavior changed.
+
+Sales regression **163/163** and changed-file lint/diff checks passed. Final
+architecture/deletion/deployment validation remains pending; no installed
+database or DB-backed SBAIO probe was executed. Unrelated artifacts remain
+preserved.
+
 
 ## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-SALES-PAGING-001 keyset pagination
 

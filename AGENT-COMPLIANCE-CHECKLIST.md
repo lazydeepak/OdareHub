@@ -1,4 +1,16 @@
 # AGENT-COMPLIANCE-CHECKLIST
+## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-SALES-CREATE-001 exact created identity
+
+Sales creation now returns and strictly verifies the current connection's
+database-generated positive `insert_id`. Identity retrieval failure and insert
+failure remain failures, preventing false success. The existing post-create
+redirect displays a localized one-time ID-bearing confirmation in EN/JA/NE;
+authorization, CSRF, validation, search/pagination, reporting, export, routes,
+schema, and lifecycle behavior are unchanged.
+
+Sales regression passed **163/163**, changed-file PHP lint and diff hygiene
+passed, and no installed database or DB-backed SBAIO probe was executed.
+
 
 ## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-SALES-PAGING-001 keyset pagination
 

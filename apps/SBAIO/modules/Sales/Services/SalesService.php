@@ -233,7 +233,7 @@ final class SalesService
     /**
      * @param array<string,mixed> $input
      */
-    public static function create(array $input): void
+    public static function create(array $input): int
     {
         $validated = self::validateCreateInput($input);
         if (!$validated['valid']) {
@@ -251,6 +251,20 @@ final class SalesService
                 self::nullIfBlank($values['sale_date']),
             ]
         );
+
+        $insertId = DB::conn()->insert_id;
+        if (is_int($insertId)) {
+            if ($insertId > 0) {
+                return $insertId;
+            }
+        } elseif (is_string($insertId) && preg_match('/^[1-9][0-9]*$/D', $insertId)) {
+            $normalizedId = filter_var($insertId, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+            if ($normalizedId !== false) {
+                return (int)$normalizedId;
+            }
+        }
+
+        throw new \RuntimeException('Sales insert identity was not available.');
     }
 
     /** @param array<string,mixed> $input */

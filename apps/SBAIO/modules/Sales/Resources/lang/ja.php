@@ -4,6 +4,7 @@ return [
     'app.sbaio.sales.index.table.title' => '',
     'app.sbaio.sales.index.table.display_name' => '',
     'sbaio.sales.admin_required' => '管理者権限が必要です。',
+    'sbaio.sales.created_with_id' => '売上データを作成しました。レコードID: {id}。',
     'sbaio.sales.invalid' => '販売情報を確認してください。',
     'sbaio.sales.sale_ref_required' => '販売番号を入力してください。',
     'sbaio.sales.sale_ref_invalid' => '有効な販売番号を入力してください。',

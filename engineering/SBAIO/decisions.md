@@ -1,4 +1,16 @@
 # SBAIO — Decisions
+### 2026-10-26 — OH-AUTO3-SBAIO-SALES-CREATE-001 exact identity contract
+
+**Decision: Return the database-generated identity from the existing Sales create service and use it in the existing success redirect.**
+
+After the parameterized insert succeeds, Sales reads `DB::conn()->insert_id`
+from the same current connection. Only a strictly positive integer identity
+(including a valid positive integer string representation) is accepted;
+missing, malformed, zero, negative, or overflowing identity evidence throws and
+cannot produce a success redirect. No latest-row query, sale-reference lookup,
+uniqueness assumption, route, permission, schema, or lifecycle change is
+introduced.
+
 
 ### 2026-10-26 — OH-AUTO3-SBAIO-SALES-PAGING-001 forward keyset contract
 

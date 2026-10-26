@@ -4,6 +4,7 @@ return [
     'app.sbaio.sales.index.table.title' => '',
     'app.sbaio.sales.index.table.display_name' => '',
     'sbaio.sales.admin_required' => 'प्रशासक पहुँच आवश्यक छ।',
+    'sbaio.sales.created_with_id' => 'बिक्री रेकर्ड सिर्जना भयो। रेकर्ड ID: {id}।',
     'sbaio.sales.invalid' => 'कृपया बिक्री विवरण सच्याउनुहोस्।',
     'sbaio.sales.sale_ref_required' => 'बिक्री सन्दर्भ आवश्यक छ।',
     'sbaio.sales.sale_ref_invalid' => 'मान्य बिक्री सन्दर्भ लेख्नुहोस्।',

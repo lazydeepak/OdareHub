@@ -99,9 +99,9 @@ final class SalesController
             self::redirect('err', t($messages[$errorKey] ?? 'sbaio.sales.invalid'));
         }
 
-        SalesService::create($validated['values']);
+        $createdId = SalesService::create($validated['values']);
 
-        self::redirect('ok', t('sbaio.sales.created'));
+        self::redirect('ok', t('sbaio.sales.created_with_id', ['id' => (string)$createdId]));
     }
 
     private static function redirect(string $key, string $message): void

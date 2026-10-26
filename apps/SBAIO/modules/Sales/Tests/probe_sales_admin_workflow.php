@@ -38,11 +38,17 @@ namespace App\Core {
 
     final class DB
     {
+        public static object $connection;
         public static array $queries = [];
         public static array $rows = [];
         public static array $fetchOneRows = [];
         public static array $fetchAllRows = [];
         public static bool $throw = false;
+
+        public static function conn(): object
+        {
+            return self::$connection;
+        }
 
         public static function fetchOne(string $sql, array $params = []): ?array
         {
@@ -68,6 +74,9 @@ namespace App\Core {
 
         public static function query(string $sql, array $params = []): void
         {
+            if (self::$throw) {
+                throw new \RuntimeException('insert failed');
+            }
             self::$queries[] = ['method' => 'query', 'sql' => $sql, 'params' => $params];
         }
     }
@@ -88,7 +97,13 @@ namespace {
             'sbaio.sales.amount_invalid' => 'Enter a valid amount.',
             'sbaio.sales.status_invalid' => 'Select a supported sales status.',
             'sbaio.sales.sale_date_invalid' => 'Enter a valid calendar date.',
+            'sbaio.sales.created_with_id' => 'Sales record created. Record ID: {id}.',
         ][$key] ?? $key;
+    }
+
+    final class SalesConnectionDouble
+    {
+        public int|string|null $insert_id = 0;
     }
 
     require_once __DIR__ . '/../Services/SalesService.php';
@@ -129,6 +144,8 @@ namespace {
     Auth::$calls = [];
     SalesController::requireAdministrator();
     $assert(Auth::$calls === [['method' => 'requireAppAccess', 'app' => 'sbaio']], 'platform administrator passes existing app access gate');
+
+    DB::$connection = new SalesConnectionDouble();
 
     Auth::$user = ['id' => 2, 'authority_role' => 'app_admin', 'role' => 'user'];
     Auth::$calls = [];
@@ -221,9 +238,38 @@ namespace {
 
     // Persistence receives strings for valid decimals and is untouched on failure.
     DB::$queries = [];
-    SalesService::create($valid['values']);
+    DB::$connection->insert_id = 417;
+    $createdId = SalesService::create($valid['values']);
     $assert(count(DB::$queries) === 1 && DB::$queries[0]['method'] === 'query', 'valid create performs one insert');
     $assert(DB::$queries[0]['params'][2] === '-12.50' && is_string(DB::$queries[0]['params'][2]), 'insert receives exact decimal string');
+    $assert($createdId === 417, 'create returns the positive connection-local generated identity');
+
+    DB::$queries = [];
+    DB::$connection->insert_id = 418;
+    $firstCreatedId = SalesService::create(['sale_ref' => 'SALE-CONCURRENT-A', 'amount' => '1.00']);
+    DB::$connection->insert_id = 419;
+    $secondCreatedId = SalesService::create(['sale_ref' => 'SALE-CONCURRENT-B', 'amount' => '1.00']);
+    $assert($firstCreatedId === 418 && $secondCreatedId === 419 && $firstCreatedId !== $secondCreatedId, 'separate connection identities are not inferred from references or latest-row queries');
+
+    foreach ([0, -1, '', 'not-an-id', null] as $invalidIdentity) {
+        DB::$connection->insert_id = $invalidIdentity;
+        try {
+            SalesService::create(['sale_ref' => 'SALE-ID-INVALID', 'amount' => '1.00']);
+            $assert(false, 'invalid generated identity unexpectedly succeeded');
+        } catch (\RuntimeException $e) {
+            $assert(str_contains($e->getMessage(), 'identity'), 'invalid generated identity fails closed without false success');
+        }
+    }
+    DB::$throw = true;
+    try {
+        SalesService::create(['sale_ref' => 'SALE-INSERT-FAIL', 'amount' => '1.00']);
+        $assert(false, 'insert failure unexpectedly succeeded');
+    } catch (\RuntimeException $e) {
+        $assert($e->getMessage() === 'insert failed', 'insert failure remains a failure and cannot redirect success');
+    }
+    DB::$throw = false;
+    $assert(str_contains($controllerSource, '$createdId = SalesService::create') && str_contains($controllerSource, "sbaio.sales.created_with_id"), 'controller confirmation uses the returned exact ID');
+    $assert(!str_contains($controllerSource, 'latest') && !str_contains($serviceSource, 'ORDER BY id DESC LIMIT 1'), 'created identity does not use latest-row or reference inference');
 
     DB::$queries = [];
     try {
@@ -244,6 +290,7 @@ namespace {
         $assert($e->getMessage() === 'csrf denied', 'invalid CSRF is rejected');
         $assert(DB::$queries === [], 'CSRF failure performs no persistence');
     }
+    $assert(str_contains($controllerSource, 'Auth::requireCsrf') && strpos($controllerSource, 'Auth::requireCsrf') < strpos($controllerSource, 'SalesService::create'), 'CSRF remains before Sales creation');
 
     // List/report/export and lifecycle contracts remain bounded and guarded.
     DB::$queries = [];
@@ -421,9 +468,11 @@ namespace {
             'sbaio.sales.search_sale_date',
             'sbaio.sales.search_amount',
             'sbaio.sales.search_next',
+            'sbaio.sales.created_with_id',
         ] as $key) {
             $assert(is_array($localeValues) && trim((string)($localeValues[$key] ?? '')) !== '', "{$locale} localizes {$key}");
         }
+        $assert(str_contains((string)($localeValues['sbaio.sales.created_with_id'] ?? ''), '{id}'), "{$locale} confirmation contains the created ID placeholder");
     }
 
     $assert(!str_contains($routesSource . $controllerSource . $serviceSource, 'related_staff_id'), 'Sales has no staff-reference coupling');

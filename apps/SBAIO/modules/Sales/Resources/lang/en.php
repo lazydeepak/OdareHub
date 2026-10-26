@@ -17,6 +17,7 @@ return [
     'sales.sales_report_title' => 'Sales Report',
     'sbaio.sales.create' => 'Create',
     'sbaio.sales.created' => 'Created',
+    'sbaio.sales.created_with_id' => 'Sales record created. Record ID: {id}.',
     'sbaio.sales.admin_required' => 'Administrator access is required.',
     'sbaio.sales.invalid' => 'Please correct the sales details.',
     'sbaio.sales.sale_ref_required' => 'A sale reference is required.',
