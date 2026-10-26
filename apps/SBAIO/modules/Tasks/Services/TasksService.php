@@ -8,6 +8,51 @@ use App\Core\DB;
 final class TasksService
 {
     /**
+     * Build the existing Task overview report payload without changing its
+     * predicates, aggregation, ordering, limits, or default-on-error behavior.
+     *
+     * @return array{summary:array<string,mixed>,byStatus:array<int,array<string,mixed>>,byPriority:array<int,array<string,mixed>>,recent:array<int,array<string,mixed>>}
+     */
+    public static function reportData(): array
+    {
+        $summary = ['total'=>0,'open'=>0,'done'=>0,'overdue'=>0,'due_7d'=>0];
+        $byStatus = [];
+        $byPriority = [];
+        $recent = [];
+
+        try {
+            $row = DB::fetchOne(
+                "SELECT COUNT(*) AS total,
+                        COALESCE(SUM(CASE WHEN LOWER(COALESCE(task_status,'')) IN ('open','in_progress','pending','todo') THEN 1 ELSE 0 END),0) AS open,
+                        COALESCE(SUM(CASE WHEN LOWER(COALESCE(task_status,'')) IN ('done','completed','closed') THEN 1 ELSE 0 END),0) AS done,
+                        COALESCE(SUM(CASE WHEN due_date IS NOT NULL AND due_date < CURDATE() AND LOWER(COALESCE(task_status,'')) NOT IN ('done','completed','closed') THEN 1 ELSE 0 END),0) AS overdue,
+                        COALESCE(SUM(CASE WHEN due_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 7 DAY) THEN 1 ELSE 0 END),0) AS due_7d
+                 FROM sbaio_tasks"
+            );
+            if (is_array($row)) { $summary = array_merge($summary, $row); }
+
+            $byStatus = DB::fetchAll(
+                "SELECT COALESCE(NULLIF(task_status,''),'(none)') AS task_status, COUNT(*) AS n
+                 FROM sbaio_tasks GROUP BY task_status ORDER BY n DESC"
+            ) ?: [];
+
+            $byPriority = DB::fetchAll(
+                "SELECT COALESCE(NULLIF(priority,''),'(none)') AS priority, COUNT(*) AS n
+                 FROM sbaio_tasks GROUP BY priority ORDER BY n DESC"
+            ) ?: [];
+
+            $recent = DB::fetchAll(
+                "SELECT id, task_title, owner_name, task_type, task_status, priority, due_date
+                 FROM sbaio_tasks ORDER BY due_date ASC, id DESC LIMIT 25"
+            ) ?: [];
+        } catch (\Throwable) {
+            // Preserve the report view's existing fail-closed/default payload.
+        }
+
+        return compact('summary', 'byStatus', 'byPriority', 'recent');
+    }
+
+    /**
      * Validate and normalize the existing Task create payload without
      * touching persistence or interpreting Staff identity.
      *

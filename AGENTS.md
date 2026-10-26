@@ -1,4 +1,15 @@
 # AGENTS.md
+## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-TASKS-REPORT-001 report ownership
+
+Completed Task report service ownership. Existing report SQL/data preparation
+now live in `TasksService::reportData()`; the presentation view performs no
+database or registry operations. Route app authorization and active report
+admission remain unchanged before controller rendering.
+
+Task report probe **15/15**, Task integrity **71/71**, Expenses **91/91**,
+Customers **195/195**, and Sales **225/225** passed. No installed database or
+DB-backed SBAIO probe was executed.
+
 ## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-TASKS-INTEGRITY-001 Task input integrity
 
 Prevented malformed Task records and silent Staff-reference coercion. Task

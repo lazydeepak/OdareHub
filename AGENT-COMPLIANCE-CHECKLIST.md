@@ -1,4 +1,16 @@
 # AGENT-COMPLIANCE-CHECKLIST
+## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-TASKS-REPORT-001 report ownership
+
+Completed Task report service ownership. The existing four report reads now
+live in `TasksService::reportData()` with SQL, output shape, ordering, limits,
+and read-failure defaults preserved. The route still authorizes SBAIO access
+and admits the active registry report before controller/view rendering;
+`Views/report.php` performs no DB or registry operations.
+
+Report ownership probe **15/15**, Task integrity **71/71**, Expenses **91/91**,
+Customers **195/195**, and Sales **225/225** passed. No installed database or
+DB-backed SBAIO probe was executed.
+
 ## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-TASKS-INTEGRITY-001 Task input integrity
 
 Closed Task creation coercion defects. All Task fields now pass one strict

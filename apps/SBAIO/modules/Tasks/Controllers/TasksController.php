@@ -10,6 +10,21 @@ require_once __DIR__ . '/../Services/TasksService.php';
 
 final class TasksController
 {
+    /**
+     * Supply the admitted report descriptor and owner-prepared data to the
+     * presentation view. Route authorization and report admission remain in
+     * the module route.
+     *
+     * @param array<string,mixed> $report
+     */
+    public static function report($view, array $report): void
+    {
+        $view->render('Tasks::report.php', [
+            'report' => $report,
+            'reportData' => TasksService::reportData(),
+        ]);
+    }
+
     public static function index($view): void
     {
         $view->render('Tasks::index.php', [

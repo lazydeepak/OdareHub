@@ -2,45 +2,12 @@
 $tt = static function (string $key): string {
   return t($key);
 };
-require_once APP_ROOT . '/apps/SBAIO/Services/ModuleReportRegistryService.php';
-
-use App\Core\DB;
-
-$report = $report ?? \Apps\SBAIO\Services\ModuleReportRegistryService::findActiveReport('sbaio.tasks.overview');
-
-$summary = ['total'=>0,'open'=>0,'done'=>0,'overdue'=>0,'due_7d'=>0];
-$byStatus = [];
-$byPriority = [];
-$recent = [];
-
-if (is_array($report)) {
-    try {
-        $row = DB::fetchOne(
-            "SELECT COUNT(*) AS total,
-                    COALESCE(SUM(CASE WHEN LOWER(COALESCE(task_status,'')) IN ('open','in_progress','pending','todo') THEN 1 ELSE 0 END),0) AS open,
-                    COALESCE(SUM(CASE WHEN LOWER(COALESCE(task_status,'')) IN ('done','completed','closed') THEN 1 ELSE 0 END),0) AS done,
-                    COALESCE(SUM(CASE WHEN due_date IS NOT NULL AND due_date < CURDATE() AND LOWER(COALESCE(task_status,'')) NOT IN ('done','completed','closed') THEN 1 ELSE 0 END),0) AS overdue,
-                    COALESCE(SUM(CASE WHEN due_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 7 DAY) THEN 1 ELSE 0 END),0) AS due_7d
-             FROM sbaio_tasks"
-        );
-        if (is_array($row)) { $summary = array_merge($summary, $row); }
-
-        $byStatus = DB::fetchAll(
-            "SELECT COALESCE(NULLIF(task_status,''),'(none)') AS task_status, COUNT(*) AS n
-             FROM sbaio_tasks GROUP BY task_status ORDER BY n DESC"
-        ) ?: [];
-
-        $byPriority = DB::fetchAll(
-            "SELECT COALESCE(NULLIF(priority,''),'(none)') AS priority, COUNT(*) AS n
-             FROM sbaio_tasks GROUP BY priority ORDER BY n DESC"
-        ) ?: [];
-
-        $recent = DB::fetchAll(
-            "SELECT id, task_title, owner_name, task_type, task_status, priority, due_date
-             FROM sbaio_tasks ORDER BY due_date ASC, id DESC LIMIT 25"
-        ) ?: [];
-    } catch (\Throwable $e) {}
-}
+$report = is_array($report ?? null) ? $report : null;
+$reportData = is_array($reportData ?? null) ? $reportData : [];
+$summary = is_array($reportData['summary'] ?? null) ? $reportData['summary'] : [];
+$byStatus = is_array($reportData['byStatus'] ?? null) ? $reportData['byStatus'] : [];
+$byPriority = is_array($reportData['byPriority'] ?? null) ? $reportData['byPriority'] : [];
+$recent = is_array($reportData['recent'] ?? null) ? $reportData['recent'] : [];
 ?>
 <?php require APP_ROOT . '/public/views/layouts/admin-wrapper-open.php'; ?>
 

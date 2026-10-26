@@ -1,4 +1,14 @@
 # SBAIO — Decisions
+### 2026-10-26 — OH-AUTO3-SBAIO-TASKS-REPORT-001 report ownership
+
+**Decision: Keep the existing Task report SQL and output contract in `TasksService::reportData()` and make the presentation view data-only.**
+
+The route continues to require SBAIO app access and admit the active
+`sbaio.tasks.overview` registry descriptor before controller rendering. The
+service owns the same four reads, predicates, aggregation, ordering, limits,
+and zero-value fallback payload; no metric, lifecycle, permission, route,
+schema, Staff, or cross-domain policy was added.
+
 ### 2026-10-26 — OH-AUTO3-SBAIO-TASKS-INTEGRITY-001 Task input contract
 
 **Decision: Validate and normalize all existing Task creation fields at the SBAIO TasksService boundary without adding Staff authorization, identity binding, lifecycle, route, or schema policy.**

@@ -1,4 +1,20 @@
 # SBAIO — Work
+## 2026-10-26 — OH-AUTO3-SBAIO-TASKS-REPORT-001 report ownership
+
+**Status: In progress — offline verification only; no installed database or DB-backed SBAIO probe.**
+
+- [x] Confirmed the existing Task report view performed four direct reads and
+  imported both `DB` and the report registry.
+- [x] Moved the unchanged summary, status, priority, and recent-task SQL into
+  `TasksService::reportData()` with the existing default-on-read-failure
+  payload preserved.
+- [x] Route authorization and active report-registry admission remain before
+  controller delegation; the controller now supplies the admitted descriptor
+  and prepared report data to the view.
+- [x] Report ownership probe passed **15/15**; Task integrity **71/71**,
+  Expenses **91/91**, Customers **195/195**, and Sales **225/225** remain
+  passing.
+
 ## 2026-10-26 — OH-AUTO3-SBAIO-TASKS-INTEGRITY-001 Task input integrity
 
 **Status: In progress — offline verification only; no installed database or DB-backed SBAIO probe.**

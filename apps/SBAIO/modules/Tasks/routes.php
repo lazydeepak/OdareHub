@@ -31,7 +31,7 @@ $router->get('/apps/sbaio/tasks/report', function() use ($view) {
         echo 'Report unavailable';
         return null;
     }
-    $view->render('Tasks::report.php', ['report' => $report]);
+    TasksController::report($view, $report);
     return null;
 });
 
@@ -50,4 +50,3 @@ $router->get('/apps/sbaio/tasks/export', function() use ($view) {
     $view->render('Tasks::export.php', ['report' => $report]);
     return null;
 });
-
