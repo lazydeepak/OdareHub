@@ -212,7 +212,7 @@ final class TasksService
         }
 
         $rows = DB::fetchAll(
-            "SELECT id, task_title, owner_name, task_type, task_bucket, related_staff_id, related_date, task_status, priority, due_date,
+            "SELECT id, task_title, owner_name, task_type, task_bucket, related_date, task_status, priority, due_date,
                     CASE
                       WHEN due_date IS NOT NULL AND due_date < CURDATE() AND {$activePredicate} THEN 'overdue'
                       WHEN due_date IS NOT NULL AND due_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 7 DAY) AND {$activePredicate} THEN 'upcoming'
@@ -251,7 +251,9 @@ final class TasksService
     }
 
     /**
-     * Read one Task by its database-generated identity.
+     * Read one Task by its database-generated identity. The read projection
+     * intentionally excludes the historical Staff linkage because no
+     * record-level Staff visibility contract exists for this surface.
      *
      * @param mixed $id
      * @return array<string,mixed>|null
@@ -276,7 +278,7 @@ final class TasksService
         }
 
         return DB::fetchOne(
-            'SELECT id, task_title, owner_name, task_type, task_bucket, related_staff_id, related_date, task_status, priority, due_date FROM sbaio_tasks WHERE id = ? LIMIT 1',
+            'SELECT id, task_title, owner_name, task_type, task_bucket, related_date, task_status, priority, due_date FROM sbaio_tasks WHERE id = ? LIMIT 1',
             [(int)$recordId]
         );
     }

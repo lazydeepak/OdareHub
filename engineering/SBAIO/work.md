@@ -1,4 +1,22 @@
 # SBAIO — Work
+## 2026-10-26 — OH-AUTO3-SBAIO-STAFF-READ-PROJECTION-001 read projection containment
+
+**Status: Contained — offline verification only; no installed database or DB-backed SBAIO probe.**
+
+- [x] Inventory found Task `search()` and `findById()` selected
+  `related_staff_id`, although the Task controller and view never consumed it.
+  Notice `recent()`, `findById()`, reports, and views were already Staff-free.
+- [x] Confirmed `activeStaff()` remains an uncalled legacy helper and is not a
+  read projection consumer; no new Staff access authority exists.
+- [x] Confirmed generic CSV export used `SELECT *`, which exposed historical
+  Task/Notice Staff IDs. No authorized export dependency on those IDs was found.
+- [x] Replaced only the unnecessary Task read fields and Task/Notice export
+  projections; preserve all other columns and historical database storage.
+- [x] Focused projection probe passed **8/8**. Task continuity **34/34**,
+  queue **31/31**, report **16/16**, input integrity **76/76**; Notice
+  continuity **37/37**, report **18/18**, input integrity **142/142**;
+  Staff containment **32/32**. No installed database or DB-backed probe ran.
+
 ## 2026-10-26 — OH-AUTO3-SBAIO-STAFF-WRITE-001 Staff-association write containment
 
 **Status: Contained — offline verification only; no installed database or DB-backed SBAIO probe.**

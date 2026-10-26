@@ -9,19 +9,31 @@ use App\Services\ExportHistoryService;
 final class ModuleReportRegistryService
 {
     /**
-     * @var array<string,array{table:string,order_by:string,direction:string,filename_prefix:string}>
+     * @var array<string,array{table:string,order_by:string,direction:string,filename_prefix:string,columns?:list<string>}>
      */
     private const CSV_REPORT_SOURCES = [
         'sbaio.attendance.overview' => ['table' => 'sbaio_attendance_daily', 'order_by' => 'id', 'direction' => 'DESC', 'filename_prefix' => 'sbaio-attendance'],
         'sbaio.customers.overview' => ['table' => 'sbaio_customers', 'order_by' => 'id', 'direction' => 'DESC', 'filename_prefix' => 'sbaio-customers'],
         'sbaio.expenses.overview' => ['table' => 'sbaio_expenses', 'order_by' => 'id', 'direction' => 'DESC', 'filename_prefix' => 'sbaio-expenses'],
         'sbaio.leave.overview' => ['table' => 'sbaio_leave_requests', 'order_by' => 'id', 'direction' => 'DESC', 'filename_prefix' => 'sbaio-leave'],
-        'sbaio.notices.overview' => ['table' => 'sbaio_notices', 'order_by' => 'id', 'direction' => 'DESC', 'filename_prefix' => 'sbaio-notices'],
+        'sbaio.notices.overview' => [
+            'table' => 'sbaio_notices',
+            'order_by' => 'id',
+            'direction' => 'DESC',
+            'filename_prefix' => 'sbaio-notices',
+            'columns' => ['id', 'title', 'body', 'notice_type', 'target_period', 'requires_ack', 'notice_level', 'is_active', 'created_at', 'updated_at'],
+        ],
         'sbaio.payroll.overview' => ['table' => 'sbaio_payroll_records', 'order_by' => 'id', 'direction' => 'DESC', 'filename_prefix' => 'sbaio-payroll'],
         'sbaio.sales.overview' => ['table' => 'sbaio_sales', 'order_by' => 'id', 'direction' => 'DESC', 'filename_prefix' => 'sbaio-sales'],
         'sbaio.schedules.overview' => ['table' => 'sbaio_schedule_assignments', 'order_by' => 'id', 'direction' => 'DESC', 'filename_prefix' => 'sbaio-schedules'],
         'sbaio.staff.overview' => ['table' => 'sbaio_staff', 'order_by' => 'id', 'direction' => 'DESC', 'filename_prefix' => 'sbaio-staff'],
-        'sbaio.tasks.overview' => ['table' => 'sbaio_tasks', 'order_by' => 'id', 'direction' => 'DESC', 'filename_prefix' => 'sbaio-tasks'],
+        'sbaio.tasks.overview' => [
+            'table' => 'sbaio_tasks',
+            'order_by' => 'id',
+            'direction' => 'DESC',
+            'filename_prefix' => 'sbaio-tasks',
+            'columns' => ['id', 'task_title', 'owner_name', 'task_type', 'task_bucket', 'related_date', 'task_status', 'priority', 'due_date', 'created_at', 'updated_at'],
+        ],
         'sbaio.timecards.overview' => ['table' => 'sbaio_timecards_daily', 'order_by' => 'id', 'direction' => 'DESC', 'filename_prefix' => 'sbaio-timecards'],
     ];
 
@@ -110,6 +122,10 @@ final class ModuleReportRegistryService
         $direction = strtoupper((string)($source['direction'] ?? 'DESC')) === 'ASC' ? 'ASC' : 'DESC';
         $filePrefix = trim((string)($source['filename_prefix'] ?? 'export'));
         $filename = $filePrefix . '-' . date('Ymd-His') . '.csv';
+        $columns = array_values(array_filter(
+            (array)($source['columns'] ?? []),
+            static fn (mixed $column): bool => is_string($column) && preg_match('/^[a-z0-9_]+$/i', $column) === 1
+        ));
 
         if (!preg_match('/^[a-z0-9_]+$/i', $table) || !preg_match('/^[a-z0-9_]+$/i', $orderBy)) {
             self::recordCsvExportFailure($reportKey, 'CSV source validation failed.');
@@ -117,15 +133,19 @@ final class ModuleReportRegistryService
         }
 
         try {
+            $select = $columns === [] ? '*' : implode(', ', $columns);
             $rows = DB::fetchAll(sprintf(
-                'SELECT * FROM %s ORDER BY %s %s LIMIT 5000',
+                'SELECT %s FROM %s ORDER BY %s %s LIMIT 5000',
+                $select,
                 $table,
                 $orderBy,
                 $direction
             ));
 
             $headers = [];
-            if (!empty($rows) && is_array($rows[0])) {
+            if ($columns !== []) {
+                $headers = $columns;
+            } elseif (!empty($rows) && is_array($rows[0])) {
                 $headers = array_keys($rows[0]);
             } else {
                 $columns = DB::fetchAll(sprintf('SHOW COLUMNS FROM %s', $table));

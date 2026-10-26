@@ -1,4 +1,18 @@
 # AGENT-COMPLIANCE-CHECKLIST
+## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-STAFF-READ-PROJECTION-001 read projection containment
+
+Completed the Staff-data read-projection audit. Task search and exact reads no
+longer select the unused historical `related_staff_id`; Notice list/exact/report
+projections were already Staff-free. Task and Notice CSV sources now declare
+explicit columns that preserve all non-Staff fields and omit only
+`related_staff_id`; other generic exports retain their `SELECT *` fallback.
+Historical schema/storage and associations remain untouched.
+
+Focused projection probe **8/8**, Task continuity **34/34**, queue **31/31**,
+report **16/16**, input integrity **76/76**, Notice continuity **37/37**,
+report **18/18**, input integrity **142/142**, and Staff containment **32/32**
+passed. No installed database or DB-backed SBAIO probe was executed.
+
 ## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-STAFF-WRITE-001 Staff-association write containment
 
 Closed the remaining unauthorized Task/Notice Staff-association write path.

@@ -159,7 +159,7 @@ namespace {
     $record = TasksService::findById('417');
     $assert($record['id'] === 417 && $record['task_title'] === 'Continuity task', 'exact retrieval returns the selected task record');
     $assert(count(DB::$queries) === 1 && DB::$queries[0]['params'] === [417], 'exact retrieval binds the positive ID as a parameter');
-    $assert(str_contains(DB::$queries[0]['sql'], 'FROM sbaio_tasks WHERE id = ? LIMIT 1'), 'exact retrieval uses bounded identity SQL');
+    $assert(str_contains(DB::$queries[0]['sql'], 'SELECT id, task_title, owner_name, task_type, task_bucket, related_date, task_status, priority, due_date FROM sbaio_tasks WHERE id = ? LIMIT 1') && !str_contains(DB::$queries[0]['sql'], 'related_staff_id'), 'exact retrieval uses the bounded Staff-free projection');
 
     DB::$queries = [];
     DB::$fetchOneRow = null;

@@ -88,6 +88,7 @@ namespace {
     $upcoming = TasksService::search(['queue' => 'upcoming']);
     $assert($upcoming['rows'][0]['queue_state'] === 'upcoming', 'upcoming result carries the queue classification');
     $assert(str_contains(DB::$queries[0]['sql'], 'due_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 7 DAY)'), 'upcoming SQL uses the existing seven-day operational window');
+    $assert(str_contains(DB::$queries[0]['sql'], 'SELECT id, task_title, owner_name, task_type, task_bucket, related_date, task_status, priority, due_date,') && !str_contains(DB::$queries[0]['sql'], 'related_staff_id'), 'Task queue projection excludes historical Staff linkage');
 
     DB::$queries = [];
     DB::$fetchAllRows = [[

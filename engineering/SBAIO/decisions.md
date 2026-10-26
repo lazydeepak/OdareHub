@@ -1,4 +1,18 @@
 # SBAIO — Decisions
+### 2026-10-26 — OH-AUTO3-SBAIO-STAFF-READ-PROJECTION-001 read projection containment
+
+**Decision: Remove Staff linkage from Task/Notice read and CSV projections where no established authorized consumer contract exists.**
+
+Task search and exact retrieval selected `related_staff_id`, but the existing
+controller/view/report consumers did not read it and no record-level Staff
+authorization contract exists. Notice list, exact, and report projections were
+already Staff-free. Task search/exact SQL now uses explicit Staff-free columns.
+The generic CSV engine retains its `SELECT *` fallback for other reports, while
+Task and Notice sources explicitly preserve every existing non-Staff column
+(including Notice `body`) and omit only `related_staff_id`. Historical schema,
+stored associations, INSERT behavior, routes, permissions, and authorization
+boundaries are unchanged.
+
 ### 2026-10-26 — OH-AUTO3-SBAIO-STAFF-WRITE-001 Staff-association write containment
 
 **Decision: Reject positive Staff associations at Task and Notice creation until an owner-approved record-level Staff authorization contract exists.**
