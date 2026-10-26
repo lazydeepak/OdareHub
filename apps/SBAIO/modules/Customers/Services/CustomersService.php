@@ -90,7 +90,7 @@ final class CustomersService
     /**
      * @param array<string,mixed> $input
      */
-    public static function create(array $input): void
+    public static function create(array $input): int
     {
         $validated = self::validateCreateInput($input);
         if (!$validated['valid']) {
@@ -98,15 +98,85 @@ final class CustomersService
         }
         $values = $validated['values'];
 
-        DB::query(
-            'INSERT INTO sbaio_customers (customer_name, contact_name, email, phone, status) VALUES (?,?,?,?,?)',
-            [
-                $values['customer_name'],
-                self::nullIfBlank($values['contact_name']),
-                self::nullIfBlank($values['email']),
-                self::nullIfBlank($values['phone']),
-                $values['status'],
-            ]
+        $db = DB::conn();
+        $transactionStarted = false;
+        try {
+            if ($db->begin_transaction() !== true) {
+                throw new \RuntimeException('Customer transaction could not start.');
+            }
+            $transactionStarted = true;
+
+            DB::query(
+                'INSERT INTO sbaio_customers (customer_name, contact_name, email, phone, status) VALUES (?,?,?,?,?)',
+                [
+                    $values['customer_name'],
+                    self::nullIfBlank($values['contact_name']),
+                    self::nullIfBlank($values['email']),
+                    self::nullIfBlank($values['phone']),
+                    $values['status'],
+                ]
+            );
+
+            $insertId = $db->insert_id;
+            if (is_int($insertId) && $insertId > 0) {
+                $createdId = $insertId;
+            } elseif (is_string($insertId) && preg_match('/^[1-9][0-9]*$/D', $insertId)) {
+                $normalizedId = filter_var($insertId, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+                if ($normalizedId !== false) {
+                    $createdId = (int)$normalizedId;
+                }
+            }
+            if (!isset($createdId)) {
+                throw new \RuntimeException('Customer insert identity was not available.');
+            }
+
+            if ($db->commit() !== true) {
+                throw new \RuntimeException('Customer transaction commit failed.');
+            }
+
+            return $createdId;
+        } catch (\Throwable $e) {
+            if ($transactionStarted) {
+                try {
+                    if ($db->rollback() !== true) {
+                        throw new \RuntimeException('Customer transaction rollback failed.');
+                    }
+                } catch (\Throwable $rollbackError) {
+                    throw new \RuntimeException('Customer transaction rollback failed.', 0, $e);
+                }
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Read one Customer record by its database-generated identity.
+     *
+     * @param mixed $id
+     * @return array<string,mixed>|null
+     */
+    public static function findById(mixed $id): ?array
+    {
+        if (!is_int($id) && !is_string($id)) {
+            throw new \InvalidArgumentException('Invalid Customer record ID.');
+        }
+        if (is_int($id)) {
+            $recordId = $id;
+        } elseif (preg_match('/^[1-9][0-9]*$/D', $id)) {
+            $recordId = filter_var($id, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+            if ($recordId === false) {
+                throw new \InvalidArgumentException('Invalid Customer record ID.');
+            }
+        } else {
+            throw new \InvalidArgumentException('Invalid Customer record ID.');
+        }
+        if ($recordId <= 0) {
+            throw new \InvalidArgumentException('Invalid Customer record ID.');
+        }
+
+        return DB::fetchOne(
+            'SELECT id, customer_name, contact_name, email, phone, status FROM sbaio_customers WHERE id = ? LIMIT 1',
+            [(int)$recordId]
         );
     }
 

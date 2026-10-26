@@ -1,4 +1,14 @@
 # AGENT-COMPLIANCE-CHECKLIST
+## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-CUSTOMERS-CONTINUITY-001 exact-ID continuity
+
+Completed reliable SBAIO Customer create-to-record continuity. Customer
+creation now uses the current connection transaction, verifies a positive
+generated ID before commit, and rolls back on insert/identity/commit failure.
+The existing administrator page reads exact `customer_id` values through a
+bounded parameterized query and renders localized found/not-found/invalid/
+unavailable states. Customers passed **151/151** and Sales **225/225** in
+database-free probes. No installed database or DB-backed SBAIO probe ran.
+
 ## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-CUSTOMERS-INPUT-001 strict input types
 
 Reproduced and closed the Customers array-to-string coercion defect. Raw create

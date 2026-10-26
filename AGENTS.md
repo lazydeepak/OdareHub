@@ -1,4 +1,18 @@
 # AGENTS.md
+## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-CUSTOMERS-CONTINUITY-001 exact-ID continuity
+
+Completed SBAIO Customer create-to-record continuity on the existing
+administrator surface. Customer creation now verifies the same-connection
+positive generated ID within a transaction and rolls back on insert, identity,
+or commit failure. The success redirect carries `customer_id`; exact retrieval
+is strict, read-only, parameterized, and administrator-gated before database
+access. No new route, permission, lifecycle, schema, Core/Auth/ACL,
+organization, Staff, Leave, Timecard, or Sales behavior changed.
+
+Customers regression **151/151**, Sales **225/225**, changed-file lint/diff
+checks, architecture gates, deletion-family gates **28/28**, and deployment
+readiness passed. No installed database or DB-backed SBAIO probe was executed.
+
 ## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-CUSTOMERS-INPUT-001 strict input types
 
 Closed the SBAIO Customers malformed-payload boundary defect. Customer create

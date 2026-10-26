@@ -9,6 +9,33 @@ declare(strict_types=1);
  */
 
 namespace App\Core {
+    final class ConnectionDouble
+    {
+        public int|string $insert_id = 417;
+        public bool $beginResult = true;
+        public bool $commitResult = true;
+        public bool $rollbackResult = true;
+        public array $events = [];
+
+        public function begin_transaction(): bool
+        {
+            $this->events[] = 'begin';
+            return $this->beginResult;
+        }
+
+        public function commit(): bool
+        {
+            $this->events[] = 'commit';
+            return $this->commitResult;
+        }
+
+        public function rollback(): bool
+        {
+            $this->events[] = 'rollback';
+            return $this->rollbackResult;
+        }
+    }
+
     final class Auth
     {
         public static ?array $user = null;
@@ -40,6 +67,14 @@ namespace App\Core {
     {
         public static array $queries = [];
         public static array $rows = [];
+        public static array $fetchOneRows = [];
+        public static bool $queryFailure = false;
+        public static ?ConnectionDouble $connection = null;
+
+        public static function conn(): ConnectionDouble
+        {
+            return self::$connection ??= new ConnectionDouble();
+        }
 
         public static function fetchAll(string $sql, array $params = []): array
         {
@@ -50,6 +85,15 @@ namespace App\Core {
         public static function query(string $sql, array $params = []): void
         {
             self::$queries[] = ['method' => 'query', 'sql' => $sql, 'params' => $params];
+            if (self::$queryFailure) {
+                throw new \RuntimeException('query failed');
+            }
+        }
+
+        public static function fetchOne(string $sql, array $params = []): ?array
+        {
+            self::$queries[] = ['method' => 'fetchOne', 'sql' => $sql, 'params' => $params];
+            return array_shift(self::$fetchOneRows) ?: null;
         }
     }
 }
@@ -152,9 +196,68 @@ namespace {
 
     // Existing persistence contract is invoked only with normalized values.
     DB::$queries = [];
-    CustomersService::create($valid['values']);
+    DB::$connection = new \App\Core\ConnectionDouble();
+    $createdId = CustomersService::create($valid['values']);
+    $assert($createdId === 417, 'valid create returns the generated positive customer ID');
     $assert(count(DB::$queries) === 1 && DB::$queries[0]['method'] === 'query', 'valid create invokes one insert query');
     $assert(DB::$queries[0]['params'] === ['Acme', 'Jane', 'jane@example.test', '+1 555 0100', 'active'], 'insert receives normalized existing fields');
+    $assert(DB::$connection->events === ['begin', 'commit'], 'successful customer creation commits after identity verification');
+
+    DB::$queries = [];
+    DB::$connection = new \App\Core\ConnectionDouble();
+    DB::$connection->insert_id = 0;
+    try {
+        CustomersService::create($valid['values']);
+        $assert(false, 'missing customer identity unexpectedly succeeded');
+    } catch (\RuntimeException) {
+        $assert(DB::$connection->events === ['begin', 'rollback'], 'missing customer identity rolls back before reporting failure');
+    }
+
+    DB::$queries = [];
+    DB::$connection = new \App\Core\ConnectionDouble();
+    DB::$connection->commitResult = false;
+    try {
+        CustomersService::create($valid['values']);
+        $assert(false, 'customer commit failure unexpectedly succeeded');
+    } catch (\RuntimeException) {
+        $assert(DB::$connection->events === ['begin', 'commit', 'rollback'], 'customer commit failure rolls back and cannot report success');
+    }
+
+    DB::$queries = [];
+    DB::$connection = new \App\Core\ConnectionDouble();
+    DB::$queryFailure = true;
+    try {
+        CustomersService::create($valid['values']);
+        $assert(false, 'customer insert failure unexpectedly succeeded');
+    } catch (\RuntimeException) {
+        $assert(DB::$connection->events === ['begin', 'rollback'], 'customer insert failure rolls back');
+    }
+    DB::$queryFailure = false;
+
+    DB::$queries = [];
+    DB::$fetchOneRows = [[
+        'id' => 417,
+        'customer_name' => 'Exact Customer',
+        'contact_name' => 'Jane',
+        'email' => 'jane@example.test',
+        'phone' => '+1 555 0100',
+        'status' => 'active',
+    ]];
+    $exactRecord = CustomersService::findById('417');
+    $assert($exactRecord !== null && $exactRecord['id'] === 417 && $exactRecord['customer_name'] === 'Exact Customer', 'exact customer retrieval uses generated ID independent of customer fields');
+    $assert(DB::$queries[0]['params'] === [417] && str_contains(DB::$queries[0]['sql'], 'WHERE id = ? LIMIT 1'), 'exact customer retrieval uses one parameterized ID predicate');
+    DB::$queries = [];
+    DB::$fetchOneRows = [null];
+    $assert(CustomersService::findById(999999) === null && count(DB::$queries) === 1, 'missing exact customer returns no record without latest-row or field inference');
+    foreach ([0, -1, '', '0', 'not-an-id', ['417'], '999999999999999999999'] as $invalidRecordId) {
+        DB::$queries = [];
+        try {
+            CustomersService::findById($invalidRecordId);
+            $assert(false, 'malformed exact customer ID unexpectedly succeeded');
+        } catch (\InvalidArgumentException) {
+            $assert(DB::$queries === [], 'malformed exact customer ID is rejected before database access');
+        }
+    }
 
     DB::$queries = [];
     try {
@@ -189,6 +292,12 @@ namespace {
     $controllerSource = file_get_contents(__DIR__ . '/../Controllers/CustomersController.php') ?: '';
     $assert(str_contains($serviceSource, "'input_type_invalid'") && !str_contains($serviceSource, '(string)($input['), 'customer validation has no pre-validation string coercion');
     $assert(str_contains($controllerSource, 'CustomersService::validateCreateInput($_POST)') && strpos($controllerSource, 'CustomersService::validateCreateInput($_POST)') < strpos($controllerSource, 'CustomersService::create($validated[\'values\'])'), 'controller validates the raw POST payload before persistence dispatch');
+    $assert(str_contains($controllerSource, 'CustomersService::findById') && str_contains($controllerSource, "'customer_id' => \$createdId"), 'post-create redirect carries the exact generated customer ID');
+    $assert(str_contains($serviceSource, 'public static function findById') && str_contains($serviceSource, 'WHERE id = ? LIMIT 1') && str_contains($serviceSource, 'begin_transaction'), 'customer service owns exact read and transaction identity guarantees');
+    $assert(!str_contains($controllerSource . $serviceSource, 'latest') && !str_contains($controllerSource . $serviceSource, 'ORDER BY id DESC LIMIT 1'), 'customer identity does not use latest-row inference');
+    foreach (['open_created_record', 'open_record', 'record_title', 'record_id', 'record_customer_name', 'record_contact_name', 'record_email', 'record_phone', 'record_status', 'record_id_invalid', 'record_not_found', 'record_unavailable'] as $key) {
+        $assert(str_contains($source, 'sbaio.customers.' . $key), 'Customers view uses localized exact-record key ' . $key);
+    }
     $assert(substr_count($routes, 'CustomersController::requireAdministrator()') === 4, 'all customer record routes require administrator authority');
     $assert(!str_contains($source . $routes, 'staff_id') && !str_contains($source . $routes, 'leave_status'), 'Customers surface has no Staff or Leave coupling');
     foreach (['en.php', 'ja.php', 'ne.php'] as $locale) {

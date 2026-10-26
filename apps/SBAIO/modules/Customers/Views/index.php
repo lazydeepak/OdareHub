@@ -6,6 +6,10 @@ $tt = static function (string $key): string {
 ?>
 <?php
 $rows = is_array($rows ?? null) ? $rows : [];
+$exactCustomer = is_array($exactCustomer ?? null) ? $exactCustomer : null;
+$exactCustomerId = is_int($exactCustomerId ?? null) ? $exactCustomerId : null;
+$exactCustomerState = is_string($exactCustomerState ?? null) ? $exactCustomerState : null;
+$createdCustomerId = is_int($createdCustomerId ?? null) ? $createdCustomerId : null;
 $suiteActions = [
   ['label' => t('nav.sbaio_dashboard'), 'url' => '/apps/sbaio'],
   ['label' => t('nav.sbaio_sales'), 'url' => '/apps/sbaio/sales'],
@@ -18,8 +22,35 @@ $moduleFilters = [
 ];
 require APP_ROOT . '/apps/SBAIO/Views/partials/module_page_intro.php';
 require APP_ROOT . '/apps/SBAIO/Views/partials/module_page_feedback.php';
-require APP_ROOT . '/apps/SBAIO/Views/partials/module_page_filters.php';
 ?>
+<?php if ($createdCustomerId !== null): ?>
+  <section class="card u-mb-14" data-sbaio-customers-created-record="1">
+    <a class="btn btn-primary" href="/apps/sbaio/customers?customer_id=<?= e((string)$createdCustomerId) ?>"><?= e(t('sbaio.customers.open_created_record')) ?></a>
+  </section>
+<?php endif; ?>
+<?php if ($exactCustomerState !== null): ?>
+  <section class="card u-mb-14" data-sbaio-customers-exact-record="1">
+    <?php if ($exactCustomerState === 'invalid'): ?>
+      <p class="muted" role="alert"><?= e(t('sbaio.customers.record_id_invalid')) ?></p>
+    <?php elseif ($exactCustomerState === 'unavailable'): ?>
+      <p class="muted" role="alert"><?= e(t('sbaio.customers.record_unavailable')) ?></p>
+    <?php elseif ($exactCustomerState === 'not_found'): ?>
+      <p class="muted" role="alert"><?= e(t('sbaio.customers.record_not_found')) ?></p>
+    <?php elseif ($exactCustomer !== null): ?>
+      <h3 class="u-mt-0"><?= e(t('sbaio.customers.record_title')) ?></h3>
+      <dl>
+        <dt><?= e(t('sbaio.customers.record_id')) ?></dt><dd><?= e((string)$exactCustomerId) ?></dd>
+        <dt><?= e(t('sbaio.customers.record_customer_name')) ?></dt><dd><?= e((string)($exactCustomer['customer_name'] ?? '')) ?></dd>
+        <dt><?= e(t('sbaio.customers.record_contact_name')) ?></dt><dd><?= e((string)($exactCustomer['contact_name'] ?? '')) ?></dd>
+        <dt><?= e(t('sbaio.customers.record_email')) ?></dt><dd><?= e((string)($exactCustomer['email'] ?? '')) ?></dd>
+        <dt><?= e(t('sbaio.customers.record_phone')) ?></dt><dd><?= e((string)($exactCustomer['phone'] ?? '')) ?></dd>
+        <dt><?= e(t('sbaio.customers.record_status')) ?></dt><dd><?= e((string)($exactCustomer['status'] ?? '')) ?></dd>
+      </dl>
+      <a class="btn" href="/apps/sbaio/customers?customer_id=<?= e((string)$exactCustomerId) ?>"><?= e(t('sbaio.customers.open_record')) ?></a>
+    <?php endif; ?>
+  </section>
+<?php endif; ?>
+<?php require APP_ROOT . '/apps/SBAIO/Views/partials/module_page_filters.php'; ?>
 <section class="card">
   <div class="card u-mb-14">
     <h3 class="u-mt-0"><?= e(t('sbaio.customers.form_title')) ?></h3>

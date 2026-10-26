@@ -1,4 +1,22 @@
 # SBAIO — Work
+## 2026-10-26 — OH-AUTO3-SBAIO-CUSTOMERS-CONTINUITY-001 exact-ID continuity
+
+**Status: Complete for offline verification; no installed database or DB-backed SBAIO probe.**
+
+- [x] Confirmed the prior Customer create flow returned no generated identity,
+  had no transaction/rollback boundary, and redirected without an exact-record
+  selector or view.
+- [x] Customer creation now verifies the same-connection positive generated ID,
+  commits only after identity verification, and rolls back on insert, identity,
+  or commit failure.
+- [x] Existing administrator Customers surface now performs strict positive-ID
+  retrieval through `WHERE id = ? LIMIT 1`; create success carries `customer_id`
+  and renders a direct authoritative-record link.
+- [x] Customers regression passed **151/151** and Sales **225/225**. Changed
+  files passed PHP lint and diff hygiene; architecture, deletion-family, and
+  deployment-readiness validation completed separately. No installed database
+  or DB-backed SBAIO probe was executed.
+
 ## 2026-10-26 — OH-AUTO3-SBAIO-CUSTOMERS-INPUT-001 strict create-input types
 
 **Status: Complete for offline verification; no installed database or DB-backed SBAIO probe.**

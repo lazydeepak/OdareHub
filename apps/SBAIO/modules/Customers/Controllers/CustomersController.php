@@ -29,13 +29,41 @@ final class CustomersController
     public static function index($view): void
     {
         self::requireAdministrator();
+        $currentQuery = is_array($_GET ?? null) ? $_GET : [];
+        $exactCustomer = null;
+        $exactCustomerId = null;
+        $exactCustomerState = null;
+        if (array_key_exists('customer_id', $currentQuery)) {
+            $rawCustomerId = $currentQuery['customer_id'];
+            if (is_string($rawCustomerId) && preg_match('/^[1-9][0-9]*$/D', $rawCustomerId)) {
+                $parsedCustomerId = filter_var($rawCustomerId, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+                if ($parsedCustomerId !== false) {
+                    $exactCustomerId = (int)$parsedCustomerId;
+                    try {
+                        $exactCustomer = CustomersService::findById($exactCustomerId);
+                        $exactCustomerState = is_array($exactCustomer) ? 'found' : 'not_found';
+                    } catch (\Throwable) {
+                        $exactCustomerState = 'unavailable';
+                    }
+                } else {
+                    $exactCustomerState = 'invalid';
+                }
+            } else {
+                $exactCustomerState = 'invalid';
+            }
+        }
         $view->render('Customers::index.php', [
             'pageTitle' => t('sbaio.customers.title'),
             'moduleTitle' => t('sbaio.customers.title'),
             'moduleDescription' => t('sbaio.customers.description'),
             'rows' => CustomersService::recent(),
-            'message' => (string)($_GET['ok'] ?? ''),
-            'error' => (string)($_GET['err'] ?? ''),
+            'currentQuery' => $currentQuery,
+            'message' => (string)($currentQuery['ok'] ?? ''),
+            'error' => (string)($currentQuery['err'] ?? ''),
+            'exactCustomer' => $exactCustomer,
+            'exactCustomerId' => $exactCustomerId,
+            'exactCustomerState' => $exactCustomerState,
+            'createdCustomerId' => ($currentQuery['ok'] ?? '') !== '' ? $exactCustomerId : null,
         ]);
     }
 
@@ -55,14 +83,16 @@ final class CustomersController
             self::redirect('err', t($messages[$errorKey] ?? 'sbaio.customers.invalid'));
         }
 
-        CustomersService::create($validated['values']);
+        $createdId = CustomersService::create($validated['values']);
 
-        self::redirect('ok', t('sbaio.customers.created'));
+        self::redirect('ok', t('sbaio.customers.created'), ['customer_id' => $createdId]);
     }
 
-    private static function redirect(string $key, string $message): void
+    /** @param array<string,int|string> $params */
+    private static function redirect(string $key, string $message, array $params = []): void
     {
-        header('Location: /apps/sbaio/customers?' . $key . '=' . rawurlencode($message));
+        $query = array_merge([$key => $message], $params);
+        header('Location: /apps/sbaio/customers?' . http_build_query($query, '', '&', PHP_QUERY_RFC3986));
         exit;
     }
 }

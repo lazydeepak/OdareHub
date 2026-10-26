@@ -1,4 +1,17 @@
 # SBAIO — Decisions
+### 2026-10-26 — OH-AUTO3-SBAIO-CUSTOMERS-CONTINUITY-001 exact identity contract
+
+**Decision: Extend the existing administrator Customers page with a read-only exact-ID view and make creation return the verified generated identity; do not add a route or infer records from customer fields/order.**
+
+`CustomersService::create()` uses the existing `DB::conn()` transaction
+boundary, performs the existing parameterized insert, validates a strictly
+positive same-connection `insert_id`, and commits only after identity success.
+Insert, identity, and commit failures roll back and cannot produce success.
+`findById()` accepts only a positive integer ID and performs one parameterized
+`WHERE id = ? LIMIT 1` read. The existing Customers administrator guard runs
+before exact retrieval and creation. No lifecycle, permission, route, schema,
+Core/Auth/ACL, or cross-domain behavior changes.
+
 ### 2026-10-26 — OH-AUTO3-SBAIO-CUSTOMERS-INPUT-001 strict input boundary
 
 **Decision: Accept only string values for supplied Customer create fields before normalization; preserve missing/`null` defaults and reject all other supplied types.**
