@@ -6,7 +6,7 @@ use Apps\Procurement\Services\ProcurementOverviewService;
 require_once APP_ROOT . '/apps/Procurement/Services/ProcurementOverviewService.php';
 
 $currentQuery = is_array($data['current_query'] ?? null) ? $data['current_query'] : [];
-$queueFilters = array_intersect_key($currentQuery, array_flip(['request_ref', 'status', 'needed_date', 'needed_from', 'needed_to']));
+$queueFilters = array_intersect_key($currentQuery, array_flip(['request_ref', 'status', 'receipt_status', 'needed_date', 'needed_from', 'needed_to']));
 $queue = ProcurementOverviewService::ownedOperatorRequests((string)($data['user_email'] ?? ''), 40, $queueFilters);
 $rows = (array)($queue['rows'] ?? []);
 $normalizedFilters = (array)($queue['filters'] ?? []);
@@ -53,6 +53,17 @@ $statusLabel = static function (string $status) use ($tr): string {
                 <option value=""><?= e($tr('proc.operator.queue.filter.all_statuses', 'All statuses')) ?></option>
                 <?php foreach (ProcurementOverviewService::OPERATOR_REQUEST_STATUSES as $status): ?>
                     <option value="<?= e($status) ?>"<?= (($normalizedFilters['status'] ?? '') === $status) ? ' selected' : '' ?>><?= e($tr('proc.operator.queue.status.' . $status, ucfirst($status))) ?></option>
+                <?php endforeach; ?>
+            </select>
+        </label>
+        <label><?= e($tr('proc.operator.queue.filter.receipt_status', 'Receipt status')) ?>
+            <select name="receipt_status">
+                <option value=""><?= e($tr('proc.operator.queue.filter.all_receipt_statuses', 'All receipt statuses')) ?></option>
+                <?php foreach (ProcurementOverviewService::OPERATOR_RECEIPT_FILTERS as $receiptFilter): ?>
+                    <?php $receiptLabel = $receiptFilter === 'none'
+                        ? $tr('proc.operator.queue.no_receipts', 'No receipts')
+                        : $tr('proc.operator.queue.status.' . $receiptFilter, ucfirst($receiptFilter)); ?>
+                    <option value="<?= e($receiptFilter) ?>"<?= (($normalizedFilters['receipt_status'] ?? '') === $receiptFilter) ? ' selected' : '' ?>><?= e($receiptLabel) ?></option>
                 <?php endforeach; ?>
             </select>
         </label>

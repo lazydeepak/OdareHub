@@ -40,7 +40,7 @@ $receiptProjection = strpos($ownedBody, 'receipt_summary.receipt_status AS lates
 
 $check($ownerPredicate !== false, 'exact authenticated created_by predicate remains mandatory');
 $check($ownedSubquery !== false && $firstRelatedJoin !== false && $ownedSubquery < $firstRelatedJoin, 'owned request set is formed before related PO/receipt joins');
-$check(str_contains($ownedBody, "WHERE ' . implode(' AND ', \$where) . '"), 'all request filters remain inside the owner-bound subquery');
+$check(str_contains($ownedBody, "WHERE ' . implode(' AND ', \$where);"), 'all request filters remain inside the owner-bound subquery');
 $check($receiptProjection !== false, 'latest receipt status is projected');
 $check(str_contains($ownedBody, 'receipt_summary.receipt_count') && str_contains($ownedBody, 'posted_received_qty'), 'receipt count and posted quantity are projected');
 $check(str_contains($ownedBody, "LOWER(COALESCE(receipt_status, \\'\\')) = \\'posted\\'"), 'posted receipt quantity uses the established receipt status');

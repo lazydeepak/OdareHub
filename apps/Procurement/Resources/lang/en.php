@@ -25,6 +25,8 @@ return [
     'proc.operator.queue.filter.title' => 'Filter my requests',
     'proc.operator.queue.filter.reference' => 'Reference contains',
     'proc.operator.queue.filter.status' => 'Status',
+    'proc.operator.queue.filter.receipt_status' => 'Receipt status',
+    'proc.operator.queue.filter.all_receipt_statuses' => 'All receipt statuses',
     'proc.operator.queue.filter.all_statuses' => 'All statuses',
     'proc.operator.queue.filter.needed_date' => 'Needed date',
     'proc.operator.queue.filter.needed_from' => 'Needed from',

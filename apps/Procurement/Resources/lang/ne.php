@@ -25,6 +25,8 @@ return [
     'proc.operator.queue.filter.title' => 'मेरा अनुरोधहरू फिल्टर गर्नुहोस्',
     'proc.operator.queue.filter.reference' => 'सन्दर्भमा समावेश',
     'proc.operator.queue.filter.status' => 'स्थिति',
+    'proc.operator.queue.filter.receipt_status' => 'रसिद स्थिति',
+    'proc.operator.queue.filter.all_receipt_statuses' => 'सबै रसिद स्थितिहरू',
     'proc.operator.queue.filter.all_statuses' => 'सबै स्थिति',
     'proc.operator.queue.filter.needed_date' => 'आवश्यक मिति',
     'proc.operator.queue.filter.needed_from' => 'आवश्यक मितिदेखि',

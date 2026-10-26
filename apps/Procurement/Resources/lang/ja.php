@@ -25,6 +25,8 @@ return [
     'proc.operator.queue.filter.title' => '依頼を絞り込む',
     'proc.operator.queue.filter.reference' => '参照番号を含む',
     'proc.operator.queue.filter.status' => '状態',
+    'proc.operator.queue.filter.receipt_status' => '受取記録の状態',
+    'proc.operator.queue.filter.all_receipt_statuses' => 'すべての受取記録状態',
     'proc.operator.queue.filter.all_statuses' => 'すべての状態',
     'proc.operator.queue.filter.needed_date' => '必要日',
     'proc.operator.queue.filter.needed_from' => '必要日の開始',
