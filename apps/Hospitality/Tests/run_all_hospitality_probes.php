@@ -39,6 +39,8 @@ $probes = [
     'operator behavioral dispatch' => 'apps/Hospitality/Tests/probe_operator_behavioral.php',
     'operator input identity' => 'apps/Hospitality/Tests/probe_operator_input_identity.php',
     'operator reservation lookup' => 'apps/Hospitality/Tests/probe_operator_reservation_lookup.php',
+    'operator reservation search validation' => 'apps/Hospitality/Tests/probe_operator_reservation_search_validation.php',
+    'operator reservation search' => 'apps/Hospitality/Tests/probe_operator_reservation_search.php',
 ];
 
 $passed = 0;

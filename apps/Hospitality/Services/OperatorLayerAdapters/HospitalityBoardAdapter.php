@@ -77,6 +77,32 @@ final class HospitalityBoardAdapter
     }
 
     /**
+     * Delegate bounded operator search after the view's existing authority
+     * boundary has admitted the Hospitality focus surface.
+     *
+     * @param array<string,mixed> $filters
+     * @return array{valid:bool,available:bool,rows:array<int,array<string,mixed>>,truncated:bool,limit:int,filters:array<string,string>}
+     */
+    public static function searchReservations(array $filters): array
+    {
+        try {
+            $result = ReservationsService::searchOperator($filters, 50);
+            return [
+                'valid' => true,
+                'available' => true,
+                'rows' => array_values((array)($result['rows'] ?? [])),
+                'truncated' => ($result['truncated'] ?? false) === true,
+                'limit' => (int)($result['limit'] ?? 50),
+                'filters' => (array)($result['filters'] ?? []),
+            ];
+        } catch (\InvalidArgumentException) {
+            return ['valid' => false, 'available' => true, 'rows' => [], 'truncated' => false, 'limit' => 50, 'filters' => []];
+        } catch (\Throwable) {
+            return ['valid' => true, 'available' => false, 'rows' => [], 'truncated' => false, 'limit' => 50, 'filters' => []];
+        }
+    }
+
+    /**
      * Read-only operator payload over existing Hospitality foundation services.
      *
      * @return array<string,mixed>|null

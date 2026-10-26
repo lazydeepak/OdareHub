@@ -86,6 +86,58 @@ final class ReservationsService
     }
 
     /**
+     * Bounded operator search over the existing reservation visibility surface.
+     * Filters are intentionally limited to established status and planned
+     * check-in date boundaries; guest identity/free-text matching is excluded.
+     *
+     * @param array<string,mixed> $filters
+     * @return array{rows:array<int,array<string,mixed>>,truncated:bool,limit:int,filters:array{status:string,from:string,to:string}}
+     */
+    public static function searchOperator(array $filters, int $limit = 50): array
+    {
+        $limit = max(1, min(50, $limit));
+        $normalized = self::normalizeOperatorSearchFilters($filters);
+        self::requireSchema();
+
+        $where = [];
+        $params = [];
+        if ($normalized['status'] !== '') {
+            $where[] = 'r.reservation_status = ?';
+            $params[] = $normalized['status'];
+        }
+        if ($normalized['from'] !== '') {
+            $where[] = 'r.check_in_date >= ?';
+            $params[] = $normalized['from'];
+        }
+        if ($normalized['to'] !== '') {
+            $where[] = 'r.check_in_date <= ?';
+            $params[] = $normalized['to'];
+        }
+
+        $rows = DB::fetchAll(
+            'SELECT r.id, r.guest_id, r.room_id, r.check_in_date, r.check_out_date,
+                    r.adults, r.children, r.rate, r.reservation_status,
+                    r.actual_check_in_at, r.actual_check_out_at,
+                    g.full_name AS guest_label, rm.room_number AS room_label
+             FROM hosp_reservations r
+             LEFT JOIN hosp_guests g ON g.id = r.guest_id
+             LEFT JOIN hosp_rooms rm ON rm.id = r.room_id
+             ' . ($where === [] ? '' : 'WHERE ' . implode(' AND ', $where)) . '
+             ORDER BY r.check_in_date ASC, r.id ASC
+             LIMIT ' . ($limit + 1),
+            $params
+        );
+
+        $truncated = count($rows) > $limit;
+        return [
+            'rows' => array_values(array_slice($rows, 0, $limit)),
+            'truncated' => $truncated,
+            'limit' => $limit,
+            'filters' => $normalized,
+        ];
+    }
+
+    /**
      * Active guests and rooms for the create form.
      * @return array{guests:array<int,array<string,mixed>>,rooms:array<int,array<string,mixed>>}
      */
@@ -224,6 +276,40 @@ final class ReservationsService
     {
         $row = DB::fetchOne("SELECT id FROM hosp_guests WHERE id=? AND guest_status='active' LIMIT 1", [$guestId]);
         return is_array($row);
+    }
+
+    /**
+     * @param array<string,mixed> $filters
+     * @return array{status:string,from:string,to:string}
+     */
+    private static function normalizeOperatorSearchFilters(array $filters): array
+    {
+        $status = $filters['status'] ?? '';
+        $from = $filters['from'] ?? '';
+        $to = $filters['to'] ?? '';
+        if (!is_string($status) || !is_string($from) || !is_string($to)) {
+            throw new \InvalidArgumentException('HOSPITALITY_RES_SEARCH_FILTER_INVALID');
+        }
+
+        $status = strtolower(trim($status));
+        $from = trim($from);
+        $to = trim($to);
+        if ($status !== '' && !in_array($status, self::STATUSES, true)) {
+            throw new \InvalidArgumentException('HOSPITALITY_RES_SEARCH_FILTER_INVALID');
+        }
+        foreach ([$from, $to] as $date) {
+            if ($date !== '' && !preg_match('/^\d{4}-\d{2}-\d{2}$/D', $date)) {
+                throw new \InvalidArgumentException('HOSPITALITY_RES_SEARCH_FILTER_INVALID');
+            }
+            if ($date !== '' && !checkdate((int)substr($date, 5, 2), (int)substr($date, 8, 2), (int)substr($date, 0, 4))) {
+                throw new \InvalidArgumentException('HOSPITALITY_RES_SEARCH_FILTER_INVALID');
+            }
+        }
+        if ($from !== '' && $to !== '' && $from > $to) {
+            throw new \InvalidArgumentException('HOSPITALITY_RES_SEARCH_FILTER_INVALID');
+        }
+
+        return ['status' => $status, 'from' => $from, 'to' => $to];
     }
 
     private static function activeRoomExists(int $roomId): bool

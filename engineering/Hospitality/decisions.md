@@ -1,5 +1,21 @@
 # Hospitality — Decisions
 
+## 2026-10-26 — OH-AUTO3-HOSP-OP-SEARCH-001 bounded operator reservation search
+
+**Decision: Extend the existing Hospitality reservation service with a bounded date/status search, not a new search authority.**
+
+The operator search runs only after the existing operator assignment/provider
+admission and `hospitality.view` gate. It accepts no guest identity or free-text
+selector. The only filters are established reservation statuses and inclusive
+planned `check_in_date` `from`/`to` boundaries; reversed, malformed, unknown,
+or non-scalar filters fail closed.
+
+The owner service orders by `check_in_date ASC, id ASC`, queries one bounded
+window of 51 rows, returns at most 50, and exposes truncation evidence. This
+supports historical and future records without changing arrivals semantics or
+inferring creator ownership. Exact-ID lookup and all existing lifecycle paths
+remain unchanged.
+
 ## 2026-10-26 — OH-AUTO3-HOSP-OP-LOOKUP-001 persistent reservation lookup
 
 **Decision: Use the existing operator Hospitality view authority and canonical reservation read.**

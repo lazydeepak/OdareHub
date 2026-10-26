@@ -1,5 +1,23 @@
 # Hospitality Work Log
 
+## 2026-10-26 — OH-AUTO3-HOSP-OP-SEARCH-001 bounded operator reservation search
+
+**Status: Implemented and verified offline; live database/browser acceptance remains environment-bound.**
+
+- [x] Added bounded search to the existing assigned Hospitality operator focus
+  view for historical and future reservations when the exact ID is unknown.
+- [x] Search accepts only established reservation status values and inclusive
+  planned check-in date boundaries; guest-name/free-text matching is excluded.
+- [x] Existing `hospitality.view` and operator assignment admission remain the
+  authority boundary before search, ordering, and limiting; no new permission,
+  route, record-ownership rule, or search framework was added.
+- [x] Results are deterministic and capped at 50, with truncation evidence;
+  exact-ID lookup, arrivals, creation, and lifecycle workflows are unchanged.
+- [x] Search probe passed **28/28**; filter validation passed **7/7**; exact
+  lookup passed **36/36**; continuation passed **21/21**.
+- [ ] Disposable database/browser acceptance remains separately blocked; no
+  database, deployment, activation, or production operation was performed.
+
 ## 2026-10-26 — OH-AUTO3-HOSP-OP-LOOKUP-001 persistent operator reservation lookup
 
 **Status: Implemented and verified offline; live database/browser acceptance remains environment-bound.**

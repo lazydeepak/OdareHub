@@ -55,6 +55,14 @@ $tr = static fn (string $key, string $fallback): string => htmlspecialchars($tra
         $reservationLookup = $reservationReference !== ''
             ? HospitalityBoardAdapter::lookupReservation($reservationReference)
             : null;
+        $searchRequested = ($currentQuery['reservation_search'] ?? '') === '1';
+        $reservationSearch = $searchRequested
+            ? HospitalityBoardAdapter::searchReservations([
+                'status' => is_string($currentQuery['reservation_status'] ?? null) ? $currentQuery['reservation_status'] : '',
+                'from' => is_string($currentQuery['reservation_from'] ?? null) ? $currentQuery['reservation_from'] : '',
+                'to' => is_string($currentQuery['reservation_to'] ?? null) ? $currentQuery['reservation_to'] : '',
+            ])
+            : null;
         $createdReservation = $createdReservationId > 0
             ? HospitalityBoardAdapter::createdReservation($createdReservationId)
             : null;
@@ -113,6 +121,66 @@ $tr = static fn (string $key, string $fallback): string => htmlspecialchars($tra
                 <dt><?php echo $tr('hospitality.field.status', 'Status'); ?></dt>
                 <dd><?php echo $esc($translate('hospitality.res_status.' . (string)($lookupReservation['reservation_status'] ?? ''), (string)($lookupReservation['reservation_status'] ?? ''))); ?></dd>
             </dl>
+            <?php endif; ?>
+        <?php endif; ?>
+    </div>
+
+    <div class="card" data-hospitality-reservation-search="1">
+        <h3><?php echo $tr('hospitality.operator.reservation.search_title', 'Search reservations'); ?></h3>
+        <p class="text-muted"><?php echo $tr('hospitality.operator.reservation.search_note', 'Search by planned arrival date and reservation status. Guest-name and free-text searches are not available.'); ?></p>
+        <form method="get" action="/u/<?php echo $esc($opUsername); ?>/hospitality" class="hosp-form">
+            <input type="hidden" name="reservation_search" value="1">
+            <label><?php echo $tr('hospitality.field.status', 'Status'); ?>
+                <select name="reservation_status">
+                    <option value=""><?php echo $tr('hospitality.operator.reservation.search_all_statuses', 'All statuses'); ?></option>
+                    <?php foreach (\Apps\Hospitality\Services\ReservationsService::STATUSES as $searchStatus): ?>
+                    <option value="<?php echo $esc($searchStatus); ?>"<?php echo (($currentQuery['reservation_status'] ?? '') === $searchStatus) ? ' selected' : ''; ?>><?php echo $esc($translate('hospitality.res_status.' . $searchStatus, $searchStatus)); ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </label>
+            <label><?php echo $tr('hospitality.operator.reservation.search_from', 'Arrival from'); ?>
+                <input type="date" name="reservation_from" value="<?php echo $esc(is_string($currentQuery['reservation_from'] ?? null) ? $currentQuery['reservation_from'] : ''); ?>">
+            </label>
+            <label><?php echo $tr('hospitality.operator.reservation.search_to', 'Arrival to'); ?>
+                <input type="date" name="reservation_to" value="<?php echo $esc(is_string($currentQuery['reservation_to'] ?? null) ? $currentQuery['reservation_to'] : ''); ?>">
+            </label>
+            <button class="btn" type="submit"><?php echo $tr('hospitality.operator.reservation.search_submit', 'Search reservations'); ?></button>
+        </form>
+        <?php if ($reservationSearch !== null): ?>
+            <?php if (($reservationSearch['valid'] ?? false) !== true): ?>
+            <p class="text-muted" role="alert"><?php echo $tr('hospitality.operator.reservation.search_invalid', 'The search filters are invalid.'); ?></p>
+            <?php elseif (($reservationSearch['available'] ?? false) !== true): ?>
+            <p class="text-muted" role="alert"><?php echo $tr('hospitality.operator.reservation.search_unavailable', 'Reservation search is temporarily unavailable.'); ?></p>
+            <?php elseif (($reservationSearch['rows'] ?? []) === []): ?>
+            <p class="text-muted"><?php echo $tr('hospitality.operator.reservation.search_no_results', 'No reservations matched these filters.'); ?></p>
+            <?php else: ?>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr>
+                        <th><?php echo $tr('hospitality.field.reservation_id', 'Reservation ID'); ?></th>
+                        <th><?php echo $tr('hospitality.field.guest', 'Guest'); ?></th>
+                        <th><?php echo $tr('hospitality.field.room', 'Room'); ?></th>
+                        <th><?php echo $tr('hospitality.field.check_in_date', 'Arrival (planned)'); ?></th>
+                        <th><?php echo $tr('hospitality.field.check_out_date', 'Departure (planned)'); ?></th>
+                        <th><?php echo $tr('hospitality.field.status', 'Status'); ?></th>
+                    </tr></thead>
+                    <tbody>
+                    <?php foreach ((array)$reservationSearch['rows'] as $searchRow): ?>
+                    <tr>
+                        <td><?php echo $esc((int)($searchRow['id'] ?? 0)); ?></td>
+                        <td><?php echo $esc($searchRow['guest_label'] ?? ''); ?></td>
+                        <td><?php echo $esc(($searchRow['room_label'] ?? '') !== '' ? $searchRow['room_label'] : $translate('hospitality.res_unassigned_room', 'Room unassigned')); ?></td>
+                        <td><?php echo $esc($searchRow['check_in_date'] ?? ''); ?></td>
+                        <td><?php echo $esc($searchRow['check_out_date'] ?? ''); ?></td>
+                        <td><?php echo $esc($translate('hospitality.res_status.' . (string)($searchRow['reservation_status'] ?? ''), (string)($searchRow['reservation_status'] ?? ''))); ?></td>
+                    </tr>
+                    <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+            <?php if (($reservationSearch['truncated'] ?? false) === true): ?>
+            <p class="text-muted"><?php echo $esc($translate('hospitality.operator.reservation.search_limited', 'Showing the first {limit} results in planned-arrival order.', ['limit' => (int)($reservationSearch['limit'] ?? 50)])); ?></p>
+            <?php endif; ?>
             <?php endif; ?>
         <?php endif; ?>
     </div>
