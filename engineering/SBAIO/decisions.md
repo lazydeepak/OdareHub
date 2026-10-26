@@ -1,4 +1,17 @@
 # SBAIO — Decisions
+### 2026-10-26 — OH-AUTO3-SBAIO-CUSTOMERS-INPUT-001 strict input boundary
+
+**Decision: Accept only string values for supplied Customer create fields before normalization; preserve missing/`null` defaults and reject all other supplied types.**
+
+`CustomersService::validateCreateInput()` now checks the raw values for
+`customer_name`, `contact_name`, `email`, `phone`, and `status` before calling
+`trim()`. Missing or `null` optional values remain blank and status still
+defaults to `active`; valid strings retain existing trimming, length, email,
+and arbitrary-status behavior. Arrays, objects, booleans, integers, floats,
+resources, and other unsupported values return `input_type_invalid` and cannot
+reach the create INSERT boundary. Existing administrator access, CSRF, routes,
+schema, and persistence shape are unchanged.
+
 ### 2026-10-26 — OH-AUTO3-SBAIO-SALES-CONTINUITY-001 exact-ID retrieval
 
 **Decision: Extend the existing administrator Sales page with a read-only exact-ID view; do not add a new route or infer records from references/order.**

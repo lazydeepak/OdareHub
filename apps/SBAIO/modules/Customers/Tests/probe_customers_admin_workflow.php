@@ -91,6 +91,16 @@ namespace {
         exit(2);
     }
 
+    if (($argv[1] ?? '') === 'malformed-controller') {
+        Auth::$user = ['id' => 8, 'authority_role' => 'app_admin', 'role' => 'user'];
+        $_POST = ['csrf' => 'valid-csrf', 'customer_name' => ['Array-shaped name']];
+        register_shutdown_function(static function (): void {
+            echo 'malformed-controller queries=' . count(DB::$queries) . "\n";
+        });
+        CustomersController::create();
+        exit(2);
+    }
+
     // Validation is pure and must not touch the fake database.
     $beforeQueries = count(DB::$queries);
     $missing = CustomersService::validateCreateInput([]);
@@ -121,6 +131,24 @@ namespace {
         'phone' => '+1 555 0100',
         'status' => 'active',
     ], 'valid customer input is normalized with active default');
+
+    // Every supplied field is string-only. Unsupported values must fail before
+    // trim/normalization and before the INSERT boundary.
+    foreach (['customer_name', 'contact_name', 'email', 'phone', 'status'] as $field) {
+        foreach ([['Acme'], new \stdClass(), true, 17, 12.5] as $malformedValue) {
+            $malformed = ['customer_name' => 'Acme', $field => $malformedValue];
+            $validatedMalformed = CustomersService::validateCreateInput($malformed);
+            $assert(!$validatedMalformed['valid'] && $validatedMalformed['errors'] === ['input_type_invalid'], $field . ' rejects unsupported input type before normalization');
+
+            DB::$queries = [];
+            try {
+                CustomersService::create($malformed);
+                $assert(false, $field . ' malformed create unexpectedly succeeded');
+            } catch (\InvalidArgumentException) {
+                $assert(DB::$queries === [], $field . ' malformed create reaches no database insertion');
+            }
+        }
+    }
 
     // Existing persistence contract is invoked only with normalized values.
     DB::$queries = [];
@@ -157,6 +185,10 @@ namespace {
     $source = file_get_contents(__DIR__ . '/../Views/index.php') ?: '';
     $routes = file_get_contents(__DIR__ . '/../routes.php') ?: '';
     $assert(str_contains($source, 'e((string)($row[\'customer_name\'] ?? \'\'))'), 'list customer values are escaped');
+    $serviceSource = file_get_contents(__DIR__ . '/../Services/CustomersService.php') ?: '';
+    $controllerSource = file_get_contents(__DIR__ . '/../Controllers/CustomersController.php') ?: '';
+    $assert(str_contains($serviceSource, "'input_type_invalid'") && !str_contains($serviceSource, '(string)($input['), 'customer validation has no pre-validation string coercion');
+    $assert(str_contains($controllerSource, 'CustomersService::validateCreateInput($_POST)') && strpos($controllerSource, 'CustomersService::validateCreateInput($_POST)') < strpos($controllerSource, 'CustomersService::create($validated[\'values\'])'), 'controller validates the raw POST payload before persistence dispatch');
     $assert(substr_count($routes, 'CustomersController::requireAdministrator()') === 4, 'all customer record routes require administrator authority');
     $assert(!str_contains($source . $routes, 'staff_id') && !str_contains($source . $routes, 'leave_status'), 'Customers surface has no Staff or Leave coupling');
     foreach (['en.php', 'ja.php', 'ne.php'] as $locale) {
@@ -235,6 +267,20 @@ namespace {
         $status = proc_close($process);
     }
     $assert($status === 0, 'non-admin controller authorization exits with denial response');
+
+    $command = [PHP_BINARY, __FILE__, 'malformed-controller'];
+    $descriptorSpec = [1 => ['pipe', 'w'], 2 => ['pipe', 'w']];
+    $process = proc_open($command, $descriptorSpec, $pipes);
+    $malformedOutput = '';
+    $malformedStatus = -1;
+    if (is_resource($process)) {
+        $malformedOutput = (string)stream_get_contents($pipes[1]);
+        stream_get_contents($pipes[2]);
+        fclose($pipes[1]);
+        fclose($pipes[2]);
+        $malformedStatus = proc_close($process);
+    }
+    $assert($malformedStatus === 0 && str_contains($malformedOutput, 'malformed-controller queries=0'), 'malformed controller payload redirects without invoking database insertion');
 
     echo "Customers admin workflow probe: {$assertions} assertions, {$failures} failures\n";
     exit($failures === 0 ? 0 : 1);

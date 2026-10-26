@@ -1,4 +1,17 @@
 # AGENTS.md
+## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-CUSTOMERS-INPUT-001 strict input types
+
+Closed the SBAIO Customers malformed-payload boundary defect. Customer create
+fields now reject supplied arrays, objects, booleans, numbers, resources, and
+other non-string types before normalization or persistence; missing/`null`
+defaults and valid-string behavior remain unchanged. Existing administrator,
+CSRF, route, schema, persistence, Sales, Core/Auth/ACL, organization, Staff,
+Leave, and Timecard behavior was preserved.
+
+Customers regression **121/121**, Sales **225/225**, changed-file lint/diff
+checks, architecture gates, deletion-family gates **28/28**, and deployment
+readiness passed. No installed database or DB-backed SBAIO probe was executed.
+
 ## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-SALES-CONTINUITY-001 exact-ID continuity
 
 Completed the SBAIO Sales create-to-record continuity slice. The existing

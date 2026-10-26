@@ -1,4 +1,19 @@
 # SBAIO — Work
+## 2026-10-26 — OH-AUTO3-SBAIO-CUSTOMERS-INPUT-001 strict create-input types
+
+**Status: Complete for offline verification; no installed database or DB-backed SBAIO probe.**
+
+- [x] Reproduced the baseline array coercion: an array-shaped customer name
+  emitted an `Array to string conversion` warning and became the accepted value
+  `Array`.
+- [x] Added a pre-normalization string-only type boundary for customer name,
+  contact name, email, phone, and status. Missing/`null` values retain existing
+  empty/default behavior; booleans, numbers, arrays, objects, and other supplied
+  non-string types fail closed.
+- [x] Added database-free service and controller regressions proving malformed
+  payloads do not reach `CustomersService::create()` or `sbaio_customers` INSERT.
+- [x] Customers probe passed **121/121**; Sales regression passed **225/225**.
+
 ## 2026-10-26 — OH-AUTO3-SBAIO-SALES-CONTINUITY-001 exact-ID continuity
 
 **Status: Complete for offline verification; database-backed SBAIO probes remain environment-bound.**

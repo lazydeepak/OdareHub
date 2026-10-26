@@ -18,12 +18,33 @@ final class CustomersService
      */
     public static function validateCreateInput(array $input): array
     {
+        $inputFields = ['customer_name', 'contact_name', 'email', 'phone', 'status'];
+        $typeErrors = [];
+        foreach ($inputFields as $field) {
+            if (array_key_exists($field, $input) && $input[$field] !== null && !is_string($input[$field])) {
+                $typeErrors[] = 'input_type_invalid';
+            }
+        }
+        if ($typeErrors !== []) {
+            return [
+                'valid' => false,
+                'errors' => array_values(array_unique($typeErrors)),
+                'values' => [
+                    'customer_name' => '',
+                    'contact_name' => '',
+                    'email' => '',
+                    'phone' => '',
+                    'status' => '',
+                ],
+            ];
+        }
+
         $values = [
-            'customer_name' => trim((string)($input['customer_name'] ?? '')),
-            'contact_name' => trim((string)($input['contact_name'] ?? '')),
-            'email' => trim((string)($input['email'] ?? '')),
-            'phone' => trim((string)($input['phone'] ?? '')),
-            'status' => trim((string)($input['status'] ?? '')),
+            'customer_name' => trim($input['customer_name'] ?? ''),
+            'contact_name' => trim($input['contact_name'] ?? ''),
+            'email' => trim($input['email'] ?? ''),
+            'phone' => trim($input['phone'] ?? ''),
+            'status' => trim($input['status'] ?? ''),
         ];
         $errors = [];
 

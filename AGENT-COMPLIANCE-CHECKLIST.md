@@ -1,4 +1,13 @@
 # AGENT-COMPLIANCE-CHECKLIST
+## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-CUSTOMERS-INPUT-001 strict input types
+
+Reproduced and closed the Customers array-to-string coercion defect. Raw create
+fields are now string-only before normalization; missing/`null` defaults and
+valid-string behavior remain unchanged. Unsupported types fail closed before
+`CustomersService::create()` and database insertion. Customers passed **121/121**
+and Sales **225/225** in database-free probes. No installed database or DB-backed
+SBAIO probe was executed.
+
 ## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-SALES-CONTINUITY-001 exact-ID continuity
 
 Completed Sales create-to-record continuity without adding a route. The
