@@ -1,4 +1,16 @@
 # SBAIO — Decisions
+### 2026-10-26 — OH-AUTO3-SBAIO-TASKS-QUEUE-001 bounded discovery contract
+
+**Decision: Extend the existing Task queue with a read-only exact-filter search and forward keyset pagination, without changing Task lifecycle or authorization semantics.**
+
+The search supports `overdue`, `upcoming`, `historical`, and `all` modes,
+exact status/priority/bucket filters, inclusive due-date bounds, a 50-row
+cap, and opaque cursors bound to the normalized filter fingerprint. Results
+order by `due_date DESC, id DESC`; overdue/upcoming use only the already
+established `done`, `completed`, and `closed` terminal values. Existing SBAIO
+app access remains the authorization boundary and no Staff field is used for
+ownership inference.
+
 ### 2026-10-26 — OH-AUTO3-SBAIO-TASKS-CONTINUITY-001 transactional identity and exact retrieval
 
 **Decision: Adopt the existing Sales/Customers/Expenses same-connection transaction and exact-ID continuity pattern for Tasks on the existing SBAIO route.**

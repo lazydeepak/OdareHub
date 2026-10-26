@@ -1,4 +1,22 @@
 # SBAIO — Work
+## 2026-10-26 — OH-AUTO3-SBAIO-TASKS-QUEUE-001 bounded Task discovery
+
+**Status: In progress — offline verification only; no installed database or DB-backed SBAIO probe.**
+
+- [x] Added bounded exact-filter Task discovery on the existing queue surface:
+  `overdue`, `upcoming`, `historical`, and `all` queue modes, exact status,
+  priority, bucket, and inclusive due-date filters.
+- [x] Results use a hard 50-row page cap, deterministic `due_date DESC,
+  id DESC` ordering, opaque filter-bound cursors, strict keyset continuation,
+  and explicit NULL-date handling.
+- [x] Overdue means due before `CURDATE()` with existing terminal statuses
+  excluded; upcoming means `CURDATE()` through seven days with the same
+  established terminal-status exclusion. No status mutation or new state was
+  added.
+- [x] Queue probe passed **30/30**; continuity **34/34**, Task integrity
+  **72/72**, report ownership **15/15**, Expenses **91/91**, Customers
+  **195/195**, and Sales **225/225** remain passing.
+
 ## 2026-10-26 — OH-AUTO3-SBAIO-TASKS-CONTINUITY-001 Task creation durability and exact retrieval
 
 **Status: In progress — offline verification only; no installed database or DB-backed SBAIO probe.**

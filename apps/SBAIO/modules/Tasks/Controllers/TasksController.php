@@ -51,11 +51,53 @@ final class TasksController
             }
         }
 
+        $searchRequested = ($currentQuery['task_search'] ?? '') === '1';
+        $searchResult = null;
+        if ($searchRequested) {
+            try {
+                $searchResult = TasksService::search([
+                    'queue' => $currentQuery['task_queue'] ?? 'all',
+                    'status' => $currentQuery['task_status_exact'] ?? '',
+                    'priority' => $currentQuery['task_priority_exact'] ?? '',
+                    'task_bucket' => $currentQuery['task_bucket_exact'] ?? '',
+                    'from' => $currentQuery['task_from'] ?? '',
+                    'to' => $currentQuery['task_to'] ?? '',
+                ], 50, is_string($currentQuery['task_cursor'] ?? null)
+                    ? $currentQuery['task_cursor']
+                    : (($currentQuery['task_cursor'] ?? null) === null ? null : '[invalid]'));
+            } catch (\InvalidArgumentException) {
+                $searchResult = ['valid' => false, 'available' => true, 'rows' => [], 'truncated' => false, 'limit' => 50, 'filters' => [], 'next_cursor' => null];
+            } catch (\Throwable) {
+                $searchResult = ['valid' => true, 'available' => false, 'rows' => [], 'truncated' => false, 'limit' => 50, 'filters' => [], 'next_cursor' => null];
+            }
+            $rows = (array)($searchResult['rows'] ?? []);
+        } else {
+            $rows = TasksService::recent();
+        }
+
+        $nextSearchUrl = null;
+        if (is_string($searchResult['next_cursor'] ?? null) && $searchResult['next_cursor'] !== '') {
+            $nextParams = ['task_search' => '1', 'task_cursor' => $searchResult['next_cursor']];
+            foreach ([
+                'queue' => 'task_queue',
+                'status' => 'task_status_exact',
+                'priority' => 'task_priority_exact',
+                'task_bucket' => 'task_bucket_exact',
+                'from' => 'task_from',
+                'to' => 'task_to',
+            ] as $filterKey => $queryKey) {
+                if (is_string($searchResult['filters'][$filterKey] ?? null) && $searchResult['filters'][$filterKey] !== '') {
+                    $nextParams[$queryKey] = $searchResult['filters'][$filterKey];
+                }
+            }
+            $nextSearchUrl = '/apps/sbaio/tasks?' . http_build_query($nextParams, '', '&', PHP_QUERY_RFC3986);
+        }
+
         $view->render('Tasks::index.php', [
             'pageTitle' => t('sbaio.tasks.title'),
             'moduleTitle' => t('sbaio.tasks.title'),
             'moduleDescription' => t('sbaio.tasks.description'),
-            'rows' => TasksService::recent(),
+            'rows' => $rows,
             'staffRows' => TasksService::activeStaff(),
             'message' => (string)($_GET['ok'] ?? ''),
             'error' => (string)($_GET['err'] ?? ''),
@@ -63,6 +105,9 @@ final class TasksController
             'exactTaskId' => $exactTaskId,
             'exactTaskState' => $exactTaskState,
             'createdRecordId' => ($_GET['ok'] ?? '') !== '' ? $exactTaskId : null,
+            'currentQuery' => $currentQuery,
+            'searchResult' => $searchResult,
+            'nextSearchUrl' => $nextSearchUrl,
         ]);
     }
 

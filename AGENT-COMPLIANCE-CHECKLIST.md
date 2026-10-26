@@ -1,4 +1,16 @@
 # AGENT-COMPLIANCE-CHECKLIST
+## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-TASKS-QUEUE-001 bounded Task discovery
+
+Added operational Task queue discovery on the existing SBAIO route. Exact
+filters support overdue, upcoming, historical, and all-task views with
+deterministic due-date/ID ordering, a 50-row cap, opaque filter-bound cursors,
+and strict invalid-input rejection before reads. No lifecycle or mutation
+behavior changed.
+
+Queue probe **30/30**, continuity **34/34**, Task integrity **72/72**, report
+ownership **15/15**, Expenses **91/91**, Customers **195/195**, and Sales
+**225/225** passed. No installed database or DB-backed SBAIO probe ran.
+
 ## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-TASKS-CONTINUITY-001 Task creation durability and exact retrieval
 
 Completed reliable Task create-to-record continuity. Task creation now uses a

@@ -7,6 +7,8 @@ use App\Core\DB;
 
 final class TasksService
 {
+    private const MAX_SEARCH_LIMIT = 50;
+
     /**
      * Build the existing Task overview report payload without changing its
      * predicates, aggregation, ordering, limits, or default-on-error behavior.
@@ -149,6 +151,91 @@ final class TasksService
     }
 
     /**
+     * Discover Task records with exact filters and forward keyset pagination.
+     * Queue modes are read-only projections over existing due dates/statuses.
+     *
+     * @param array<string,mixed> $filters
+     * @return array{valid:bool,available:bool,rows:array<int,array<string,mixed>>,truncated:bool,limit:int,filters:array{queue:string,status:string,priority:string,task_bucket:string,from:string,to:string},next_cursor:?string}
+     */
+    public static function search(array $filters, int $limit = self::MAX_SEARCH_LIMIT, ?string $cursor = null): array
+    {
+        $limit = max(1, min(self::MAX_SEARCH_LIMIT, $limit));
+        $normalized = self::normalizeSearchFilters($filters);
+        $fingerprint = self::searchFilterFingerprint($normalized);
+        $cursorData = self::decodeSearchCursor($cursor, $fingerprint);
+        $where = [];
+        $params = [];
+
+        if ($normalized['status'] !== '') {
+            $where[] = 'task_status = ?';
+            $params[] = $normalized['status'];
+        }
+        if ($normalized['priority'] !== '') {
+            $where[] = 'priority = ?';
+            $params[] = $normalized['priority'];
+        }
+        if ($normalized['task_bucket'] !== '') {
+            $where[] = 'task_bucket = ?';
+            $params[] = $normalized['task_bucket'];
+        }
+        if ($normalized['from'] !== '') {
+            $where[] = 'due_date >= ?';
+            $params[] = $normalized['from'];
+        }
+        if ($normalized['to'] !== '') {
+            $where[] = 'due_date <= ?';
+            $params[] = $normalized['to'];
+        }
+
+        $activePredicate = "LOWER(COALESCE(task_status,'')) NOT IN ('done','completed','closed')";
+        if ($normalized['queue'] === 'overdue') {
+            $where[] = "due_date IS NOT NULL AND due_date < CURDATE() AND {$activePredicate}";
+        } elseif ($normalized['queue'] === 'upcoming') {
+            $where[] = "due_date IS NOT NULL AND due_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 7 DAY) AND {$activePredicate}";
+        }
+
+        if ($cursorData !== null) {
+            if ($cursorData['due_date'] === null) {
+                $where[] = '(due_date IS NULL AND id < ?)';
+                $params[] = $cursorData['id'];
+            } else {
+                $where[] = '(due_date < ? OR due_date IS NULL OR (due_date = ? AND id < ?))';
+                $params[] = $cursorData['due_date'];
+                $params[] = $cursorData['due_date'];
+                $params[] = $cursorData['id'];
+            }
+        }
+
+        $rows = DB::fetchAll(
+            "SELECT id, task_title, owner_name, task_type, task_bucket, related_staff_id, related_date, task_status, priority, due_date,
+                    CASE
+                      WHEN due_date IS NOT NULL AND due_date < CURDATE() AND {$activePredicate} THEN 'overdue'
+                      WHEN due_date IS NOT NULL AND due_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 7 DAY) AND {$activePredicate} THEN 'upcoming'
+                      ELSE 'historical'
+                    END AS queue_state
+             FROM sbaio_tasks"
+            . ($where === [] ? '' : ' WHERE ' . implode(' AND ', $where))
+            . ' ORDER BY due_date DESC, id DESC LIMIT ' . ($limit + 1),
+            $params
+        );
+        $truncated = count($rows) > $limit;
+        $displayRows = array_values(array_slice($rows, 0, $limit));
+        $nextCursor = $truncated && $displayRows !== []
+            ? self::encodeSearchCursor($displayRows[count($displayRows) - 1], $fingerprint)
+            : null;
+
+        return [
+            'valid' => true,
+            'available' => true,
+            'rows' => $displayRows,
+            'truncated' => $truncated,
+            'limit' => $limit,
+            'filters' => $normalized,
+            'next_cursor' => $nextCursor,
+        ];
+    }
+
+    /**
      * @return array<int,array<string,mixed>>
      */
     public static function activeStaff(): array
@@ -187,6 +274,103 @@ final class TasksService
             'SELECT id, task_title, owner_name, task_type, task_bucket, related_staff_id, related_date, task_status, priority, due_date FROM sbaio_tasks WHERE id = ? LIMIT 1',
             [(int)$recordId]
         );
+    }
+
+    /**
+     * @param array<string,mixed> $filters
+     * @return array{queue:string,status:string,priority:string,task_bucket:string,from:string,to:string}
+     */
+    private static function normalizeSearchFilters(array $filters): array
+    {
+        $allowed = ['queue', 'status', 'priority', 'task_bucket', 'from', 'to'];
+        if (array_diff(array_keys($filters), $allowed) !== []) {
+            throw new \InvalidArgumentException('SBAIO_TASKS_SEARCH_FILTER_INVALID');
+        }
+        $values = [];
+        foreach ($allowed as $key) {
+            $value = $filters[$key] ?? '';
+            if (!is_string($value)) {
+                throw new \InvalidArgumentException('SBAIO_TASKS_SEARCH_FILTER_INVALID');
+            }
+            $values[$key] = trim($value);
+        }
+        $values['queue'] = strtolower($values['queue']);
+        if (!in_array($values['queue'], ['all', 'overdue', 'upcoming', 'historical'], true)
+            || strlen($values['status']) > 40
+            || strlen($values['priority']) > 40
+            || strlen($values['task_bucket']) > 80
+            || ($values['from'] !== '' && !self::isCalendarDate($values['from']))
+            || ($values['to'] !== '' && !self::isCalendarDate($values['to']))
+            || ($values['from'] !== '' && $values['to'] !== '' && $values['from'] > $values['to'])) {
+            throw new \InvalidArgumentException('SBAIO_TASKS_SEARCH_FILTER_INVALID');
+        }
+
+        return $values;
+    }
+
+    /** @param array{queue:string,status:string,priority:string,task_bucket:string,from:string,to:string} $filters */
+    private static function searchFilterFingerprint(array $filters): string
+    {
+        return hash('sha256', (string)json_encode($filters, JSON_UNESCAPED_SLASHES));
+    }
+
+    /** @return array{due_date:?string,id:int}|null */
+    private static function decodeSearchCursor(?string $cursor, string $fingerprint): ?array
+    {
+        if ($cursor === null || trim($cursor) === '') {
+            return null;
+        }
+        if (!preg_match('/^[A-Za-z0-9_-]+$/D', $cursor) || (strlen($cursor) % 4) === 1) {
+            throw new \InvalidArgumentException('SBAIO_TASKS_SEARCH_CURSOR_INVALID');
+        }
+        $encoded = strtr($cursor, '-_', '+/');
+        $encoded .= str_repeat('=', (4 - (strlen($encoded) % 4)) % 4);
+        $json = base64_decode($encoded, true);
+        if ($json === false) {
+            throw new \InvalidArgumentException('SBAIO_TASKS_SEARCH_CURSOR_INVALID');
+        }
+        try {
+            $payload = json_decode($json, true, 8, JSON_THROW_ON_ERROR);
+        } catch (\JsonException) {
+            throw new \InvalidArgumentException('SBAIO_TASKS_SEARCH_CURSOR_INVALID');
+        }
+        if (!is_array($payload)
+            || array_diff(array_keys($payload), ['v', 'due_date', 'id', 'fingerprint']) !== []
+            || count($payload) !== 4
+            || ($payload['v'] ?? null) !== 1
+            || !is_string($payload['fingerprint'] ?? null)
+            || !hash_equals($fingerprint, $payload['fingerprint'])) {
+            throw new \InvalidArgumentException('SBAIO_TASKS_SEARCH_CURSOR_INVALID');
+        }
+        $dueDate = $payload['due_date'] ?? null;
+        if ($dueDate !== null && (!is_string($dueDate) || !self::isCalendarDate($dueDate))) {
+            throw new \InvalidArgumentException('SBAIO_TASKS_SEARCH_CURSOR_INVALID');
+        }
+        $id = $payload['id'] ?? null;
+        if (!is_int($id) || $id < 1) {
+            throw new \InvalidArgumentException('SBAIO_TASKS_SEARCH_CURSOR_INVALID');
+        }
+        return ['due_date' => $dueDate, 'id' => $id];
+    }
+
+    /** @param array<string,mixed> $row */
+    private static function encodeSearchCursor(array $row, string $fingerprint): string
+    {
+        $id = $row['id'] ?? null;
+        if (is_string($id) && ctype_digit($id)) {
+            $id = (int)$id;
+        }
+        $dueDate = $row['due_date'] ?? null;
+        if (!is_int($id) || $id < 1 || ($dueDate !== null && (!is_string($dueDate) || !self::isCalendarDate($dueDate)))) {
+            throw new \UnexpectedValueException('SBAIO_TASKS_SEARCH_ROW_INVALID');
+        }
+        $json = json_encode([
+            'v' => 1,
+            'due_date' => $dueDate,
+            'id' => $id,
+            'fingerprint' => $fingerprint,
+        ], JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
+        return rtrim(strtr(base64_encode($json), '+/', '-_'), '=');
     }
 
     /**

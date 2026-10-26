@@ -11,6 +11,9 @@ $exactTask = is_array($exactTask ?? null) ? $exactTask : null;
 $exactTaskId = is_int($exactTaskId ?? null) ? $exactTaskId : null;
 $exactTaskState = is_string($exactTaskState ?? null) ? $exactTaskState : null;
 $createdRecordId = is_int($createdRecordId ?? null) ? $createdRecordId : null;
+$currentQuery = is_array($currentQuery ?? null) ? $currentQuery : [];
+$searchResult = is_array($searchResult ?? null) ? $searchResult : null;
+$nextSearchUrl = is_string($nextSearchUrl ?? null) ? $nextSearchUrl : null;
 $suiteActions = [
   ['label' => t('nav.sbaio_dashboard'), 'url' => '/apps/sbaio'],
   ['label' => t('nav.sbaio_notices'), 'url' => '/apps/sbaio/notices'],
@@ -53,6 +56,56 @@ require APP_ROOT . '/apps/SBAIO/Views/partials/module_page_filters.php';
     <?php endif; ?>
   </section>
 <?php endif; ?>
+<section class="card u-mb-14" data-sbaio-tasks-search="1">
+  <h3 class="u-mt-0"><?= e(t('sbaio.tasks.search_title')) ?></h3>
+  <div class="muted mb-10"><?= e(t('sbaio.tasks.search_note')) ?></div>
+  <form method="get" action="/apps/sbaio/tasks" class="grid form-grid-4">
+    <input type="hidden" name="task_search" value="1">
+    <label><?= e(t('sbaio.tasks.search_queue')) ?>
+      <select name="task_queue">
+        <?php foreach (['all' => 'sbaio.tasks.search_all', 'overdue' => 'sbaio.tasks.search_overdue', 'upcoming' => 'sbaio.tasks.search_upcoming', 'historical' => 'sbaio.tasks.search_historical'] as $queueValue => $queueKey): ?>
+          <option value="<?= e($queueValue) ?>" <?= (($currentQuery['task_queue'] ?? 'all') === $queueValue) ? 'selected' : '' ?>><?= e(t($queueKey)) ?></option>
+        <?php endforeach; ?>
+      </select>
+    </label>
+    <label><?= e(t('sbaio.tasks.search_status')) ?><input class="input" type="text" name="task_status_exact" value="<?= e((string)($currentQuery['task_status_exact'] ?? '')) ?>"></label>
+    <label><?= e(t('sbaio.tasks.search_priority')) ?><input class="input" type="text" name="task_priority_exact" value="<?= e((string)($currentQuery['task_priority_exact'] ?? '')) ?>"></label>
+    <label><?= e(t('sbaio.tasks.search_bucket')) ?><input class="input" type="text" name="task_bucket_exact" value="<?= e((string)($currentQuery['task_bucket_exact'] ?? '')) ?>"></label>
+    <label><?= e(t('sbaio.tasks.search_from')) ?><input class="input" type="date" name="task_from" value="<?= e((string)($currentQuery['task_from'] ?? '')) ?>"></label>
+    <label><?= e(t('sbaio.tasks.search_to')) ?><input class="input" type="date" name="task_to" value="<?= e((string)($currentQuery['task_to'] ?? '')) ?>"></label>
+    <div class="col-span-full"><button class="btn btn-primary" type="submit"><?= e(t('sbaio.tasks.search_submit')) ?></button></div>
+  </form>
+</section>
+<?php if ($searchResult !== null): ?>
+  <section class="card u-mb-14" data-sbaio-tasks-search-result="1">
+    <?php if (($searchResult['valid'] ?? false) !== true): ?>
+      <p class="muted" role="alert"><?= e(t('sbaio.tasks.search_invalid')) ?></p>
+    <?php elseif (($searchResult['available'] ?? false) !== true): ?>
+      <p class="muted" role="alert"><?= e(t('sbaio.tasks.search_unavailable')) ?></p>
+    <?php elseif ($rows === []): ?>
+      <p class="muted"><?= e(t('sbaio.tasks.search_no_results')) ?></p>
+    <?php else: ?>
+      <p class="muted"><?= e(t('sbaio.tasks.search_order_note')) ?></p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>#</th><th><?= e($tt('tasks.title_column')) ?></th><th><?= e(t('sbaio.tasks.record_status')) ?></th><th><?= e(t('sbaio.tasks.record_priority')) ?></th><th><?= e(t('sbaio.tasks.record_due_date')) ?></th><th><?= e(t('sbaio.tasks.search_state')) ?></th></tr></thead>
+        <tbody>
+          <?php foreach ($rows as $row): ?>
+            <?php $state = (string)($row['queue_state'] ?? 'historical'); ?>
+            <tr>
+              <td><a href="/apps/sbaio/tasks?task_id=<?= e((string)($row['id'] ?? '')) ?>">#<?= (int)($row['id'] ?? 0) ?></a></td>
+              <td><?= e((string)($row['task_title'] ?? '')) ?></td>
+              <td><?= e((string)($row['task_status'] ?? '')) ?></td>
+              <td><?= e((string)($row['priority'] ?? '')) ?></td>
+              <td><?= e((string)($row['due_date'] ?? '')) ?></td>
+              <td><?= e(t('sbaio.tasks.queue_state_' . $state)) ?></td>
+            </tr>
+          <?php endforeach; ?>
+        </tbody>
+      </table></div>
+      <?php if ($nextSearchUrl !== null): ?><p class="muted"><?= e(t('sbaio.tasks.search_limited')) ?> <a href="<?= e($nextSearchUrl) ?>"><?= e(t('sbaio.tasks.search_next')) ?></a></p><?php endif; ?>
+    <?php endif; ?>
+  </section>
+<?php endif; ?>
 <section class="card">
   <div class="card u-mb-14">
     <h3 class="u-mt-0"><?= e(t('sbaio.tasks.form_title')) ?></h3>
@@ -80,6 +133,7 @@ require APP_ROOT . '/apps/SBAIO/Views/partials/module_page_filters.php';
       </div>
     </form>
   </div>
+  <?php if ($searchResult === null): ?>
   <?php if ($rows === []): ?>
     <?php
     $emptyTitle = t('sbaio.tasks.queue');
@@ -106,6 +160,7 @@ require APP_ROOT . '/apps/SBAIO/Views/partials/module_page_filters.php';
         </tbody>
       </table>
     </div>
+  <?php endif; ?>
   <?php endif; ?>
 </section>
 <?php require APP_ROOT . '/public/views/layouts/admin-wrapper-close.php'; ?>

@@ -1,4 +1,15 @@
 # AGENTS.md
+## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-TASKS-QUEUE-001 bounded Task discovery
+
+Task queue discovery now supports exact overdue, upcoming, historical, and
+all-task views with bounded keyset pagination. Existing status semantics are
+preserved; no mutation, lifecycle, Staff ownership, permission, route, schema,
+Core, or Auth behavior was added.
+
+Queue probe **30/30**, continuity **34/34**, Task integrity **72/72**, report
+ownership **15/15**, Expenses **91/91**, Customers **195/195**, and Sales
+**225/225** passed. No installed database or DB-backed SBAIO probe was executed.
+
 ## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-TASKS-CONTINUITY-001 Task creation durability and exact retrieval
 
 Task creation now returns a verified generated ID only after same-connection
