@@ -30,6 +30,28 @@ final class SalesController
     {
         self::requireAdministrator();
         $currentQuery = is_array($_GET ?? null) ? $_GET : [];
+        $exactSale = null;
+        $exactSaleId = null;
+        $exactSaleState = null;
+        if (array_key_exists('sale_id', $currentQuery)) {
+            $rawSaleId = $currentQuery['sale_id'];
+            if (is_string($rawSaleId) && preg_match('/^[1-9][0-9]*$/D', $rawSaleId)) {
+                $parsedSaleId = filter_var($rawSaleId, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+                if ($parsedSaleId !== false) {
+                    $exactSaleId = (int)$parsedSaleId;
+                    try {
+                        $exactSale = SalesService::findById($exactSaleId);
+                        $exactSaleState = is_array($exactSale) ? 'found' : 'not_found';
+                    } catch (\Throwable) {
+                        $exactSaleState = 'unavailable';
+                    }
+                } else {
+                    $exactSaleState = 'invalid';
+                }
+            } else {
+                $exactSaleState = 'invalid';
+            }
+        }
         $searchRequested = ($currentQuery['sales_search'] ?? '') === '1';
         $searchResult = null;
         if ($searchRequested) {
@@ -59,6 +81,10 @@ final class SalesController
             'saleStatusOptions' => SalesService::STATUSES,
             'message' => (string)($_GET['ok'] ?? ''),
             'error' => (string)($_GET['err'] ?? ''),
+            'exactSale' => $exactSale,
+            'exactSaleId' => $exactSaleId,
+            'exactSaleState' => $exactSaleState,
+            'createdRecordId' => ($_GET['ok'] ?? '') !== '' ? $exactSaleId : null,
         ]);
     }
 
@@ -101,12 +127,14 @@ final class SalesController
 
         $createdId = SalesService::create($validated['values']);
 
-        self::redirect('ok', t('sbaio.sales.created_with_id', ['id' => (string)$createdId]));
+        self::redirect('ok', t('sbaio.sales.created_with_id', ['id' => (string)$createdId]), ['sale_id' => $createdId]);
     }
 
-    private static function redirect(string $key, string $message): void
+    /** @param array<string,int|string> $params */
+    private static function redirect(string $key, string $message, array $params = []): void
     {
-        header('Location: /apps/sbaio/sales?' . $key . '=' . rawurlencode($message));
+        $query = array_merge([$key => $message], $params);
+        header('Location: /apps/sbaio/sales?' . http_build_query($query, '', '&', PHP_QUERY_RFC3986));
         exit;
     }
 }

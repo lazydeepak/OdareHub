@@ -112,6 +112,37 @@ final class SalesService
     }
 
     /**
+     * Read one Sales record by its database-generated identity.
+     *
+     * @param mixed $id
+     * @return array<string,mixed>|null
+     */
+    public static function findById(mixed $id): ?array
+    {
+        if (!is_int($id) && !is_string($id)) {
+            throw new \InvalidArgumentException('Invalid Sales record ID.');
+        }
+        if (is_int($id)) {
+            $recordId = $id;
+        } elseif (preg_match('/^[1-9][0-9]*$/D', $id)) {
+            $recordId = filter_var($id, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+            if ($recordId === false) {
+                throw new \InvalidArgumentException('Invalid Sales record ID.');
+            }
+        } else {
+            throw new \InvalidArgumentException('Invalid Sales record ID.');
+        }
+        if ($recordId <= 0) {
+            throw new \InvalidArgumentException('Invalid Sales record ID.');
+        }
+
+        return DB::fetchOne(
+            'SELECT id, sale_ref, customer_name, amount, sale_status, sale_date FROM sbaio_sales WHERE id = ? LIMIT 1',
+            [(int)$recordId]
+        );
+    }
+
+    /**
      * Search Sales records using only exact reference, established status, and
      * inclusive sale-date filters. The read is bounded and deterministic.
      *

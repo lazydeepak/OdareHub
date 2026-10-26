@@ -99,6 +99,18 @@ namespace {
             'sbaio.sales.status_invalid' => 'Select a supported sales status.',
             'sbaio.sales.sale_date_invalid' => 'Enter a valid calendar date.',
             'sbaio.sales.created_with_id' => 'Sales record created. Record ID: {id}.',
+            'sbaio.sales.open_created_record' => 'Open created record',
+            'sbaio.sales.open_record' => 'Open record',
+            'sbaio.sales.record_title' => 'Sales record',
+            'sbaio.sales.record_id' => 'Record ID',
+            'sbaio.sales.record_reference' => 'Reference',
+            'sbaio.sales.record_customer' => 'Customer',
+            'sbaio.sales.record_date' => 'Sale date',
+            'sbaio.sales.record_amount' => 'Amount',
+            'sbaio.sales.record_status' => 'Status',
+            'sbaio.sales.record_id_invalid' => 'Enter a valid positive record ID.',
+            'sbaio.sales.record_not_found' => 'The requested Sales record was not found.',
+            'sbaio.sales.record_unavailable' => 'The requested Sales record is unavailable.',
         ][$key] ?? $key;
     }
 
@@ -269,6 +281,32 @@ namespace {
     $assert(DB::$transactionEvents === ['begin', 'commit'], 'successful creation commits only after insert identity verification');
 
     DB::$queries = [];
+    DB::$fetchOneRows = [[
+        'id' => 417,
+        'sale_ref' => 'DUPLICATE-REF',
+        'customer_name' => 'Exact Customer',
+        'amount' => '42.00',
+        'sale_status' => 'open',
+        'sale_date' => '2024-02-29',
+    ]];
+    $exactRecord = SalesService::findById('417');
+    $assert($exactRecord !== null && $exactRecord['id'] === 417 && $exactRecord['sale_ref'] === 'DUPLICATE-REF', 'exact record retrieval uses the generated ID even when references may duplicate');
+    $assert(DB::$queries[0]['params'] === [417] && str_contains(DB::$queries[0]['sql'], 'WHERE id = ? LIMIT 1'), 'exact record retrieval uses one parameterized ID predicate');
+    DB::$queries = [];
+    DB::$fetchOneRows = [null];
+    $assert(SalesService::findById(999999) === null && count(DB::$queries) === 1, 'missing exact record returns no record without falling back to reference or latest-row lookup');
+    foreach ([0, -1, '', '0', 'not-an-id', ['417'], '999999999999999999999'] as $invalidRecordId) {
+        DB::$queries = [];
+        try {
+            SalesService::findById($invalidRecordId);
+            $assert(false, 'malformed exact record ID unexpectedly succeeded');
+        } catch (\InvalidArgumentException) {
+            $assert(DB::$queries === [], 'malformed exact record ID is rejected before database access');
+        }
+    }
+    $assert(str_contains($serviceSource, 'public static function findById') && !str_contains(substr($serviceSource, strpos($serviceSource, 'public static function findById'), strpos($serviceSource, 'public static function search') - strpos($serviceSource, 'public static function findById')), 'INSERT INTO'), 'exact record reader is read-only');
+
+    DB::$queries = [];
     DB::$transactionEvents = [];
     DB::$connection->insert_id = 418;
     $firstCreatedId = SalesService::create(['sale_ref' => 'SALE-CONCURRENT-A', 'amount' => '1.00']);
@@ -322,6 +360,9 @@ namespace {
     DB::$connection->commitResult = true;
     DB::$connection->rollbackResult = true;
     $assert(str_contains($controllerSource, '$createdId = SalesService::create') && str_contains($controllerSource, "sbaio.sales.created_with_id"), 'controller confirmation uses the returned exact ID');
+    $assert(str_contains($controllerSource, 'SalesService::findById') && str_contains($controllerSource, "'sale_id' => \$createdId"), 'post-create redirect carries the exact generated ID to the existing Sales surface');
+    $assert(str_contains($controllerSource, 'self::requireAdministrator();') && strpos($controllerSource, 'self::requireAdministrator();') < strpos($controllerSource, 'SalesService::findById'), 'exact record authorization precedes database access');
+    $assert(str_contains($indexSource, 'sale_id') && str_contains($indexSource, 'sbaio.sales.open_created_record') && str_contains($indexSource, 'data-sbaio-sales-exact-record'), 'Sales page renders an exact-ID record view and direct created-record link');
     $assert(!str_contains($controllerSource, 'latest') && !str_contains($serviceSource, 'ORDER BY id DESC LIMIT 1'), 'created identity does not use latest-row or reference inference');
 
     DB::$queries = [];
@@ -522,6 +563,18 @@ namespace {
             'sbaio.sales.search_amount',
             'sbaio.sales.search_next',
             'sbaio.sales.created_with_id',
+            'sbaio.sales.open_created_record',
+            'sbaio.sales.open_record',
+            'sbaio.sales.record_title',
+            'sbaio.sales.record_id',
+            'sbaio.sales.record_reference',
+            'sbaio.sales.record_customer',
+            'sbaio.sales.record_date',
+            'sbaio.sales.record_amount',
+            'sbaio.sales.record_status',
+            'sbaio.sales.record_id_invalid',
+            'sbaio.sales.record_not_found',
+            'sbaio.sales.record_unavailable',
         ] as $key) {
             $assert(is_array($localeValues) && trim((string)($localeValues[$key] ?? '')) !== '', "{$locale} localizes {$key}");
         }

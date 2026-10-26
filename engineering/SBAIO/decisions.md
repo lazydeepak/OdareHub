@@ -1,4 +1,15 @@
 # SBAIO — Decisions
+### 2026-10-26 — OH-AUTO3-SBAIO-SALES-CONTINUITY-001 exact-ID retrieval
+
+**Decision: Extend the existing administrator Sales page with a read-only exact-ID view; do not add a new route or infer records from references/order.**
+
+`SalesService::findById()` strictly accepts a positive integer ID and performs
+one parameterized `WHERE id = ? LIMIT 1` read. The existing Sales administrator
+guard runs before this read. The create redirect carries the verified generated
+ID as `sale_id`, and the page emits a direct link to that same authoritative
+surface. Duplicate references, pagination, missing records, malformed IDs, and
+database-read failures cannot substitute another record or disclose data.
+
 ### 2026-10-26 — OH-AUTO3-SBAIO-SALES-INTEGRITY-001 bounded transaction contract
 
 **Decision: Keep the Sales insert and same-connection generated-ID verification inside one existing `mysqli` transaction boundary.**

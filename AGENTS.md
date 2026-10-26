@@ -1,4 +1,18 @@
 # AGENTS.md
+## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-SALES-CONTINUITY-001 exact-ID continuity
+
+Completed the SBAIO Sales create-to-record continuity slice. The existing
+administrator Sales surface now reads records by the verified generated ID
+through a bounded parameterized `WHERE id = ? LIMIT 1` path, with strict
+positive-ID validation before database access. The existing create redirect
+provides a direct `sale_id` link; no route, permission, lifecycle, schema,
+Core/Auth/ACL, organization, Staff, Leave, Timecard, search, report, or export
+behavior changed.
+
+Sales regression **225/225**, Customers **68/68**, and changed-file lint/diff
+checks passed. Final architecture/deletion/deployment validation remains
+pending; no installed database or DB-backed SBAIO probe was executed.
+
 ## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-SALES-INTEGRITY-001 transactional identity verification
 
 Closed the Sales post-insert durability gap within the SBAIO service boundary.

@@ -1,4 +1,13 @@
 # AGENT-COMPLIANCE-CHECKLIST
+## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-SALES-CONTINUITY-001 exact-ID continuity
+
+Completed Sales create-to-record continuity without adding a route. The
+existing administrator page now performs a strict, read-only parameterized
+lookup by generated positive ID and renders the exact record. Creation links to
+that surface through `sale_id`; duplicate references, pagination, malformed or
+missing IDs, unauthorized access, and read failures do not fall back to other
+records. Sales passed **225/225** and Customers **68/68**.
+
 ## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-SALES-INTEGRITY-001 transactional identity verification
 
 Confirmed and closed the Sales durability defect: the prior insert occurred

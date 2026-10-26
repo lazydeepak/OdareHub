@@ -1,4 +1,20 @@
 # SBAIO — Work
+## 2026-10-26 — OH-AUTO3-SBAIO-SALES-CONTINUITY-001 exact-ID continuity
+
+**Status: Complete for offline verification; database-backed SBAIO probes remain environment-bound.**
+
+- [x] Confirmed the prior ID-bearing confirmation had no authoritative exact-ID
+  retrieval or direct record link; list/search paths could be affected by
+  duplicate references and pagination.
+- [x] Added bounded read-only `SalesService::findById()` and integrated it into
+  the existing administrator Sales page via strict positive `sale_id` input.
+- [x] Existing create success now links to `/apps/sbaio/sales?sale_id={id}`;
+  authorization precedes the exact read, and missing/malformed/unavailable
+  records fail closed without disclosure or fallback inference.
+- [x] Sales regression passed **225/225** and Customers **68/68**; changed-file
+  PHP lint and diff hygiene passed. No installed database or DB-backed SBAIO
+  probe was executed.
+
 ## 2026-10-26 — OH-AUTO3-SBAIO-SALES-INTEGRITY-001 transactional identity verification
 
 **Status: Complete for offline verification; database-backed SBAIO probes remain environment-bound.**

@@ -9,6 +9,10 @@ $rows = is_array($rows ?? null) ? $rows : [];
 $currentQuery = is_array($currentQuery ?? null) ? $currentQuery : [];
 $searchResult = is_array($searchResult ?? null) ? $searchResult : null;
 $saleStatusOptions = is_array($saleStatusOptions ?? null) ? $saleStatusOptions : [];
+$exactSale = is_array($exactSale ?? null) ? $exactSale : null;
+$exactSaleId = is_int($exactSaleId ?? null) ? $exactSaleId : null;
+$exactSaleState = is_string($exactSaleState ?? null) ? $exactSaleState : null;
+$createdRecordId = is_int($createdRecordId ?? null) ? $createdRecordId : null;
 $nextSearchUrl = null;
 if (is_string($searchResult['next_cursor'] ?? null) && $searchResult['next_cursor'] !== '') {
   $nextParams = ['sales_search' => '1', 'sales_cursor' => $searchResult['next_cursor']];
@@ -36,8 +40,35 @@ $moduleFilters = [
 ];
 require APP_ROOT . '/apps/SBAIO/Views/partials/module_page_intro.php';
 require APP_ROOT . '/apps/SBAIO/Views/partials/module_page_feedback.php';
-require APP_ROOT . '/apps/SBAIO/Views/partials/module_page_filters.php';
 ?>
+<?php if ($createdRecordId !== null): ?>
+  <section class="card u-mb-14" data-sbaio-sales-created-record="1">
+    <a class="btn btn-primary" href="/apps/sbaio/sales?sale_id=<?= e((string)$createdRecordId) ?>"><?= e(t('sbaio.sales.open_created_record')) ?></a>
+  </section>
+<?php endif; ?>
+<?php if ($exactSaleState !== null): ?>
+  <section class="card u-mb-14" data-sbaio-sales-exact-record="1">
+    <?php if ($exactSaleState === 'invalid'): ?>
+      <p class="muted" role="alert"><?= e(t('sbaio.sales.record_id_invalid')) ?></p>
+    <?php elseif ($exactSaleState === 'unavailable'): ?>
+      <p class="muted" role="alert"><?= e(t('sbaio.sales.record_unavailable')) ?></p>
+    <?php elseif ($exactSaleState === 'not_found'): ?>
+      <p class="muted" role="alert"><?= e(t('sbaio.sales.record_not_found')) ?></p>
+    <?php elseif ($exactSale !== null): ?>
+      <h3 class="u-mt-0"><?= e(t('sbaio.sales.record_title')) ?></h3>
+      <dl>
+        <dt><?= e(t('sbaio.sales.record_id')) ?></dt><dd><?= e((string)$exactSaleId) ?></dd>
+        <dt><?= e(t('sbaio.sales.record_reference')) ?></dt><dd><?= e((string)($exactSale['sale_ref'] ?? '')) ?></dd>
+        <dt><?= e(t('sbaio.sales.record_customer')) ?></dt><dd><?= e((string)($exactSale['customer_name'] ?? '')) ?></dd>
+        <dt><?= e(t('sbaio.sales.record_date')) ?></dt><dd><?= e((string)($exactSale['sale_date'] ?? '')) ?></dd>
+        <dt><?= e(t('sbaio.sales.record_amount')) ?></dt><dd><?= e(number_format((float)($exactSale['amount'] ?? 0), 2, '.', ',')) ?></dd>
+        <dt><?= e(t('sbaio.sales.record_status')) ?></dt><dd><?= e((string)($exactSale['sale_status'] ?? '')) ?></dd>
+      </dl>
+      <a class="btn" href="/apps/sbaio/sales?sale_id=<?= e((string)$exactSaleId) ?>"><?= e(t('sbaio.sales.open_record')) ?></a>
+    <?php endif; ?>
+  </section>
+<?php endif; ?>
+<?php require APP_ROOT . '/apps/SBAIO/Views/partials/module_page_filters.php'; ?>
 <section class="card">
   <div class="card u-mb-14" data-sbaio-sales-search="1">
     <h3 class="u-mt-0"><?= e(t('sbaio.sales.search_title')) ?></h3>
