@@ -1,4 +1,20 @@
 # SBAIO — Work
+## 2026-10-26 — OH-AUTO3-SBAIO-EXPENSES-INTEGRITY-001 monetary validation
+
+**Status: In progress — offline verification only; no installed database or DB-backed SBAIO probe.**
+
+- [x] Reproduced the Expense defect: `ExpensesService::create()` converted
+  arbitrary input through `is_numeric()` and float coercion, silently turning
+  malformed values into `0.0` and allowing non-schema monetary formats.
+- [x] Added exact decimal-string validation aligned to the existing
+  `DECIMAL(12,2)` schema: up to 10 integral digits and 2 fractional digits,
+  with normalized string persistence and no float conversion.
+- [x] Invalid, missing, overflow, scientific, special, comma-formatted, and
+  non-string amounts now fail before the INSERT. Existing app-access, CSRF,
+  expense reference, status, date, route, and schema contracts remain intact.
+- [x] Expense monetary probe passed **29/29**; Customers **195/195** and Sales
+  **225/225** remain passing.
+
 ## 2026-10-26 — OH-AUTO3-SBAIO-CUSTOMERS-SEARCH-001 bounded historical discovery
 
 **Status: In progress — offline verification only; no installed database or DB-backed SBAIO probe.**

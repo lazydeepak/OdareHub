@@ -31,6 +31,10 @@ final class ExpensesController
             self::redirect('err', t('sbaio.expenses.required'));
         }
 
+        if (ExpensesService::validateAmount($_POST['amount'] ?? null) === null) {
+            self::redirect('err', t('sbaio.expenses.amount_invalid'));
+        }
+
         ExpensesService::create($_POST);
 
         self::redirect('ok', t('sbaio.expenses.created'));

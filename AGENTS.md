@@ -1,4 +1,17 @@
 # AGENTS.md
+## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-EXPENSES-INTEGRITY-001 monetary validation
+
+Prevented silent monetary corruption during SBAIO Expense creation. Expense
+amounts now use exact decimal-string validation aligned to `DECIMAL(12,2)` and
+are passed to the existing INSERT without float conversion. Invalid, missing,
+scientific, special, overflow, comma-formatted, and non-string values fail
+before SQL. Existing route, app access, CSRF, status/date, schema, Customers,
+and Sales behavior remain unchanged.
+
+Expense probe **29/29**, Customers **195/195**, Sales **225/225**, and changed
+file lint/diff checks passed. Architecture/deletion/deployment validation
+remains pending; no installed database or DB-backed SBAIO probe was executed.
+
 ## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-CUSTOMERS-SEARCH-001 bounded historical discovery
 
 Added bounded exact-filter Customer historical discovery to the existing

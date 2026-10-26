@@ -1,4 +1,13 @@
 # AGENT-COMPLIANCE-CHECKLIST
+## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-EXPENSES-INTEGRITY-001 monetary validation
+
+Closed silent Expense monetary coercion. The existing `DECIMAL(12,2)` contract
+is now enforced with decimal-string validation before INSERT; no float or
+`is_numeric()` conversion remains. Valid values persist as exact strings,
+while malformed/special/overflow/non-string amounts fail without SQL.
+Expense probe **29/29**, Customers **195/195**, and Sales **225/225** passed.
+No installed database or DB-backed SBAIO probe ran.
+
 ## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-CUSTOMERS-SEARCH-001 bounded historical discovery
 
 Added bounded historical Customer discovery on the existing administrator

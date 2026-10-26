@@ -16,6 +16,7 @@ return [
     'expenses.report_key_label' => 'Report Key',
     'expenses.report_unavailable_message' => 'This report is unavailable because its owner module is inactive or not registered.',
     'sbaio.expenses.create' => 'Create Expense',
+    'sbaio.expenses.amount_invalid' => 'Enter an amount with up to 10 integral digits and 2 decimal places.',
     'sbaio.expenses.empty_desc' => 'No expense records yet. This module is installed and ready.',
     'sbaio.expenses.form_desc' => 'Track operating expenses so SBAIO can grow into the workbook’s broader business reporting model.',
     'sbaio.expenses.form_title' => 'Add Expense Record',

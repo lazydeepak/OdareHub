@@ -1,4 +1,16 @@
 # SBAIO — Decisions
+### 2026-10-26 — OH-AUTO3-SBAIO-EXPENSES-INTEGRITY-001 monetary input contract
+
+**Decision: Validate Expense amounts as decimal strings before persistence and preserve the existing Expense route, insert shape, status/date behavior, and authorization boundaries.**
+
+The accepted monetary grammar is the existing Sales contract aligned to
+`DECIMAL(12,2)`: up to 10 integral digits and 1–2 fractional digits, optional
+sign, and leading-decimal notation such as `.5`; values are normalized to a
+decimal string without binary floating-point conversion. Missing, malformed,
+scientific, special, overflow, comma-formatted, and non-string values fail
+closed before SQL. No approval lifecycle, permission, route, schema,
+Core/Auth/ACL, organization, Staff, Leave, or Timecard behavior changes.
+
 ### 2026-10-26 — OH-AUTO3-SBAIO-CUSTOMERS-SEARCH-001 bounded historical discovery
 
 **Decision: Extend `CustomersService` and the existing administrator Customers page with exact-filter forward keyset search; do not add a route, generic search framework, fuzzy matching, or unfiltered historical browse.**
