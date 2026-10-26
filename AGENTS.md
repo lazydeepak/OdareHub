@@ -1,4 +1,16 @@
 # AGENTS.md
+## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-TASKS-DUE-PARITY-001 report/queue due parity
+
+Aligned the Task dashboard report's seven-day due aggregate with the
+actionable queue's existing non-terminal predicate. Overdue was already
+consistent; report snapshot ordering remains intentionally distinct from queue
+ordering. No lifecycle, mutation, authorization, route, schema, Core, or Auth
+behavior changed.
+
+Report probe **16/16**, queue **30/30**, continuity **34/34**, Task integrity
+**72/72**, Expenses **91/91**, Customers **195/195**, and Sales **225/225**
+passed. No installed database or DB-backed SBAIO probe was executed.
+
 ## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-TASKS-QUEUE-001 bounded Task discovery
 
 Task queue discovery now supports exact overdue, upcoming, historical, and

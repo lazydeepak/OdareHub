@@ -76,7 +76,8 @@ namespace {
     $assert($data['summary']['total'] === 7 && $data['summary']['overdue'] === 1, 'report summary preserves prepared aggregate values');
     $assert($data['byStatus'][0]['task_status'] === 'open' && $data['byPriority'][0]['priority'] === 'urgent' && $data['recent'][0]['id'] === 9, 'report collections preserve existing output shape');
     $assert(count(DB::$queries) === 4 && DB::$queries[0]['method'] === 'fetchOne', 'report performs exactly the existing four reads in order');
-    $assert(str_contains(DB::$queries[0]['sql'], "LOWER(COALESCE(task_status,'')) IN ('open','in_progress','pending','todo')") && str_contains(DB::$queries[0]['sql'], 'DATE_ADD(CURDATE(), INTERVAL 7 DAY)'), 'summary SQL preserves status and seven-day predicates');
+    $assert(str_contains(DB::$queries[0]['sql'], "LOWER(COALESCE(task_status,'')) IN ('open','in_progress','pending','todo')") && str_contains(DB::$queries[0]['sql'], 'due_date IS NOT NULL AND due_date < CURDATE() AND LOWER(COALESCE(task_status,\'\')) NOT IN (\'done\',\'completed\',\'closed\')'), 'summary SQL preserves the actionable overdue predicate');
+    $assert(str_contains(DB::$queries[0]['sql'], "due_date IS NOT NULL AND due_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 7 DAY) AND LOWER(COALESCE(task_status,'')) NOT IN ('done','completed','closed')"), 'report due_7d predicate matches the actionable upcoming queue at both inclusive boundaries and excludes terminal tasks');
     $assert(str_contains(DB::$queries[1]['sql'], 'GROUP BY task_status ORDER BY n DESC') && str_contains(DB::$queries[2]['sql'], 'GROUP BY priority ORDER BY n DESC'), 'distribution SQL preserves grouping and ordering');
     $assert(str_contains(DB::$queries[3]['sql'], 'ORDER BY due_date ASC, id DESC LIMIT 25'), 'recent SQL preserves ordering and limit');
 

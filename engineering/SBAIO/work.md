@@ -1,4 +1,22 @@
 # SBAIO — Work
+## 2026-10-26 — OH-AUTO3-SBAIO-TASKS-DUE-PARITY-001 report/queue due parity
+
+**Status: In progress — offline verification only; no installed database or DB-backed SBAIO probe.**
+
+- [x] Confirmed the discrepancy: the Task report `due_7d` aggregate counted
+  terminal tasks, while the actionable queue `upcoming` mode excluded the
+  existing `done`, `completed`, and `closed` statuses.
+- [x] Aligned only the report `due_7d` predicate with the existing queue:
+  non-null `due_date` inclusive from `CURDATE()` through seven days, excluding
+  those established terminal values. The report `overdue` predicate already
+  matched.
+- [x] Preserved the report's ascending recent snapshot as an intentional
+  presentation distinction from the actionable queue's `due_date DESC,
+  id DESC` order.
+- [x] Report probe now passes **16/16**; queue **30/30**, continuity **34/34**,
+  Task integrity **72/72**, Expenses **91/91**, Customers **195/195**, and
+  Sales **225/225** remain passing.
+
 ## 2026-10-26 — OH-AUTO3-SBAIO-TASKS-QUEUE-001 bounded Task discovery
 
 **Status: In progress — offline verification only; no installed database or DB-backed SBAIO probe.**

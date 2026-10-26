@@ -1,4 +1,15 @@
 # AGENT-COMPLIANCE-CHECKLIST
+## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-TASKS-DUE-PARITY-001 report/queue due parity
+
+Reconciled the Task dashboard report with the actionable queue. The report's
+`due_7d` count now excludes established terminal statuses exactly as the
+queue's upcoming view does, while overdue was already aligned. Boundary
+coverage confirms inclusive today/seventh-day semantics and terminal exclusion.
+
+Report probe **16/16**, queue **30/30**, continuity **34/34**, Task integrity
+**72/72**, Expenses **91/91**, Customers **195/195**, and Sales **225/225**
+passed. No installed database or DB-backed SBAIO probe ran.
+
 ## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-TASKS-QUEUE-001 bounded Task discovery
 
 Added operational Task queue discovery on the existing SBAIO route. Exact

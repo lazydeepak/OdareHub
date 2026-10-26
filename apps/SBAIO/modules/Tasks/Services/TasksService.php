@@ -28,7 +28,7 @@ final class TasksService
                         COALESCE(SUM(CASE WHEN LOWER(COALESCE(task_status,'')) IN ('open','in_progress','pending','todo') THEN 1 ELSE 0 END),0) AS open,
                         COALESCE(SUM(CASE WHEN LOWER(COALESCE(task_status,'')) IN ('done','completed','closed') THEN 1 ELSE 0 END),0) AS done,
                         COALESCE(SUM(CASE WHEN due_date IS NOT NULL AND due_date < CURDATE() AND LOWER(COALESCE(task_status,'')) NOT IN ('done','completed','closed') THEN 1 ELSE 0 END),0) AS overdue,
-                        COALESCE(SUM(CASE WHEN due_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 7 DAY) THEN 1 ELSE 0 END),0) AS due_7d
+                        COALESCE(SUM(CASE WHEN due_date IS NOT NULL AND due_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 7 DAY) AND LOWER(COALESCE(task_status,'')) NOT IN ('done','completed','closed') THEN 1 ELSE 0 END),0) AS due_7d
                  FROM sbaio_tasks"
             );
             if (is_array($row)) { $summary = array_merge($summary, $row); }

@@ -1,4 +1,15 @@
 # SBAIO — Decisions
+### 2026-10-26 — OH-AUTO3-SBAIO-TASKS-DUE-PARITY-001 report/queue due parity
+
+**Decision: Make the Task report's `due_7d` aggregate use the existing actionable queue's upcoming predicate, while retaining the report's separate snapshot ordering.**
+
+The report now counts only non-null due dates from inclusive `CURDATE()`
+through seven days and excludes the already-established `done`, `completed`,
+and `closed` statuses, matching the queue without adding lifecycle semantics.
+The report's `recent` list remains an ascending due-date snapshot with its
+existing 25-row limit; it is not the actionable queue and therefore retains a
+separate presentation order.
+
 ### 2026-10-26 — OH-AUTO3-SBAIO-TASKS-QUEUE-001 bounded discovery contract
 
 **Decision: Extend the existing Task queue with a read-only exact-filter search and forward keyset pagination, without changing Task lifecycle or authorization semantics.**
