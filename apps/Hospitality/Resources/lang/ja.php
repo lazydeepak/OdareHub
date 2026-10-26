@@ -189,4 +189,5 @@ return [
     'hospitality.operator.reservation.search_unavailable' => '予約検索を一時利用できません。',
     'hospitality.operator.reservation.search_no_results' => '条件に一致する予約はありません。',
     'hospitality.operator.reservation.search_limited' => '到着予定日の順に先頭 {limit} 件を表示しています。',
+    'hospitality.operator.reservation.search_next' => '次の結果',
 ];

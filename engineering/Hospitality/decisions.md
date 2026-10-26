@@ -1,5 +1,21 @@
 # Hospitality — Decisions
 
+## 2026-10-26 — OH-AUTO3-HOSP-OP-PAGING-001 keyset pagination
+
+**Decision: Use an opaque, filter-bound keyset cursor over the existing bounded reservation search.**
+
+The cursor represents the final displayed `(check_in_date, id)` pair and is
+validated as a strict base64url JSON payload with version, valid date, positive
+integer ID, and the normalized status/date filter fingerprint. A cursor whose
+filters differ from the current request, or whose shape/value is malformed,
+fails closed. No offset scan or new pagination framework is introduced.
+
+The owner query adds the lexicographic predicate
+`check_in_date > cursor_date OR (check_in_date = cursor_date AND id > cursor_id)`
+before the existing deterministic order and `LIMIT 51`. The view renders at
+most 50 rows and emits a same-user `/u/{username}/hospitality` next link that
+preserves the active filters and cursor state.
+
 ## 2026-10-26 — OH-AUTO3-HOSP-OP-SEARCH-001 bounded operator reservation search
 
 **Decision: Extend the existing Hospitality reservation service with a bounded date/status search, not a new search authority.**

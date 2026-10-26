@@ -189,4 +189,5 @@ return [
     'hospitality.operator.reservation.search_unavailable' => 'Reservation search is temporarily unavailable.',
     'hospitality.operator.reservation.search_no_results' => 'No reservations matched these filters.',
     'hospitality.operator.reservation.search_limited' => 'Showing the first {limit} results in planned-arrival order.',
+    'hospitality.operator.reservation.search_next' => 'Next results',
 ];

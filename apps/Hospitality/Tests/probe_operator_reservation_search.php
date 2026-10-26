@@ -8,14 +8,16 @@ namespace Apps\Hospitality\Services {
         public static array $result = [];
         public static array $filters = [];
         public static int $limit = 0;
+        public static string $cursor = '';
         public static bool $throw = false;
         public static int $calls = 0;
 
-        public static function searchOperator(array $filters, int $limit = 50): array
+        public static function searchOperator(array $filters, int $limit = 50, mixed $cursor = ''): array
         {
             self::$calls++;
             self::$filters = $filters;
             self::$limit = $limit;
+            self::$cursor = $cursor;
             if (self::$throw) {
                 throw new \RuntimeException('SCHEMA_PENDING');
             }
@@ -50,6 +52,7 @@ namespace {
         ],
         'truncated' => false,
         'limit' => 50,
+        'next_cursor' => 'NEXT-CURSOR',
         'filters' => ['status' => '', 'from' => '', 'to' => ''],
     ];
 
@@ -59,6 +62,10 @@ namespace {
 
     $filtered = HospitalityBoardAdapter::searchReservations(['status' => 'booked', 'from' => '2027-01-01', 'to' => '2027-01-01']);
     $check(($filtered['valid'] ?? false) === true && ReservationsService::$filters === ['status' => 'booked', 'from' => '2027-01-01', 'to' => '2027-01-01'], 'status and inclusive date-boundary filters are forwarded exactly');
+    $paged = HospitalityBoardAdapter::searchReservations(['status' => 'booked'], 'VALID-CURSOR');
+    $check(($paged['next_cursor'] ?? null) === 'NEXT-CURSOR' && ReservationsService::$cursor === 'VALID-CURSOR', 'cursor is forwarded and next-page evidence is returned');
+    $invalidCursor = HospitalityBoardAdapter::searchReservations([], ['array-cursor']);
+    $check(($invalidCursor['valid'] ?? true) === false, 'non-scalar cursor fails before service dispatch');
 
     $missing = HospitalityBoardAdapter::searchReservations(['status' => 'cancelled', 'from' => '2030-01-01', 'to' => '2030-01-01']);
     ReservationsService::$result['rows'] = [];
@@ -77,16 +84,19 @@ namespace {
     $check(!str_contains($view, 'guest_name') && !str_contains($view, 'guest_email') && !str_contains($view, 'free_text'), 'no speculative guest or free-text search is exposed');
     $check(str_contains($service, 'public static function searchOperator') && str_contains($adapter, 'ReservationsService::searchOperator'), 'search remains Hospitality-owned and reuses its service boundary');
     $check(str_contains($service, 'r.check_in_date >= ?') && str_contains($service, 'r.check_in_date <= ?'), 'date boundaries are inclusive query predicates');
+    $check(str_contains($service, '(r.check_in_date > ? OR (r.check_in_date = ? AND r.id > ?))'), 'keyset cursor predicate prevents skipped or duplicated records');
     $check(str_contains($service, 'in_array($status, self::STATUSES, true)'), 'status filters use established reservation statuses');
     $check(str_contains($service, 'ORDER BY r.check_in_date ASC, r.id ASC'), 'search ordering is deterministic');
     $check(str_contains($service, '$limit + 1') && str_contains($service, 'array_slice($rows, 0, $limit)'), 'search result limit is bounded with truncation evidence');
+    $check(str_contains($view, 'reservation_cursor') && str_contains($view, 'reservation_status') && str_contains($view, 'reservation_from') && str_contains($view, 'reservation_to'), 'next-page navigation preserves active filters and cursor');
+    $check(str_contains($view, "'/u/' . \$opUsername . '/hospitality?"), 'next-page navigation remains same-user confined');
     $check(str_contains($service, 'if ($from !== \'\' && $to !== \'\' && $from > $to)'), 'reversed date ranges fail validation');
     $check(OperatorContributionService::contribute(['surface' => 'operator', 'region' => 'focus_views', 'context' => ['active_assigned_apps' => ['other_app']]]) === [], 'unassigned operator receives no searchable Hospitality surface');
     $check(isset(OperatorContributionService::contribute(['surface' => 'operator', 'region' => 'focus_views', 'context' => ['active_assigned_apps' => ['hospitality']]])['view_map']['hospitality']), 'assigned operator retains the existing searchable surface');
 
     foreach (['en', 'ja', 'ne'] as $locale) {
         $catalog = include $root . '/apps/Hospitality/Resources/lang/' . $locale . '.php';
-        foreach (['hospitality.operator.reservation.search_title', 'hospitality.operator.reservation.search_invalid', 'hospitality.operator.reservation.search_no_results', 'hospitality.operator.reservation.search_limited'] as $key) {
+        foreach (['hospitality.operator.reservation.search_title', 'hospitality.operator.reservation.search_invalid', 'hospitality.operator.reservation.search_no_results', 'hospitality.operator.reservation.search_limited', 'hospitality.operator.reservation.search_next'] as $key) {
             $check(array_key_exists($key, (array)$catalog), $locale . ' locale key: ' . $key);
         }
     }

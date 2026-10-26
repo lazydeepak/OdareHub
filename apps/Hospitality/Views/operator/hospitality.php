@@ -58,10 +58,10 @@ $tr = static fn (string $key, string $fallback): string => htmlspecialchars($tra
         $searchRequested = ($currentQuery['reservation_search'] ?? '') === '1';
         $reservationSearch = $searchRequested
             ? HospitalityBoardAdapter::searchReservations([
-                'status' => is_string($currentQuery['reservation_status'] ?? null) ? $currentQuery['reservation_status'] : '',
-                'from' => is_string($currentQuery['reservation_from'] ?? null) ? $currentQuery['reservation_from'] : '',
-                'to' => is_string($currentQuery['reservation_to'] ?? null) ? $currentQuery['reservation_to'] : '',
-            ])
+                'status' => $currentQuery['reservation_status'] ?? '',
+                'from' => $currentQuery['reservation_from'] ?? '',
+                'to' => $currentQuery['reservation_to'] ?? '',
+            ], $currentQuery['reservation_cursor'] ?? '')
             : null;
         $createdReservation = $createdReservationId > 0
             ? HospitalityBoardAdapter::createdReservation($createdReservationId)
@@ -180,6 +180,20 @@ $tr = static fn (string $key, string $fallback): string => htmlspecialchars($tra
             </div>
             <?php if (($reservationSearch['truncated'] ?? false) === true): ?>
             <p class="text-muted"><?php echo $esc($translate('hospitality.operator.reservation.search_limited', 'Showing the first {limit} results in planned-arrival order.', ['limit' => (int)($reservationSearch['limit'] ?? 50)])); ?></p>
+            <?php endif; ?>
+            <?php if (is_string($reservationSearch['next_cursor'] ?? null) && $reservationSearch['next_cursor'] !== ''): ?>
+            <?php
+                $searchFilters = (array)($reservationSearch['filters'] ?? []);
+                $nextSearchQuery = [
+                    'reservation_search' => '1',
+                    'reservation_status' => (string)($searchFilters['status'] ?? ''),
+                    'reservation_from' => (string)($searchFilters['from'] ?? ''),
+                    'reservation_to' => (string)($searchFilters['to'] ?? ''),
+                    'reservation_cursor' => $reservationSearch['next_cursor'],
+                ];
+                $nextSearchUrl = '/u/' . $opUsername . '/hospitality?' . http_build_query($nextSearchQuery, '', '&', PHP_QUERY_RFC3986);
+            ?>
+            <a class="btn" href="<?php echo $esc($nextSearchUrl); ?>"><?php echo $tr('hospitality.operator.reservation.search_next', 'Next results'); ?></a>
             <?php endif; ?>
             <?php endif; ?>
         <?php endif; ?>

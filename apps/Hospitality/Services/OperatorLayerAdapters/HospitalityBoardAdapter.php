@@ -81,24 +81,28 @@ final class HospitalityBoardAdapter
      * boundary has admitted the Hospitality focus surface.
      *
      * @param array<string,mixed> $filters
-     * @return array{valid:bool,available:bool,rows:array<int,array<string,mixed>>,truncated:bool,limit:int,filters:array<string,string>}
+     * @return array{valid:bool,available:bool,rows:array<int,array<string,mixed>>,truncated:bool,limit:int,next_cursor:?string,filters:array<string,string>}
      */
-    public static function searchReservations(array $filters): array
+    public static function searchReservations(array $filters, mixed $cursor = ''): array
     {
+        if (!is_string($cursor)) {
+            return ['valid' => false, 'available' => true, 'rows' => [], 'truncated' => false, 'limit' => 50, 'next_cursor' => null, 'filters' => []];
+        }
         try {
-            $result = ReservationsService::searchOperator($filters, 50);
+            $result = ReservationsService::searchOperator($filters, 50, $cursor);
             return [
                 'valid' => true,
                 'available' => true,
                 'rows' => array_values((array)($result['rows'] ?? [])),
                 'truncated' => ($result['truncated'] ?? false) === true,
                 'limit' => (int)($result['limit'] ?? 50),
+                'next_cursor' => isset($result['next_cursor']) && is_string($result['next_cursor']) ? $result['next_cursor'] : null,
                 'filters' => (array)($result['filters'] ?? []),
             ];
         } catch (\InvalidArgumentException) {
-            return ['valid' => false, 'available' => true, 'rows' => [], 'truncated' => false, 'limit' => 50, 'filters' => []];
+            return ['valid' => false, 'available' => true, 'rows' => [], 'truncated' => false, 'limit' => 50, 'next_cursor' => null, 'filters' => []];
         } catch (\Throwable) {
-            return ['valid' => true, 'available' => false, 'rows' => [], 'truncated' => false, 'limit' => 50, 'filters' => []];
+            return ['valid' => true, 'available' => false, 'rows' => [], 'truncated' => false, 'limit' => 50, 'next_cursor' => null, 'filters' => []];
         }
     }
 

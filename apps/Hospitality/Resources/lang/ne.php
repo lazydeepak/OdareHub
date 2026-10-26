@@ -189,4 +189,5 @@ return [
     'hospitality.operator.reservation.search_unavailable' => 'आरक्षण खोज अहिले उपलब्ध छैन।',
     'hospitality.operator.reservation.search_no_results' => 'यी फिल्टरसँग मिल्ने आरक्षण भेटिएन।',
     'hospitality.operator.reservation.search_limited' => 'योजनाबद्ध आगमनको क्रममा पहिलो {limit} परिणाम देखाइएको छ।',
+    'hospitality.operator.reservation.search_next' => 'अर्का परिणामहरू',
 ];

@@ -1,5 +1,22 @@
 # Hospitality Work Log
 
+## 2026-10-26 — OH-AUTO3-HOSP-OP-PAGING-001 keyset pagination
+
+**Status: Implemented and verified offline; live database/browser acceptance remains environment-bound.**
+
+- [x] Extended the existing bounded reservation search with strict keyset
+  pagination; each page displays at most 50 rows and queries at most 51.
+- [x] Cursors encode the last `(check_in_date, id)` key and a fingerprint of
+  the normalized status/date filters; malformed, non-scalar, or changed-filter
+  cursors fail closed.
+- [x] Preserved deterministic ordering, inclusive status/date filters, the
+  existing operator assignment/`hospitality.view` boundary, same-user `/u/*`
+  navigation, exact-ID lookup, arrivals, and lifecycle behavior.
+- [x] Search pagination probe passed **36/36**; cursor/filter validation passed
+  **12/12**; exact lookup passed **36/36**; continuation passed **21/21**.
+- [ ] Disposable database/browser acceptance remains separately blocked; no
+  database, deployment, activation, or production operation was performed.
+
 ## 2026-10-26 — OH-AUTO3-HOSP-OP-SEARCH-001 bounded operator reservation search
 
 **Status: Implemented and verified offline; live database/browser acceptance remains environment-bound.**

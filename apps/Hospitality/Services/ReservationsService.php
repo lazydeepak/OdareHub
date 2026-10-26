@@ -91,12 +91,13 @@ final class ReservationsService
      * check-in date boundaries; guest identity/free-text matching is excluded.
      *
      * @param array<string,mixed> $filters
-     * @return array{rows:array<int,array<string,mixed>>,truncated:bool,limit:int,filters:array{status:string,from:string,to:string}}
+     * @return array{rows:array<int,array<string,mixed>>,truncated:bool,limit:int,next_cursor:?string,filters:array{status:string,from:string,to:string}}
      */
-    public static function searchOperator(array $filters, int $limit = 50): array
+    public static function searchOperator(array $filters, int $limit = 50, string $cursor = ''): array
     {
         $limit = max(1, min(50, $limit));
         $normalized = self::normalizeOperatorSearchFilters($filters);
+        $cursorState = self::decodeOperatorSearchCursor($cursor, $normalized);
         self::requireSchema();
 
         $where = [];
@@ -112,6 +113,12 @@ final class ReservationsService
         if ($normalized['to'] !== '') {
             $where[] = 'r.check_in_date <= ?';
             $params[] = $normalized['to'];
+        }
+        if ($cursorState !== null) {
+            $where[] = '(r.check_in_date > ? OR (r.check_in_date = ? AND r.id > ?))';
+            $params[] = $cursorState['date'];
+            $params[] = $cursorState['date'];
+            $params[] = $cursorState['id'];
         }
 
         $rows = DB::fetchAll(
@@ -129,10 +136,20 @@ final class ReservationsService
         );
 
         $truncated = count($rows) > $limit;
+        $nextCursor = null;
+        if ($truncated) {
+            $lastRow = (array)$rows[$limit - 1];
+            $nextCursor = self::encodeOperatorSearchCursor(
+                (string)($lastRow['check_in_date'] ?? ''),
+                (string)($lastRow['id'] ?? ''),
+                $normalized
+            );
+        }
         return [
             'rows' => array_values(array_slice($rows, 0, $limit)),
             'truncated' => $truncated,
             'limit' => $limit,
+            'next_cursor' => $nextCursor,
             'filters' => $normalized,
         ];
     }
@@ -310,6 +327,74 @@ final class ReservationsService
         }
 
         return ['status' => $status, 'from' => $from, 'to' => $to];
+    }
+
+    /**
+     * Cursor is opaque to the view but contains only a validated page key and
+     * the filter fingerprint that produced it. It is not an authorization
+     * boundary; the existing operator admission remains the boundary.
+     *
+     * @param array{status:string,from:string,to:string} $filters
+     * @return array{date:string,id:int}|null
+     */
+    private static function decodeOperatorSearchCursor(string $cursor, array $filters): ?array
+    {
+        if ($cursor === '') {
+            return null;
+        }
+        if (strlen($cursor) > 256 || !preg_match('/^[A-Za-z0-9_-]+$/D', $cursor)) {
+            throw new \InvalidArgumentException('HOSPITALITY_RES_SEARCH_CURSOR_INVALID');
+        }
+        $padding = str_repeat('=', (4 - (strlen($cursor) % 4)) % 4);
+        $decoded = base64_decode(strtr($cursor, '-_', '+/') . $padding, true);
+        $payload = is_string($decoded) ? json_decode($decoded, true) : null;
+        if (!is_array($payload) || array_keys($payload) !== ['v', 'date', 'id', 'filter']) {
+            throw new \InvalidArgumentException('HOSPITALITY_RES_SEARCH_CURSOR_INVALID');
+        }
+        $date = $payload['date'] ?? null;
+        $id = $payload['id'] ?? null;
+        $filter = $payload['filter'] ?? null;
+        if (($payload['v'] ?? null) !== 1 || !is_string($date) || !is_string($id) || !is_string($filter)) {
+            throw new \InvalidArgumentException('HOSPITALITY_RES_SEARCH_CURSOR_INVALID');
+        }
+        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/D', $date)
+            || !checkdate((int)substr($date, 5, 2), (int)substr($date, 8, 2), (int)substr($date, 0, 4))
+            || !preg_match('/^[1-9]\d*$/D', $id)
+            || (strlen($id) > strlen((string)PHP_INT_MAX) || (strlen($id) === strlen((string)PHP_INT_MAX) && strcmp($id, (string)PHP_INT_MAX) > 0))
+            || !preg_match('/^[a-f0-9]{64}$/D', $filter)
+            || !hash_equals(self::operatorSearchFilterFingerprint($filters), $filter)) {
+            throw new \InvalidArgumentException('HOSPITALITY_RES_SEARCH_CURSOR_INVALID');
+        }
+
+        return ['date' => $date, 'id' => (int)$id];
+    }
+
+    /**
+     * @param array{status:string,from:string,to:string} $filters
+     */
+    private static function encodeOperatorSearchCursor(string $date, string $id, array $filters): string
+    {
+        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/D', $date)
+            || !checkdate((int)substr($date, 5, 2), (int)substr($date, 8, 2), (int)substr($date, 0, 4))
+            || !preg_match('/^[1-9]\d*$/D', $id)
+            || (strlen($id) > strlen((string)PHP_INT_MAX) || (strlen($id) === strlen((string)PHP_INT_MAX) && strcmp($id, (string)PHP_INT_MAX) > 0))) {
+            throw new \RuntimeException('HOSPITALITY_RES_SEARCH_CURSOR_BUILD_FAILED');
+        }
+        $json = json_encode([
+            'v' => 1,
+            'date' => $date,
+            'id' => $id,
+            'filter' => self::operatorSearchFilterFingerprint($filters),
+        ], JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
+        return rtrim(strtr(base64_encode($json), '+/', '-_'), '=');
+    }
+
+    /**
+     * @param array{status:string,from:string,to:string} $filters
+     */
+    private static function operatorSearchFilterFingerprint(array $filters): string
+    {
+        return hash('sha256', $filters['status'] . "\0" . $filters['from'] . "\0" . $filters['to']);
     }
 
     private static function activeRoomExists(int $roomId): bool
