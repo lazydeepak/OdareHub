@@ -8,6 +8,8 @@ use App\Core\DB;
 final class SalesService
 {
     private const MAX_LIST_LIMIT = 25;
+    private const MAX_SEARCH_LIMIT = 50;
+    public const STATUSES = ['draft', 'open', 'pending', 'won', 'completed', 'closed'];
 
     /**
      * Validate and normalize the existing Sales create payload without
@@ -70,7 +72,7 @@ final class SalesService
             if ($status === '') {
                 $status = 'open';
             }
-            if (!in_array($status, ['draft', 'open', 'pending', 'won', 'completed', 'closed'], true)) {
+            if (!in_array($status, self::STATUSES, true)) {
                 $errors[] = 'status_invalid';
             }
         }
@@ -107,6 +109,56 @@ final class SalesService
         return DB::fetchAll(
             'SELECT id, sale_ref, customer_name, amount, sale_status FROM sbaio_sales ORDER BY id DESC LIMIT ' . $limit
         );
+    }
+
+    /**
+     * Search Sales records using only exact reference, established status, and
+     * inclusive sale-date filters. The read is bounded and deterministic.
+     *
+     * @param array<string,mixed> $filters
+     * @return array{valid:bool,available:bool,rows:array<int,array<string,mixed>>,truncated:bool,limit:int,filters:array{sale_ref:string,status:string,from:string,to:string}}
+     */
+    public static function search(array $filters, int $limit = 50): array
+    {
+        $limit = max(1, min(self::MAX_SEARCH_LIMIT, $limit));
+        $normalized = self::normalizeSearchFilters($filters);
+        $where = [];
+        $params = [];
+
+        if ($normalized['sale_ref'] !== '') {
+            $where[] = 'sale_ref = ?';
+            $params[] = $normalized['sale_ref'];
+        }
+        if ($normalized['status'] !== '') {
+            $where[] = 'sale_status = ?';
+            $params[] = $normalized['status'];
+        }
+        if ($normalized['from'] !== '') {
+            $where[] = 'sale_date >= ?';
+            $params[] = $normalized['from'];
+        }
+        if ($normalized['to'] !== '') {
+            $where[] = 'sale_date <= ?';
+            $params[] = $normalized['to'];
+        }
+
+        $rows = DB::fetchAll(
+            'SELECT id, sale_ref, customer_name, amount, sale_status, sale_date
+             FROM sbaio_sales'
+            . ($where === [] ? '' : ' WHERE ' . implode(' AND ', $where))
+            . ' ORDER BY sale_date DESC, id DESC LIMIT ' . ($limit + 1),
+            $params
+        );
+        $truncated = count($rows) > $limit;
+
+        return [
+            'valid' => true,
+            'available' => true,
+            'rows' => array_values(array_slice($rows, 0, $limit)),
+            'truncated' => $truncated,
+            'limit' => $limit,
+            'filters' => $normalized,
+        ];
     }
 
     /**
@@ -194,6 +246,40 @@ final class SalesService
         }
 
         return $input[$key];
+    }
+
+    /**
+     * @param array<string,mixed> $filters
+     * @return array{sale_ref:string,status:string,from:string,to:string}
+     */
+    private static function normalizeSearchFilters(array $filters): array
+    {
+        if (array_diff(array_keys($filters), ['sale_ref', 'status', 'from', 'to']) !== []) {
+            throw new \InvalidArgumentException('SBAIO_SALES_SEARCH_FILTER_INVALID');
+        }
+        $saleRef = $filters['sale_ref'] ?? '';
+        $status = $filters['status'] ?? '';
+        $from = $filters['from'] ?? '';
+        $to = $filters['to'] ?? '';
+        foreach ([$saleRef, $status, $from, $to] as $value) {
+            if (!is_string($value)) {
+                throw new \InvalidArgumentException('SBAIO_SALES_SEARCH_FILTER_INVALID');
+            }
+        }
+
+        $saleRef = trim($saleRef);
+        $status = strtolower(trim($status));
+        $from = trim($from);
+        $to = trim($to);
+        if (strlen($saleRef) > 80
+            || ($status !== '' && !in_array($status, self::STATUSES, true))
+            || ($from !== '' && !self::isCalendarDate($from))
+            || ($to !== '' && !self::isCalendarDate($to))
+            || ($from !== '' && $to !== '' && $from > $to)) {
+            throw new \InvalidArgumentException('SBAIO_SALES_SEARCH_FILTER_INVALID');
+        }
+
+        return ['sale_ref' => $saleRef, 'status' => $status, 'from' => $from, 'to' => $to];
     }
 
     private static function normalizeDecimal(string $value): ?string

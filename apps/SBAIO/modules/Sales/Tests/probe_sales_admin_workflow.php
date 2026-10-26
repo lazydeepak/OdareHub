@@ -254,6 +254,51 @@ namespace {
     $assert($rows === DB::$rows, 'recent returns repository rows unchanged');
     $assert(str_contains(DB::$queries[0]['sql'], 'ORDER BY id DESC LIMIT 25'), 'recent remains deterministically bounded');
 
+    // Search accepts historical records, combines all supported filters, and
+    // binds every caller-provided value rather than concatenating input.
+    DB::$queries = [];
+    DB::$fetchAllRows = [array_merge(
+        [['id' => 100, 'sale_ref' => 'SALE-HIST', 'customer_name' => 'Acme', 'amount' => '10.00', 'sale_status' => 'completed', 'sale_date' => '2022-01-15']],
+        array_fill(0, 50, ['id' => 99, 'sale_ref' => 'OTHER', 'customer_name' => 'Other', 'amount' => '1.00', 'sale_status' => 'open', 'sale_date' => '2022-01-14'])
+    )];
+    $search = SalesService::search([
+        'sale_ref' => ' SALE-HIST ',
+        'status' => 'COMPLETED',
+        'from' => '2022-01-01',
+        'to' => '2022-01-31',
+    ]);
+    $assert($search['valid'] === true && $search['available'] === true, 'valid search reports a usable result');
+    $assert(count($search['rows']) === 50 && $search['truncated'] === true && $search['limit'] === 50, 'search returns at most 50 rows and indicates truncation');
+    $assert($search['filters'] === ['sale_ref' => 'SALE-HIST', 'status' => 'completed', 'from' => '2022-01-01', 'to' => '2022-01-31'], 'search normalizes supported filters deterministically');
+    $assert(str_contains(DB::$queries[0]['sql'], 'sale_ref = ?') && str_contains(DB::$queries[0]['sql'], 'sale_status = ?') && str_contains(DB::$queries[0]['sql'], 'sale_date >= ?') && str_contains(DB::$queries[0]['sql'], 'sale_date <= ?'), 'combined search uses exact and inclusive parameterized predicates');
+    $assert(DB::$queries[0]['params'] === ['SALE-HIST', 'completed', '2022-01-01', '2022-01-31'], 'search binds normalized filter values in predicate order');
+    $assert(str_contains(DB::$queries[0]['sql'], 'ORDER BY sale_date DESC, id DESC LIMIT 51'), 'search uses deterministic ordering and one-row overflow bound');
+    $assert($search['rows'][0]['sale_date'] === '2022-01-15', 'search can retrieve a historical sale outside the recent listing window');
+
+    DB::$queries = [];
+    DB::$fetchAllRows = [[]];
+    $statusOnly = SalesService::search(['status' => 'won']);
+    $assert($statusOnly['filters']['status'] === 'won' && DB::$queries[0]['params'] === ['won'], 'status-only search remains supported');
+    $assert(str_contains(DB::$queries[0]['sql'], 'sale_status = ?') && !str_contains(DB::$queries[0]['sql'], 'sale_ref = ?'), 'search emits only predicates for supplied filters');
+
+    foreach ([
+        ['status' => 'cancelled'],
+        ['from' => '2023-02-29'],
+        ['from' => '2024-03-01', 'to' => '2024-02-01'],
+        ['sale_ref' => str_repeat('R', 81)],
+        ['sale_ref' => ['SALE-ARRAY']],
+        ['unexpected' => 'value'],
+    ] as $invalidFilters) {
+        DB::$queries = [];
+        try {
+            SalesService::search($invalidFilters);
+            $assert(false, 'invalid search filters unexpectedly succeeded');
+        } catch (\InvalidArgumentException) {
+            $assert(DB::$queries === [], 'invalid search filters perform no database read');
+        }
+    }
+    $assert(str_contains($controllerSource, 'self::requireAdministrator();') && strpos($controllerSource, 'self::requireAdministrator();') < strpos($controllerSource, 'SalesService::search'), 'Sales search authorization precedes service/database access');
+
     DB::$queries = [];
     DB::$fetchOneRows = [[
         'total' => 4,
@@ -297,6 +342,19 @@ namespace {
             'sbaio.sales.amount_invalid',
             'sbaio.sales.status_invalid',
             'sbaio.sales.sale_date_invalid',
+            'sbaio.sales.search_title',
+            'sbaio.sales.search_reference',
+            'sbaio.sales.search_status',
+            'sbaio.sales.search_from',
+            'sbaio.sales.search_to',
+            'sbaio.sales.search_submit',
+            'sbaio.sales.search_invalid',
+            'sbaio.sales.search_unavailable',
+            'sbaio.sales.search_no_results',
+            'sbaio.sales.search_limited',
+            'sbaio.sales.search_customer',
+            'sbaio.sales.search_sale_date',
+            'sbaio.sales.search_amount',
         ] as $key) {
             $assert(is_array($localeValues) && trim((string)($localeValues[$key] ?? '')) !== '', "{$locale} localizes {$key}");
         }

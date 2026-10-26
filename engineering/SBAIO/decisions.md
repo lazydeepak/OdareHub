@@ -1,5 +1,21 @@
 # SBAIO — Decisions
 
+### 2026-10-26 — OH-AUTO3-SBAIO-SALES-SEARCH-001 bounded retrieval contract
+
+**Decision: Extend the existing Sales-owned read service rather than introduce a generic search framework or new route.**
+
+Search accepts exact `sale_ref`, one of the established `draft`, `open`,
+`pending`, `won`, `completed`, or `closed` statuses, and inclusive `sale_from`
+/ `sale_to` calendar dates. Each supplied value is validated before any DB read;
+the service binds values as parameters and uses one overflow row (`LIMIT 51`)
+to expose a bounded 50-row result plus `truncated` state. Ordering is fixed to
+`sale_date DESC, id DESC`.
+
+The existing Sales route continues to apply administrator authorization before
+the controller invokes search. No permission, lifecycle, schema, mutation,
+report, export, organization, or cross-domain authorization contract changes.
+
+
 ### 2026-10-26 — OH-AUTO3-SBAIO-SALES-REPORT-001 report read ownership
 
 **Decision: Keep Sales report query ownership in `SalesService`, with the route/controller supplying a prepared payload to the view.**

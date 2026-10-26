@@ -1,4 +1,20 @@
 # AGENT-COMPLIANCE-CHECKLIST
+
+## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-SALES-SEARCH-001 bounded Sales search
+
+Added bounded Sales administrator search for exact sale-reference lookup,
+established status filtering, and inclusive sale-date ranges. Search validates
+all supplied filters before database access, uses parameterized SQL, orders by
+`sale_date DESC, id DESC`, fetches one overflow row, and exposes a 50-row
+truncation state. Existing administrator authorization, create behavior,
+reporting, exports, routes, lifecycle statuses, schema, and Core/Auth/ACL
+boundaries remain unchanged.
+
+The database-free Sales probe passed **130/130**; Customers regression passed
+**68/68**; changed-file PHP lint and `git diff --check` passed. No installed
+database, DB-backed SBAIO probe, deployment, activation, or unrelated artifact
+operation occurred.
+
 ## Session Summary (2026-10-26) — OH-AUTO3-ORG-CONTEXT-001 authenticated organization context resolver
 
 Added `apps/Platform/Services/AuthenticatedOrganizationContextResolver.php` as

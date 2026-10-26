@@ -1,4 +1,20 @@
 # AGENTS.md
+
+## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-SALES-SEARCH-001 bounded Sales search
+
+Implemented the bounded Sales-owned administrator search slice. Exact
+sale-reference, established status, and inclusive sale-date filters are
+strictly validated before parameterized reads; results are deterministically
+ordered, capped at 50 displayed rows, and report truncation. The existing
+administrator gate remains before search/database access, and no route,
+permission, lifecycle, schema, reporting, export, Core/Auth/ACL, organization,
+Staff, Leave, or Timecard behavior changed.
+
+Sales probe **130/130**, Customers regression **68/68**, PHP lint, architecture
+gates, deletion-family gates **28/28**, and diff hygiene passed. No installed
+database or DB-backed SBAIO probe was executed. Unrelated working-tree artifacts
+were preserved.
+
 ## Session Summary (2026-10-26) — OH-AUTO3-ORG-CONTEXT-001 authenticated organization context resolver
 
 Implemented the Platform-owned authenticated organization context seam without

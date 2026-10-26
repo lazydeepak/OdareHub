@@ -1,5 +1,25 @@
 # SBAIO — Work
 
+## 2026-10-26 — OH-AUTO3-SBAIO-SALES-SEARCH-001 bounded Sales search
+
+**Status: Complete for offline verification; database-backed SBAIO probes remain environment-bound.**
+
+- [x] Confirmed the pre-change Sales administration listing was limited to
+  `SalesService::recent()` and the latest 25 records; no equivalent historical
+  search existed.
+- [x] Added Sales-owned exact reference, established-status, and inclusive
+  sale-date range search with strict validation, parameterized predicates,
+  deterministic `sale_date DESC, id DESC` ordering, a 50-row display bound,
+  and truncation indication.
+- [x] Preserved existing administrator authorization, create behavior,
+  reporting, exports, lifecycle statuses, routes, and schema boundaries.
+- [x] Focused Sales regression passed **130/130**; Customers regression passed
+  **68/68**; changed-file PHP lint, architecture gates, deletion-family gates
+  **28/28**, and `git diff --check` passed.
+- [x] No installed database, DB-backed SBAIO probe, deployment, activation, or
+  unrelated artifact operation occurred.
+
+
 ## 2026-10-26 — OH-AUTO3-SBAIO-SALES-REPORT-001 report read extraction
 
 **Status: Implemented and verified offline; database-backed Sales probes remain environment-bound.**

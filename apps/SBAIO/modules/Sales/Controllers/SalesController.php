@@ -29,11 +29,34 @@ final class SalesController
     public static function index($view): void
     {
         self::requireAdministrator();
+        $currentQuery = is_array($_GET ?? null) ? $_GET : [];
+        $searchRequested = ($currentQuery['sales_search'] ?? '') === '1';
+        $searchResult = null;
+        if ($searchRequested) {
+            try {
+                $searchResult = SalesService::search([
+                    'sale_ref' => $currentQuery['sale_ref'] ?? '',
+                    'status' => $currentQuery['sale_status'] ?? '',
+                    'from' => $currentQuery['sale_from'] ?? '',
+                    'to' => $currentQuery['sale_to'] ?? '',
+                ]);
+            } catch (\InvalidArgumentException) {
+                $searchResult = ['valid' => false, 'available' => true, 'rows' => [], 'truncated' => false, 'limit' => 50, 'filters' => []];
+            } catch (\Throwable) {
+                $searchResult = ['valid' => true, 'available' => false, 'rows' => [], 'truncated' => false, 'limit' => 50, 'filters' => []];
+            }
+            $rows = (array)($searchResult['rows'] ?? []);
+        } else {
+            $rows = SalesService::recent();
+        }
         $view->render('Sales::index.php', [
             'pageTitle' => t('sbaio.sales.title'),
             'moduleTitle' => t('sbaio.sales.title'),
             'moduleDescription' => t('sbaio.sales.description'),
-            'rows' => SalesService::recent(),
+            'rows' => $rows,
+            'currentQuery' => $currentQuery,
+            'searchResult' => $searchResult,
+            'saleStatusOptions' => SalesService::STATUSES,
             'message' => (string)($_GET['ok'] ?? ''),
             'error' => (string)($_GET['err'] ?? ''),
         ]);
