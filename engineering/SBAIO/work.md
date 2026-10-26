@@ -1,4 +1,19 @@
 # SBAIO — Work
+## 2026-10-26 — OH-AUTO3-SBAIO-EXPENSES-INPUT-002 complete input integrity
+
+**Status: In progress — offline verification only; no installed database or DB-backed SBAIO probe.**
+
+- [x] Confirmed the prior monetary fix still left reference, category, status,
+  and date fields subject to `(string)` coercion before SQL.
+- [x] Added one service-owned Expense create contract covering scalar types,
+  `VARCHAR` bounds, required reference, optional blank defaults, arbitrary
+  existing statuses, and strict calendar dates.
+- [x] Controller now validates the complete raw POST payload and passes only
+  normalized values to the existing service INSERT. Malformed non-monetary
+  values fail before SQL; no route or authorization boundary changed.
+- [x] Expanded Expense probe passed **62/62**; Customers **195/195** and Sales
+  **225/225** remain passing.
+
 ## 2026-10-26 — OH-AUTO3-SBAIO-EXPENSES-INTEGRITY-001 monetary validation
 
 **Status: In progress — offline verification only; no installed database or DB-backed SBAIO probe.**

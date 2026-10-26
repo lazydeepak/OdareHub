@@ -1,4 +1,16 @@
 # SBAIO — Decisions
+### 2026-10-26 — OH-AUTO3-SBAIO-EXPENSES-INPUT-002 complete input contract
+
+**Decision: Extend the existing Expense service validation boundary to all create fields while preserving the existing insert shape, optional defaults, arbitrary status values, route, CSRF, and app-access behavior.**
+
+`expense_ref`, `category_name`, `expense_status`, and `expense_date` now reject
+unsupported supplied types before normalization. Reference/category/status
+lengths match the existing schema (`80/120/40`), reference remains required,
+blank category/status/date retain existing null/default behavior, and dates
+must be real `Y-m-d` calendar dates. The already-established exact decimal
+amount contract remains unchanged. No approval lifecycle, permission, route,
+schema, Core/Auth/ACL, organization, Staff, Leave, or Timecard behavior changes.
+
 ### 2026-10-26 — OH-AUTO3-SBAIO-EXPENSES-INTEGRITY-001 monetary input contract
 
 **Decision: Validate Expense amounts as decimal strings before persistence and preserve the existing Expense route, insert shape, status/date behavior, and authorization boundaries.**

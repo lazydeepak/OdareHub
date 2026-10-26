@@ -1,4 +1,18 @@
 # AGENTS.md
+## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-EXPENSES-INPUT-002 complete input integrity
+
+Completed SBAIO Expense creation input integrity beyond monetary validation.
+Reference, category, status, and date inputs now reject malformed types and
+schema-invalid lengths/dates before SQL; optional defaults and arbitrary
+existing statuses remain preserved. The controller passes normalized values to
+the unchanged INSERT shape. No route, permission, lifecycle, schema,
+Core/Auth/ACL, organization, Staff, Leave, Timecard, Customers, or Sales
+behavior changed.
+
+Expense probe **62/62**, Customers **195/195**, Sales **225/225**, and changed
+file lint/diff checks passed. Architecture/deletion/deployment validation
+remains pending; no installed database or DB-backed SBAIO probe was executed.
+
 ## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-EXPENSES-INTEGRITY-001 monetary validation
 
 Prevented silent monetary corruption during SBAIO Expense creation. Expense

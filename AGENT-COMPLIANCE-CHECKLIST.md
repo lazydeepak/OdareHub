@@ -1,4 +1,13 @@
 # AGENT-COMPLIANCE-CHECKLIST
+## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-EXPENSES-INPUT-002 complete input integrity
+
+Completed Expense create input integrity beyond monetary validation. All create
+fields now pass one strict service-owned contract before SQL: scalar types,
+schema-aligned lengths, required reference, optional defaults, arbitrary status
+compatibility, and real calendar dates. Malformed non-monetary inputs perform
+zero SQL. Expense probe **62/62**, Customers **195/195**, and Sales **225/225**
+passed. No installed database or DB-backed SBAIO probe ran.
+
 ## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-EXPENSES-INTEGRITY-001 monetary validation
 
 Closed silent Expense monetary coercion. The existing `DECIMAL(12,2)` contract

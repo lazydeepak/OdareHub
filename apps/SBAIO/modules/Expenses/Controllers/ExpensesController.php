@@ -26,16 +26,25 @@ final class ExpensesController
     {
         Auth::requireCsrf((string)($_POST['csrf'] ?? ''));
 
-        $expenseRef = trim((string)($_POST['expense_ref'] ?? ''));
-        if ($expenseRef === '') {
-            self::redirect('err', t('sbaio.expenses.required'));
+        $validated = ExpensesService::validateCreateInput($_POST);
+        if (!$validated['valid']) {
+            $messages = [
+                'required' => 'sbaio.expenses.required',
+                'expense_ref_invalid' => 'sbaio.expenses.reference_invalid',
+                'expense_ref_too_long' => 'sbaio.expenses.reference_too_long',
+                'category_invalid' => 'sbaio.expenses.category_invalid',
+                'category_too_long' => 'sbaio.expenses.category_too_long',
+                'amount_required' => 'sbaio.expenses.amount_required',
+                'amount_invalid' => 'sbaio.expenses.amount_invalid',
+                'status_invalid' => 'sbaio.expenses.status_invalid',
+                'status_too_long' => 'sbaio.expenses.status_too_long',
+                'expense_date_invalid' => 'sbaio.expenses.expense_date_invalid',
+            ];
+            $errorKey = (string)($validated['errors'][0] ?? 'invalid');
+            self::redirect('err', t($messages[$errorKey] ?? 'sbaio.expenses.invalid'));
         }
 
-        if (ExpensesService::validateAmount($_POST['amount'] ?? null) === null) {
-            self::redirect('err', t('sbaio.expenses.amount_invalid'));
-        }
-
-        ExpensesService::create($_POST);
+        ExpensesService::create($validated['values']);
 
         self::redirect('ok', t('sbaio.expenses.created'));
     }
