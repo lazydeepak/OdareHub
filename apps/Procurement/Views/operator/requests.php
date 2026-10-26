@@ -22,7 +22,8 @@ $tr = static function (string $key, string $fallback): string {
 };
 $statusClass = static function (string $status): string {
     return match (strtolower(trim($status))) {
-        'approved', 'issued', 'closed' => 'chip chip--ok',
+        'approved', 'issued', 'closed', 'received', 'posted' => 'chip chip--ok',
+        'partial' => 'chip chip--warn',
         'cancelled', 'rejected' => 'chip chip--danger',
         default => 'chip chip--neutral',
     };
@@ -96,6 +97,7 @@ $statusLabel = static function (string $status) use ($tr): string {
                         <th><?= e($tr('proc.operator.queue.needed_date', 'Needed date')) ?></th>
                         <th><?= e($tr('proc.operator.queue.created_at', 'Created')) ?></th>
                         <th><?= e($tr('proc.operator.queue.purchase_order', 'Purchase order')) ?></th>
+                        <th><?= e($tr('proc.operator.queue.receipt', 'Receipt')) ?></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -117,6 +119,22 @@ $statusLabel = static function (string $status) use ($tr): string {
                                     <?php if (trim($poStatus) !== ''): ?>
                                         <span class="<?= e($statusClass($poStatus)) ?>"><?= e($tr('proc.operator.queue.purchase_order_status', 'PO status')) ?>: <?= e($statusLabel($poStatus)) ?></span>
                                     <?php endif; ?>
+                                <?php endif; ?>
+                            </td>
+                            <?php $receiptRef = trim((string)($row['receipt_ref'] ?? '')); ?>
+                            <?php $receiptStatus = strtolower(trim((string)($row['latest_receipt_status'] ?? ''))); ?>
+                            <?php $receiptCount = (int)($row['receipt_count'] ?? 0); ?>
+                            <?php $postedReceivedQty = (float)($row['posted_received_qty'] ?? 0); ?>
+                            <td>
+                                <?php if ($poRef === ''): ?>
+                                    <?= e($tr('proc.operator.queue.not_linked', 'Not linked')) ?>
+                                <?php elseif ($receiptCount === 0): ?>
+                                    <?= e($tr('proc.operator.queue.no_receipts', 'No receipts')) ?>
+                                <?php else: ?>
+                                    <?php if ($receiptRef !== ''): ?><div><?= e($receiptRef) ?></div><?php endif; ?>
+                                    <span class="<?= e($statusClass($receiptStatus)) ?>"><?= e($tr('proc.operator.queue.receipt_status', 'Receipt status')) ?>: <?= e($statusLabel($receiptStatus)) ?></span>
+                                    <div><?= e($tr('proc.operator.queue.receipt_count', 'Receipts')) ?>: <?= e((string)$receiptCount) ?></div>
+                                    <div><?= e($tr('proc.operator.queue.received_quantity', 'Posted quantity')) ?>: <?= e(number_format($postedReceivedQty, 2, '.', '')) ?></div>
                                 <?php endif; ?>
                             </td>
                         </tr>

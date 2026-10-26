@@ -265,6 +265,10 @@ final class ProcurementOverviewService
         }
 
         try {
+            // Resolve the exact creator-owned request set before joining any
+            // purchase-order or receipt data. Related lifecycle state must
+            // never become a lookup path around the authenticated ownership
+            // predicate.
             $where = ['r.created_by = ?'];
             $params = [$actorEmail];
             if ($normalizedFilters['request_ref'] !== '') {
@@ -288,20 +292,56 @@ final class ProcurementOverviewService
                     $params[] = $normalizedFilters['needed_to'];
                 }
             }
+            $ownedRequests =
+                'SELECT r.id, r.request_ref, r.request_status, r.requested_qty,
+                        r.needed_date, r.created_at
+                 FROM procurement_requests r
+                 WHERE ' . implode(' AND ', $where) . '
+                 ORDER BY r.created_at DESC, r.id DESC
+                 LIMIT ' . $limit;
+
             $rows = DB::fetchAll(
                 'SELECT r.id, r.request_ref, r.request_status, r.requested_qty,
-                        r.needed_date, r.created_at, po.po_ref, po.po_status
-                 FROM procurement_requests r
+                        r.needed_date, r.created_at,
+                        po.po_ref, po.po_status,
+                        receipt_summary.receipt_ref,
+                        receipt_summary.receipt_status AS latest_receipt_status,
+                        receipt_summary.receipt_count,
+                        receipt_summary.posted_received_qty
+                 FROM (' . $ownedRequests . ') r
                  LEFT JOIN (
                      SELECT request_id, MAX(id) AS id
                      FROM procurement_purchase_orders
-                      WHERE request_id IS NOT NULL
-                      GROUP BY request_id
-                  ) latest_po ON latest_po.request_id = r.id
-                  LEFT JOIN procurement_purchase_orders po ON po.id = latest_po.id
-                  WHERE ' . implode(' AND ', $where) . '
-                  ORDER BY r.created_at DESC, r.id DESC
-                  LIMIT ' . $limit,
+                     WHERE request_id IS NOT NULL
+                     GROUP BY request_id
+                 ) latest_po ON latest_po.request_id = r.id
+                 LEFT JOIN procurement_purchase_orders po ON po.id = latest_po.id
+                 LEFT JOIN (
+                     SELECT latest.po_id,
+                            latest_receipt.receipt_ref,
+                            latest_receipt.receipt_status,
+                            totals.receipt_count,
+                            totals.posted_received_qty
+                     FROM (
+                         SELECT po_id, MAX(id) AS id
+                         FROM procurement_receipts
+                         WHERE po_id IS NOT NULL
+                         GROUP BY po_id
+                     ) latest
+                     INNER JOIN procurement_receipts latest_receipt
+                         ON latest_receipt.id = latest.id
+                     INNER JOIN (
+                         SELECT po_id,
+                                COUNT(*) AS receipt_count,
+                                COALESCE(SUM(
+                                    CASE WHEN LOWER(COALESCE(receipt_status, \'\')) = \'posted\'
+                                         THEN received_qty ELSE 0 END
+                                ), 0) AS posted_received_qty
+                         FROM procurement_receipts
+                         WHERE po_id IS NOT NULL
+                         GROUP BY po_id
+                     ) totals ON totals.po_id = latest.po_id
+                 ) receipt_summary ON receipt_summary.po_id = po.id',
                 $params
             );
         } catch (\Throwable) {
