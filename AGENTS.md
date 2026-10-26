@@ -1,4 +1,18 @@
 # AGENTS.md
+## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-SALES-INTEGRITY-001 transactional identity verification
+
+Closed the Sales post-insert durability gap within the SBAIO service boundary.
+The existing InnoDB Sales insert now runs in a current-connection transaction;
+identity is verified before commit, and insert, invalid identity, or commit
+failure attempts rollback and prevents false success. No Core/DB abstraction,
+route, permission, schema, lifecycle, report, export, or unrelated artifact
+behavior changed.
+
+Sales regression **175/175** and changed-file lint/diff checks passed. Final
+architecture/deletion/deployment validation remains pending; no installed
+database or DB-backed SBAIO probe was executed. Unrelated artifacts remain
+preserved.
+
 ## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-SALES-CREATE-001 exact created identity
 
 Implemented exact SBAIO Sales creation identity handling. The existing insert

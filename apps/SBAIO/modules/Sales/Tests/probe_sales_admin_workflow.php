@@ -40,6 +40,7 @@ namespace App\Core {
     {
         public static object $connection;
         public static array $queries = [];
+        public static array $transactionEvents = [];
         public static array $rows = [];
         public static array $fetchOneRows = [];
         public static array $fetchAllRows = [];
@@ -104,6 +105,27 @@ namespace {
     final class SalesConnectionDouble
     {
         public int|string|null $insert_id = 0;
+        public bool $beginResult = true;
+        public bool $commitResult = true;
+        public bool $rollbackResult = true;
+
+        public function begin_transaction(): bool
+        {
+            \App\Core\DB::$transactionEvents[] = 'begin';
+            return $this->beginResult;
+        }
+
+        public function commit(): bool
+        {
+            \App\Core\DB::$transactionEvents[] = 'commit';
+            return $this->commitResult;
+        }
+
+        public function rollback(): bool
+        {
+            \App\Core\DB::$transactionEvents[] = 'rollback';
+            return $this->rollbackResult;
+        }
     }
 
     require_once __DIR__ . '/../Services/SalesService.php';
@@ -238,20 +260,25 @@ namespace {
 
     // Persistence receives strings for valid decimals and is untouched on failure.
     DB::$queries = [];
+    DB::$transactionEvents = [];
     DB::$connection->insert_id = 417;
     $createdId = SalesService::create($valid['values']);
     $assert(count(DB::$queries) === 1 && DB::$queries[0]['method'] === 'query', 'valid create performs one insert');
     $assert(DB::$queries[0]['params'][2] === '-12.50' && is_string(DB::$queries[0]['params'][2]), 'insert receives exact decimal string');
     $assert($createdId === 417, 'create returns the positive connection-local generated identity');
+    $assert(DB::$transactionEvents === ['begin', 'commit'], 'successful creation commits only after insert identity verification');
 
     DB::$queries = [];
+    DB::$transactionEvents = [];
     DB::$connection->insert_id = 418;
     $firstCreatedId = SalesService::create(['sale_ref' => 'SALE-CONCURRENT-A', 'amount' => '1.00']);
     DB::$connection->insert_id = 419;
     $secondCreatedId = SalesService::create(['sale_ref' => 'SALE-CONCURRENT-B', 'amount' => '1.00']);
     $assert($firstCreatedId === 418 && $secondCreatedId === 419 && $firstCreatedId !== $secondCreatedId, 'separate connection identities are not inferred from references or latest-row queries');
+    $assert(DB::$transactionEvents === ['begin', 'commit', 'begin', 'commit'], 'separate creations each own an independent transaction boundary');
 
     foreach ([0, -1, '', 'not-an-id', null] as $invalidIdentity) {
+        DB::$transactionEvents = [];
         DB::$connection->insert_id = $invalidIdentity;
         try {
             SalesService::create(['sale_ref' => 'SALE-ID-INVALID', 'amount' => '1.00']);
@@ -259,7 +286,9 @@ namespace {
         } catch (\RuntimeException $e) {
             $assert(str_contains($e->getMessage(), 'identity'), 'invalid generated identity fails closed without false success');
         }
+        $assert(DB::$transactionEvents === ['begin', 'rollback'], 'invalid identity rolls back before failure escapes');
     }
+    DB::$transactionEvents = [];
     DB::$throw = true;
     try {
         SalesService::create(['sale_ref' => 'SALE-INSERT-FAIL', 'amount' => '1.00']);
@@ -267,7 +296,31 @@ namespace {
     } catch (\RuntimeException $e) {
         $assert($e->getMessage() === 'insert failed', 'insert failure remains a failure and cannot redirect success');
     }
+    $assert(DB::$transactionEvents === ['begin', 'rollback'], 'insert failure rolls back without commit');
     DB::$throw = false;
+    DB::$transactionEvents = [];
+    DB::$connection->insert_id = 420;
+    DB::$connection->commitResult = false;
+    try {
+        SalesService::create(['sale_ref' => 'SALE-COMMIT-FAIL', 'amount' => '1.00']);
+        $assert(false, 'commit failure unexpectedly succeeded');
+    } catch (\RuntimeException $e) {
+        $assert($e->getMessage() === 'Sales transaction commit failed.', 'commit failure cannot produce false success');
+    }
+    $assert(DB::$transactionEvents === ['begin', 'commit', 'rollback'], 'commit failure attempts rollback and never returns an ID');
+    DB::$connection->commitResult = true;
+    DB::$transactionEvents = [];
+    DB::$connection->commitResult = false;
+    DB::$connection->rollbackResult = false;
+    try {
+        SalesService::create(['sale_ref' => 'SALE-ROLLBACK-FAIL', 'amount' => '1.00']);
+        $assert(false, 'rollback failure unexpectedly succeeded');
+    } catch (\RuntimeException $e) {
+        $assert($e->getMessage() === 'Sales transaction rollback failed.', 'rollback failure is surfaced as failure rather than false success');
+    }
+    $assert(DB::$transactionEvents === ['begin', 'commit', 'rollback'], 'rollback failure is attempted after commit failure');
+    DB::$connection->commitResult = true;
+    DB::$connection->rollbackResult = true;
     $assert(str_contains($controllerSource, '$createdId = SalesService::create') && str_contains($controllerSource, "sbaio.sales.created_with_id"), 'controller confirmation uses the returned exact ID');
     $assert(!str_contains($controllerSource, 'latest') && !str_contains($serviceSource, 'ORDER BY id DESC LIMIT 1'), 'created identity does not use latest-row or reference inference');
 

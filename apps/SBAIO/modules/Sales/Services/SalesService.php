@@ -241,30 +241,55 @@ final class SalesService
         }
         $values = $validated['values'];
 
-        DB::query(
-            'INSERT INTO sbaio_sales (sale_ref, customer_name, amount, sale_status, sale_date) VALUES (?,?,?,?,?)',
-            [
-                $values['sale_ref'],
-                self::nullIfBlank($values['customer_name']),
-                $values['amount'],
-                $values['sale_status'],
-                self::nullIfBlank($values['sale_date']),
-            ]
-        );
+        $db = DB::conn();
+        $transactionStarted = false;
+        try {
+            if ($db->begin_transaction() !== true) {
+                throw new \RuntimeException('Sales transaction could not start.');
+            }
+            $transactionStarted = true;
 
-        $insertId = DB::conn()->insert_id;
-        if (is_int($insertId)) {
-            if ($insertId > 0) {
-                return $insertId;
+            DB::query(
+                'INSERT INTO sbaio_sales (sale_ref, customer_name, amount, sale_status, sale_date) VALUES (?,?,?,?,?)',
+                [
+                    $values['sale_ref'],
+                    self::nullIfBlank($values['customer_name']),
+                    $values['amount'],
+                    $values['sale_status'],
+                    self::nullIfBlank($values['sale_date']),
+                ]
+            );
+
+            $insertId = $db->insert_id;
+            if (is_int($insertId) && $insertId > 0) {
+                $createdId = $insertId;
+            } elseif (is_string($insertId) && preg_match('/^[1-9][0-9]*$/D', $insertId)) {
+                $normalizedId = filter_var($insertId, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+                if ($normalizedId !== false) {
+                    $createdId = (int)$normalizedId;
+                }
             }
-        } elseif (is_string($insertId) && preg_match('/^[1-9][0-9]*$/D', $insertId)) {
-            $normalizedId = filter_var($insertId, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
-            if ($normalizedId !== false) {
-                return (int)$normalizedId;
+            if (!isset($createdId)) {
+                throw new \RuntimeException('Sales insert identity was not available.');
             }
+
+            if ($db->commit() !== true) {
+                throw new \RuntimeException('Sales transaction commit failed.');
+            }
+
+            return $createdId;
+        } catch (\Throwable $e) {
+            if ($transactionStarted) {
+                try {
+                    if ($db->rollback() !== true) {
+                        throw new \RuntimeException('Sales transaction rollback failed.');
+                    }
+                } catch (\Throwable $rollbackError) {
+                    throw new \RuntimeException('Sales transaction rollback failed.', 0, $e);
+                }
+            }
+            throw $e;
         }
-
-        throw new \RuntimeException('Sales insert identity was not available.');
     }
 
     /** @param array<string,mixed> $input */

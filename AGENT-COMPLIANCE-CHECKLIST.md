@@ -1,4 +1,13 @@
 # AGENT-COMPLIANCE-CHECKLIST
+## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-SALES-INTEGRITY-001 transactional identity verification
+
+Confirmed and closed the Sales durability defect: the prior insert occurred
+before identity validation without rollback, while `sbaio_sales` is InnoDB.
+Sales creation now uses the existing current `mysqli` connection transaction,
+commits only after exact positive-ID verification, and rolls back on insert,
+identity, or commit failure. Sales regression passed **175/175**; no installed
+database or DB-backed SBAIO probe was executed.
+
 ## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-SALES-CREATE-001 exact created identity
 
 Sales creation now returns and strictly verifies the current connection's

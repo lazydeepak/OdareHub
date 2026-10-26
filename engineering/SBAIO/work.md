@@ -1,4 +1,18 @@
 # SBAIO — Work
+## 2026-10-26 — OH-AUTO3-SBAIO-SALES-INTEGRITY-001 transactional identity verification
+
+**Status: Complete for offline verification; database-backed SBAIO probes remain environment-bound.**
+
+- [x] Confirmed the pre-change defect: Sales inserted before identity
+  verification, with no transaction or rollback, while `sbaio_sales` is an
+  existing InnoDB table.
+- [x] Bounded Sales creation now begins a transaction, inserts, verifies the
+  same connection's positive generated identity, commits only after identity
+  success, and rolls back on insert, identity, or commit failure.
+- [x] Sales regression passed **175/175**, including transaction ordering,
+  rollback, commit failure, invalid/overflow identity, and no-false-success
+  coverage. No installed database or DB-backed SBAIO probe was executed.
+
 ## 2026-10-26 — OH-AUTO3-SBAIO-SALES-CREATE-001 exact created identity
 
 **Status: Complete for offline verification; database-backed SBAIO probes remain environment-bound.**

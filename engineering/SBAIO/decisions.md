@@ -1,4 +1,16 @@
 # SBAIO — Decisions
+### 2026-10-26 — OH-AUTO3-SBAIO-SALES-INTEGRITY-001 bounded transaction contract
+
+**Decision: Keep the Sales insert and same-connection generated-ID verification inside one existing `mysqli` transaction boundary.**
+
+The service uses `DB::conn()->begin_transaction()`, performs the existing
+parameterized insert, verifies the connection-local positive identity, and
+calls `commit()` only after verification. Insert, identity, and commit failures
+attempt `rollback()` and propagate failure; no success ID or redirect is
+returned. The existing `sbaio_sales` schema is verified as InnoDB, so this
+bounded service transaction has transactional storage support without a Core
+or generic transaction-abstraction change.
+
 ### 2026-10-26 — OH-AUTO3-SBAIO-SALES-CREATE-001 exact identity contract
 
 **Decision: Return the database-generated identity from the existing Sales create service and use it in the existing success redirect.**
