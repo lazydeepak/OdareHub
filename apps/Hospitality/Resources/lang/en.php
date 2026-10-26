@@ -173,4 +173,10 @@ return [
     'hospitality.operator.hk.save' => 'Save status',
     'hospitality.operator.housekeeping.title' => 'Housekeeping snapshot',
     'hospitality.operator.local_folio_note' => 'Local Hospitality folio records only; no payments or invoices.',
+    'hospitality.operator.reservation.lookup_title' => 'Find reservation',
+    'hospitality.operator.reservation.lookup_note' => 'Use the exact reservation ID to view a reservation, including stays outside the arrivals board.',
+    'hospitality.operator.reservation.lookup_submit' => 'Find reservation',
+    'hospitality.operator.reservation.lookup_invalid' => 'Enter a valid positive reservation ID.',
+    'hospitality.operator.reservation.lookup_unavailable' => 'Reservation lookup is temporarily unavailable.',
+    'hospitality.operator.reservation.lookup_not_found' => 'No reservation was found for that ID.',
 ];

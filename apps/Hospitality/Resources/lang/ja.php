@@ -173,4 +173,10 @@ return [
     'hospitality.operator.hk.save' => 'ステータスを保存',
     'hospitality.operator.housekeeping.title' => 'ハウスキーピング概要',
     'hospitality.operator.local_folio_note' => 'ホスピタリティ内のローカルフォリオ記録のみです。決済や請求書はありません。',
+    'hospitality.operator.reservation.lookup_title' => '予約を検索',
+    'hospitality.operator.reservation.lookup_note' => '到着予定一覧の対象外の滞在を含め、正確な予約 ID で予約を表示します。',
+    'hospitality.operator.reservation.lookup_submit' => '予約を検索',
+    'hospitality.operator.reservation.lookup_invalid' => '1以上の有効な予約 IDを入力してください。',
+    'hospitality.operator.reservation.lookup_unavailable' => '予約検索を一時利用できません。',
+    'hospitality.operator.reservation.lookup_not_found' => 'その ID の予約は見つかりません。',
 ];

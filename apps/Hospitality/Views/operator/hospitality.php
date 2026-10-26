@@ -48,6 +48,13 @@ $tr = static fn (string $key, string $fallback): string => htmlspecialchars($tra
         unset($_SESSION['operator_hospitality_flash_ok'], $_SESSION['operator_hospitality_flash_err'], $_SESSION['operator_hospitality_created_reservation_id']);
         $csrfToken = Auth::csrfToken();
         $reservationOptions = $canManage ? HospitalityBoardAdapter::reservationFormOptions() : null;
+        $currentQuery = is_array($data['current_query'] ?? null) ? $data['current_query'] : [];
+        $reservationReference = is_string(($currentQuery['reservation_ref'] ?? null))
+            ? (string)$currentQuery['reservation_ref']
+            : '';
+        $reservationLookup = $reservationReference !== ''
+            ? HospitalityBoardAdapter::lookupReservation($reservationReference)
+            : null;
         $createdReservation = $createdReservationId > 0
             ? HospitalityBoardAdapter::createdReservation($createdReservationId)
             : null;
@@ -73,6 +80,42 @@ $tr = static fn (string $key, string $fallback): string => htmlspecialchars($tra
     <?php if ($flashErr !== ''): ?>
     <p class="hosp-chip hosp-chip--danger"><?php echo $esc($translate(str_starts_with($flashErr, 'HOSPITALITY_RES_') ? 'hospitality.operator.flash.reservation_create_failed' : 'hospitality.operator.flash.update_failed', 'Unable to update the Hospitality action.')); ?></p>
     <?php endif; ?>
+
+    <div class="card" data-hospitality-reservation-lookup="1">
+        <h3><?php echo $tr('hospitality.operator.reservation.lookup_title', 'Find reservation'); ?></h3>
+        <p class="text-muted"><?php echo $tr('hospitality.operator.reservation.lookup_note', 'Use the exact reservation ID to view a reservation, including stays outside the arrivals board.'); ?></p>
+        <form method="get" action="/u/<?php echo $esc($opUsername); ?>/hospitality" class="hosp-form">
+            <label><?php echo $tr('hospitality.field.reservation_id', 'Reservation ID'); ?>
+                <input type="text" name="reservation_ref" inputmode="numeric" pattern="[1-9][0-9]*" maxlength="19" value="<?php echo $esc($reservationReference); ?>">
+            </label>
+            <button class="btn" type="submit"><?php echo $tr('hospitality.operator.reservation.lookup_submit', 'Find reservation'); ?></button>
+        </form>
+        <?php if ($reservationLookup !== null): ?>
+            <?php if (($reservationLookup['valid'] ?? false) !== true): ?>
+            <p class="text-muted" role="alert"><?php echo $tr('hospitality.operator.reservation.lookup_invalid', 'Enter a valid positive reservation ID.'); ?></p>
+            <?php elseif (($reservationLookup['available'] ?? false) !== true): ?>
+            <p class="text-muted" role="alert"><?php echo $tr('hospitality.operator.reservation.lookup_unavailable', 'Reservation lookup is temporarily unavailable.'); ?></p>
+            <?php elseif (!is_array($reservationLookup['reservation'] ?? null)): ?>
+            <p class="text-muted"><?php echo $tr('hospitality.operator.reservation.lookup_not_found', 'No reservation was found for that ID.'); ?></p>
+            <?php else: ?>
+            <?php $lookupReservation = (array)$reservationLookup['reservation']; ?>
+            <dl>
+                <dt><?php echo $tr('hospitality.field.reservation_id', 'Reservation ID'); ?></dt>
+                <dd><?php echo $esc((int)($lookupReservation['id'] ?? 0)); ?></dd>
+                <dt><?php echo $tr('hospitality.field.guest', 'Guest'); ?></dt>
+                <dd><?php echo $esc($lookupReservation['guest_label'] ?? ''); ?></dd>
+                <dt><?php echo $tr('hospitality.field.room', 'Room'); ?></dt>
+                <dd><?php echo $esc(($lookupReservation['room_label'] ?? '') !== '' ? $lookupReservation['room_label'] : $translate('hospitality.res_unassigned_room', 'Room unassigned')); ?></dd>
+                <dt><?php echo $tr('hospitality.field.check_in_date', 'Arrival (planned)'); ?></dt>
+                <dd><?php echo $esc($lookupReservation['check_in_date'] ?? ''); ?></dd>
+                <dt><?php echo $tr('hospitality.field.check_out_date', 'Departure (planned)'); ?></dt>
+                <dd><?php echo $esc($lookupReservation['check_out_date'] ?? ''); ?></dd>
+                <dt><?php echo $tr('hospitality.field.status', 'Status'); ?></dt>
+                <dd><?php echo $esc($translate('hospitality.res_status.' . (string)($lookupReservation['reservation_status'] ?? ''), (string)($lookupReservation['reservation_status'] ?? ''))); ?></dd>
+            </dl>
+            <?php endif; ?>
+        <?php endif; ?>
+    </div>
 
     <?php if ($flashOk === 'HOSPITALITY_RES_CREATED' && is_array($createdReservation)): ?>
     <div class="card">

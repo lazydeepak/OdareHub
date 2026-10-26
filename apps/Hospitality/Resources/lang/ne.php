@@ -173,4 +173,10 @@ return [
     'hospitality.operator.hk.save' => 'स्थिति सुरक्षित गर्नुहोस्',
     'hospitality.operator.housekeeping.title' => 'हाउसकिपिङ सारांश',
     'hospitality.operator.local_folio_note' => 'हस्पिट्यालिटीका स्थानीय फोलियो रेकर्ड मात्र; भुक्तानी वा बिल छैन।',
+    'hospitality.operator.reservation.lookup_title' => 'आरक्षण खोज्नुहोस्',
+    'hospitality.operator.reservation.lookup_note' => 'आगमन बोर्डमा नदेखिने बसाइँसमेत हेर्न सही आरक्षण आईडी प्रयोग गर्नुहोस्।',
+    'hospitality.operator.reservation.lookup_submit' => 'आरक्षण खोज्नुहोस्',
+    'hospitality.operator.reservation.lookup_invalid' => '१ वा सोभन्दा ठूलो मान्य आरक्षण आईडी प्रविष्ट गर्नुहोस्।',
+    'hospitality.operator.reservation.lookup_unavailable' => 'आरक्षण खोज अहिले उपलब्ध छैन।',
+    'hospitality.operator.reservation.lookup_not_found' => 'त्यो आईडीको आरक्षण भेटिएन।',
 ];

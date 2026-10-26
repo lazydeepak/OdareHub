@@ -1,5 +1,24 @@
 # Hospitality — Decisions
 
+## 2026-10-26 — OH-AUTO3-HOSP-OP-LOOKUP-001 persistent reservation lookup
+
+**Decision: Use the existing operator Hospitality view authority and canonical reservation read.**
+
+The persistent operator lookup accepts only a canonical positive decimal
+reservation ID from the existing `/u/{username}/hospitality` GET query; leading,
+trailing, signed, fractional, scientific, and overflow values are rejected.
+The view's existing `hospitality.view` check and operator assignment/provider
+admission remain the authority boundary; no creator ownership is inferred and
+no new permission or route is introduced. The adapter delegates to
+`ReservationsService::findById()`, which performs one exact-ID bounded joined
+read and returns no details for a missing ID. Malformed input is rejected
+before service access, and service/schema failure fails closed.
+
+The lookup intentionally does not broaden the arrivals projection or lifecycle
+state machine. It can therefore retrieve valid past-date reservations that the
+arrivals board excludes, while preserving all existing mutation controls and
+same-user operator navigation.
+
 ## 2026-10-25 — OH-AUTO3-HOSP-001 created-reservation continuation
 
 **Status: Implemented and verified within the bounded Hospitality owner boundary.**

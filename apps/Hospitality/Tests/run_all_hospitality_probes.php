@@ -38,6 +38,7 @@ $probes = [
     'operator slice9 no-show' => 'apps/Hospitality/Tests/probe_operator_slice9_no_show.php',
     'operator behavioral dispatch' => 'apps/Hospitality/Tests/probe_operator_behavioral.php',
     'operator input identity' => 'apps/Hospitality/Tests/probe_operator_input_identity.php',
+    'operator reservation lookup' => 'apps/Hospitality/Tests/probe_operator_reservation_lookup.php',
 ];
 
 $passed = 0;

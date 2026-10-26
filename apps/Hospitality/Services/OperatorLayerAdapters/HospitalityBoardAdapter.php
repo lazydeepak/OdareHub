@@ -47,6 +47,36 @@ final class HospitalityBoardAdapter
     }
 
     /**
+     * Resolve a browser-supplied exact reservation reference through the
+     * existing owner read. The caller must already have passed the operator
+     * surface/permission boundary; this adapter adds no new authority.
+     *
+     * @return array{valid:bool,available:bool,reservation:?array<string,mixed>}
+     */
+    public static function lookupReservation(string $reference): array
+    {
+        if ($reference === ''
+            || !preg_match('/^[1-9][0-9]*$/D', $reference)
+            || strlen($reference) > strlen((string)PHP_INT_MAX)
+            || (strlen($reference) === strlen((string)PHP_INT_MAX)
+                && strcmp($reference, (string)PHP_INT_MAX) > 0)
+        ) {
+            return ['valid' => false, 'available' => true, 'reservation' => null];
+        }
+
+        try {
+            $reservation = ReservationsService::findById((int)$reference);
+            return [
+                'valid' => true,
+                'available' => true,
+                'reservation' => is_array($reservation) ? $reservation : null,
+            ];
+        } catch (\Throwable) {
+            return ['valid' => true, 'available' => false, 'reservation' => null];
+        }
+    }
+
+    /**
      * Read-only operator payload over existing Hospitality foundation services.
      *
      * @return array<string,mixed>|null

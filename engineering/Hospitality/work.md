@@ -1,5 +1,23 @@
 # Hospitality Work Log
 
+## 2026-10-26 — OH-AUTO3-HOSP-OP-LOOKUP-001 persistent operator reservation lookup
+
+**Status: Implemented and verified offline; live database/browser acceptance remains environment-bound.**
+
+- [x] Added a persistent exact-reference lookup inside the existing assigned
+  Hospitality operator focus view; it reuses `ReservationsService::findById()`
+  and the existing `hospitality.view`/operator-surface admission boundary.
+- [x] Kept the read bounded and read-only: canonical positive decimal ID input,
+  one existing exact-ID owner query, no creator inference, no new route or
+  permission, and fail-closed malformed/missing/unavailable cases.
+- [x] Localized reservation identity, guest, planned stay dates, room, status,
+  lookup states, and past-date scope in EN/JA/NE. Existing arrivals and
+  lifecycle behavior remain unchanged.
+- [x] Lookup probe passed **34/34**; existing continuation **21/21**,
+  behavioral **57/57**, and input-identity **24/24** probes passed.
+- [ ] Disposable database/browser acceptance remains separately blocked; no
+  database, deployment, activation, or production operation was performed.
+
 ## 2026-10-25 — OH-AUTO3-HOSP-001 created-reservation continuation
 
 **Status: Complete — bounded owner-local implementation.**
