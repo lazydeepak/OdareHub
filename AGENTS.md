@@ -1,4 +1,15 @@
 # AGENTS.md
+## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-TASKS-CONTINUITY-001 Task creation durability and exact retrieval
+
+Task creation now returns a verified generated ID only after same-connection
+transaction commit; insert, identity, and commit failures roll back. The
+existing Task administrator surface reads exact `task_id` values through a
+bounded parameterized lookup, with malformed IDs rejected before SQL.
+
+Continuity probe **34/34**, Task integrity **72/72**, Expenses **91/91**,
+Customers **195/195**, and Sales **225/225** passed. No installed database or
+DB-backed SBAIO probe was executed.
+
 ## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-TASKS-REPORT-001 report ownership
 
 Completed Task report service ownership. Existing report SQL/data preparation

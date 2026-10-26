@@ -1,4 +1,20 @@
 # SBAIO — Work
+## 2026-10-26 — OH-AUTO3-SBAIO-TASKS-CONTINUITY-001 Task creation durability and exact retrieval
+
+**Status: In progress — offline verification only; no installed database or DB-backed SBAIO probe.**
+
+- [x] Task creation now uses a same-connection transaction, validates the
+  positive generated ID before commit, and rolls back insert, identity, or
+  commit failures.
+- [x] The existing Task POST redirects with the exact `task_id`; the existing
+  administrator Task page reads that ID through a bounded parameterized
+  `WHERE id = ? LIMIT 1` path.
+- [x] Malformed, overflow, negative, fractional, scientific, array, and
+  boolean IDs fail closed before reads; no latest-row or title inference was
+  added. Existing SBAIO app authorization remains unchanged.
+- [x] Continuity probe passed **34/34**; Task integrity **72/72**, Expenses
+  **91/91**, Customers **195/195**, and Sales **225/225** remain passing.
+
 ## 2026-10-26 — OH-AUTO3-SBAIO-TASKS-REPORT-001 report ownership
 
 **Status: In progress — offline verification only; no installed database or DB-backed SBAIO probe.**

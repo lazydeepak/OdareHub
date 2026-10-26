@@ -7,6 +7,10 @@ $tt = static function (string $key): string {
 <?php
 $rows = is_array($rows ?? null) ? $rows : [];
 $staffRows = is_array($staffRows ?? null) ? $staffRows : [];
+$exactTask = is_array($exactTask ?? null) ? $exactTask : null;
+$exactTaskId = is_int($exactTaskId ?? null) ? $exactTaskId : null;
+$exactTaskState = is_string($exactTaskState ?? null) ? $exactTaskState : null;
+$createdRecordId = is_int($createdRecordId ?? null) ? $createdRecordId : null;
 $suiteActions = [
   ['label' => t('nav.sbaio_dashboard'), 'url' => '/apps/sbaio'],
   ['label' => t('nav.sbaio_notices'), 'url' => '/apps/sbaio/notices'],
@@ -21,6 +25,34 @@ require APP_ROOT . '/apps/SBAIO/Views/partials/module_page_intro.php';
 require APP_ROOT . '/apps/SBAIO/Views/partials/module_page_feedback.php';
 require APP_ROOT . '/apps/SBAIO/Views/partials/module_page_filters.php';
 ?>
+<?php if ($createdRecordId !== null): ?>
+  <section class="card u-mb-14" data-sbaio-tasks-created-record="1">
+    <a class="btn btn-primary" href="/apps/sbaio/tasks?task_id=<?= e((string)$createdRecordId) ?>"><?= e(t('sbaio.tasks.open_created_record')) ?></a>
+  </section>
+<?php endif; ?>
+<?php if ($exactTaskState !== null): ?>
+  <section class="card u-mb-14" data-sbaio-tasks-exact-record="1">
+    <?php if ($exactTaskState === 'invalid'): ?>
+      <p class="muted" role="alert"><?= e(t('sbaio.tasks.record_id_invalid')) ?></p>
+    <?php elseif ($exactTaskState === 'unavailable'): ?>
+      <p class="muted" role="alert"><?= e(t('sbaio.tasks.record_unavailable')) ?></p>
+    <?php elseif ($exactTaskState === 'not_found'): ?>
+      <p class="muted" role="alert"><?= e(t('sbaio.tasks.record_not_found')) ?></p>
+    <?php elseif ($exactTask !== null): ?>
+      <h3 class="u-mt-0"><?= e(t('sbaio.tasks.record_title')) ?></h3>
+      <dl>
+        <dt><?= e(t('sbaio.tasks.record_id')) ?></dt><dd><?= e((string)$exactTaskId) ?></dd>
+        <dt><?= e(t('sbaio.tasks.record_task_title')) ?></dt><dd><?= e((string)($exactTask['task_title'] ?? '')) ?></dd>
+        <dt><?= e(t('sbaio.tasks.record_owner')) ?></dt><dd><?= e((string)($exactTask['owner_name'] ?? '')) ?></dd>
+        <dt><?= e(t('sbaio.tasks.record_type')) ?></dt><dd><?= e((string)($exactTask['task_type'] ?? '')) ?></dd>
+        <dt><?= e(t('sbaio.tasks.record_status')) ?></dt><dd><?= e((string)($exactTask['task_status'] ?? '')) ?></dd>
+        <dt><?= e(t('sbaio.tasks.record_priority')) ?></dt><dd><?= e((string)($exactTask['priority'] ?? '')) ?></dd>
+        <dt><?= e(t('sbaio.tasks.record_due_date')) ?></dt><dd><?= e((string)($exactTask['due_date'] ?? '')) ?></dd>
+      </dl>
+      <a class="btn" href="/apps/sbaio/tasks?task_id=<?= e((string)$exactTaskId) ?>"><?= e(t('sbaio.tasks.open_record')) ?></a>
+    <?php endif; ?>
+  </section>
+<?php endif; ?>
 <section class="card">
   <div class="card u-mb-14">
     <h3 class="u-mt-0"><?= e(t('sbaio.tasks.form_title')) ?></h3>

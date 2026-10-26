@@ -27,6 +27,30 @@ final class TasksController
 
     public static function index($view): void
     {
+        $currentQuery = is_array($_GET ?? null) ? $_GET : [];
+        $exactTask = null;
+        $exactTaskId = null;
+        $exactTaskState = null;
+        if (array_key_exists('task_id', $currentQuery)) {
+            $rawTaskId = $currentQuery['task_id'];
+            if (is_string($rawTaskId) && preg_match('/^[1-9][0-9]*$/D', $rawTaskId)) {
+                $parsedTaskId = filter_var($rawTaskId, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+                if ($parsedTaskId !== false) {
+                    $exactTaskId = (int)$parsedTaskId;
+                    try {
+                        $exactTask = TasksService::findById($exactTaskId);
+                        $exactTaskState = is_array($exactTask) ? 'found' : 'not_found';
+                    } catch (\Throwable) {
+                        $exactTaskState = 'unavailable';
+                    }
+                } else {
+                    $exactTaskState = 'invalid';
+                }
+            } else {
+                $exactTaskState = 'invalid';
+            }
+        }
+
         $view->render('Tasks::index.php', [
             'pageTitle' => t('sbaio.tasks.title'),
             'moduleTitle' => t('sbaio.tasks.title'),
@@ -35,6 +59,10 @@ final class TasksController
             'staffRows' => TasksService::activeStaff(),
             'message' => (string)($_GET['ok'] ?? ''),
             'error' => (string)($_GET['err'] ?? ''),
+            'exactTask' => $exactTask,
+            'exactTaskId' => $exactTaskId,
+            'exactTaskState' => $exactTaskState,
+            'createdRecordId' => ($_GET['ok'] ?? '') !== '' ? $exactTaskId : null,
         ]);
     }
 
@@ -66,14 +94,19 @@ final class TasksController
             self::redirect('err', t($messages[$errorKey] ?? 'sbaio.tasks.invalid'));
         }
 
-        TasksService::create($validated['values']);
+        $createdId = TasksService::create($validated['values']);
 
-        self::redirect('ok', t('sbaio.tasks.created'));
+        self::redirect('ok', t('sbaio.tasks.created_with_id', ['id' => (string)$createdId]), ['task_id' => $createdId]);
     }
 
-    private static function redirect(string $key, string $message): void
+    /** @param array<string,int|string> $params */
+    private static function redirect(string $key, string $message, array $params = []): void
     {
-        header('Location: /apps/sbaio/tasks?' . $key . '=' . rawurlencode($message));
+        $query = [$key => $message];
+        foreach ($params as $paramKey => $paramValue) {
+            $query[$paramKey] = (string)$paramValue;
+        }
+        header('Location: /apps/sbaio/tasks?' . http_build_query($query, '', '&', PHP_QUERY_RFC3986));
         exit;
     }
 }

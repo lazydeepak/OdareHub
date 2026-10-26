@@ -1,4 +1,16 @@
 # AGENT-COMPLIANCE-CHECKLIST
+## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-TASKS-CONTINUITY-001 Task creation durability and exact retrieval
+
+Completed reliable Task create-to-record continuity. Task creation now uses a
+same-connection transaction, verifies the generated positive ID before commit,
+and rolls back all failure paths. The existing Task page retrieves the exact
+created record through a bounded parameterized ID read; malformed IDs fail
+closed before SQL.
+
+Continuity probe **34/34**, Task integrity **72/72**, Expenses **91/91**,
+Customers **195/195**, and Sales **225/225** passed. No installed database or
+DB-backed SBAIO probe ran.
+
 ## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-TASKS-REPORT-001 report ownership
 
 Completed Task report service ownership. The existing four report reads now

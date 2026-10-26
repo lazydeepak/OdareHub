@@ -1,4 +1,15 @@
 # SBAIO — Decisions
+### 2026-10-26 — OH-AUTO3-SBAIO-TASKS-CONTINUITY-001 transactional identity and exact retrieval
+
+**Decision: Adopt the existing Sales/Customers/Expenses same-connection transaction and exact-ID continuity pattern for Tasks on the existing SBAIO route.**
+
+Task creation returns only the positive generated ID after insert identity
+verification and commit; insert, identity, commit, and rollback failures cannot
+produce success. The existing Task page receives `task_id` through the create
+redirect and reads only `WHERE id = ? LIMIT 1` after the unchanged SBAIO app
+access gate. No latest-row, title, Staff identity, lifecycle, or permission
+inference is permitted.
+
 ### 2026-10-26 — OH-AUTO3-SBAIO-TASKS-REPORT-001 report ownership
 
 **Decision: Keep the existing Task report SQL and output contract in `TasksService::reportData()` and make the presentation view data-only.**

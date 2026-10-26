@@ -159,9 +159,40 @@ final class TasksService
     }
 
     /**
+     * Read one Task by its database-generated identity.
+     *
+     * @param mixed $id
+     * @return array<string,mixed>|null
+     */
+    public static function findById(mixed $id): ?array
+    {
+        if (!is_int($id) && !is_string($id)) {
+            throw new \InvalidArgumentException('Invalid Task record ID.');
+        }
+        if (is_int($id)) {
+            $recordId = $id;
+        } elseif (preg_match('/^[1-9][0-9]*$/D', $id)) {
+            $recordId = filter_var($id, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+            if ($recordId === false) {
+                throw new \InvalidArgumentException('Invalid Task record ID.');
+            }
+        } else {
+            throw new \InvalidArgumentException('Invalid Task record ID.');
+        }
+        if ($recordId <= 0) {
+            throw new \InvalidArgumentException('Invalid Task record ID.');
+        }
+
+        return DB::fetchOne(
+            'SELECT id, task_title, owner_name, task_type, task_bucket, related_staff_id, related_date, task_status, priority, due_date FROM sbaio_tasks WHERE id = ? LIMIT 1',
+            [(int)$recordId]
+        );
+    }
+
+    /**
      * @param array<string,mixed> $input
      */
-    public static function create(array $input): void
+    public static function create(array $input): int
     {
         $validated = self::validateCreateInput($input);
         if (!$validated['valid']) {
@@ -169,20 +200,59 @@ final class TasksService
         }
         $values = $validated['values'];
 
-        DB::query(
-            'INSERT INTO sbaio_tasks (task_title, owner_name, task_type, task_bucket, related_staff_id, related_date, task_status, priority, due_date) VALUES (?,?,?,?,?,?,?,?,?)',
-            [
-                $values['task_title'],
-                self::nullIfBlank($values['owner_name']),
-                self::nullIfBlank($values['task_type']),
-                self::nullIfBlank($values['task_bucket']),
-                $values['related_staff_id'],
-                self::nullIfBlank($values['related_date']),
-                $values['task_status'],
-                $values['priority'],
-                self::nullIfBlank($values['due_date']),
-            ]
-        );
+        $db = DB::conn();
+        $transactionStarted = false;
+        try {
+            if ($db->begin_transaction() !== true) {
+                throw new \RuntimeException('Task transaction could not start.');
+            }
+            $transactionStarted = true;
+
+            DB::query(
+                'INSERT INTO sbaio_tasks (task_title, owner_name, task_type, task_bucket, related_staff_id, related_date, task_status, priority, due_date) VALUES (?,?,?,?,?,?,?,?,?)',
+                [
+                    $values['task_title'],
+                    self::nullIfBlank($values['owner_name']),
+                    self::nullIfBlank($values['task_type']),
+                    self::nullIfBlank($values['task_bucket']),
+                    $values['related_staff_id'],
+                    self::nullIfBlank($values['related_date']),
+                    $values['task_status'],
+                    $values['priority'],
+                    self::nullIfBlank($values['due_date']),
+                ]
+            );
+
+            $insertId = $db->insert_id;
+            if (is_int($insertId) && $insertId > 0) {
+                $createdId = $insertId;
+            } elseif (is_string($insertId) && preg_match('/^[1-9][0-9]*$/D', $insertId)) {
+                $normalizedId = filter_var($insertId, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+                if ($normalizedId !== false) {
+                    $createdId = (int)$normalizedId;
+                }
+            }
+            if (!isset($createdId)) {
+                throw new \RuntimeException('Task insert identity was not available.');
+            }
+
+            if ($db->commit() !== true) {
+                throw new \RuntimeException('Task transaction commit failed.');
+            }
+
+            return $createdId;
+        } catch (\Throwable $e) {
+            if ($transactionStarted) {
+                try {
+                    if ($db->rollback() !== true) {
+                        throw new \RuntimeException('Task transaction rollback failed.');
+                    }
+                } catch (\Throwable $rollbackError) {
+                    throw new \RuntimeException('Task transaction rollback failed.', 0, $e);
+                }
+            }
+            throw $e;
+        }
     }
 
     /** @param array<string,mixed> $input */

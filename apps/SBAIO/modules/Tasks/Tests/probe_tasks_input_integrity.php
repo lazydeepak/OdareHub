@@ -8,9 +8,42 @@ declare(strict_types=1);
  * or connects to an installed/configured database.
  */
 namespace App\Core {
+    final class TaskDbConnection
+    {
+        public int|string|null $insert_id = 417;
+        public array $events = [];
+        public bool $beginResult = true;
+        public bool $commitResult = true;
+        public bool $rollbackResult = true;
+
+        public function begin_transaction(): bool
+        {
+            $this->events[] = 'begin';
+            return $this->beginResult;
+        }
+
+        public function commit(): bool
+        {
+            $this->events[] = 'commit';
+            return $this->commitResult;
+        }
+
+        public function rollback(): bool
+        {
+            $this->events[] = 'rollback';
+            return $this->rollbackResult;
+        }
+    }
+
     final class DB
     {
         public static array $queries = [];
+        public static TaskDbConnection $connection;
+
+        public static function conn(): TaskDbConnection
+        {
+            return self::$connection;
+        }
 
         public static function query(string $sql, array $params = []): void
         {
@@ -24,6 +57,8 @@ namespace {
 
     use App\Core\DB;
     use Plugins\Tasks\Services\TasksService;
+
+    DB::$connection = new \App\Core\TaskDbConnection();
 
     $assertions = 0;
     $failures = 0;
@@ -107,6 +142,8 @@ namespace {
     $assert(str_contains($routesSource, "Auth::requireAppAccess('sbaio')") && strpos($routesSource, "Auth::requireAppAccess('sbaio')") < strpos($routesSource, 'TasksController::create'), 'existing SBAIO app authorization remains before Task creation');
 
     DB::$queries = [];
+    DB::$connection->events = [];
+    DB::$connection->insert_id = 417;
     TasksService::create([
         'task_title' => 'Prepare report',
         'owner_name' => 'Operations',
@@ -120,6 +157,7 @@ namespace {
     ]);
     $assert(count(DB::$queries) === 1, 'valid Task performs one insert');
     $assert(DB::$queries[0]['params'] === ['Prepare report', 'Operations', 'follow-up', 'weekly', 42, '2026-10-26', 'legacy-status', 'urgent', '2026-12-31'], 'insert receives exact normalized Task values including integer staff ID');
+    $assert(DB::$connection->events === ['begin', 'commit'], 'valid Task commits the same-connection transaction after identity capture');
 
     foreach ([
         ['task_title' => ['bad'], 'related_staff_id' => '42'],
