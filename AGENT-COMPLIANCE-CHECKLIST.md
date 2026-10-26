@@ -6,6 +6,17 @@ insert, verify positive generated identity, commit, and rollback on failure.
 Success returns an exact ID and emits a localized ID-bearing confirmation;
 missing identity, insert failure, commit failure, and rollback failure cannot
 report success. Durability probe **78/78**, Customers **195/195**, and Sales
+**225/225** passed. Architecture gates, deletion-family gates **28/28**,
+deployment readiness, lint, and diff hygiene passed. No installed database or
+DB-backed SBAIO probe ran.
+
+## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-EXPENSES-DURABILITY-001 transactional identity
+
+Expense creation now uses the established same-connection transaction pattern:
+insert, verify positive generated identity, commit, and rollback on failure.
+Success returns an exact ID and emits a localized ID-bearing confirmation;
+missing identity, insert failure, commit failure, and rollback failure cannot
+report success. Durability probe **78/78**, Customers **195/195**, and Sales
 **225/225** passed. No installed database or DB-backed SBAIO probe ran.
 
 ## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-EXPENSES-INPUT-002 complete input integrity

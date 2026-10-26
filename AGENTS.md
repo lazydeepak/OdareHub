@@ -8,6 +8,20 @@ success flow now carries `expense_id` and shows a localized ID-bearing
 confirmation. No route, permission, lifecycle, schema, Core/Auth/ACL,
 organization, Staff, Leave, Timecard, Customers, or Sales behavior changed.
 
+Durability probe **78/78**, Customers **195/195**, Sales **225/225**,
+architecture gates, deletion-family gates **28/28**, deployment readiness,
+lint, and diff hygiene passed. No installed database or DB-backed SBAIO probe
+was executed.
+
+## Session Summary (2026-10-26) — OH-AUTO3-SBAIO-EXPENSES-DURABILITY-001 transactional identity
+
+Expense creation now begins a same-connection transaction, verifies the
+positive generated ID before commit, rolls back all insert/identity/commit
+failures, and returns the exact ID only after successful commit. The existing
+success flow now carries `expense_id` and shows a localized ID-bearing
+confirmation. No route, permission, lifecycle, schema, Core/Auth/ACL,
+organization, Staff, Leave, Timecard, Customers, or Sales behavior changed.
+
 Durability probe **78/78**, Customers **195/195**, Sales **225/225**, and
 changed-file lint/diff checks passed. Architecture/deletion/deployment
 validation remains pending; no installed database or DB-backed SBAIO probe
