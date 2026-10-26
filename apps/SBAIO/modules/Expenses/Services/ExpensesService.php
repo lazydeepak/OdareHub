@@ -101,7 +101,7 @@ final class ExpensesService
     /**
      * @param array<string,mixed> $input
      */
-    public static function create(array $input): void
+    public static function create(array $input): int
     {
         $validated = self::validateCreateInput($input);
         if (!$validated['valid']) {
@@ -109,16 +109,55 @@ final class ExpensesService
         }
         $values = $validated['values'];
 
-        DB::query(
-            'INSERT INTO sbaio_expenses (expense_ref, category_name, amount, expense_status, expense_date) VALUES (?,?,?,?,?)',
-            [
-                $values['expense_ref'],
-                self::nullIfBlank($values['category_name']),
-                $values['amount'],
-                $values['expense_status'],
-                self::nullIfBlank($values['expense_date']),
-            ]
-        );
+        $db = DB::conn();
+        $transactionStarted = false;
+        try {
+            if ($db->begin_transaction() !== true) {
+                throw new \RuntimeException('Expense transaction could not start.');
+            }
+            $transactionStarted = true;
+
+            DB::query(
+                'INSERT INTO sbaio_expenses (expense_ref, category_name, amount, expense_status, expense_date) VALUES (?,?,?,?,?)',
+                [
+                    $values['expense_ref'],
+                    self::nullIfBlank($values['category_name']),
+                    $values['amount'],
+                    $values['expense_status'],
+                    self::nullIfBlank($values['expense_date']),
+                ]
+            );
+
+            $insertId = $db->insert_id;
+            if (is_int($insertId) && $insertId > 0) {
+                $createdId = $insertId;
+            } elseif (is_string($insertId) && preg_match('/^[1-9][0-9]*$/D', $insertId)) {
+                $normalizedId = filter_var($insertId, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+                if ($normalizedId !== false) {
+                    $createdId = (int)$normalizedId;
+                }
+            }
+            if (!isset($createdId)) {
+                throw new \RuntimeException('Expense insert identity was not available.');
+            }
+
+            if ($db->commit() !== true) {
+                throw new \RuntimeException('Expense transaction commit failed.');
+            }
+
+            return $createdId;
+        } catch (\Throwable $e) {
+            if ($transactionStarted) {
+                try {
+                    if ($db->rollback() !== true) {
+                        throw new \RuntimeException('Expense transaction rollback failed.');
+                    }
+                } catch (\Throwable $rollbackError) {
+                    throw new \RuntimeException('Expense transaction rollback failed.', 0, $e);
+                }
+            }
+            throw $e;
+        }
     }
 
     /**

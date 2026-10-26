@@ -27,6 +27,7 @@ return [
     'sbaio.expenses.status_too_long' => 'The expense status is too long.',
     'sbaio.expenses.expense_date_invalid' => 'Enter a valid calendar date for the expense.',
     'sbaio.expenses.invalid' => 'Please correct the expense details.',
+    'sbaio.expenses.created_with_id' => 'Expense record created. Record ID: {id}.',
     'sbaio.expenses.empty_desc' => 'No expense records yet. This module is installed and ready.',
     'sbaio.expenses.form_desc' => 'Track operating expenses so SBAIO can grow into the workbook’s broader business reporting model.',
     'sbaio.expenses.form_title' => 'Add Expense Record',

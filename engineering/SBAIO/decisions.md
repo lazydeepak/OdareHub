@@ -1,4 +1,16 @@
 # SBAIO — Decisions
+### 2026-10-26 — OH-AUTO3-SBAIO-EXPENSES-DURABILITY-001 transaction and identity
+
+**Decision: Adopt the established Sales/Customers same-connection transaction boundary for Expense creation and return only the verified positive generated ID after commit.**
+
+Expense creation begins a transaction on `DB::conn()`, performs the existing
+parameterized INSERT through `DB::query()`, validates the connection's
+`insert_id` as a positive integer, commits, and returns that ID. Insert,
+identity, commit, or rollback failure cannot produce success; no latest-row,
+reference-based, or second-connection identity lookup is used. The existing
+route receives an ID-bearing localized confirmation and `expense_id` query
+context without adding a route or detail workflow.
+
 ### 2026-10-26 — OH-AUTO3-SBAIO-EXPENSES-INPUT-002 complete input contract
 
 **Decision: Extend the existing Expense service validation boundary to all create fields while preserving the existing insert shape, optional defaults, arbitrary status values, route, CSRF, and app-access behavior.**

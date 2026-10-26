@@ -14,4 +14,5 @@ return [
     'sbaio.expenses.status_too_long' => 'खर्च स्थिति धेरै लामो छ।',
     'sbaio.expenses.expense_date_invalid' => 'मान्य खर्च मिति लेख्नुहोस्।',
     'sbaio.expenses.invalid' => 'कृपया खर्च विवरण सच्याउनुहोस्।',
+    'sbaio.expenses.created_with_id' => 'खर्च रेकर्ड सिर्जना भयो। रेकर्ड ID: {id}।',
 ];

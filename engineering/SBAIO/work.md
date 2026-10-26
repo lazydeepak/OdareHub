@@ -1,4 +1,20 @@
 # SBAIO — Work
+## 2026-10-26 — OH-AUTO3-SBAIO-EXPENSES-DURABILITY-001 transactional identity
+
+**Status: In progress — offline verification only; no installed database or DB-backed SBAIO probe.**
+
+- [x] Confirmed the existing `DB::conn()`/`mysqli` convention used by Sales and
+  Customers is available without changing Core: begin, insert, verify positive
+  generated identity, commit, and rollback on failure.
+- [x] Expense creation now returns the same-connection generated record ID only
+  after commit. Missing identity, insert failure, commit failure, and rollback
+  failure cannot report success.
+- [x] Existing success redirect now carries `expense_id` and uses localized
+  ID-bearing confirmation; no route, schema, authorization, or approval
+  behavior changed.
+- [x] Durability probe passed **78/78**; Customers **195/195** and Sales
+  **225/225** remain passing.
+
 ## 2026-10-26 — OH-AUTO3-SBAIO-EXPENSES-INPUT-002 complete input integrity
 
 **Status: In progress — offline verification only; no installed database or DB-backed SBAIO probe.**

@@ -44,9 +44,9 @@ final class ExpensesController
             self::redirect('err', t($messages[$errorKey] ?? 'sbaio.expenses.invalid'));
         }
 
-        ExpensesService::create($validated['values']);
+        $createdId = ExpensesService::create($validated['values']);
 
-        self::redirect('ok', t('sbaio.expenses.created'));
+        self::redirect('ok', t('sbaio.expenses.created_with_id', ['id' => (string)$createdId]), ['expense_id' => $createdId]);
     }
 
     private static function redirect(string $key, string $message): void

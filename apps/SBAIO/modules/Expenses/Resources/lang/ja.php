@@ -14,4 +14,5 @@ return [
     'sbaio.expenses.status_too_long' => '経費ステータスが長すぎます。',
     'sbaio.expenses.expense_date_invalid' => '有効な経費日付を入力してください。',
     'sbaio.expenses.invalid' => '経費情報を確認してください。',
+    'sbaio.expenses.created_with_id' => '経費データを作成しました。レコードID: {id}。',
 ];
