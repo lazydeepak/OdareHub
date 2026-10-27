@@ -1,5 +1,17 @@
 # Shell — Decisions
 
+### 2026-10-27 — OH-AUTO3-DATA-EXCHANGE-FINALIZATION-INTEGRITY-001
+
+**Decision: Treat terminal persistence verification as part of approval
+success.**
+
+After execution, approval now verifies that the claimed row contains the
+expected terminal status, approver identity, and exact result payload. Any
+missing row, non-terminal state, claim/payload mismatch, or persistence
+exception returns `job_finalization_uncertain`; execution success alone is not
+reported as approval success. No retry, rollback, or automatic recovery is
+introduced, so uncertain jobs remain for separate operational handling.
+
 ### 2026-10-27 — OH-AUTO3-DATA-EXCHANGE-APPROVAL-RACE-001
 
 **Decision: Claim queued Data Exchange jobs atomically before execution.**

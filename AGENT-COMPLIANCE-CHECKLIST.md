@@ -1,5 +1,17 @@
 # AGENT-COMPLIANCE-CHECKLIST
 
+## Session Summary (2026-10-27) — OH-AUTO3-DATA-EXCHANGE-FINALIZATION-INTEGRITY-001
+
+Closed the queued approval false-success gap. Approval now verifies persisted
+terminal status, approver identity, and exact result payload after finalization;
+unverified persistence returns `job_finalization_uncertain` and never reports
+success. No retry or recovery mutation was added.
+
+Finalization/race probe **18/18**, PHP lint, focused SBAIO/Shell regressions,
+architecture gates, deletion gates, deployment readiness, and diff hygiene
+passed. No Core/Auth/ACL, schema, installed database, actual import,
+deployment, or activation operation occurred.
+
 ## Session Summary (2026-10-27) — OH-AUTO3-DATA-EXCHANGE-APPROVAL-RACE-001
 
 Prevented duplicate queued Data Exchange execution under concurrent approval.

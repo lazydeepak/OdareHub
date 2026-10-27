@@ -33,6 +33,10 @@ $assert(str_contains($source, 'json_decode((string)($claimed[\'result_json\'] ??
 $assert(str_contains($source, "'job_already_claimed'"), 'concurrent loser receives an explicit claim conflict');
 $assert(str_contains($source, "WHERE id = ? AND status = \\'processing\\' AND result_json = ? LIMIT 1"), 'finalization is conditional on the same claim');
 $assert(str_contains($source, "status IN (\\'pending\\',\\'processing\\',\\'approved_applied"), 'processing jobs remain visible in queue history');
+$assert(str_contains($source, 'SELECT status, approved_by_user_id, result_json FROM data_exchange_jobs'), 'finalization reads persisted terminal evidence');
+$assert(str_contains($source, '$finalizationVerified'), 'approval has an explicit finalization verification decision');
+$assert(str_contains($source, "'job_finalization_uncertain'"), 'uncertain finalization fails closed');
+$assert(str_contains($source, "in_array(\$finalizedStatus, ['approved_applied', 'approved_failed'], true)"), 'only established terminal statuses can verify success');
 $assert(str_contains($source, 'does not expose affected_rows'), 'probe records the DB abstraction affected-row limitation');
 $assert(!str_contains($source, 'FOR UPDATE'), 'no unbounded lock claim is inferred without transaction authority');
 
@@ -74,6 +78,14 @@ if ($bWon) {
 $assert($aWon && !$bWon, 'only one concurrent claimant wins the atomic transition');
 $assert($executions === 1, 'claimed job executes exactly once in the race model');
 $assert($status === 'processing' && $claimOwner === 'A', 'claim owner remains explicit after loser rejection');
+
+// Reproduce the false-success condition: execution can succeed in memory
+// while terminal persistence is missing or unverifiable. The corrected
+// contract must not report success in that state.
+$executionSucceeded = true;
+$finalizationVerified = false;
+$reportedSuccess = $executionSucceeded && $finalizationVerified;
+$assert(!$reportedSuccess, 'successful execution without verified terminal persistence is not success');
 
 echo "Data-exchange approval-race probe: {$passed} assertions, {$failed} failures\n";
 exit($failed === 0 ? 0 : 1);

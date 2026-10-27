@@ -420,13 +420,52 @@ final class DataExchangeService
             'approved_at' => date('c'),
             'execution' => $execution,
         ], JSON_UNESCAPED_UNICODE);
+        if (!is_string($resultPayload) || $resultPayload === '') {
+            return [
+                'ok' => false,
+                'error' => 'job_finalization_uncertain',
+                'job_id' => $jobId,
+                'status' => 'processing',
+                'execution' => $execution,
+            ];
+        }
 
-        DB::query(
-            'UPDATE data_exchange_jobs
-             SET status = ?, approved_by_user_id = ?, approved_at = NOW(), result_json = ?, updated_at = NOW()
-             WHERE id = ? AND status = \'processing\' AND result_json = ? LIMIT 1',
-            [$status, $approverUserId, $resultPayload, $jobId, $claimPayload]
-        );
+        try {
+            DB::query(
+                'UPDATE data_exchange_jobs
+                 SET status = ?, approved_by_user_id = ?, approved_at = NOW(), result_json = ?, updated_at = NOW()
+                 WHERE id = ? AND status = \'processing\' AND result_json = ? LIMIT 1',
+                [$status, $approverUserId, $resultPayload, $jobId, $claimPayload]
+            );
+            $finalizedJob = DB::fetchOne(
+                'SELECT status, approved_by_user_id, result_json FROM data_exchange_jobs WHERE id = ? LIMIT 1',
+                [$jobId]
+            );
+        } catch (\Throwable) {
+            return [
+                'ok' => false,
+                'error' => 'job_finalization_uncertain',
+                'job_id' => $jobId,
+                'status' => 'processing',
+                'execution' => $execution,
+            ];
+        }
+
+        $finalizedStatus = is_array($finalizedJob) ? (string)($finalizedJob['status'] ?? '') : '';
+        $finalizationVerified = is_array($finalizedJob)
+            && in_array($finalizedStatus, ['approved_applied', 'approved_failed'], true)
+            && $finalizedStatus === $status
+            && (int)($finalizedJob['approved_by_user_id'] ?? 0) === $approverUserId
+            && (string)($finalizedJob['result_json'] ?? '') === $resultPayload;
+        if (!$finalizationVerified) {
+            return [
+                'ok' => false,
+                'error' => 'job_finalization_uncertain',
+                'job_id' => $jobId,
+                'status' => $finalizedStatus !== '' ? $finalizedStatus : 'processing',
+                'execution' => $execution,
+            ];
+        }
 
         return [
             'ok' => (bool)$execution['ok'],

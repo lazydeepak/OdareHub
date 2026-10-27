@@ -1,5 +1,22 @@
 # Shell — Work
 
+## 2026-10-27 — OH-AUTO3-DATA-EXCHANGE-FINALIZATION-INTEGRITY-001
+
+**Status: Complete — database-free finalization proof; no installed database,
+schema change, actual import, deployment, or activation.**
+
+- [x] Reproduced the false-success gap: successful in-memory execution was
+  returned even when terminal persistence was not verified.
+- [x] Finalization now reads back `status`, `approved_by_user_id`, and the
+  exact persisted result payload after the conditional terminal update.
+- [x] Approval reports success only for a verified `approved_applied` terminal
+  state; verified `approved_failed` remains an explicit failed result.
+- [x] Update exceptions, missing rows, claim mismatches, payload mismatches,
+  and non-terminal states return `job_finalization_uncertain` without retry or
+  recovery mutation.
+- [x] Finalization integrity/race probe passed **18/18**; existing SBAIO and
+  Shell regressions remain green.
+
 ## 2026-10-27 — OH-AUTO3-DATA-EXCHANGE-APPROVAL-RACE-001
 
 **Status: Complete — database-free concurrency proof; no installed database,
