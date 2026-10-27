@@ -13,7 +13,18 @@ require_once __DIR__ . '/Controllers/SbaioExportController.php';
 require_once __DIR__ . '/Controllers/SbaioImportController.php';
 require_once __DIR__ . '/Controllers/SbaioRestoreController.php';
 require_once __DIR__ . '/Services/SbaioLegacyImportService.php';
+require_once __DIR__ . '/Services/SbaioBulkIoAdmissionService.php';
 require_once __DIR__ . '/bootstrap.php';
+
+$requireBulkIoAdmission = static function (): bool {
+    if (SBAIO\Services\SbaioBulkIoAdmissionService::isAvailable('suite_bulk_io')) {
+        return true;
+    }
+
+    http_response_code(404);
+    echo 'Bulk I/O unavailable';
+    return false;
+};
 
 $router->get('/apps/sbaio', function () use ($view) {
     Auth::requireAppAccess('sbaio');
@@ -29,78 +40,111 @@ $router->get('/apps/sbaio/reports', function () use ($view) {
     return null;
 });
 
-$router->get('/apps/sbaio/imports', function () use ($view) {
+$router->get('/apps/sbaio/imports', function () use ($view, $requireBulkIoAdmission) {
     Auth::requireAppAccess('sbaio');
+    if (!$requireBulkIoAdmission()) {
+        return null;
+    }
     Auth::bootSession();
     SbaioImportController::index($view);
     return null;
 });
 
-$router->get('/apps/sbaio/exports', function () use ($view) {
+$router->get('/apps/sbaio/exports', function () use ($view, $requireBulkIoAdmission) {
     Auth::requireAppAccess('sbaio');
+    if (!$requireBulkIoAdmission()) {
+        return null;
+    }
     Auth::bootSession();
     SbaioExportController::index($view);
     return null;
 });
 
-$router->get('/apps/sbaio/restores', function () use ($view) {
+$router->get('/apps/sbaio/restores', function () use ($view, $requireBulkIoAdmission) {
     Auth::requireAppAccess('sbaio');
+    if (!$requireBulkIoAdmission()) {
+        return null;
+    }
     Auth::bootSession();
     SbaioRestoreController::index($view);
     return null;
 });
 
-$router->post('/apps/sbaio/imports/preview', function () {
+$router->post('/apps/sbaio/imports/preview', function () use ($requireBulkIoAdmission) {
     Auth::requireAppAccess('sbaio');
+    if (!$requireBulkIoAdmission()) {
+        return null;
+    }
     Auth::bootSession();
     SbaioImportController::previewWorkbook();
     return null;
 });
 
-$router->post('/apps/sbaio/imports/commit', function () {
+$router->post('/apps/sbaio/imports/commit', function () use ($requireBulkIoAdmission) {
     Auth::requireAppAccess('sbaio');
+    if (!$requireBulkIoAdmission()) {
+        return null;
+    }
     Auth::bootSession();
     SbaioImportController::commitWorkbook();
     return null;
 });
 
-$router->post('/apps/sbaio/exports/suite', function () {
+$router->post('/apps/sbaio/exports/suite', function () use ($requireBulkIoAdmission) {
     Auth::requireAppAccess('sbaio');
+    if (!$requireBulkIoAdmission()) {
+        return null;
+    }
     Auth::bootSession();
     SbaioExportController::exportSuite();
     return null;
 });
 
-$router->post('/apps/sbaio/exports/module', function () {
+$router->post('/apps/sbaio/exports/module', function () use ($requireBulkIoAdmission) {
     Auth::requireAppAccess('sbaio');
+    if (!$requireBulkIoAdmission()) {
+        return null;
+    }
     Auth::bootSession();
     SbaioExportController::exportModule();
     return null;
 });
 
-$router->post('/apps/sbaio/restores/preview', function () {
+$router->post('/apps/sbaio/restores/preview', function () use ($requireBulkIoAdmission) {
     Auth::requireAppAccess('sbaio');
+    if (!$requireBulkIoAdmission()) {
+        return null;
+    }
     Auth::bootSession();
     SbaioRestoreController::previewRestore();
     return null;
 });
 
-$router->post('/apps/sbaio/restores/commit', function () {
+$router->post('/apps/sbaio/restores/commit', function () use ($requireBulkIoAdmission) {
     Auth::requireAppAccess('sbaio');
+    if (!$requireBulkIoAdmission()) {
+        return null;
+    }
     Auth::bootSession();
     SbaioRestoreController::commitRestore();
     return null;
 });
 
-$router->post('/apps/sbaio/restores/cancel', function () {
+$router->post('/apps/sbaio/restores/cancel', function () use ($requireBulkIoAdmission) {
     Auth::requireAppAccess('sbaio');
+    if (!$requireBulkIoAdmission()) {
+        return null;
+    }
     Auth::bootSession();
     SbaioRestoreController::cancelPreview();
     return null;
 });
 
-$router->get('/apps/sbaio/exports/download', function () {
+$router->get('/apps/sbaio/exports/download', function () use ($requireBulkIoAdmission) {
     Auth::requireAppAccess('sbaio');
+    if (!$requireBulkIoAdmission()) {
+        return null;
+    }
     Auth::bootSession();
     SbaioExportController::download();
     return null;

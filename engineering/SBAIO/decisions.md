@@ -1,4 +1,25 @@
 # SBAIO — Decisions
+### 2026-10-27 — OH-AUTO3-SBAIO-BULK-IO-CONTAINMENT-001 suite bulk-I/O containment
+
+**Decision: Fail closed for suite-level SBAIO import, export, restore, and
+backup-download routes until an owner-approved bulk-I/O authorization contract
+exists.**
+
+The existing SBAIO app-access check remains first. A centralized SBAIO-owned
+admission then rejects all eleven suite-level routes before session boot,
+CSRF/controller dispatch, history SQL, upload filesystem writes, package
+creation/application, import transactions, restore data mutation, or backup
+file reads. No new permission, identity binding, organization scope, or
+supervisor policy was invented.
+
+`ExportHistoryService`, `ImportHistoryService`, `RestoreHistoryService`, and
+the shared package/import/restore services remain unchanged; this is route
+containment, not a redesign of their business or lifecycle behavior.
+
+Remaining owner decisions are the suite-level actor authority, identity and
+organization scope, record/package visibility, and explicit approval boundary
+for import, export, restore, and backup download operations.
+
 ### 2026-10-27 — OH-AUTO3-SBAIO-CSV-DELIVERY-INTEGRITY-001 CSV delivery integrity
 
 **Decision: Record CSV export success only after the complete output stream has

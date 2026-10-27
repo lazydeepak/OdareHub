@@ -1,4 +1,22 @@
 # SBAIO — Work
+### 2026-10-27 — OH-AUTO3-SBAIO-BULK-IO-CONTAINMENT-001 suite bulk-I/O containment
+
+**Status: Complete — offline/static verification only; no exports, imports, restores, package operations, production filesystem mutations, installed database, or DB-backed probe.**
+
+- [x] Inventoried all eleven suite-level routes: three index GETs, two import
+  POSTs, two export POSTs, three restore POSTs, and one backup-download GET.
+- [x] Added centralized fail-closed admission after existing SBAIO app access
+  and before session boot, CSRF, controller, SQL, filesystem, package, or
+  restore dispatch.
+- [x] Confirmed underlying bypass-capable operations: export file/package
+  creation, import upload and transactions, restore package/data application,
+  and backup `readfile()`.
+- [x] Bulk-I/O containment probe passed **58/58**. No shared service or
+  history service was modified.
+- [x] Remaining owner decisions are suite-level actor authority, identity and
+  organization scope, record/package visibility, and explicit bulk-I/O
+  approval for import/export/restore/download.
+
 ### 2026-10-27 — OH-AUTO3-SBAIO-CSV-DELIVERY-INTEGRITY-001 CSV delivery integrity
 
 **Status: Complete — offline/static verification only; no installed database or DB-backed SBAIO probe.**

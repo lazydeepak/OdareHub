@@ -1,4 +1,14 @@
 # AGENTS.md
+## Session Summary (2026-10-27) — OH-AUTO3-SBAIO-BULK-IO-CONTAINMENT-001 suite bulk-I/O containment
+
+Contained all 11 SBAIO suite-level import, export, restore, and backup-download
+routes after existing app access and before session/controller/SQL/filesystem/
+package dispatch. Shared services and history contracts remain unchanged.
+
+Bulk-I/O containment probe **58/58** passed. No actual export, import, restore,
+package operation, production filesystem mutation, installed database, or
+DB-backed probe ran; unrelated artifacts were preserved.
+
 ## Session Summary (2026-10-27) — OH-AUTO3-SBAIO-CSV-DELIVERY-INTEGRITY-001 CSV delivery integrity
 
 Corrected premature SBAIO CSV success recording. Success history now occurs
