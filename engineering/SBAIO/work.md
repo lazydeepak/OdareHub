@@ -1,4 +1,19 @@
 # SBAIO — Work
+### 2026-10-27 — OH-AUTO3-SBAIO-CSV-DELIVERY-INTEGRITY-001 CSV delivery integrity
+
+**Status: Complete — offline/static verification only; no installed database or DB-backed SBAIO probe.**
+
+- [x] Reproduced the baseline chronology: CSV success was recorded after
+  `php://output` opened but before BOM, headers, rows, and close completed.
+- [x] Success history now records only after successful BOM/header/row writes
+  and successful stream close.
+- [x] BOM, header `fputcsv()`, row `fputcsv()`, stream-open, and stream-close
+  failures now fail the export and record failure history.
+- [x] Delivery-integrity probe passed **14/14**; formula safety **30/30**;
+  CSV admission/projection **244/244**; personnel export containment **23/23**.
+- [x] `ExportHistoryService` was not changed; existing historical success and
+  failure record contracts remain preserved.
+
 ### 2026-10-27 — OH-AUTO3-SBAIO-CSV-FORMULA-SAFETY-001 CSV formula safety
 
 **Status: Complete — offline/static verification only; no installed database or DB-backed SBAIO probe.**

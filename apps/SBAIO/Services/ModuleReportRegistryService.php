@@ -287,25 +287,44 @@ final class ModuleReportRegistryService
                 return false;
             }
 
-            self::recordCsvExportSuccess($reportKey, $filename, $table, count($rows));
-
-            // UTF-8 BOM for Excel compatibility.
-            fwrite($out, "\xEF\xBB\xBF");
-            if (!empty($headers)) {
-                fputcsv($out, $headers, ',', '"', '\\');
-            }
-
-            foreach ($rows as $row) {
-                $line = [];
-                foreach ($headers as $header) {
-                    $line[] = self::serializeCsvCell($row[$header] ?? '');
+            try {
+                // UTF-8 BOM for Excel compatibility.
+                $bom = "\xEF\xBB\xBF";
+                if (fwrite($out, $bom) !== strlen($bom)) {
+                    throw new \RuntimeException('Unable to write CSV header.');
                 }
-                fputcsv($out, $line, ',', '"', '\\');
-            }
 
-            fclose($out);
-            return true;
+                if (!empty($headers) && fputcsv($out, $headers, ',', '"', '\\') === false) {
+                    throw new \RuntimeException('Unable to write CSV columns.');
+                }
+
+                foreach ($rows as $row) {
+                    $line = [];
+                    foreach ($headers as $header) {
+                        $line[] = self::serializeCsvCell($row[$header] ?? '');
+                    }
+                    if (fputcsv($out, $line, ',', '"', '\\') === false) {
+                        throw new \RuntimeException('Unable to write CSV row.');
+                    }
+                }
+
+                if (!fclose($out)) {
+                    throw new \RuntimeException('Unable to close CSV output stream.');
+                }
+                $out = null;
+                self::recordCsvExportSuccess($reportKey, $filename, $table, count($rows));
+                return true;
+            } catch (\Throwable $e) {
+                if (is_resource($out)) {
+                    fclose($out);
+                }
+                self::recordCsvExportFailure($reportKey, $e->getMessage());
+                return false;
+            }
         } catch (\Throwable $e) {
+            if (isset($out) && is_resource($out)) {
+                fclose($out);
+            }
             self::recordCsvExportFailure($reportKey, $e->getMessage());
             return false;
         }

@@ -1,4 +1,14 @@
 # AGENT-COMPLIANCE-CHECKLIST
+## Session Summary (2026-10-27) — OH-AUTO3-SBAIO-CSV-DELIVERY-INTEGRITY-001 CSV delivery integrity
+
+Corrected premature SBAIO CSV success recording. Success history now occurs
+only after BOM, header, row, and stream-close success; output failures record
+failed history and return `false`. `ExportHistoryService` remains unchanged.
+
+Delivery-integrity probe **14/14**, formula safety **30/30**, CSV projection
+**244/244**, and personnel export containment **23/23** passed. No installed
+database or DB-backed probe ran; unrelated artifacts were preserved.
+
 ## Session Summary (2026-10-27) — OH-AUTO3-SBAIO-CSV-FORMULA-SAFETY-001 CSV formula safety
 
 Centralized CSV cell serialization now preserves numeric compatibility while

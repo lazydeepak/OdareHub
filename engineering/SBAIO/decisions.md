@@ -1,4 +1,20 @@
 # SBAIO — Decisions
+### 2026-10-27 — OH-AUTO3-SBAIO-CSV-DELIVERY-INTEGRITY-001 CSV delivery integrity
+
+**Decision: Record CSV export success only after the complete output stream has
+been written and closed successfully.**
+
+The previous SBAIO CSV path recorded `completed` immediately after opening
+`php://output`, before the BOM, headers, rows, and stream close. The path now
+checks BOM, header-row, data-row, and close results; output failures record a
+failed export and return `false`. Success history is recorded only after close
+success. `ExportHistoryService` and its historical record contract remain
+unchanged.
+
+This corrects audit chronology and delivery failure handling only. CSV formula
+safety, projections, admission, personnel containment, authorization, schema,
+Core/Auth/ACL, and database behavior remain unchanged.
+
 ### 2026-10-27 — OH-AUTO3-SBAIO-CSV-FORMULA-SAFETY-001 CSV formula safety
 
 **Decision: Neutralize spreadsheet formula-like text at the centralized
