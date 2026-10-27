@@ -1,5 +1,20 @@
 # AGENTS.md
 
+## Session Summary (2026-10-28) — OH-AUTO3-SBAIO-AUTHORIZATION-RESTORATION-PLAN-001
+
+Completed the engineering-facing SBAIO personnel authorization and functional
+restoration plan at
+`engineering/SBAIO/personnel-authorization-restoration-plan.md`.
+Repository identity and baseline were verified; the plan documents verified
+implementations, missing contracts, the complete restoration matrix, numbered
+owner decisions, staged assignments, acceptance criteria, regressions, and
+fail-closed defaults.
+
+GO for owner review; BLOCKED for implementation. No code, permissions,
+identity binding, schema, database, runtime, activation, live test,
+deployment, or policy implementation occurred. Unrelated working-tree
+artifacts were preserved.
+
 ## Session Summary (2026-10-27) — OH-AUTO3-DATA-EXCHANGE-FINALIZATION-INTEGRITY-001
 
 Closed the queued approval false-success gap. Approval now verifies persisted

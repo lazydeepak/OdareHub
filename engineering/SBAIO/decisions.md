@@ -1,5 +1,17 @@
 # SBAIO — Decisions
 
+### 2026-10-28 — OH-AUTO3-SBAIO-AUTHORIZATION-RESTORATION-PLAN-001
+
+**Decision status: Documentation-only plan complete; no restoration policy is
+approved.**
+
+`engineering/SBAIO/personnel-authorization-restoration-plan.md` is the
+engineering-facing restoration matrix and roadmap. It reconciles verified
+SBAIO implementations with missing identity, organization, supervisor,
+permission, payroll, Leave, Timecard, dashboard, export, widget, bulk-I/O, and
+Data Exchange contracts. Existing containment remains binding; implementation
+requires separate owner decisions and acceptance gates.
+
 ### 2026-10-27 — OH-AUTO3-SBAIO-DATA-EXCHANGE-EXECUTION-GATE-001
 
 **Decision: Enforce SBAIO Data Exchange admission inside the shared execution

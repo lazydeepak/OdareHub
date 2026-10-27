@@ -1,5 +1,19 @@
 # SBAIO — Work
 
+### 2026-10-28 — OH-AUTO3-SBAIO-AUTHORIZATION-RESTORATION-PLAN-001
+
+**Status: Complete — engineering restoration plan prepared; implementation
+remains blocked.**
+
+- [x] Completed `engineering/SBAIO/personnel-authorization-restoration-plan.md`
+  with verified implementation/missing-contract evidence, the full restoration
+  matrix, numbered owner decisions, and independently executable roadmap.
+- [x] Preserved all established personnel, payroll, Leave, Timecard, dashboard,
+  report, export, widget, bulk-I/O, and Data Exchange fail-closed boundaries.
+- [x] Verified documentation-only scope; no code, schema, database, activation,
+  live test, deployment, or policy implementation occurred.
+- [x] Verdict: GO for owner review; BLOCKED for restoration implementation.
+
 ### 2026-10-27 — OH-AUTO3-SBAIO-DATA-EXCHANGE-EXECUTION-GATE-001
 
 **Status: Complete — service-level gate verified without database, actual
