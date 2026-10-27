@@ -196,6 +196,36 @@ final class ModuleReportRegistryService
         return self::findActiveHtmlReport($reportKey) !== null;
     }
 
+    /**
+     * Serialize one CSV cell without allowing spreadsheet formula execution.
+     * Numeric values remain numeric-compatible; textual formula-like values
+     * receive Excel's literal-text prefix before fputcsv() quotes them.
+     */
+    private static function serializeCsvCell(mixed $value): string
+    {
+        if (is_bool($value)) {
+            return $value ? '1' : '0';
+        }
+
+        if ($value === null) {
+            return '';
+        }
+
+        if (is_scalar($value)) {
+            $cell = (string)$value;
+            if (is_string($value) && is_numeric($value)) {
+                return $cell;
+            }
+
+            return preg_match('/^\s*[=+\-@]/', $cell) === 1
+                ? "'" . $cell
+                : $cell;
+        }
+
+        $encoded = json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        return is_string($encoded) ? $encoded : '';
+    }
+
     public static function streamCsvForReport(string $reportKey): bool
     {
         $reportKey = trim($reportKey);
@@ -262,24 +292,15 @@ final class ModuleReportRegistryService
             // UTF-8 BOM for Excel compatibility.
             fwrite($out, "\xEF\xBB\xBF");
             if (!empty($headers)) {
-                fputcsv($out, $headers);
+                fputcsv($out, $headers, ',', '"', '\\');
             }
 
             foreach ($rows as $row) {
                 $line = [];
                 foreach ($headers as $header) {
-                    $value = $row[$header] ?? '';
-                    if (is_bool($value)) {
-                        $line[] = $value ? '1' : '0';
-                    } elseif ($value === null) {
-                        $line[] = '';
-                    } elseif (is_scalar($value)) {
-                        $line[] = (string)$value;
-                    } else {
-                        $line[] = json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-                    }
+                    $line[] = self::serializeCsvCell($row[$header] ?? '');
                 }
-                fputcsv($out, $line);
+                fputcsv($out, $line, ',', '"', '\\');
             }
 
             fclose($out);

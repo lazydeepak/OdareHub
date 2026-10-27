@@ -1,4 +1,22 @@
 # SBAIO — Work
+### 2026-10-27 — OH-AUTO3-SBAIO-CSV-FORMULA-SAFETY-001 CSV formula safety
+
+**Status: Complete — offline/static verification only; no installed database or DB-backed SBAIO probe.**
+
+- [x] Reproduced the prior CSV behavior: formula-like text was passed to
+  `fputcsv()` unchanged and emitted as a formula candidate.
+- [x] Added centralized cell serialization at the existing CSV boundary;
+  textual `=`, `+`, `-`, and `@` triggers receive a literal apostrophe while
+  numeric values remain numeric-compatible.
+- [x] Formula safety probe passed **30/30**, including exact before/after CSV
+  lines, quoted cells, numeric strings/scalars, booleans, nulls, and JSON
+  structured values.
+- [x] Existing CSV admission/projection **244/244**, personnel export
+  containment **23/23**, route inventory **56/56**, mutation **74/74**, index
+  **57/57**, and HTML report **50/50** probes remain green.
+- [x] Explicit `fputcsv()` escape argument preserves the existing escape
+  behavior and removes the PHP deprecation without changing export contracts.
+
 ### 2026-10-27 — OH-AUTO3-SBAIO-PAYROLL-PARITY-CONTAINMENT-001 Payroll parity containment
 
 **Status: Complete — offline/static verification only; no installed database or DB-backed SBAIO probe.**

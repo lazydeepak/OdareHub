@@ -1,4 +1,15 @@
 # AGENT-COMPLIANCE-CHECKLIST
+## Session Summary (2026-10-27) — OH-AUTO3-SBAIO-CSV-FORMULA-SAFETY-001 CSV formula safety
+
+Centralized CSV cell serialization now preserves numeric compatibility while
+prefixing formula-like textual cells with a literal apostrophe before
+`fputcsv()`. Existing report projections, CSV admission, and personnel
+containment remain unchanged.
+
+Formula safety probe **30/30** passed, including before/after CSV output,
+quoted cells, numeric values, booleans, nulls, and structured values. No
+installed database or DB-backed probe ran; unrelated artifacts were preserved.
+
 ## Session Summary (2026-10-27) — OH-AUTO3-SBAIO-PAYROLL-PARITY-CONTAINMENT-001 Payroll parity containment
 
 Contained the remaining Payroll parity disclosure route. Existing app access

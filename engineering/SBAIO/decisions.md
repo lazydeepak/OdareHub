@@ -1,4 +1,20 @@
 # SBAIO — Decisions
+### 2026-10-27 — OH-AUTO3-SBAIO-CSV-FORMULA-SAFETY-001 CSV formula safety
+
+**Decision: Neutralize spreadsheet formula-like text at the centralized
+authorized CSV serialization boundary.**
+
+`ModuleReportRegistryService::streamCsvForReport()` now preserves numeric
+scalars and numeric strings exactly, retains existing boolean/null/structured
+serialization, and prefixes nonnumeric text beginning with `=`, `+`, `-`, or
+`@` (including leading-whitespace variants) with a literal apostrophe before
+`fputcsv()`. Report projections, admission, personnel containment, and export
+authorization remain unchanged.
+
+This is output encoding safety, not authorization expansion or personnel
+visibility restoration. No database, schema, Core/Auth/ACL, or business
+workflow behavior changed.
+
 ### 2026-10-27 — OH-AUTO3-SBAIO-PAYROLL-PARITY-CONTAINMENT-001 Payroll parity containment
 
 **Decision: Fail closed for Payroll parity diagnostics until an owner-approved personnel/payroll record-level visibility contract exists.**
