@@ -11,6 +11,11 @@ require_once __DIR__ . '/Controllers/SchedulesController.php';
 $router->get('/apps/sbaio/schedules', function () use ($view) {
     Auth::requireAppAccess('sbaio');
     Auth::bootSession();
+    if (!ModuleReportRegistryService::isPersonnelIndexAvailable('sbaio.schedules.overview')) {
+        http_response_code(404);
+        echo 'Module unavailable';
+        return null;
+    }
     SchedulesController::index($view);
     return null;
 });

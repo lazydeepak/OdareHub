@@ -1,4 +1,16 @@
 # AGENT-COMPLIANCE-CHECKLIST
+## Session Summary (2026-10-27) — OH-AUTO3-SBAIO-PERSONNEL-INDEX-CONTAINMENT-001 module index containment
+
+Added centralized fail-closed GET containment for six SBAIO personnel-related
+module index surfaces: Attendance, Leave, Payroll, Schedules, Staff, and
+Timecards. Existing app access and active-module admission run first; blocked
+index routes stop before controller/service SQL. Customers remains available.
+
+Index containment probe **57/57** passed. POST authorization risks were audited
+separately and documented; existing app-access/CSRF checks remain unchanged.
+No Core/Auth/ACL, permissions, identity, organization, supervisor, schema,
+database, personnel workflow, deployment, or activation change was made.
+
 ## Session Summary (2026-10-27) — OH-AUTO3-SBAIO-PERSONNEL-HTML-REPORT-CONTAINMENT-001 HTML report containment
 
 Added centralized fail-closed containment for six SBAIO personnel/payroll HTML

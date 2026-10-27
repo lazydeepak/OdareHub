@@ -13,6 +13,11 @@ require_once __DIR__ . '/Services/TimecardService.php';
 $router->get('/apps/sbaio/timecards', function () use ($view) {
     Auth::requireAppAccess('sbaio');
     Auth::bootSession();
+    if (!ModuleReportRegistryService::isPersonnelIndexAvailable('sbaio.timecards.overview')) {
+        http_response_code(404);
+        echo 'Module unavailable';
+        return null;
+    }
     TimecardsController::index($view);
     return null;
 });

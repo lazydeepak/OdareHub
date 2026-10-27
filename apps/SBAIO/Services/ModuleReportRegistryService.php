@@ -168,6 +168,15 @@ final class ModuleReportRegistryService
         return $report;
     }
 
+    /**
+     * Read-only admission for personnel module index surfaces. This is a
+     * containment gate, not a new authorization or record-level policy.
+     */
+    public static function isPersonnelIndexAvailable(string $reportKey): bool
+    {
+        return self::findActiveHtmlReport($reportKey) !== null;
+    }
+
     public static function streamCsvForReport(string $reportKey): bool
     {
         $reportKey = trim($reportKey);

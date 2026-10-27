@@ -1,4 +1,23 @@
 # SBAIO — Work
+### 2026-10-27 — OH-AUTO3-SBAIO-PERSONNEL-INDEX-CONTAINMENT-001 module index containment
+
+**Status: Complete — offline/static verification only; no installed database or DB-backed SBAIO probe.**
+
+- [x] Added centralized `isPersonnelIndexAvailable()` admission before the
+  six module index controllers execute.
+- [x] GET index surfaces now fail closed for Attendance, Leave, Payroll,
+  Schedules, Staff, and Timecards; Customers remains available.
+- [x] Index containment probe passed **57/57**. Each blocked route performs
+  only the existing `installed_plugins` admission query and no sensitive source
+  table query before controller execution.
+- [x] Audited affected workflows and separately documented POST risks. Staff
+  create, Payroll run creation, Leave creation/holiday creation, Attendance
+  save, Timecard generation/approval, and Schedule template/assignment POST
+  routes retain existing app-access and CSRF checks but lack proven
+  record-level Staff identity, organization, or supervisor authority.
+- [x] No POST, controller, service, schema, permission, identity, or workflow
+  behavior was changed.
+
 ### 2026-10-27 — OH-AUTO3-SBAIO-PERSONNEL-HTML-REPORT-CONTAINMENT-001 HTML report containment
 
 **Status: Complete — offline/static verification only; no installed database or DB-backed SBAIO probe.**

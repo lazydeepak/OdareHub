@@ -11,6 +11,11 @@ require_once __DIR__ . '/Controllers/AttendanceController.php';
 $router->get('/apps/sbaio/attendance', function () use ($view) {
     Auth::requireAppAccess('sbaio');
     Auth::bootSession();
+    if (!ModuleReportRegistryService::isPersonnelIndexAvailable('sbaio.attendance.overview')) {
+        http_response_code(404);
+        echo 'Module unavailable';
+        return null;
+    }
     AttendanceController::index($view);
     return null;
 });

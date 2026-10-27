@@ -11,6 +11,11 @@ require_once __DIR__ . '/Controllers/LeaveController.php';
 $router->get('/apps/sbaio/leave', function () use ($view) {
     Auth::requireAppAccess('sbaio');
     Auth::bootSession();
+    if (!ModuleReportRegistryService::isPersonnelIndexAvailable('sbaio.leave.overview')) {
+        http_response_code(404);
+        echo 'Module unavailable';
+        return null;
+    }
     LeaveController::index($view);
     return null;
 });

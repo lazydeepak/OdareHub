@@ -11,6 +11,11 @@ require_once __DIR__ . '/Controllers/StaffController.php';
 $router->get('/apps/sbaio/staff', function () use ($view) {
     Auth::requireAppAccess('sbaio');
     Auth::bootSession();
+    if (!ModuleReportRegistryService::isPersonnelIndexAvailable('sbaio.staff.overview')) {
+        http_response_code(404);
+        echo 'Module unavailable';
+        return null;
+    }
     StaffController::index($view);
     return null;
 });

@@ -13,6 +13,11 @@ require_once __DIR__ . '/Services/PayrollScaffoldService.php';
 $router->get('/apps/sbaio/payroll', function () use ($view) {
     Auth::requireAppAccess('sbaio');
     Auth::bootSession();
+    if (!ModuleReportRegistryService::isPersonnelIndexAvailable('sbaio.payroll.overview')) {
+        http_response_code(404);
+        echo 'Module unavailable';
+        return null;
+    }
     PayrollController::index($view);
     return null;
 });

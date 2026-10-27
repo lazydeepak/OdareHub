@@ -1,4 +1,21 @@
 # SBAIO — Decisions
+### 2026-10-27 — OH-AUTO3-SBAIO-PERSONNEL-INDEX-CONTAINMENT-001 module index containment
+
+**Decision: Fail closed for six personnel-related module index GET surfaces until an owner-approved record-level visibility contract exists.**
+
+The existing SBAIO app access and active-module admission remain the first
+checks. `isPersonnelIndexAvailable()` then rejects the Attendance, Leave,
+Payroll, Schedules, Staff, and Timecards index descriptors before their
+controllers or services can query personnel/payroll data. This is containment,
+not a new permission, identity binding, organization scope, supervisor scope,
+schema rule, or workflow redesign.
+
+The corresponding POST workflows remain separately unresolved. Their routes
+retain existing app-access and CSRF checks, but no established contract proves
+authenticated-user-to-Staff binding, organization/supervisor scope, or
+record-level mutation authority for the affected personnel records. No POST
+behavior was changed in this slice.
+
 ### 2026-10-27 — OH-AUTO3-SBAIO-PERSONNEL-HTML-REPORT-CONTAINMENT-001 HTML report containment
 
 **Decision: Fail closed for the six personnel/payroll HTML report descriptors until an owner-approved record-level visibility contract exists.**
