@@ -177,6 +177,16 @@ final class ModuleReportRegistryService
         return self::findActiveHtmlReport($reportKey) !== null;
     }
 
+    /**
+     * Read-only admission for personnel mutation routes. No existing
+     * personnel/payroll record-level mutation contract is established.
+     */
+    public static function isPersonnelMutationAvailable(string $reportKey): bool
+    {
+        return self::findActiveReport($reportKey) !== null
+            && !isset(self::REPORTS_REQUIRING_OWNER_DECISION[trim($reportKey)]);
+    }
+
     public static function streamCsvForReport(string $reportKey): bool
     {
         $reportKey = trim($reportKey);

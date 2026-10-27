@@ -24,6 +24,11 @@ $router->get('/apps/sbaio/payroll', function () use ($view) {
 
 $router->post('/apps/sbaio/payroll/create-run', function () {
     Auth::requireAppAccess('sbaio');
+    if (!ModuleReportRegistryService::isPersonnelMutationAvailable('sbaio.payroll.overview')) {
+        http_response_code(404);
+        echo 'Mutation unavailable';
+        return null;
+    }
     Auth::bootSession();
     PayrollController::createRun();
     return null;

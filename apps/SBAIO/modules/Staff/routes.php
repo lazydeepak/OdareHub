@@ -22,6 +22,11 @@ $router->get('/apps/sbaio/staff', function () use ($view) {
 
 $router->post('/apps/sbaio/staff/create', function () {
     Auth::requireAppAccess('sbaio');
+    if (!ModuleReportRegistryService::isPersonnelMutationAvailable('sbaio.staff.overview')) {
+        http_response_code(404);
+        echo 'Mutation unavailable';
+        return null;
+    }
     Auth::bootSession();
     StaffController::create();
     return null;

@@ -22,6 +22,11 @@ $router->get('/apps/sbaio/leave', function () use ($view) {
 
 $router->post('/apps/sbaio/leave/create', function () {
     Auth::requireAppAccess('sbaio');
+    if (!ModuleReportRegistryService::isPersonnelMutationAvailable('sbaio.leave.overview')) {
+        http_response_code(404);
+        echo 'Mutation unavailable';
+        return null;
+    }
     Auth::bootSession();
     LeaveController::createLeave();
     return null;
@@ -29,6 +34,11 @@ $router->post('/apps/sbaio/leave/create', function () {
 
 $router->post('/apps/sbaio/leave/holiday', function () {
     Auth::requireAppAccess('sbaio');
+    if (!ModuleReportRegistryService::isPersonnelMutationAvailable('sbaio.leave.overview')) {
+        http_response_code(404);
+        echo 'Mutation unavailable';
+        return null;
+    }
     Auth::bootSession();
     LeaveController::createHoliday();
     return null;

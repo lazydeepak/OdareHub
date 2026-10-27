@@ -22,6 +22,11 @@ $router->get('/apps/sbaio/attendance', function () use ($view) {
 
 $router->post('/apps/sbaio/attendance/save', function () {
     Auth::requireAppAccess('sbaio');
+    if (!ModuleReportRegistryService::isPersonnelMutationAvailable('sbaio.attendance.overview')) {
+        http_response_code(404);
+        echo 'Mutation unavailable';
+        return null;
+    }
     Auth::bootSession();
     AttendanceController::saveEntry();
     return null;

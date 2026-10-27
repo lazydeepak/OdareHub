@@ -1,4 +1,23 @@
 # SBAIO — Work
+### 2026-10-27 — OH-AUTO3-SBAIO-PERSONNEL-MUTATION-CONTAINMENT-001 mutation containment
+
+**Status: Complete — offline/static verification only; no installed database or DB-backed SBAIO probe.**
+
+- [x] Contained all nine personnel/payroll POST endpoints: Staff create;
+  Payroll run creation; Leave create and holiday; Attendance save; Timecard
+  generation and approval; Schedule template and assignment.
+- [x] Mutation gates run after existing app access but before session/controller
+  setup, CSRF dispatch, service invocation, SQL, transaction, or commit paths.
+- [x] Mutation containment probe passed **74/74**. Each blocked endpoint uses
+  only the existing `installed_plugins` admission query and no source-table
+  SQL before dispatch.
+- [x] Remaining reachable entry points: Payroll `/parity` remains a GET
+  parity-validation surface; six `/export` pages remain metadata-only landing
+  pages, while CSV downloads remain fail-closed. No mutation is reachable
+  through those pages.
+- [x] No controller, service, POST workflow, schema, permission, identity, or
+  business-record behavior was redesigned.
+
 ### 2026-10-27 — OH-AUTO3-SBAIO-PERSONNEL-INDEX-CONTAINMENT-001 module index containment
 
 **Status: Complete — offline/static verification only; no installed database or DB-backed SBAIO probe.**

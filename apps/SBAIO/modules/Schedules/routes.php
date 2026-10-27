@@ -22,6 +22,11 @@ $router->get('/apps/sbaio/schedules', function () use ($view) {
 
 $router->post('/apps/sbaio/schedules/templates', function () {
     Auth::requireAppAccess('sbaio');
+    if (!ModuleReportRegistryService::isPersonnelMutationAvailable('sbaio.schedules.overview')) {
+        http_response_code(404);
+        echo 'Mutation unavailable';
+        return null;
+    }
     Auth::bootSession();
     SchedulesController::createTemplate();
     return null;
@@ -29,6 +34,11 @@ $router->post('/apps/sbaio/schedules/templates', function () {
 
 $router->post('/apps/sbaio/schedules/assign', function () {
     Auth::requireAppAccess('sbaio');
+    if (!ModuleReportRegistryService::isPersonnelMutationAvailable('sbaio.schedules.overview')) {
+        http_response_code(404);
+        echo 'Mutation unavailable';
+        return null;
+    }
     Auth::bootSession();
     SchedulesController::assignRange();
     return null;

@@ -1,4 +1,15 @@
 # AGENTS.md
+## Session Summary (2026-10-27) — OH-AUTO3-SBAIO-PERSONNEL-MUTATION-CONTAINMENT-001 mutation containment
+
+Added centralized fail-closed mutation admission for all nine personnel/payroll
+POST endpoints across Staff, Payroll, Leave, Attendance, Timecards, and
+Schedules. Existing app access remains first; blocked routes stop before
+session/controller setup, CSRF dispatch, service, SQL, transaction, or commit.
+
+Mutation containment probe **74/74** passed. Payroll `/parity` and metadata-only
+`/export` landing pages remain documented reachable read entry points; CSV
+downloads remain contained. No installed database or DB-backed probe ran.
+
 ## Session Summary (2026-10-27) — OH-AUTO3-SBAIO-PERSONNEL-INDEX-CONTAINMENT-001 module index containment
 
 Added centralized fail-closed GET containment for six SBAIO personnel-related

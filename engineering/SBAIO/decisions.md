@@ -1,4 +1,21 @@
 # SBAIO — Decisions
+### 2026-10-27 — OH-AUTO3-SBAIO-PERSONNEL-MUTATION-CONTAINMENT-001 mutation containment
+
+**Decision: Fail closed for all nine personnel/payroll POST mutation routes until an owner-approved record-level mutation contract exists.**
+
+The existing SBAIO app access and active-module admission remain the first
+checks. `isPersonnelMutationAvailable()` rejects Staff, Payroll, Leave,
+Attendance, Timecards, and Schedules mutation routes before session/controller
+setup, CSRF dispatch, service calls, SQL, or transactions. No new permission,
+identity binding, organization scope, supervisor scope, schema rule, or
+business-logic redesign was introduced.
+
+Remaining reachable read entry points are documented separately: Payroll
+`/parity` remains a GET parity-validation surface, and the six `/export`
+landing pages remain metadata-only pages whose CSV actions are already blocked
+by the prior export containment. These were not conflated with mutation
+containment.
+
 ### 2026-10-27 — OH-AUTO3-SBAIO-PERSONNEL-INDEX-CONTAINMENT-001 module index containment
 
 **Decision: Fail closed for six personnel-related module index GET surfaces until an owner-approved record-level visibility contract exists.**

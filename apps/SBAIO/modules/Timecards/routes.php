@@ -24,6 +24,11 @@ $router->get('/apps/sbaio/timecards', function () use ($view) {
 
 $router->post('/apps/sbaio/timecards/generate', function () {
     Auth::requireAppAccess('sbaio');
+    if (!ModuleReportRegistryService::isPersonnelMutationAvailable('sbaio.timecards.overview')) {
+        http_response_code(404);
+        echo 'Mutation unavailable';
+        return null;
+    }
     Auth::bootSession();
     TimecardsController::generate();
     return null;
@@ -31,6 +36,11 @@ $router->post('/apps/sbaio/timecards/generate', function () {
 
 $router->post('/apps/sbaio/timecards/approve', function () {
     Auth::requireAppAccess('sbaio');
+    if (!ModuleReportRegistryService::isPersonnelMutationAvailable('sbaio.timecards.overview')) {
+        http_response_code(404);
+        echo 'Mutation unavailable';
+        return null;
+    }
     Auth::bootSession();
     TimecardsController::approvePeriod();
     return null;
