@@ -319,7 +319,7 @@ final class DataExchangeService
     {
         self::ensureImportJobsTable();
 
-        $where = ['status IN (\'pending\',\'approved_applied\',\'approved_failed\',\'rejected\')'];
+        $where = ['status IN (\'pending\',\'processing\',\'approved_applied\',\'approved_failed\',\'rejected\')'];
         $params = [];
         if ($adapterKey !== '') {
             $where[] = 'adapter_key = ?';
@@ -370,7 +370,47 @@ final class DataExchangeService
             return ['ok' => false, 'error' => 'adapter_unavailable', 'job_id' => $jobId, 'status' => 'pending', 'execution' => []];
         }
 
-        $execution = self::executeImportFromFile($definition, (string)($job['stored_path'] ?? ''), true);
+        $claimToken = bin2hex(random_bytes(16));
+        $claimPayload = json_encode([
+            'claim_token' => $claimToken,
+            'claimed_at' => date('c'),
+        ], JSON_UNESCAPED_UNICODE);
+        if (!is_string($claimPayload) || $claimPayload === '') {
+            return ['ok' => false, 'error' => 'job_claim_failed', 'job_id' => $jobId, 'status' => 'pending', 'execution' => []];
+        }
+
+        // The conditional update is the atomic claim. InnoDB can affect one
+        // row for the winner and zero rows for every concurrent loser. DB's
+        // generic query contract does not expose affected_rows, so the unique
+        // token read-back is the explicit ownership verification.
+        DB::query(
+            'UPDATE data_exchange_jobs
+             SET status = \'processing\', result_json = ?, updated_at = NOW()
+             WHERE id = ? AND status = \'pending\' LIMIT 1',
+            [$claimPayload, $jobId]
+        );
+        $claimed = DB::fetchOne('SELECT status, result_json FROM data_exchange_jobs WHERE id = ? LIMIT 1', [$jobId]);
+        $claimedResult = is_array($claimed)
+            ? json_decode((string)($claimed['result_json'] ?? '{}'), true)
+            : null;
+        if (!is_array($claimed) || (string)($claimed['status'] ?? '') !== 'processing'
+            || !is_array($claimedResult) || (string)($claimedResult['claim_token'] ?? '') !== $claimToken) {
+            return ['ok' => false, 'error' => 'job_already_claimed', 'job_id' => $jobId, 'status' => (string)($claimed['status'] ?? 'pending'), 'execution' => []];
+        }
+
+        try {
+            $execution = self::executeImportFromFile($definition, (string)($job['stored_path'] ?? ''), true);
+        } catch (\Throwable $e) {
+            $execution = [
+                'ok' => false,
+                'error' => 'import_exception',
+                'message' => $e->getMessage(),
+                'mode' => 'none',
+                'processed_rows' => 0,
+                'inserted_rows' => 0,
+                'skipped_rows' => 0,
+            ];
+        }
         $execution['adapter_key'] = (string)($job['adapter_key'] ?? '');
         $execution['app_key'] = (string)($job['app_key'] ?? '');
         $execution['module_key'] = (string)($job['module_key'] ?? '');
@@ -384,8 +424,8 @@ final class DataExchangeService
         DB::query(
             'UPDATE data_exchange_jobs
              SET status = ?, approved_by_user_id = ?, approved_at = NOW(), result_json = ?, updated_at = NOW()
-             WHERE id = ? LIMIT 1',
-            [$status, $approverUserId, $resultPayload, $jobId]
+             WHERE id = ? AND status = \'processing\' AND result_json = ? LIMIT 1',
+            [$status, $approverUserId, $resultPayload, $jobId, $claimPayload]
         );
 
         return [

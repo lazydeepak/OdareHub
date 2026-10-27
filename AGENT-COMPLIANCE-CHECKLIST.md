@@ -1,5 +1,18 @@
 # AGENT-COMPLIANCE-CHECKLIST
 
+## Session Summary (2026-10-27) — OH-AUTO3-DATA-EXCHANGE-APPROVAL-RACE-001
+
+Prevented duplicate queued Data Exchange execution under concurrent approval.
+The existing check-then-execute lifecycle now uses an atomic conditional
+`pending` → `processing` claim with a unique token and ownership read-back;
+only the claimant executes and finalizes the job. Crash recovery remains
+explicitly limited: an interrupted claimant may leave `processing` state.
+
+Approval-race probe **13/13**, PHP lint, focused SBAIO/Shell regressions,
+architecture gates, deletion gates, deployment readiness, and diff hygiene
+passed. No Core/Auth/ACL, schema, installed database, actual import,
+deployment, or activation operation occurred.
+
 ## Session Summary (2026-10-27) — OH-AUTO3-SBAIO-DATA-EXCHANGE-EXECUTION-GATE-001
 
 Corrected incomplete Data Exchange service containment. A forged SBAIO import

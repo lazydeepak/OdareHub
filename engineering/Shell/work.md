@@ -1,5 +1,25 @@
 # Shell — Work
 
+## 2026-10-27 — OH-AUTO3-DATA-EXCHANGE-APPROVAL-RACE-001
+
+**Status: Complete — database-free concurrency proof; no installed database,
+schema change, actual import, deployment, or activation.**
+
+- [x] Reproduced the approval race in the prior check-then-execute lifecycle:
+  two concurrent approvals could both observe `pending` and execute once each.
+- [x] Added an atomic conditional `pending` → `processing` claim with a unique
+  claim token and token read-back ownership verification.
+- [x] Final status update is conditional on the same processing claim; losers
+  return `job_already_claimed` and cannot execute.
+- [x] The shared DB abstraction exposes neither transactions nor
+  `affected_rows`; the probe verifies the database-engine conditional-update
+  semantics through the claim-token equivalent. No `FOR UPDATE` claim was
+  inferred.
+- [x] Crash limitation recorded: a process crash after claim leaves the job
+  `processing`; no automatic retry/recovery policy was invented.
+- [x] Approval-race probe passed **13/13**; existing SBAIO and Shell regressions
+  remain green.
+
 ## 2026-10-22 — OH-AUTO3-006 Parts search composition
 
 - [x] Forwarded the existing operator query state from Shell composition into

@@ -1,5 +1,22 @@
 # Shell — Decisions
 
+### 2026-10-27 — OH-AUTO3-DATA-EXCHANGE-APPROVAL-RACE-001
+
+**Decision: Claim queued Data Exchange jobs atomically before execution.**
+
+Approval now performs a conditional database update from `pending` to
+`processing`, storing a unique claim token. The claimant verifies that token
+through a read-back before invoking the existing import execution path. A
+concurrent request cannot satisfy the pending predicate and receives
+`job_already_claimed`. Finalization requires the same claim payload, preserving
+historical job rows and existing terminal statuses.
+
+The current DB abstraction does not expose `affected_rows`, transaction
+boundaries, or row-lock APIs, so no direct affected-row or `FOR UPDATE` claim
+was added. The token read-back is the explicit ownership evidence. A crash
+after claiming can leave a job in `processing`; recovery/retry remains a
+separate owner decision and is not enabled here.
+
 ## Decision Log
 
 ### 2026-10-16 — OH-AUTO2-117 recent-activity entity enrichment boundary
