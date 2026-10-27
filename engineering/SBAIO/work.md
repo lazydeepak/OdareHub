@@ -1,4 +1,20 @@
 # SBAIO — Work
+### 2026-10-27 — OH-AUTO3-SBAIO-PERSONNEL-EXPORT-CONTAINMENT-001 personnel/payroll export containment
+
+**Status: Complete — offline verification only; no installed database or DB-backed SBAIO probe.**
+
+- [x] Blocked six report keys lacking established personnel/financial
+  record-level export authority: Attendance, Leave, Payroll, Schedules, Staff,
+  and Timecards.
+- [x] Containment occurs after existing active-report admission but before
+  source lookup and SQL; no new permission or identity policy was added.
+- [x] Preserved Task, Notice, Customers, Expenses, and Sales export behavior
+  and explicit projections.
+- [x] Personnel export containment probe passed **23/23**. Existing CSV
+  admission/projection probe remains **244/244**.
+- [x] Remaining owner decisions concern personnel/financial visibility,
+  Staff identity binding, organization scope, and supervisor scope.
+
 ### 2026-10-27 — OH-AUTO3-SBAIO-CSV-ADMISSION-001 unresolved personnel/financial visibility
 
 **Status: Deferred owner decision — no runtime change.**

@@ -9,6 +9,21 @@ use App\Services\ExportHistoryService;
 final class ModuleReportRegistryService
 {
     /**
+     * Existing SBAIO app/report admission does not establish personnel or
+     * financial record-level export visibility for these sources.
+     *
+     * @var array<string,true>
+     */
+    private const CSV_REPORTS_REQUIRING_OWNER_DECISION = [
+        'sbaio.attendance.overview' => true,
+        'sbaio.leave.overview' => true,
+        'sbaio.payroll.overview' => true,
+        'sbaio.schedules.overview' => true,
+        'sbaio.staff.overview' => true,
+        'sbaio.timecards.overview' => true,
+    ];
+
+    /**
      * @var array<string,array{table:string,order_by:string,direction:string,filename_prefix:string,columns?:list<string>}>
      */
     private const CSV_REPORT_SOURCES = [
@@ -140,6 +155,11 @@ final class ModuleReportRegistryService
         $reportKey = trim($reportKey);
         if (!is_array(self::findActiveReport($reportKey))) {
             self::recordCsvExportFailure($reportKey !== '' ? $reportKey : 'unknown', 'CSV report is not active.');
+            return false;
+        }
+
+        if (isset(self::CSV_REPORTS_REQUIRING_OWNER_DECISION[$reportKey])) {
+            self::recordCsvExportFailure($reportKey, 'CSV export requires an owner-approved personnel or financial visibility contract.');
             return false;
         }
 

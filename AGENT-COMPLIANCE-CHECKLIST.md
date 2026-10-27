@@ -1,4 +1,16 @@
 # AGENT-COMPLIANCE-CHECKLIST
+## Session Summary (2026-10-27) — OH-AUTO3-SBAIO-PERSONNEL-EXPORT-CONTAINMENT-001 personnel/payroll export containment
+
+Added centralized fail-closed containment for six SBAIO personnel/payroll CSV
+report keys lacking established record-level export authority: Attendance,
+Leave, Payroll, Schedules, Staff, and Timecards. Existing report admission
+still runs first; blocked reports are rejected before source lookup or SQL.
+Task, Notice, Customers, Expenses, and Sales exports remain unchanged.
+
+Containment probe **23/23** passed. No installed database or DB-backed SBAIO
+probe ran; no Core/Auth/ACL, schema, identity, organization, or business-record
+change was made.
+
 ## Session Summary (2026-10-27) — OH-AUTO3-SBAIO-CSV-ADMISSION-001 CSV admission and projection safety
 
 Closed the SBAIO CSV export admission bypass at the shared

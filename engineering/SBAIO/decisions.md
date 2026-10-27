@@ -1,4 +1,22 @@
 # SBAIO — Decisions
+### 2026-10-27 — OH-AUTO3-SBAIO-PERSONNEL-EXPORT-CONTAINMENT-001 personnel/payroll export containment
+
+**Decision: Fail closed for personnel/payroll CSV reports until an owner-approved record-level export contract exists.**
+
+The existing `app.sbaio.access` plus active-module admission does not establish
+Staff identity binding, organization scope, supervisor scope, or record-level
+personnel/financial export visibility. The following report keys are therefore
+blocked centrally before source lookup/query: `sbaio.attendance.overview`,
+`sbaio.leave.overview`, `sbaio.payroll.overview`,
+`sbaio.schedules.overview`, `sbaio.staff.overview`, and
+`sbaio.timecards.overview`.
+
+This is a fail-closed export containment decision, not a new permission or
+record-level policy. Task, Notice, Customers, Expenses, and Sales retain their
+existing authorized CSV behavior and explicit projections. No stored records,
+schema, lifecycle, identity, organization, Core/Auth/ACL, or route behavior
+was changed.
+
 ### 2026-10-27 — OH-AUTO3-SBAIO-CSV-ADMISSION-001 unresolved personnel/financial visibility
 
 **Status: Unresolved — no new policy inferred.**
