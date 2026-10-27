@@ -14,6 +14,7 @@ require_once __DIR__ . '/Controllers/SbaioImportController.php';
 require_once __DIR__ . '/Controllers/SbaioRestoreController.php';
 require_once __DIR__ . '/Services/SbaioLegacyImportService.php';
 require_once __DIR__ . '/Services/SbaioBulkIoAdmissionService.php';
+require_once __DIR__ . '/Services/SbaioDashboardPrivacyAdmissionService.php';
 require_once __DIR__ . '/bootstrap.php';
 
 $requireBulkIoAdmission = static function (): bool {
@@ -26,6 +27,16 @@ $requireBulkIoAdmission = static function (): bool {
     return false;
 };
 
+$requireConsolidatedReportsPrivacy = static function (): bool {
+    if (SBAIO\Services\SbaioDashboardPrivacyAdmissionService::isPersonnelDataAvailable()) {
+        return true;
+    }
+
+    http_response_code(404);
+    echo 'Consolidated personnel reports unavailable';
+    return false;
+};
+
 $router->get('/apps/sbaio', function () use ($view) {
     Auth::requireAppAccess('sbaio');
     Auth::bootSession();
@@ -33,8 +44,11 @@ $router->get('/apps/sbaio', function () use ($view) {
     return null;
 });
 
-$router->get('/apps/sbaio/reports', function () use ($view) {
+$router->get('/apps/sbaio/reports', function () use ($view, $requireConsolidatedReportsPrivacy) {
     Auth::requireAppAccess('sbaio');
+    if (!$requireConsolidatedReportsPrivacy()) {
+        return null;
+    }
     Auth::bootSession();
     SbaioDashboardController::reports($view);
     return null;

@@ -11,46 +11,47 @@ final class SbaioDashboardController
     public static function index($view): void
     {
         $ctx = platform_user_context_contract()->resolveUserContext(Auth::user());
+        $personnelDataAvailable = \SBAIO\Services\SbaioDashboardPrivacyAdmissionService::isPersonnelDataAvailable();
         $moduleVisibility = array_values(array_map('strval', (array)($ctx['module_visibility'] ?? [])));
         $suiteRoleLabels = array_values(array_map('strval', (array)($ctx['suite_role_template_labels'] ?? [])));
         $moduleTemplateLabels = array_values(array_map('strval', (array)($ctx['module_permission_template_labels'] ?? [])));
 
-        $leaveRequests = self::count('sbaio_leave_requests');
-        $holidayEntries = self::count('sbaio_holiday_calendar');
+        $leaveRequests = $personnelDataAvailable ? self::count('sbaio_leave_requests') : 0;
+        $holidayEntries = $personnelDataAvailable ? self::count('sbaio_holiday_calendar') : 0;
         $counts = [
-            'staff' => self::count('sbaio_staff'),
-            'attendance' => self::count('sbaio_attendance_daily'),
-            'schedules' => self::count('sbaio_schedule_assignments'),
-            'timecards_periods' => self::count('sbaio_timecard_periods'),
-            'payroll_runs' => self::count('sbaio_payroll_runs'),
-            'payroll_records' => self::count('sbaio_payroll_records'),
+            'staff' => $personnelDataAvailable ? self::count('sbaio_staff') : 0,
+            'attendance' => $personnelDataAvailable ? self::count('sbaio_attendance_daily') : 0,
+            'schedules' => $personnelDataAvailable ? self::count('sbaio_schedule_assignments') : 0,
+            'timecards_periods' => $personnelDataAvailable ? self::count('sbaio_timecard_periods') : 0,
+            'payroll_runs' => $personnelDataAvailable ? self::count('sbaio_payroll_runs') : 0,
+            'payroll_records' => $personnelDataAvailable ? self::count('sbaio_payroll_records') : 0,
             'customers' => self::count('sbaio_customers'),
             'tasks' => self::count('sbaio_tasks'),
             'sales' => self::count('sbaio_sales'),
             'expenses' => self::count('sbaio_expenses'),
             'notices' => self::count('sbaio_notices'),
-            'salary_rates' => self::count('sbaio_salary_monthly_rates'),
-            'fixed_profiles' => self::count('sbaio_payroll_fixed_profiles'),
+            'salary_rates' => $personnelDataAvailable ? self::count('sbaio_salary_monthly_rates') : 0,
+            'fixed_profiles' => $personnelDataAvailable ? self::count('sbaio_payroll_fixed_profiles') : 0,
             'leave_requests' => $leaveRequests,
             'holiday_entries' => $holidayEntries,
         ];
 
-        $draftTimecards = self::countWhere(
+        $draftTimecards = $personnelDataAvailable ? self::countWhere(
             'sbaio_timecard_periods',
             "LOWER(COALESCE(approval_status, 'draft')) IN ('draft','generated','pending')"
-        );
-        $draftPayroll = self::countWhere(
+        ) : 0;
+        $draftPayroll = $personnelDataAvailable ? self::countWhere(
             'sbaio_payroll_runs',
             "LOWER(COALESCE(run_status, 'draft')) IN ('draft','generated','pending')"
-        );
-        $pendingLeave = self::countWhere(
+        ) : 0;
+        $pendingLeave = $personnelDataAvailable ? self::countWhere(
             'sbaio_leave_requests',
             "LOWER(COALESCE(leave_status, 'draft')) IN ('draft','pending','submitted')"
-        );
-        $missingPunches = self::countWhere(
+        ) : 0;
+        $missingPunches = $personnelDataAvailable ? self::countWhere(
             'sbaio_attendance_daily',
             "(work_start_at IS NULL OR work_end_at IS NULL) AND LOWER(COALESCE(day_marker, 'workday')) NOT IN ('holiday','leave','off_day','closed')"
-        );
+        ) : 0;
 
         $sections = [
             [
@@ -314,14 +315,25 @@ final class SbaioDashboardController
             }, $sections), static fn(array $section): bool => (array)($section['cards'] ?? []) !== []));
         }
 
+        if (!$personnelDataAvailable) {
+            $sections = array_values(array_filter($sections, static function (array $section): bool {
+                return !array_intersect(
+                    ['sbaio_staff', 'sbaio_schedules', 'sbaio_attendance', 'sbaio_leave', 'sbaio_timecards', 'sbaio_payroll'],
+                    (array)($section['module_keys'] ?? [])
+                );
+            }));
+        }
+
+        $heroStats = $personnelDataAvailable ? [
+            ['label' => t('nav.sbaio_staff'), 'value' => $counts['staff']],
+            ['label' => t('sbaio.host.missing_punches'), 'value' => $missingPunches],
+            ['label' => t('sbaio.host.draft_timecards'), 'value' => $draftTimecards],
+            ['label' => t('sbaio.dashboard.card.draft_payroll'), 'value' => $draftPayroll],
+        ] : [];
+
         $view->render('sbaio::dashboard.php', [
             'pageTitle' => t('nav.sbaio_dashboard'),
-            'heroStats' => [
-                ['label' => t('nav.sbaio_staff'), 'value' => $counts['staff']],
-                ['label' => t('sbaio.host.missing_punches'), 'value' => $missingPunches],
-                ['label' => t('sbaio.host.draft_timecards'), 'value' => $draftTimecards],
-                ['label' => t('sbaio.dashboard.card.draft_payroll'), 'value' => $draftPayroll],
-            ],
+            'heroStats' => $heroStats,
             'sections' => $sections,
             'suite_role_template_labels' => $suiteRoleLabels,
             'module_permission_template_labels' => $moduleTemplateLabels,

@@ -1,4 +1,22 @@
 # SBAIO — Decisions
+### 2026-10-27 — OH-AUTO3-SBAIO-SUITE-DASHBOARD-PRIVACY-001 dashboard privacy
+
+**Decision: Suppress central SBAIO personnel/payroll dashboard data and fail
+closed for the consolidated reports surface until an owner-approved
+record-level visibility contract exists.**
+
+The central dashboard retains business-operations cards and counts, but Staff,
+attendance, schedules, leave, timecards, payroll, salary-reference, and fixed-
+profile queries, hero statistics, and cards are suppressed by the SBAIO-owned
+privacy admission. `/apps/sbaio/reports` is rejected after existing SBAIO app
+access and before session boot, controller dispatch, or consolidated-report
+SQL.
+
+No permission, Staff identity binding, organization/supervisor scope, schema,
+database, shared service, or historical record policy was added. Remaining
+owner decisions are record-level visibility for personnel/payroll reads,
+consolidated reporting, and the associated module workflows.
+
 ### 2026-10-27 — OH-AUTO3-SBAIO-BULK-IO-CONTAINMENT-001 suite bulk-I/O containment
 
 **Decision: Fail closed for suite-level SBAIO import, export, restore, and

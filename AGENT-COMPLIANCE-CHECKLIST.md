@@ -1,4 +1,16 @@
 # AGENT-COMPLIANCE-CHECKLIST
+## Session Summary (2026-10-27) — OH-AUTO3-SBAIO-SUITE-DASHBOARD-PRIVACY-001 dashboard privacy
+
+Contained remaining central SBAIO dashboard and consolidated-report personnel/
+payroll exposure. Sensitive dashboard queries, hero statistics, and cards now
+fail closed while business-operations cards remain available. `/apps/sbaio/reports`
+is blocked before session/controller/SQL dispatch.
+
+Dashboard privacy probe **28/28** and existing personnel route, index, HTML
+report, and mutation containment probes **56/56**, **57/57**, **50/50**, and
+**74/74** passed. No installed database or DB-backed probe ran; unrelated
+artifacts were preserved.
+
 ## Session Summary (2026-10-27) — OH-AUTO3-SBAIO-BULK-IO-CONTAINMENT-001 suite bulk-I/O containment
 
 Contained all 11 SBAIO suite-level import, export, restore, and backup-download

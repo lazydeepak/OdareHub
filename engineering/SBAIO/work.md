@@ -1,4 +1,22 @@
 # SBAIO — Work
+### 2026-10-27 — OH-AUTO3-SBAIO-SUITE-DASHBOARD-PRIVACY-001 dashboard privacy
+
+**Status: Complete — offline/static verification only; no installed database or DB-backed SBAIO probe.**
+
+- [x] Confirmed the baseline central dashboard queried Staff, attendance,
+  schedules, leave, timecards, payroll, salary-rate, and fixed-profile tables
+  under SBAIO app access alone.
+- [x] Central dashboard now conditionally suppresses all personnel/payroll
+  queries, hero statistics, sections, and cards while retaining business
+  operations such as Customers, Tasks, Sales, Expenses, and Notices.
+- [x] Consolidated `/apps/sbaio/reports` now fails closed before session boot,
+  controller execution, and attendance/timecard/payroll SQL.
+- [x] Dashboard privacy probe passed **28/28**; existing personnel route,
+  index, HTML-report, and mutation containment passed **56/56**, **57/57**,
+  **50/50**, and **74/74**.
+- [x] No Core/Auth/ACL, permission, Staff identity, organization/supervisor,
+  schema, database, shared service, or historical record behavior changed.
+
 ### 2026-10-27 — OH-AUTO3-SBAIO-BULK-IO-CONTAINMENT-001 suite bulk-I/O containment
 
 **Status: Complete — offline/static verification only; no exports, imports, restores, package operations, production filesystem mutations, installed database, or DB-backed probe.**
