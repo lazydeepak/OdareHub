@@ -34,7 +34,7 @@ $router->get('/apps/sbaio/payroll/parity', function () use ($view) {
 $router->get('/apps/sbaio/payroll/report', function() use ($view) {
     Auth::requireAppAccess('sbaio');
     Auth::bootSession();
-    $report = ModuleReportRegistryService::findActiveReport('sbaio.payroll.overview');
+    $report = ModuleReportRegistryService::findActiveHtmlReport('sbaio.payroll.overview');
     if (!is_array($report)) {
         http_response_code(404);
         echo 'Report unavailable';

@@ -32,7 +32,7 @@ $router->post('/apps/sbaio/schedules/assign', function () {
 $router->get('/apps/sbaio/schedules/report', function() use ($view) {
     Auth::requireAppAccess('sbaio');
     Auth::bootSession();
-    $report = ModuleReportRegistryService::findActiveReport('sbaio.schedules.overview');
+    $report = ModuleReportRegistryService::findActiveHtmlReport('sbaio.schedules.overview');
     if (!is_array($report)) {
         http_response_code(404);
         echo 'Report unavailable';

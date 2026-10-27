@@ -14,7 +14,7 @@ final class ModuleReportRegistryService
      *
      * @var array<string,true>
      */
-    private const CSV_REPORTS_REQUIRING_OWNER_DECISION = [
+    private const REPORTS_REQUIRING_OWNER_DECISION = [
         'sbaio.attendance.overview' => true,
         'sbaio.leave.overview' => true,
         'sbaio.payroll.overview' => true,
@@ -150,6 +150,24 @@ final class ModuleReportRegistryService
         return null;
     }
 
+    /**
+     * Resolve an HTML report only when its record-level visibility contract is
+     * established. Active-report admission still runs first; unresolved
+     * personnel/payroll reports fail closed before their views can issue SQL.
+     *
+     * @return array<string,mixed>|null
+     */
+    public static function findActiveHtmlReport(string $reportKey): ?array
+    {
+        $reportKey = trim($reportKey);
+        $report = self::findActiveReport($reportKey);
+        if (!is_array($report) || isset(self::REPORTS_REQUIRING_OWNER_DECISION[$reportKey])) {
+            return null;
+        }
+
+        return $report;
+    }
+
     public static function streamCsvForReport(string $reportKey): bool
     {
         $reportKey = trim($reportKey);
@@ -158,7 +176,7 @@ final class ModuleReportRegistryService
             return false;
         }
 
-        if (isset(self::CSV_REPORTS_REQUIRING_OWNER_DECISION[$reportKey])) {
+        if (isset(self::REPORTS_REQUIRING_OWNER_DECISION[$reportKey])) {
             self::recordCsvExportFailure($reportKey, 'CSV export requires an owner-approved personnel or financial visibility contract.');
             return false;
         }

@@ -1,4 +1,22 @@
 # SBAIO — Work
+### 2026-10-27 — OH-AUTO3-SBAIO-PERSONNEL-HTML-REPORT-CONTAINMENT-001 HTML report containment
+
+**Status: Complete — offline/static verification only; no installed database or DB-backed SBAIO probe.**
+
+- [x] Added centralized `findActiveHtmlReport()` containment after active
+  report admission and before six sensitive report views can receive a report
+  descriptor or issue source SQL.
+- [x] Contained `/apps/sbaio/{attendance,leave,payroll,schedules,staff,timecards}/report`.
+- [x] Changed the six report-view fallbacks to the same fail-closed resolver,
+  preventing direct view inclusion from re-opening the report SQL path.
+- [x] HTML containment probe passed **50/50**; blocked keys perform only the
+  installed-module admission query and never query their source tables.
+- [x] Audited index/dashboard paths: Staff, Payroll, Leave, Attendance,
+  Schedules, and Timecards still query/render personnel, payroll, attendance,
+  leave, schedule, or staff-selector data under existing SBAIO app access.
+  Those surfaces remain unresolved owner decisions and were not changed in
+  this report-only slice.
+
 ### 2026-10-27 — OH-AUTO3-SBAIO-PERSONNEL-EXPORT-CONTAINMENT-001 personnel/payroll export containment
 
 **Status: Complete — offline verification only; no installed database or DB-backed SBAIO probe.**

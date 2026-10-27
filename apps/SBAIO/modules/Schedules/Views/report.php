@@ -6,7 +6,7 @@ require_once APP_ROOT . '/apps/SBAIO/Services/ModuleReportRegistryService.php';
 
 use App\Core\DB;
 
-$report = $report ?? \Apps\SBAIO\Services\ModuleReportRegistryService::findActiveReport('sbaio.schedules.overview');
+$report = $report ?? \Apps\SBAIO\Services\ModuleReportRegistryService::findActiveHtmlReport('sbaio.schedules.overview');
 
 $summary = ['templates'=>0,'assignments'=>0,'upcoming'=>0,'this_week'=>0,'minutes'=>0];
 $byStatus = [];

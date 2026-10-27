@@ -34,7 +34,7 @@ $router->post('/apps/sbaio/timecards/approve', function () {
 $router->get('/apps/sbaio/timecards/report', function() use ($view) {
     Auth::requireAppAccess('sbaio');
     Auth::bootSession();
-    $report = ModuleReportRegistryService::findActiveReport('sbaio.timecards.overview');
+    $report = ModuleReportRegistryService::findActiveHtmlReport('sbaio.timecards.overview');
     if (!is_array($report)) {
         http_response_code(404);
         echo 'Report unavailable';

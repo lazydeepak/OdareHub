@@ -25,7 +25,7 @@ $router->post('/apps/sbaio/staff/create', function () {
 $router->get('/apps/sbaio/staff/report', function() use ($view) {
     Auth::requireAppAccess('sbaio');
     Auth::bootSession();
-    $report = ModuleReportRegistryService::findActiveReport('sbaio.staff.overview');
+    $report = ModuleReportRegistryService::findActiveHtmlReport('sbaio.staff.overview');
     if (!is_array($report)) {
         http_response_code(404);
         echo 'Report unavailable';

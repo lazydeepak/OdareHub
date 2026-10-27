@@ -6,7 +6,7 @@ require_once APP_ROOT . '/apps/SBAIO/Services/ModuleReportRegistryService.php';
 
 use App\Core\DB;
 
-$report = $report ?? \Apps\SBAIO\Services\ModuleReportRegistryService::findActiveReport('sbaio.timecards.overview');
+$report = $report ?? \Apps\SBAIO\Services\ModuleReportRegistryService::findActiveHtmlReport('sbaio.timecards.overview');
 
 $summary = ['periods'=>0,'days'=>0,'worked_minutes'=>0,'ot_minutes'=>0,'approved'=>0];
 $byStatus = [];

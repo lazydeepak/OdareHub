@@ -32,7 +32,7 @@ $router->post('/apps/sbaio/leave/holiday', function () {
 $router->get('/apps/sbaio/leave/report', function() use ($view) {
     Auth::requireAppAccess('sbaio');
     Auth::bootSession();
-    $report = ModuleReportRegistryService::findActiveReport('sbaio.leave.overview');
+    $report = ModuleReportRegistryService::findActiveHtmlReport('sbaio.leave.overview');
     if (!is_array($report)) {
         http_response_code(404);
         echo 'Report unavailable';

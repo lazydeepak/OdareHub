@@ -6,7 +6,7 @@ require_once APP_ROOT . '/apps/SBAIO/Services/ModuleReportRegistryService.php';
 
 use App\Core\DB;
 
-$report = $report ?? \Apps\SBAIO\Services\ModuleReportRegistryService::findActiveReport('sbaio.staff.overview');
+$report = $report ?? \Apps\SBAIO\Services\ModuleReportRegistryService::findActiveHtmlReport('sbaio.staff.overview');
 
 $summary = ['total'=>0,'active'=>0,'helpers'=>0,'new_90d'=>0,'exited'=>0];
 $byStatus = [];

@@ -25,7 +25,7 @@ $router->post('/apps/sbaio/attendance/save', function () {
 $router->get('/apps/sbaio/attendance/report', function() use ($view) {
     Auth::requireAppAccess('sbaio');
     Auth::bootSession();
-    $report = ModuleReportRegistryService::findActiveReport('sbaio.attendance.overview');
+    $report = ModuleReportRegistryService::findActiveHtmlReport('sbaio.attendance.overview');
     if (!is_array($report)) {
         http_response_code(404);
         echo 'Report unavailable';

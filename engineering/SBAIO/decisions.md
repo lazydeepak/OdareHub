@@ -1,4 +1,20 @@
 # SBAIO — Decisions
+### 2026-10-27 — OH-AUTO3-SBAIO-PERSONNEL-HTML-REPORT-CONTAINMENT-001 HTML report containment
+
+**Decision: Fail closed for the six personnel/payroll HTML report descriptors until an owner-approved record-level visibility contract exists.**
+
+The existing SBAIO app access and active-report admission are retained as the
+first checks, but `findActiveHtmlReport()` returns no descriptor for
+Attendance, Leave, Payroll, Schedules, Staff, or Timecards. Their `/report`
+routes therefore stop before rendering, and their report-view fallback also
+fails closed before report SQL. This adds no permission, identity binding,
+organization scope, supervisor scope, schema, or record policy.
+
+The corresponding module index/dashboard surfaces remain separately exposed
+under existing SBAIO app access and are not silently treated as resolved by
+this report-only containment. The audit remains an owner decision for those
+surfaces and for personnel/financial record visibility generally.
+
 ### 2026-10-27 — OH-AUTO3-SBAIO-PERSONNEL-EXPORT-CONTAINMENT-001 personnel/payroll export containment
 
 **Decision: Fail closed for personnel/payroll CSV reports until an owner-approved record-level export contract exists.**

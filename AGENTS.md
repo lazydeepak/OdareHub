@@ -1,4 +1,17 @@
 # AGENTS.md
+## Session Summary (2026-10-27) — OH-AUTO3-SBAIO-PERSONNEL-HTML-REPORT-CONTAINMENT-001 HTML report containment
+
+Added centralized fail-closed containment for six SBAIO personnel/payroll HTML
+report keys lacking established record-level visibility: Attendance, Leave,
+Payroll, Schedules, Staff, and Timecards. Existing active-report admission
+still runs first; blocked `/report` routes and report-view fallbacks stop before
+source-table SQL. Corresponding index/dashboard disclosures were audited and
+remain outside this report-only change pending owner decisions.
+
+HTML containment probe **50/50** passed. No installed database or DB-backed
+SBAIO probe ran; no Core/Auth/ACL, schema, identity, organization, permission,
+route, or business-record policy was added.
+
 ## Session Summary (2026-10-27) — OH-AUTO3-SBAIO-PERSONNEL-EXPORT-CONTAINMENT-001 personnel/payroll export containment
 
 Added centralized fail-closed containment for six SBAIO personnel/payroll CSV
