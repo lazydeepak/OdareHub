@@ -49,6 +49,13 @@ $blockedDefinition = [
     'governance_mode' => 'audited',
 ];
 require_once $root . '/apps/Shell/Services/DataExchangeService.php';
+$forgedDefinition = [
+    'key' => 'sbaio.attendance_daily',
+    'app_key' => 'sbaio',
+    'supports_import' => true,
+];
+$forgedExecution = \Apps\Shell\Services\DataExchangeService::executeImportFromFile($forgedDefinition, '/definitely/not-a-real-stored-file', true);
+$assert(($forgedExecution['ok'] ?? true) === false && ($forgedExecution['error'] ?? '') === 'import_disabled', 'forged SBAIO definition is rejected by the service admission');
 $upload = \Apps\Shell\Services\DataExchangeService::processImportUpload($blockedDefinition, [
     'name' => 'personnel.csv',
     'tmp_name' => '/definitely/not-an-upload',
@@ -60,16 +67,18 @@ $execution = \Apps\Shell\Services\DataExchangeService::executeImportFromFile($bl
 $assert(($execution['ok'] ?? true) === false && ($execution['error'] ?? '') === 'import_disabled', 'blocked execution stops before stored-file read and SQL');
 
 $processStart = strpos($dxSource, 'public static function processImportUpload');
-$processGate = $processStart === false ? false : strpos($dxSource, "if (array_key_exists('supports_import', \$definition)", $processStart);
-$processTmp = strpos($dxSource, '$tmp = (string)($file[\'tmp_name\'] ?? \'\');');
+$processGate = $processStart === false ? false : strpos($dxSource, 'self::isImportDefinitionAvailable($definition)', $processStart);
+$processTmp = $processStart === false ? false : strpos($dxSource, '$tmp = (string)($file[\'tmp_name\'] ?? \'\');', $processStart);
 $executeStart = strpos($dxSource, 'public static function executeImportFromFile');
-$executeGate = $executeStart === false ? false : strpos($dxSource, "if (array_key_exists('supports_import', \$definition)", $executeStart);
+$executeGate = $executeStart === false ? false : strpos($dxSource, 'self::isImportDefinitionAvailable($definition)', $executeStart);
 $executeFile = $executeStart === false ? false : strpos($dxSource, "if (\$storedPath === '' || !is_file(\$storedPath))", $executeStart);
 $assert($processGate !== false && $processTmp !== false && $processGate < $processTmp, 'upload admission precedes filesystem upload inspection');
 $assert($executeGate !== false && $executeFile !== false && $executeGate < $executeFile, 'execution admission precedes stored-file inspection');
 
 $jsonField = "'supports_import' => (bool)(\$definition['supports_import'] ?? true)";
 $assert(str_contains($dxSource, $jsonField), 'queued definition persists import capability state');
+$assert(str_contains($dxSource, 'SbaioDataExchangeAdmissionService::isAvailable'), 'service execution consults SBAIO owner admission');
+$assert(str_contains($dxSource, 'private static function isImportDefinitionAvailable'), 'service has one centralized import admission');
 $approvalCall = strpos($dxSource, 'self::executeImportFromFile($definition');
 $approvalLookup = strpos($dxSource, "SELECT * FROM data_exchange_jobs WHERE id = ? LIMIT 1");
 $assert($approvalLookup !== false && $approvalCall !== false && $approvalLookup < $approvalCall, 'approval reads only queue metadata before governed execution');
@@ -82,6 +91,7 @@ $uploadCall = strpos($routesSource, 'DataExchangeService::processImportUpload', 
 $assert($importRoute !== false && $findDefinition !== false && $uploadCall !== false && $findDefinition < $uploadCall, 'import route resolves an admitted definition before upload');
 $assert(str_contains($routesSource, "if (empty(\$definition['supports_import']))"), 'route preserves generic import capability gate');
 $assert(str_contains($routesSource, "\$router->post('/u/data-exchange/job/approve'"), 'queued approval route remains present for authorized non-SBAIO adapters');
+$assert(!str_contains($dxSource, 'array $context = []'), 'queued approval cannot omit current owner context');
 $composerSource = (string)file_get_contents($root . '/apps/Shell/Composers/DataExchangeComposer.php');
 $assert(str_contains($composerSource, '$definitions === []'), 'queue listing is suppressed when no current adapters are admitted');
 

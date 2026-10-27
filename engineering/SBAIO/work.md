@@ -1,5 +1,21 @@
 # SBAIO — Work
 
+### 2026-10-27 — OH-AUTO3-SBAIO-DATA-EXCHANGE-EXECUTION-GATE-001
+
+**Status: Complete — service-level gate verified without database, actual
+imports, queue execution, or filesystem mutation.**
+
+- [x] Reproduced the prior gap: a forged `sbaio.attendance_daily` definition
+  with `supports_import=true` reached `stored_file_missing` instead of the
+  SBAIO admission boundary.
+- [x] Centralized owner-aware admission in `DataExchangeService` before upload
+  inspection, stored-file inspection, enqueue, parsing, and execution.
+- [x] Queued approval now requires current owner context and rejects stale or
+  unavailable definitions before import execution; current Manufacturing
+  adapter behavior remains eligible.
+- [x] Corrected execution-gate probe passed **26/26**; prior containment and
+  Shell/operator regressions remain green.
+
 ### 2026-10-27 — OH-AUTO3-SBAIO-DATA-EXCHANGE-CONTAINMENT-001
 
 **Status: Complete — database-free/static verification only; no actual upload,

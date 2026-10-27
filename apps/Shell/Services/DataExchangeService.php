@@ -36,7 +36,7 @@ final class DataExchangeService
      */
     public static function processImportUpload(array $definition, array $file): array
     {
-        if (array_key_exists('supports_import', $definition) && empty($definition['supports_import'])) {
+        if (!self::isImportDefinitionAvailable($definition)) {
             return [
                 'ok' => false,
                 'error' => 'import_disabled',
@@ -196,7 +196,7 @@ final class DataExchangeService
      */
     public static function executeImportFromFile(array $definition, string $storedPath, bool $allowApprovalRequired = false): array
     {
-        if (array_key_exists('supports_import', $definition) && empty($definition['supports_import'])) {
+        if (!self::isImportDefinitionAvailable($definition)) {
             return [
                 'ok' => false,
                 'error' => 'import_disabled',
@@ -272,6 +272,10 @@ final class DataExchangeService
         int $rowCount,
         array $header
     ): int {
+        if (!self::isImportDefinitionAvailable($definition)) {
+            throw new \RuntimeException('import_disabled');
+        }
+
         self::ensureImportJobsTable();
 
         $definitionJson = json_encode([
@@ -341,7 +345,7 @@ final class DataExchangeService
     /**
      * @return array{ok:bool,error:string,job_id:int,status:string,execution:array<string,mixed>}
      */
-    public static function approveQueuedJob(int $jobId, int $approverUserId, array $context = []): array
+    public static function approveQueuedJob(int $jobId, int $approverUserId, array $context): array
     {
         self::ensureImportJobsTable();
 
@@ -361,11 +365,9 @@ final class DataExchangeService
         // Re-admit the queued adapter against current owner definitions. This
         // prevents a previously queued adapter from bypassing a later
         // fail-closed owner admission while preserving current adapters.
-        if ($context !== []) {
-            $currentDefinition = self::findDefinition($context, (string)($definition['key'] ?? ''));
-            if (!is_array($currentDefinition)) {
-                return ['ok' => false, 'error' => 'adapter_unavailable', 'job_id' => $jobId, 'status' => 'pending', 'execution' => []];
-            }
+        $currentDefinition = self::findDefinition($context, (string)($definition['key'] ?? ''));
+        if (!is_array($currentDefinition) || !self::isImportDefinitionAvailable($currentDefinition)) {
+            return ['ok' => false, 'error' => 'adapter_unavailable', 'job_id' => $jobId, 'status' => 'pending', 'execution' => []];
         }
 
         $execution = self::executeImportFromFile($definition, (string)($job['stored_path'] ?? ''), true);
@@ -551,6 +553,35 @@ final class DataExchangeService
         $base = basename($name);
         $base = preg_replace('/[^a-zA-Z0-9._-]/', '_', $base) ?? 'upload.csv';
         return $base === '' ? 'upload.csv' : $base;
+    }
+
+    /**
+     * Owner-aware import admission. Generic adapters retain their existing
+     * capability flag; SBAIO personnel adapters additionally require the
+     * SBAIO-owned record-level mutation admission.
+     *
+     * @param array<string,mixed> $definition
+     */
+    private static function isImportDefinitionAvailable(array $definition): bool
+    {
+        if (array_key_exists('supports_import', $definition) && empty($definition['supports_import'])) {
+            return false;
+        }
+
+        if (strtolower(trim((string)($definition['app_key'] ?? ''))) !== 'sbaio') {
+            return true;
+        }
+
+        $admissionPath = (defined('APP_ROOT') ? APP_ROOT : dirname(__DIR__, 3))
+            . '/apps/SBAIO/Services/SbaioDataExchangeAdmissionService.php';
+        if (!is_file($admissionPath)) {
+            return false;
+        }
+        require_once $admissionPath;
+
+        return \SBAIO\Services\SbaioDataExchangeAdmissionService::isAvailable(
+            strtolower(trim((string)($definition['key'] ?? '')))
+        );
     }
 
     private static function normalizeColumnName(string $value): string

@@ -1,5 +1,17 @@
 # AGENTS.md
 
+## Session Summary (2026-10-27) — OH-AUTO3-SBAIO-DATA-EXCHANGE-EXECUTION-GATE-001
+
+Corrected incomplete Data Exchange service containment. A forged SBAIO import
+definition previously reached the stored-file boundary; it now fails with
+`import_disabled` before upload/file parsing or source SQL. Queued approval
+requires current owner context and rejects stale definitions before execution.
+
+Execution-gate probe **26/26** passed, with prior SBAIO and Shell regressions,
+architecture gates, deletion gates, deployment readiness, PHP lint, and diff
+hygiene remaining green. No database, actual import, queue execution,
+filesystem mutation, deployment, or activation occurred.
+
 ## Session Summary (2026-10-27) — OH-AUTO3-SBAIO-DATA-EXCHANGE-CONTAINMENT-001
 
 Closed SBAIO personnel-data mutation paths through Shell operator Data Exchange

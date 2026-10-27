@@ -1,5 +1,20 @@
 # SBAIO — Decisions
 
+### 2026-10-27 — OH-AUTO3-SBAIO-DATA-EXCHANGE-EXECUTION-GATE-001
+
+**Decision: Enforce SBAIO Data Exchange admission inside the shared execution
+service, not only at contribution discovery.**
+
+The previous contribution boundary did not protect direct service calls or
+stored queued definitions. `DataExchangeService` now consults the SBAIO-owned
+admission before upload, enqueue, file parsing, and source mutation. Queued
+approval requires current owner context and re-admits the current definition;
+missing or stale definitions remain pending and cannot execute. Manufacturing
+continues through its existing generic capability path.
+
+No new permission, identity binding, organization/supervisor scope, schema,
+database, or import policy was invented.
+
 ### 2026-10-27 — OH-AUTO3-SBAIO-DATA-EXCHANGE-CONTAINMENT-001
 
 **Decision: Fail closed for the two SBAIO operator Data Exchange adapters and
