@@ -68,7 +68,9 @@ final class DataExchangeComposer
         $canApprove = in_array($authorityRole, ['platform_admin', 'app_admin'], true);
         $userId = (int)($this->context['user_id'] ?? 0);
         $selectedKey = strtolower(trim((string)($selectedDefinition['key'] ?? '')));
-        $queueJobs = DataExchangeService::listQueueJobs($userId, $canApprove, $selectedKey, 20);
+        $queueJobs = $definitions === []
+            ? []
+            : DataExchangeService::listQueueJobs($userId, $canApprove, $selectedKey, 20);
 
         return [
             'title' => $this->tr('operator.data_exchange.title', 'Data Exchange'),

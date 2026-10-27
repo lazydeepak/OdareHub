@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Apps\SBAIO\Services;
 
+require_once __DIR__ . '/SbaioDataExchangeAdmissionService.php';
+
 final class OperatorSurfaceContributionService
 {
     /**
@@ -89,6 +91,10 @@ final class OperatorSurfaceContributionService
      */
     private static function dataExchangeDefinitions(): array
     {
+        if (!\SBAIO\Services\SbaioDataExchangeAdmissionService::isAvailable('sbaio')) {
+            return [];
+        }
+
         return [
             [
                 'key' => 'sbaio.attendance_daily',

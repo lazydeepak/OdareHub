@@ -1,4 +1,28 @@
 # SBAIO — Work
+
+### 2026-10-27 — OH-AUTO3-SBAIO-DATA-EXCHANGE-CONTAINMENT-001
+
+**Status: Complete — database-free/static verification only; no actual upload,
+import, queued approval, installed database, or destructive filesystem action.**
+
+- [x] Confirmed both SBAIO operator adapters (`sbaio.attendance_daily` and
+  `sbaio.timecard_weekly`) were import-enabled and reached Shell upload,
+  execution, audit, and queue paths under existing workspace visibility.
+- [x] Added SBAIO-owned fail-closed Data Exchange admission; neither adapter
+  is currently contributed to the operator Data Exchange surface.
+- [x] Added generic service guards before upload filesystem inspection and
+  before stored-file parsing/source SQL for disabled definitions.
+- [x] Queued approval now re-admits the current owner definition before
+  execution; historical queued SBAIO definitions cannot bypass removal of the
+  current adapter contribution. Queue listing is empty when no current adapter
+  is admitted.
+- [x] Containment probe passed **22/22**; existing bulk-I/O **58/58**,
+  personnel mutation **74/74**, personnel export **23/23**, host containment
+  **15/15**, role home **26/26**, worker dashboard **42/42**, and responsive
+  navigation **51/51** remain green.
+- [x] Manufacturing production, orders, and dispatch adapter declarations
+  remain present; no Manufacturing runtime logic was changed.
+
 ### 2026-10-27 — OH-AUTO3-SBAIO-OPERATOR-WIDGET-PRIVACY-001 operator widget privacy
 
 **Status: Complete — offline/static verification only; no installed database, DB-backed probe, or live operator session.**

@@ -36,6 +36,17 @@ final class DataExchangeService
      */
     public static function processImportUpload(array $definition, array $file): array
     {
+        if (array_key_exists('supports_import', $definition) && empty($definition['supports_import'])) {
+            return [
+                'ok' => false,
+                'error' => 'import_disabled',
+                'file_name' => trim((string)($file['name'] ?? '')),
+                'row_count' => 0,
+                'header' => [],
+                'stored_path' => '',
+            ];
+        }
+
         $tmp = (string)($file['tmp_name'] ?? '');
         $name = trim((string)($file['name'] ?? ''));
         $size = (int)($file['size'] ?? 0);
@@ -185,6 +196,17 @@ final class DataExchangeService
      */
     public static function executeImportFromFile(array $definition, string $storedPath, bool $allowApprovalRequired = false): array
     {
+        if (array_key_exists('supports_import', $definition) && empty($definition['supports_import'])) {
+            return [
+                'ok' => false,
+                'error' => 'import_disabled',
+                'mode' => 'none',
+                'processed_rows' => 0,
+                'inserted_rows' => 0,
+                'skipped_rows' => 0,
+            ];
+        }
+
         if ($storedPath === '' || !is_file($storedPath)) {
             return [
                 'ok' => false,
@@ -260,6 +282,7 @@ final class DataExchangeService
             'governance_mode' => (string)($definition['governance_mode'] ?? 'approval_required'),
             'import_columns' => (array)($definition['import_columns'] ?? []),
             'export_columns' => (array)($definition['export_columns'] ?? []),
+            'supports_import' => (bool)($definition['supports_import'] ?? true),
         ], JSON_UNESCAPED_UNICODE);
 
         DB::query(
@@ -318,7 +341,7 @@ final class DataExchangeService
     /**
      * @return array{ok:bool,error:string,job_id:int,status:string,execution:array<string,mixed>}
      */
-    public static function approveQueuedJob(int $jobId, int $approverUserId): array
+    public static function approveQueuedJob(int $jobId, int $approverUserId, array $context = []): array
     {
         self::ensureImportJobsTable();
 
@@ -333,6 +356,16 @@ final class DataExchangeService
         $definition = json_decode((string)($job['definition_json'] ?? '{}'), true);
         if (!is_array($definition) || trim((string)($definition['key'] ?? '')) === '') {
             return ['ok' => false, 'error' => 'job_definition_missing', 'job_id' => $jobId, 'status' => 'pending', 'execution' => []];
+        }
+
+        // Re-admit the queued adapter against current owner definitions. This
+        // prevents a previously queued adapter from bypassing a later
+        // fail-closed owner admission while preserving current adapters.
+        if ($context !== []) {
+            $currentDefinition = self::findDefinition($context, (string)($definition['key'] ?? ''));
+            if (!is_array($currentDefinition)) {
+                return ['ok' => false, 'error' => 'adapter_unavailable', 'job_id' => $jobId, 'status' => 'pending', 'execution' => []];
+            }
         }
 
         $execution = self::executeImportFromFile($definition, (string)($job['stored_path'] ?? ''), true);

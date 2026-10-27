@@ -1,4 +1,19 @@
 # AGENT-COMPLIANCE-CHECKLIST
+
+## Session Summary (2026-10-27) — OH-AUTO3-SBAIO-DATA-EXCHANGE-CONTAINMENT-001
+
+Closed SBAIO personnel-data mutation paths through Shell operator Data Exchange
+imports and queued approvals. Both SBAIO adapters now fail closed before upload,
+stored-file parsing, source SQL, and import execution. Queued approval
+re-admits the current owner definition before execution; Manufacturing adapter
+declarations remain unchanged.
+
+Containment probe **22/22**, bulk-I/O **58/58**, personnel mutation **74/74**,
+personnel export **23/23**, host containment **15/15**, role home **26/26**,
+worker dashboard **42/42**, and responsive navigation **51/51** passed. No
+actual import, installed database, DB-backed probe, destructive filesystem
+operation, live operator session, deployment, or activation occurred.
+
 ## Session Summary (2026-10-27) — OH-AUTO3-SBAIO-OPERATOR-WIDGET-PRIVACY-001 operator widget privacy
 
 Contained SBAIO Attendance, Timecards, Leave, and Payroll operator widget

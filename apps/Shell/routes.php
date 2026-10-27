@@ -766,7 +766,8 @@ $router->post('/u/data-exchange/job/approve', function () use ($resolveOperatorP
         }
 
         $userId = (int)($userArr['id'] ?? 0);
-        $result = \Apps\Shell\Services\DataExchangeService::approveQueuedJob($jobId, $userId);
+        $ctx = \Apps\Platform\Services\UserAssignmentContext::context()->resolveUserContext($user);
+        $result = \Apps\Shell\Services\DataExchangeService::approveQueuedJob($jobId, $userId, $ctx);
         if (!$result['ok']) {
             throw new \RuntimeException($dxTr('operator.data_exchange.error.job_approval_failed', 'Job approval failed: {error}', [
                 'error' => (string)($result['error'] ?? 'unknown'),

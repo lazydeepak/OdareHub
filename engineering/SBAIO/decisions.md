@@ -1,4 +1,23 @@
 # SBAIO — Decisions
+
+### 2026-10-27 — OH-AUTO3-SBAIO-DATA-EXCHANGE-CONTAINMENT-001
+
+**Decision: Fail closed for the two SBAIO operator Data Exchange adapters and
+queued approvals until an owner-approved personnel record-level mutation
+contract exists.**
+
+`sbaio.attendance_daily` and `sbaio.timecard_weekly` are no longer admitted
+from the SBAIO operator contribution. The generic Data Exchange service also
+rejects definitions that disable import before upload inspection, stored-file
+inspection, parsing, or source-table execution. Queued approval re-admits the
+current owner definition before execution, so previously queued SBAIO jobs
+cannot bypass the current owner admission; current Manufacturing adapters
+remain declared and eligible through the existing path.
+
+No permission, Staff identity binding, organization/supervisor scope, schema,
+database, import execution, or approval policy was invented. This is a
+fail-closed owner-contribution and execution-boundary correction.
+
 ### 2026-10-27 — OH-AUTO3-SBAIO-OPERATOR-WIDGET-PRIVACY-001 operator widget privacy
 
 **Decision: Fail closed for SBAIO personnel/payroll operator widget providers
