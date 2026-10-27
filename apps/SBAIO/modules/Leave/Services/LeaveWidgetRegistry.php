@@ -5,6 +5,8 @@ namespace Plugins\Leave\Services;
 
 use App\Core\DB;
 
+require_once dirname(__DIR__, 3) . '/Services/SbaioOperatorWidgetPrivacyService.php';
+
 final class LeaveWidgetRegistry
 {
     /**
@@ -13,6 +15,10 @@ final class LeaveWidgetRegistry
      */
     public static function contribute(string $region, array $context = []): array
     {
+        if (!\SBAIO\Services\SbaioOperatorWidgetPrivacyService::isAvailable($region)) {
+            return [];
+        }
+
         return match ($region) {
             'summary_cards'   => self::summaryCard(),
             'watchlist_items' => self::watchlistItem(),

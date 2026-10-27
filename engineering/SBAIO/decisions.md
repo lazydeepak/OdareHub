@@ -1,4 +1,23 @@
 # SBAIO — Decisions
+### 2026-10-27 — OH-AUTO3-SBAIO-OPERATOR-WIDGET-PRIVACY-001 operator widget privacy
+
+**Decision: Fail closed for SBAIO personnel/payroll operator widget providers
+until an owner-approved record-level visibility contract exists.**
+
+Attendance, Timecards, Leave, and Payroll widget registries now reject
+`summary_cards` and `watchlist_items` before count/detail SQL. This prevents
+Staff names/codes, attendance exceptions, leave entries, timecard states, and
+payroll states from reaching Shell operator discovery or rendering. Shell's
+generic provider discovery, URL normalization, authorization, and rendering
+contracts remain unchanged. Existing SBAIO host summary/monitoring
+contributions remain suppressed; non-sensitive navigation references are not
+data widgets and remain unchanged.
+
+No permission, Staff identity binding, organization/supervisor scope, schema,
+database, or operator-session policy was invented. Remaining owner decisions
+are record-level authority for personnel/payroll summaries, watchlists, and
+operator click-through workflows.
+
 ### 2026-10-27 — OH-AUTO3-SBAIO-SUITE-DASHBOARD-PRIVACY-001 dashboard privacy
 
 **Decision: Suppress central SBAIO personnel/payroll dashboard data and fail

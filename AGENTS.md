@@ -1,4 +1,15 @@
 # AGENTS.md
+## Session Summary (2026-10-27) — OH-AUTO3-SBAIO-OPERATOR-WIDGET-PRIVACY-001 operator widget privacy
+
+Contained SBAIO Attendance, Timecards, Leave, and Payroll operator widget
+providers before sensitive count/detail SQL. Shell discovery, authorization,
+URL normalization, and rendering remain generic and unchanged.
+
+Operator widget privacy probe **38/38**, host containment **15/15**, role home
+**26/26**, worker dashboard **42/42**, and responsive navigation **51/51**
+passed. No installed database, DB-backed probe, or live operator session ran;
+unrelated artifacts were preserved.
+
 ## Session Summary (2026-10-27) — OH-AUTO3-SBAIO-SUITE-DASHBOARD-PRIVACY-001 dashboard privacy
 
 Contained remaining central SBAIO dashboard and consolidated-report personnel/

@@ -1,4 +1,23 @@
 # SBAIO — Work
+### 2026-10-27 — OH-AUTO3-SBAIO-OPERATOR-WIDGET-PRIVACY-001 operator widget privacy
+
+**Status: Complete — offline/static verification only; no installed database, DB-backed probe, or live operator session.**
+
+- [x] Confirmed Attendance, Timecards, Leave, and Payroll registries could
+  issue sensitive counts/details through Shell operator widget discovery under
+  module/app visibility without record-level Staff authority.
+- [x] Added an SBAIO-owned fail-closed provider admission before all sensitive
+  widget count/detail methods execute.
+- [x] Attendance, Timecards, Leave, and Payroll now return no summary or
+  watchlist widgets; Shell discovery, normalization, authorization, and
+  rendering remain generic and unchanged.
+- [x] Operator widget privacy probe passed **38/38**; host containment
+  **15/15**; role-shaped operator home **26/26**; worker dashboard **42/42**;
+  responsive navigation **51/51**.
+- [x] Existing SBAIO dashboard/personnel/privacy and bulk-I/O regressions
+  remain green. No Core/Auth/ACL, permission, identity, organization,
+  supervisor, schema, database, or historical-record behavior changed.
+
 ### 2026-10-27 — OH-AUTO3-SBAIO-SUITE-DASHBOARD-PRIVACY-001 dashboard privacy
 
 **Status: Complete — offline/static verification only; no installed database or DB-backed SBAIO probe.**
