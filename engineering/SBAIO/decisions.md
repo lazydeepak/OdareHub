@@ -1,4 +1,18 @@
 # SBAIO — Decisions
+### 2026-10-27 — OH-AUTO3-SBAIO-CSV-ADMISSION-001 unresolved personnel/financial visibility
+
+**Status: Unresolved — no new policy inferred.**
+
+Staff, Payroll, Leave, Attendance, and Timecards exports contain personnel or
+financial fields, but the repository proves only the existing SBAIO app/report
+admission (`app.sbaio.access` plus active module lifecycle). It does not prove
+authenticated-user-to-Staff binding, organization scope, supervisor scope, or
+record-level export visibility for those fields. The CSV change therefore
+preserves the established export field contract while making it explicit; it
+does not claim that the fields are newly authorized or add a filtering policy.
+An owner-approved personnel/financial export visibility decision remains
+required before narrowing, expanding, or introducing record-level filtering.
+
 ### 2026-10-27 — OH-AUTO3-SBAIO-CSV-ADMISSION-001 CSV admission and projection safety
 
 **Decision: Centralize existing active-report admission in the CSV stream boundary and require explicit projections for every SBAIO CSV source.**

@@ -1,4 +1,15 @@
 # SBAIO — Work
+### 2026-10-27 — OH-AUTO3-SBAIO-CSV-ADMISSION-001 unresolved personnel/financial visibility
+
+**Status: Deferred owner decision — no runtime change.**
+
+The explicit Staff, Payroll, Leave, Attendance, and Timecards projections are
+schema-bound preservation of the existing export contract, not a new
+record-level authorization grant. Existing evidence does not establish Staff
+identity binding, organization/supervisor scope, or personnel/financial export
+visibility beyond SBAIO app/report admission. Future narrowing or filtering
+requires a separate owner-approved decision; no policy was invented here.
+
 ## 2026-10-27 — OH-AUTO3-SBAIO-CSV-ADMISSION-001 CSV admission and projection audit
 
 **Status: Complete — offline/static verification only; no installed database or DB-backed SBAIO probe.**
