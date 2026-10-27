@@ -1,4 +1,20 @@
 # SBAIO — Decisions
+### 2026-10-27 — OH-AUTO3-SBAIO-PAYROLL-PARITY-CONTAINMENT-001 Payroll parity containment
+
+**Decision: Fail closed for Payroll parity diagnostics until an owner-approved personnel/payroll record-level visibility contract exists.**
+
+The existing `/apps/sbaio/payroll/parity` route previously invoked
+`PayrollParityValidationService::report(80)` after only SBAIO app access. The
+service reads salary-monthly rates, payroll records/runs, staff rows, fixed
+payroll profiles, and emits employee and financial comparison fields.
+`isPersonnelParityAvailable()` now rejects the route after existing active
+report admission and before session/controller/service/SQL execution.
+
+No permission, identity binding, organization scope, supervisor scope, schema,
+payroll business logic, or historical record behavior was added or changed.
+The remaining owner decisions are personnel identity binding, organization and
+supervisor scope, and record-level visibility for reads, exports, and mutations.
+
 ### 2026-10-27 — OH-AUTO3-SBAIO-PERSONNEL-MUTATION-CONTAINMENT-001 mutation containment
 
 **Decision: Fail closed for all nine personnel/payroll POST mutation routes until an owner-approved record-level mutation contract exists.**

@@ -1,4 +1,15 @@
 # AGENT-COMPLIANCE-CHECKLIST
+## Session Summary (2026-10-27) — OH-AUTO3-SBAIO-PAYROLL-PARITY-CONTAINMENT-001 Payroll parity containment
+
+Contained the remaining Payroll parity disclosure route. Existing app access
+and active-report admission remain first; the route now fails closed before
+session/controller/service execution and before salary, payroll, staff, or
+fixed-profile SQL.
+
+Parity and complete route-inventory probe **56/56** passed. Existing GET,
+HTML-report, CSV, and mutation containment remained intact. No installed
+database or DB-backed probe ran; unrelated artifacts were preserved.
+
 ## Session Summary (2026-10-27) — OH-AUTO3-SBAIO-PERSONNEL-MUTATION-CONTAINMENT-001 mutation containment
 
 Added centralized fail-closed mutation admission for all nine personnel/payroll

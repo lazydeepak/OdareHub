@@ -36,6 +36,11 @@ $router->post('/apps/sbaio/payroll/create-run', function () {
 
 $router->get('/apps/sbaio/payroll/parity', function () use ($view) {
     Auth::requireAppAccess('sbaio');
+    if (!ModuleReportRegistryService::isPersonnelParityAvailable('sbaio.payroll.overview')) {
+        http_response_code(404);
+        echo 'Parity unavailable';
+        return null;
+    }
     Auth::bootSession();
     PayrollController::parity($view);
     return null;

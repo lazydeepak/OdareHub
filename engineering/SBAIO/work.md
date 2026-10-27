@@ -1,4 +1,22 @@
 # SBAIO — Work
+### 2026-10-27 — OH-AUTO3-SBAIO-PAYROLL-PARITY-CONTAINMENT-001 Payroll parity containment
+
+**Status: Complete — offline/static verification only; no installed database or DB-backed SBAIO probe.**
+
+- [x] Contained `/apps/sbaio/payroll/parity` with centralized
+  `isPersonnelParityAvailable()` admission before session boot and parity
+  controller/service execution.
+- [x] Before containment, `PayrollParityValidationService::report(80)` read
+  salary-monthly rates, payroll records/runs, staff rows, fixed payroll
+  profiles, and emitted employee/salary/financial comparison data.
+- [x] Parity and complete route inventory probe passed **56/56**. Admission
+  performs only the existing `installed_plugins` query and no payroll/staff
+  source SQL.
+- [x] Inventory confirms all six personnel modules retain index, HTML report,
+  CSV export, and mutation containment; Payroll parity is now contained too.
+- [x] Remaining authorization decisions are Staff identity binding,
+  organization/supervisor scope, and record-level personnel/payroll visibility.
+
 ### 2026-10-27 — OH-AUTO3-SBAIO-PERSONNEL-MUTATION-CONTAINMENT-001 mutation containment
 
 **Status: Complete — offline/static verification only; no installed database or DB-backed SBAIO probe.**

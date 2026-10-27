@@ -187,6 +187,15 @@ final class ModuleReportRegistryService
             && !isset(self::REPORTS_REQUIRING_OWNER_DECISION[trim($reportKey)]);
     }
 
+    /**
+     * Read-only admission for personnel parity diagnostics. The existing
+     * personnel/payroll visibility contract is not established.
+     */
+    public static function isPersonnelParityAvailable(string $reportKey): bool
+    {
+        return self::findActiveHtmlReport($reportKey) !== null;
+    }
+
     public static function streamCsvForReport(string $reportKey): bool
     {
         $reportKey = trim($reportKey);
