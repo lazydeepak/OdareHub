@@ -1,7 +1,8 @@
 # OH-AUTO4-002 — Product Readiness and Priority Reconciliation
 
 **Repository:** `/Users/lazydeepak/dev/OdareHub`
-**Verified baseline:** `bb0abecc20dd711973172c2d1ec9da07810196ff`
+**Assessment baseline:** `bb0abecc20dd711973172c2d1ec9da07810196ff`
+**Reverified at:** `ccfc1bb60eefd2d687097f97768f5abc2ea3d6a6`
 **Branch:** `main`
 **Status:** **Assessment complete; one bounded next slice recommended**
 **Mode:** Read-only assessment and documentation-only delivery
@@ -54,6 +55,24 @@ Reviewed:
 - current SBAIO operator contribution/view, admission services, and routes;
 - recorded focused probes and containment evidence.
 
+### Named milestone reconciliation
+
+- **OH-AUTO2-114 — completed:** Shell account-panel extraction is recorded with
+  a 12/12 isolated parity probe. The older “Next” entry in the Shell work
+  register is historical debt and is not a new assignment.
+- **OH-AUTO2-115 — completed:** Shell recent-activity extraction is recorded
+  with a 16/16 isolated fake-query/translation/rendering probe.
+- **OH-AUTO2-116 — completed:** Shell worker task-to-action identity integrity
+  is recorded with a 42/42 adversarial proof; exact provider IDs remain bound
+  to the existing authorized `/u/{username}/tasks` route.
+- **OH-AUTO2-105B — still blocked:** the separately authorized incident
+  assessment stopped before database connection because no independently
+  verified least-privilege read-only account and complete recovery evidence
+  exist. No approval to execute the assessment is inferred here.
+- **OH-AUTO2-105R — distinct and open:** the prior accidental DB-backed probe
+  incident remains impact-undetermined. Its status must not be conflated with
+  105B prerequisite authorization or treated as resolved by the 105S guard.
+
 No application code, Core/Auth/ACL, database, SQL, migration, activation,
 deployment, browser, HTTP, or live-runtime operation was performed.
 
@@ -73,6 +92,8 @@ deployment, browser, HTTP, or live-runtime operation was performed.
 ## 5. Completed work not to reopen without regression evidence
 
 - Shell worker/task and responsive navigation foundations;
+- OH-AUTO2-114 account-panel extraction, OH-AUTO2-115 recent-activity
+  extraction, and OH-AUTO2-116 worker task-to-action integrity;
 - Manufacturing Processing scope and Assembly/QC operator authority;
 - Manufacturing Parts search/detail and recent operator UX corrections;
 - Procurement creator-owned operator request queue and PO-to-receipt handoff;
