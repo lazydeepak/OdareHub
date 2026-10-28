@@ -1,5 +1,21 @@
 # AGENT-COMPLIANCE-CHECKLIST
 
+## Session Summary (2026-10-29) — OH-AUTO4-002 product readiness reconciliation
+
+Verified baseline `bb0abecc20dd711973172c2d1ec9da07810196ff` with
+`HEAD == origin/main` and created
+`engineering/auto4-product-readiness-reconciliation.md`.
+
+The documentation reconciles current readiness evidence, completed and blocked
+work, ranked engineering candidates, and one executable next assignment:
+contain SBAIO operator navigation to `/u/*` without authorization restoration.
+SBAIO personnel authorization remains blocked pending OH-AUTO4-001 owner review.
+
+No application, Core/Auth/ACL, database, migration, activation, deployment,
+browser, HTTP, or live-runtime change occurred. Unrelated artifacts were
+preserved.
+
+
 ## Session Summary (2026-10-29) — OH-AUTO4-SBAIO-001 owner decision package
 
 Independently verified `f203ff3f4162f37d61bd0257bf8f23c32ce3d75c` with
