@@ -1,5 +1,18 @@
 # AGENTS.md
 
+## Session Summary (2026-10-29) — OH-AUTO4-SBAIO-001 owner decision package
+
+Independently verified `f203ff3f4162f37d61bd0257bf8f23c32ce3d75c` with
+`HEAD == origin/main` and created
+`engineering/SBAIO/owner-decision-package.md`. The package covers all 17 owner
+decisions with recommended defaults, alternatives, security implications,
+dependencies, and authority classifications.
+
+GO for owner review; BLOCKED for authorization implementation. No application,
+Core/Auth/ACL, permission, identity, schema, database, runtime, activation,
+deployment, or policy change occurred.
+
+
 ## Session Summary (2026-10-28) — OH-AUTO3-SBAIO-AUTHORIZATION-RESTORATION-PLAN-001
 
 Completed the engineering-facing SBAIO personnel authorization and functional

@@ -1,5 +1,17 @@
 # SBAIO — Decisions
 
+### 2026-10-29 — OH-AUTO4-SBAIO-001 owner decision package
+
+**Decision status: Documentation-only package complete; no owner policy is
+approved.**
+
+`engineering/SBAIO/owner-decision-package.md` expands all 17 restoration
+proposals into a decision-ready register. It labels technical recommendations
+separately from business-owner authority, records alternatives and security
+implications, and preserves fail-closed behavior until the required decisions
+and acceptance gates are explicitly approved.
+
+
 ### 2026-10-28 — OH-AUTO3-SBAIO-AUTHORIZATION-RESTORATION-PLAN-001
 
 **Decision status: Documentation-only plan complete; no restoration policy is

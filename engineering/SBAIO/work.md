@@ -1,5 +1,22 @@
 # SBAIO — Work
 
+### 2026-10-29 — OH-AUTO4-SBAIO-001 owner decision package
+
+**Status: Complete — decision-ready documentation; authorization and
+implementation remain blocked.**
+
+- [x] Independently verified commit `f203ff3f4162f37d61bd0257bf8f23c32ce3d75c`
+  and `HEAD == origin/main` before preparing the package.
+- [x] Completed `engineering/SBAIO/owner-decision-package.md` for all 17
+  decisions with recommended defaults, alternatives, security implications,
+  dependencies, and approving owners.
+- [x] Distinguished safe technical recommendations from decisions requiring
+  explicit business-owner authority.
+- [x] Preserved existing containment; no policy, authorization, schema,
+  database, runtime, activation, or deployment change was made.
+- [x] Verdict: GO for owner review; BLOCKED for authorization implementation.
+
+
 ### 2026-10-28 — OH-AUTO3-SBAIO-AUTHORIZATION-RESTORATION-PLAN-001
 
 **Status: Complete — engineering restoration plan prepared; implementation
