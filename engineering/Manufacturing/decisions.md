@@ -1,5 +1,24 @@
 # Manufacturing — Decisions
 
+### 2026-10-30 — OH-AUTO4-MFG-002 dispatch lifecycle contract resolution
+
+**Decision status: BLOCKED — owner approval is required before implementation.**
+
+Current Manufacturing source has two administrative dispatch lifecycle
+families. The `DispatchOpsService` family lacks operator record scope,
+complete transitions, transaction/rollback, and audit semantics. The
+DispatchEntries workflow family has assignment/permission/scope checks and
+history/audit mechanisms, but its state machine does not match the Fulfillment
+`draft/ready/prepared/completed` contract and its transaction boundary is not
+an operator guarantee. Existing operator admission proves identity and app/
+view access, not dispatch-record mutation authority.
+
+No first operation is independently safe without an approved dispatch-specific
+profile/action mapping, exact record-scope predicate, canonical transition
+mapping, atomic persistence/audit contract, and duplicate/concurrency policy.
+No code or regression probe was added. Evidence:
+`docs/architecture/oh-auto4-mfg-002-dispatch-lifecycle-contract-resolution.md`.
+
 ### 2026-10-30 — OH-AUTO4-MFG-001 dispatch lifecycle dependency reconciliation
 
 **Decision status: BLOCKED — implementation requires an explicit Manufacturing

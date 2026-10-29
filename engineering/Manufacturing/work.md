@@ -1,5 +1,23 @@
 # Manufacturing — Work
 
+## 2026-10-30 — OH-AUTO4-MFG-002 dispatch lifecycle contract resolution
+
+**Status: Blocked — no independently safe dispatch mutation identified.**
+
+- [x] Verified HEAD and remote parity at `45ccbb4d4fde5f366be730ce1cd09cf3138c1a69`.
+- [x] Reconciled the existing Fulfillment/admin lifecycle, DispatchEntries
+  workflow, operator admission, Processing/Production scope precedents, and
+  migration-owned dispatch storage.
+- [x] Confirmed generic workflow assignment/part-scope checks do not establish
+  dispatch-entry ownership or operator action authority.
+- [x] Confirmed the generic workflow state machine is incompatible with the
+  Fulfillment completion-status sequence and is not transactionally atomic
+  across update, transition history, and audit events.
+- [x] Preserved existing behavior; no lifecycle route, mutation, schema,
+  migration, or speculative regression probe was added.
+
+Dependency record: `docs/architecture/oh-auto4-mfg-002-dispatch-lifecycle-contract-resolution.md`.
+
 ## 2026-10-30 — OH-AUTO4-MFG-001 dispatch lifecycle dependency reconciliation
 
 **Status: Blocked — no safe operator lifecycle implementation authorized.**

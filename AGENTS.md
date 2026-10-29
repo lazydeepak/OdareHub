@@ -7536,3 +7536,18 @@ and updated Manufacturing work/decision records. No implementation, route,
 schema, database, authorization, Core/Auth/ACL, activation, deployment,
 browser, HTTP, or live-test change occurred; SBAIO D-01–D-04 proposals remain
 unapproved.
+
+## Session Summary (2026-10-30) — OH-AUTO4-MFG-002 dispatch lifecycle contract resolution
+
+Verified OH-AUTO4-MFG-002 at HEAD/origin parity `45ccbb4d4fde5f366be730ce1cd09cf3138c1a69`.
+The milestone remains blocked: generic workflow assignment/part scope does not
+establish dispatch-record operator authority, the workflow state machine does
+not match Fulfillment completion states, and the persistence/history/audit
+sequence is not an operator-atomic contract.
+
+Created the dependency record at
+`docs/architecture/oh-auto4-mfg-002-dispatch-lifecycle-contract-resolution.md`
+and updated Manufacturing work/decision records. No implementation, route,
+schema, database, authorization, Core/Auth/ACL, activation, deployment,
+browser, HTTP, or live-test change occurred; unrelated artifacts remain
+preserved.

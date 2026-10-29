@@ -8765,3 +8765,19 @@ route, schema, migration, database, authorization, Core/Auth/ACL, browser,
 HTTP, deployment, activation, or live-test change occurred. No false lifecycle
 probe was added for an unapproved contract. Unrelated dirty artifacts and
 incident evidence were preserved.
+
+## Session Summary (2026-10-30) — OH-AUTO4-MFG-002 dispatch lifecycle contract resolution
+
+Verified HEAD and `origin/main` parity at
+`45ccbb4d4fde5f366be730ce1cd09cf3138c1a69` and reconciled OH-AUTO4-MFG-002
+against the existing MFG-001 blocker, dispatch services, module workflow,
+operator admission, Processing/Production scope precedents, and migrations.
+
+The milestone remains blocked: generic workflow assignment/part scope is not
+dispatch-record authority; its state machine does not match Fulfillment
+completion statuses; and the existing update/history/audit sequence is not an
+operator-atomic contract. Created
+`docs/architecture/oh-auto4-mfg-002-dispatch-lifecycle-contract-resolution.md`
+and updated Manufacturing records. No code, route, schema, migration,
+database, Core/Auth/ACL, browser, HTTP, activation, deployment, or live-test
+change occurred. Unrelated dirty artifacts were preserved.
