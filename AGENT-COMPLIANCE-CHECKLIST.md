@@ -8749,3 +8749,19 @@ operation occurred. Unrelated dirty worktree artifacts were preserved.
 
 Validation: `git diff --check` clean; documentation scope reviewed; no runtime
 tests or database operations run.
+
+## Session Summary (2026-10-30) — OH-AUTO4-MFG-001 dispatch lifecycle dependency reconciliation
+
+Verified the Manufacturing dispatch lifecycle milestone remains unfinished and
+blocked. Existing administrative `markReady`, `prepare`, and `complete` paths
+do not provide operator record scope, a complete legal transition contract,
+transaction/rollback, audit failure semantics, or idempotency. Existing module
+workflow/audit components are administrative and were not treated as `/u/*`
+operator authority.
+
+Created `docs/architecture/oh-auto4-mfg-001-dispatch-lifecycle-dependency-reconciliation.md`
+and updated the Manufacturing work/decision registers. No runtime operation,
+route, schema, migration, database, authorization, Core/Auth/ACL, browser,
+HTTP, deployment, activation, or live-test change occurred. No false lifecycle
+probe was added for an unapproved contract. Unrelated dirty artifacts and
+incident evidence were preserved.

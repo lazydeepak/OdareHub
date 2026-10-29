@@ -1,5 +1,23 @@
 # Manufacturing — Work
 
+## 2026-10-30 — OH-AUTO4-MFG-001 dispatch lifecycle dependency reconciliation
+
+**Status: Blocked — no safe operator lifecycle implementation authorized.**
+
+- [x] Verified OH-AUTO4-MFG-001 is unfinished; the prior OH-AUTO2-MFG-001
+  assessment was read-only and OH-AUTO2-MFG-002 explicitly blocked operator
+  lifecycle exposure.
+- [x] Reconciled current `DispatchOpsService`, `DispatchWorkflow`, module
+  controller, routes, migrations, and existing operator admission boundaries.
+- [x] Confirmed no approved operator record-scope authority, complete legal
+  transition contract, runtime-DDL-free mutation path, or audit/idempotency
+  contract exists for `markReady`, `prepare`, or `complete`.
+- [x] Preserved existing administrative/module behavior and fail-closed
+  operator boundaries; no runtime implementation or new lifecycle probe was
+  added.
+
+Dependency record: `docs/architecture/oh-auto4-mfg-001-dispatch-lifecycle-dependency-reconciliation.md`.
+
 ## 2026-10-25 — OH-AUTO3-MFG-UX-003 operator workflow continuity
 
 - [x] Verified the integrated baseline and inspected existing operator workflow

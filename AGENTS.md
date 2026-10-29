@@ -7521,3 +7521,18 @@ the status and source record. Existing fail-closed SBAIO containment,
 OH-AUTO2-105B, OH-AUTO2-105R, and unrelated dirty worktree artifacts were
 preserved. No code, Core/Auth/ACL, authorization, schema, database, migration,
 route, activation, deployment, browser, HTTP, or runtime operation occurred.
+
+## Session Summary (2026-10-30) — OH-AUTO4-MFG-001 dispatch lifecycle dependency reconciliation
+
+Verified OH-AUTO4-MFG-001 against the current Manufacturing register, prior
+OH-AUTO2-MFG-001/MFG-002 evidence, and current dispatch services. The milestone
+remains unfinished and blocked: no approved operator record scope, complete
+legal transition matrix, runtime-DDL-free transaction path, audit semantics, or
+idempotency contract exists for `markReady`, `prepare`, or `complete`.
+
+Created the dependency reconciliation at
+`docs/architecture/oh-auto4-mfg-001-dispatch-lifecycle-dependency-reconciliation.md`
+and updated Manufacturing work/decision records. No implementation, route,
+schema, database, authorization, Core/Auth/ACL, activation, deployment,
+browser, HTTP, or live-test change occurred; SBAIO D-01–D-04 proposals remain
+unapproved.

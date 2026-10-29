@@ -1,5 +1,21 @@
 # Manufacturing — Decisions
 
+### 2026-10-30 — OH-AUTO4-MFG-001 dispatch lifecycle dependency reconciliation
+
+**Decision status: BLOCKED — implementation requires an explicit Manufacturing
+operator authority contract.**
+
+The current repository still supports administrative dispatch lifecycle paths,
+but no approved operator record scope maps an authenticated `/u/*` operator to
+an exact dispatch entry. The existing `DispatchOpsService` methods also lack
+the complete legal transition, transaction/rollback, audit, and idempotency
+contract required for safe operator exposure. The stronger module workflow
+path is administrative and cannot be treated as operator authorization.
+
+`docs/architecture/oh-auto4-mfg-001-dispatch-lifecycle-dependency-reconciliation.md`
+records the evidence and required owner decisions. No lifecycle operation,
+route, schema, authorization, or regression probe was added.
+
 ### 2026-10-25 — OH-AUTO3-MFG-UX-001 Assembly/QC range control
 
 **Status:** Implemented and verified offline under the existing operator
