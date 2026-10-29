@@ -8730,3 +8730,22 @@ deployment, or activation operation occurred.
 Focused handoff proof passed **13/13**; neighboring Procurement workflow and
 authorization probes, PHP lint, architecture gates, deletion-family gates
 **28/28**, deployment readiness, and diff hygiene passed. Unrelated staged,
+
+## Session Summary (2026-10-30) — OH-AUTO4-SBAIO-003 D-01–D-04 decision dependency reconciliation
+
+Prepared the bounded, read-only decision record at
+`docs/architecture/oh-auto4-sbaio-003-d01-d04-decision-record.md`.
+Reconciled the SBAIO owner-decision package with Platform organization and
+membership evidence, Staff identity/eligibility fields, and ACL hard-
+authorization boundaries. Evaluated Platform Option B and documented proposed
+outcomes for D-01–D-04, alternatives, security invariants, dependencies,
+authoritative owners, exact approvals, and cross-module contradictions.
+
+All recommendations are explicitly **PROPOSED**, not approved. Existing SBAIO
+containment and OH-AUTO2-105B/OH-AUTO2-105R boundaries remain unchanged. No
+code, Core/Auth/ACL, schema, migration, database, route, identity binding,
+authorization restoration, activation, deployment, browser, HTTP, or runtime
+operation occurred. Unrelated dirty worktree artifacts were preserved.
+
+Validation: `git diff --check` clean; documentation scope reviewed; no runtime
+tests or database operations run.

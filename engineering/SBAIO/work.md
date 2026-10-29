@@ -1,5 +1,24 @@
 # SBAIO — Work
 
+### 2026-10-30 — OH-AUTO4-SBAIO-003 D-01–D-04 decision dependency reconciliation
+
+**Status: Complete — proposed decision record ready for owner approval;
+implementation remains blocked.**
+
+- [x] Reconciled the SBAIO owner-decision package with Platform organization and
+  membership contracts, Staff identity/eligibility evidence, and ACL boundaries.
+- [x] Evaluated Platform Option B and separated technical membership evidence
+  from cross-domain owner approval.
+- [x] Recorded explicit **PROPOSED** outcomes for D-01–D-04, ownership,
+  alternatives, security invariants, dependencies, and exact approving owners.
+- [x] Documented contradictions between Platform’s DB-free technical acceptance
+  and the still-pending SBAIO organization-authority decision.
+- [x] Preserved all existing fail-closed containment; no code, authorization,
+  schema, database, migration, activation, deployment, or runtime behavior was
+  changed.
+
+Decision record: `docs/architecture/oh-auto4-sbaio-003-d01-d04-decision-record.md`.
+
 ### 2026-10-29 — OH-AUTO4-SBAIO-002 operator navigation confinement
 
 **Status: Complete — database-free rendered-view containment; authorization
@@ -17,7 +36,6 @@ restoration remains blocked.**
 - [x] No route, permission, identity, organization, database, schema,
   migration, activation, deployment, or personnel authorization behavior was
   added or changed.
-
 
 ### 2026-10-29 — OH-AUTO4-SBAIO-001 owner decision package
 

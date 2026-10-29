@@ -1,5 +1,22 @@
 # SBAIO — Decisions
 
+### 2026-10-30 — OH-AUTO4-SBAIO-003 D-01–D-04 proposed decision record
+
+**Decision status: PROPOSED only; owner approval is pending and implementation
+remains blocked.**
+
+`docs/architecture/oh-auto4-sbaio-003-d01-d04-decision-record.md` reconciles
+the SBAIO owner-decision package with Platform membership evidence, Staff
+eligibility fields, and ACL boundaries. It recommends Platform Option B as the
+preferred organization-authority direction, while explicitly distinguishing
+Platform’s technical evidence/resolver acceptance from approval of a
+cross-domain SBAIO authorization policy.
+
+The record proposes D-01–D-04 outcomes for binding ownership, active
+cardinality, organization authority, and Staff eligibility. No recommendation
+is marked approved. Existing SBAIO containment and the OH-AUTO2-105B/105R
+boundaries remain unchanged.
+
 ### 2026-10-29 — OH-AUTO4-SBAIO-001 owner decision package
 
 **Decision status: Documentation-only package complete; no owner policy is

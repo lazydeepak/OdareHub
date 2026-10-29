@@ -7506,3 +7506,18 @@ activation behavior was introduced.
 Handoff proof **13/13**, neighboring Procurement probes, PHP lint, architecture
 gates, deletion-family gates **28/28**, deployment readiness, and diff hygiene
 passed. Unrelated working-tree artifacts remain preserved.
+
+## Session Summary (2026-10-30) — OH-AUTO4-SBAIO-003 D-01–D-04 decision dependency reconciliation
+
+Created `docs/architecture/oh-auto4-sbaio-003-d01-d04-decision-record.md` as a
+bounded, documentation-only reconciliation of SBAIO authorization decisions
+D-01–D-04. The record evaluates Platform Option B against the existing
+organization/membership, Staff, and ACL contracts; identifies the distinction
+between Platform technical evidence acceptance and cross-domain owner approval;
+and records all outcomes as **PROPOSED**, not approved.
+
+Updated `engineering/SBAIO/work.md` and `engineering/SBAIO/decisions.md` with
+the status and source record. Existing fail-closed SBAIO containment,
+OH-AUTO2-105B, OH-AUTO2-105R, and unrelated dirty worktree artifacts were
+preserved. No code, Core/Auth/ACL, authorization, schema, database, migration,
+route, activation, deployment, browser, HTTP, or runtime operation occurred.
