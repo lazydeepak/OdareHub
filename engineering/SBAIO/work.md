@@ -1,5 +1,24 @@
 # SBAIO — Work
 
+### 2026-10-29 — OH-AUTO4-SBAIO-002 operator navigation confinement
+
+**Status: Complete — database-free rendered-view containment; authorization
+restoration remains blocked.**
+
+- [x] Removed administrative `/apps/sbaio/*` destinations from the SBAIO
+  operator view; only the existing `/u/{username}/sbaio?tab=overview` link is
+  actionable.
+- [x] Unsupported personnel tabs now render localized, non-actionable states
+  without loading sensitive providers or exposing an empty-data implication.
+- [x] Preserved assignment gating in `OperatorSurfaceContributionService` and
+  added rendered-view/contribution regression coverage: **17/17**.
+- [x] PHP lint, focused diff hygiene, applicable architecture gates, and the
+  existing SBAIO containment boundaries remain required validation evidence.
+- [x] No route, permission, identity, organization, database, schema,
+  migration, activation, deployment, or personnel authorization behavior was
+  added or changed.
+
+
 ### 2026-10-29 — OH-AUTO4-SBAIO-001 owner decision package
 
 **Status: Complete — decision-ready documentation; authorization and

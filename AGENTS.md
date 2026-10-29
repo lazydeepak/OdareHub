@@ -1,5 +1,18 @@
 # AGENTS.md
 
+## Session Summary (2026-10-29) — OH-AUTO4-SBAIO-002 operator navigation confinement
+
+Contained the SBAIO operator navigation defect: the `/u/*` SBAIO view no longer
+emits `/apps/sbaio/*` administrative destinations. Only the existing
+`/u/{username}/sbaio?tab=overview` link remains actionable; unsupported personnel
+tabs render localized, non-actionable unavailable states.
+
+Added database-free rendered-view and contribution coverage (**17/17**).
+Assignment gating and sensitive-data containment remain unchanged. No route,
+permission, identity, organization, schema, database, migration, activation,
+deployment, or SBAIO authorization restoration change occurred.
+
+
 ## Session Summary (2026-10-29) — OH-AUTO4-002 independent verification
 
 Reverified the existing product-readiness reconciliation at

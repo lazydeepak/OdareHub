@@ -1,5 +1,16 @@
 # AGENT-COMPLIANCE-CHECKLIST
 
+## Session Summary (2026-10-29) — OH-AUTO4-SBAIO-002 operator navigation confinement
+
+Removed `/apps/sbaio/*` destinations from the SBAIO operator view and rendered
+unsupported tabs as localized, non-actionable unavailable states. The existing
+assignment gate and sensitive provider containment remain unchanged.
+
+Rendered-view/contribution probe: **17/17**. No Core/Auth/ACL, route,
+permission, identity, organization, database, migration, activation,
+deployment, browser, HTTP, or personnel authorization implementation occurred.
+
+
 ## Session Summary (2026-10-29) — OH-AUTO4-002 independent verification
 
 Reverified `engineering/auto4-product-readiness-reconciliation.md` against
