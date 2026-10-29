@@ -1,5 +1,25 @@
 # Procurement — Decisions
 
+### 2026-10-30 — OH-AUTO4-PROC-001 mutation dependency reconciliation
+
+**Decision status: BLOCKED — Procurement owner approval is required before implementation.**
+
+Existing Procurement admin mutations provide app access, CSRF, lifecycle
+validation, transactions, audit, and selected row locks. The approved-request
+to PO path also has duplicate-conversion protection and historical 10/10
+concurrency evidence. None of these paths proves organization/tenant isolation
+or record-level mutation authority: the schema has `created_by` but no tenant
+identity, and the organization-scoped intake descriptor is explicitly
+non-persistent, non-authorizing, and unwired.
+
+The accepted operator Procurement contract remains creator-owned and read-only;
+approval, cancellation, PO creation, supplier mutation, and receiving remain
+deferred. No first mutation is independently safe without an owner-approved
+actor/permission mapping, tenant source, record predicate, lifecycle, atomic
+audit, and durable duplicate/concurrency contract. Evidence:
+`docs/architecture/oh-auto4-proc-001-procurement-mutation-dependency-reconciliation.md`.
+
+
 ### 2026-10-25 — OH-AUTO3-PROC-WORKFLOW-001 PO-to-receipt handoff
 
 **Status:** Implemented and verified as a bounded workflow handoff

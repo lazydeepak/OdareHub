@@ -1,5 +1,19 @@
 # AGENTS.md
 
+## Session Summary (2026-10-30) — OH-AUTO4-PROC-001 mutation dependency reconciliation
+
+Verified OH-AUTO4-PROC-001 at HEAD/origin parity
+`35e4782fdcc72ee457a25ec891f666621f13a849`. Existing Procurement mutations
+have selected transaction, audit, row-lock, and concurrency evidence, but no
+approved organization/tenant source or record-level mutation authority.
+
+Created the dependency record at
+`docs/architecture/oh-auto4-proc-001-procurement-mutation-dependency-reconciliation.md`
+and updated Procurement work/decision records. No implementation, database,
+route, schema, authorization, Core/Auth/ACL, activation, deployment, browser,
+HTTP, or live-test change occurred; unrelated artifacts remain preserved.
+
+
 ## Session Summary (2026-10-29) — OH-AUTO4-SBAIO-002 operator navigation confinement
 
 Contained the SBAIO operator navigation defect: the `/u/*` SBAIO view no longer

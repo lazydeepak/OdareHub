@@ -1,5 +1,24 @@
 # AGENT-COMPLIANCE-CHECKLIST
 
+## Session Summary (2026-10-30) — OH-AUTO4-PROC-001 mutation dependency reconciliation
+
+Verified HEAD/origin parity at
+`35e4782fdcc72ee457a25ec891f666621f13a849` and reconciled OH-AUTO4-PROC-001
+against Procurement records, admin mutation services, route/controller guards,
+operator read-only decisions, transaction/audit proofs, and concurrency
+evidence.
+
+The assignment remains blocked: existing mutations lack an approved
+organization/tenant source and record-level mutation authority. The strongest
+approved-request-to-PO path has transaction, audit, row-lock, duplicate, and
+10/10 concurrency evidence, but cannot be treated as tenant-isolated by
+inference. Created
+`docs/architecture/oh-auto4-proc-001-procurement-mutation-dependency-reconciliation.md`
+and updated Procurement records. No code, database, route, schema,
+Core/Auth/ACL, browser, HTTP, activation, deployment, or live-test change
+occurred; unrelated artifacts were preserved.
+
+
 ## Session Summary (2026-10-29) — OH-AUTO4-SBAIO-002 operator navigation confinement
 
 Removed `/apps/sbaio/*` destinations from the SBAIO operator view and rendered

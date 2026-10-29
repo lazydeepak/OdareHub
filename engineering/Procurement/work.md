@@ -1,5 +1,24 @@
 # Procurement — Work
 
+## 2026-10-30 — OH-AUTO4-PROC-001 mutation dependency reconciliation
+
+**Status: Blocked — no mutation currently satisfies the complete safety contract.**
+
+- [x] Verified HEAD and `origin/main` parity at
+  `35e4782fdcc72ee457a25ec891f666621f13a849`.
+- [x] Confirmed OH-AUTO4-PROC-001 has no prior completion record and is not
+  actively implemented in the repository.
+- [x] Audited supplier, request, purchase-order, and receipt mutations,
+  including route/controller authorization, lifecycle checks, transactions,
+  audit behavior, record locks, and duplicate/concurrency evidence.
+- [x] Confirmed the strongest approved-request conversion path still lacks an
+  organization/tenant source and record-level mutation authority.
+- [x] Preserved the existing read-only operator boundary and all unrelated
+  working-tree artifacts; no code or speculative mutation probe was added.
+
+Dependency record: `docs/architecture/oh-auto4-proc-001-procurement-mutation-dependency-reconciliation.md`.
+
+
 ## 2026-10-25 — OH-AUTO3-PROC-WORKFLOW-001 PO-to-receipt handoff
 
 **Status: COMPLETE — bounded workflow handoff integrated.**
