@@ -20,7 +20,7 @@ final class ProcurementOverviewService
         $required = [
             'procurement_suppliers' => ['id', 'supplier_name', 'supplier_status'],
             'procurement_requests' => [
-                'id', 'request_ref', 'product_id', 'requested_qty', 'needed_date',
+                'id', 'organization_id', 'request_ref', 'product_id', 'requested_qty', 'needed_date',
                 'source_app', 'source_ref_type', 'source_ref_id', 'request_status', 'created_at',
             ],
             'procurement_purchase_orders' => [
@@ -98,6 +98,7 @@ final class ProcurementOverviewService
 
         DB::query("CREATE TABLE IF NOT EXISTS procurement_requests (
             id BIGINT AUTO_INCREMENT PRIMARY KEY,
+            organization_id INT NULL,
             request_ref VARCHAR(60) NOT NULL,
             product_id INT NULL,
             requested_qty DECIMAL(14,2) NOT NULL DEFAULT 0,
@@ -111,7 +112,10 @@ final class ProcurementOverviewService
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             UNIQUE KEY uniq_proc_request_ref (request_ref),
-            KEY idx_proc_request_status (request_status)
+            KEY idx_proc_request_status (request_status),
+            KEY idx_procurement_requests_organization (organization_id),
+            CONSTRAINT fk_procurement_requests_organization FOREIGN KEY (organization_id)
+                REFERENCES org_companies(id) ON DELETE RESTRICT ON UPDATE CASCADE
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 
         DB::query("CREATE TABLE IF NOT EXISTS procurement_purchase_orders (
@@ -257,12 +261,12 @@ final class ProcurementOverviewService
      * @param array<string,mixed> $filters
      * @return array{available:bool,rows:array<int,array<string,mixed>>,filters:array<string,mixed>,invalid_filters:array<int,string>}
      */
-    public static function ownedOperatorRequests(string $actorEmail, int $limit = 40, array $filters = []): array
+    public static function ownedOperatorRequests(string $actorEmail, int $limit = 40, array $filters = [], ?int $organizationId = null): array
     {
         $actorEmail = trim($actorEmail);
         $limit = max(1, min(50, $limit));
         $normalizedFilters = self::normalizeOperatorRequestFilters($filters);
-        if ($actorEmail === '') {
+        if ($actorEmail === '' || $organizationId === null || $organizationId <= 0) {
             return ['available' => false, 'rows' => [], 'filters' => $normalizedFilters, 'invalid_filters' => []];
         }
 
@@ -281,6 +285,8 @@ final class ProcurementOverviewService
             // predicate.
             $where = ['r.created_by = ?'];
             $params = [$actorEmail];
+            $where[] = 'r.organization_id = ?';
+            $params[] = $organizationId;
             if ($normalizedFilters['request_ref'] !== '') {
                 $where[] = 'LOWER(r.request_ref) LIKE ?';
                 $params[] = '%' . strtolower($normalizedFilters['request_ref']) . '%';
@@ -385,12 +391,12 @@ final class ProcurementOverviewService
      *
      * @return array{available:bool,trace:?array<string,mixed>,invalid_reference:bool}
      */
-    public static function ownedOperatorRequestTrace(string $actorEmail, string $requestRef, int $receiptLimit = 50): array
+    public static function ownedOperatorRequestTrace(string $actorEmail, string $requestRef, int $receiptLimit = 50, ?int $organizationId = null): array
     {
         $actorEmail = trim($actorEmail);
         $requestRef = trim($requestRef);
         $receiptLimit = max(1, min(50, $receiptLimit));
-        if ($actorEmail === '' || $requestRef === ''
+        if ($actorEmail === '' || $requestRef === '' || $organizationId === null || $organizationId <= 0
             || strlen($requestRef) > 60
             || preg_match('/[\x00-\x1F\x7F]/', $requestRef) === 1
             || preg_match('//u', $requestRef) !== 1
@@ -419,7 +425,7 @@ final class ProcurementOverviewService
                      SELECT r.id, r.request_ref, r.request_status, r.requested_qty,
                             r.needed_date, r.created_at
                      FROM procurement_requests r
-                     WHERE r.created_by = ? AND r.request_ref = ?
+                     WHERE r.created_by = ? AND r.request_ref = ? AND r.organization_id = ?
                      LIMIT 1
                  ) r
                   LEFT JOIN procurement_purchase_orders po
@@ -432,7 +438,7 @@ final class ProcurementOverviewService
                  LEFT JOIN procurement_receipts rc ON rc.po_id = po.id
                  ORDER BY rc.id ASC
                  LIMIT ' . ($receiptLimit + 1),
-                [$actorEmail, $requestRef]
+                [$actorEmail, $requestRef, $organizationId]
             );
         } catch (\Throwable) {
             return ['available' => false, 'trace' => null, 'invalid_reference' => false];
@@ -959,6 +965,10 @@ final class ProcurementOverviewService
      */
     public static function createRequest(array $input, string $actor): void
     {
+        $organizationId = is_int($input['organization_id'] ?? null) ? $input['organization_id'] : null;
+        if ($organizationId === null || $organizationId <= 0) {
+            throw new \InvalidArgumentException('Authenticated organization context is required.');
+        }
         // Validate and canonicalize before request-reference generation,
         // audit access, or any request mutation. Manual creation keeps the
         // established blank/missing default of draft while accepting the
@@ -982,9 +992,10 @@ final class ProcurementOverviewService
         $db->begin_transaction();
         try {
             DB::query(
-                'INSERT INTO procurement_requests (request_ref, product_id, requested_qty, needed_date, source_app, source_ref_type, source_ref_id, request_status, note, created_by)
-                 VALUES (?,?,?,?,?,?,?,?,?,?)',
+                'INSERT INTO procurement_requests (organization_id, request_ref, product_id, requested_qty, needed_date, source_app, source_ref_type, source_ref_id, request_status, note, created_by)
+                 VALUES (?,?,?,?,?,?,?,?,?,?,?)',
                 [
+                    $organizationId,
                     $requestRef,
                     self::toPositiveInt($input['product_id'] ?? null),
                     $qty,
@@ -1013,6 +1024,7 @@ final class ProcurementOverviewService
                         'note' => 'Procurement request created.',
                         'metadata' => [
                             'request_ref' => $requestRef,
+                            'organization_id' => $organizationId,
                             'source_app' => (string)($input['source_app'] ?? ''),
                         ],
                     ]
@@ -1031,8 +1043,11 @@ final class ProcurementOverviewService
     /**
      * @return array{request_id:int,already_exists:bool}
      */
-    public static function intakeFromManufacturingDemand(int $demandId, string $actor): array
+    public static function intakeFromManufacturingDemand(int $demandId, string $actor, ?int $organizationId = null): array
     {
+        if ($organizationId === null || $organizationId <= 0) {
+            throw new \InvalidArgumentException('Authenticated organization context is required.');
+        }
         if ($demandId <= 0) {
             throw new \InvalidArgumentException('Invalid manufacturing demand id.');
         }
@@ -1070,9 +1085,10 @@ final class ProcurementOverviewService
         }
 
         DB::query(
-            'INSERT INTO procurement_requests (request_ref, product_id, requested_qty, needed_date, source_app, source_ref_type, source_ref_id, request_status, note, created_by)
-             VALUES (?,?,?,?,?,?,?,?,?,?)',
+            'INSERT INTO procurement_requests (organization_id, request_ref, product_id, requested_qty, needed_date, source_app, source_ref_type, source_ref_id, request_status, note, created_by)
+             VALUES (?,?,?,?,?,?,?,?,?,?,?)',
             [
+                $organizationId,
                 self::nextRef('PR'),
                 self::toPositiveInt($row['product_id'] ?? null),
                 round(max(0.0, (float)($row['required_qty'] ?? 0.0)), 2),
@@ -1103,6 +1119,7 @@ final class ProcurementOverviewService
                         'source_app' => 'manufacturing',
                         'source_ref_type' => 'mfg_procurement_demands',
                         'source_ref_id' => (string)$demandId,
+                        'organization_id' => $organizationId,
                     ],
                 ]
             );

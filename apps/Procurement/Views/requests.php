@@ -2,6 +2,14 @@
 <?php if (!($readiness['available'] ?? false)): require __DIR__ . '/_read_unavailable.php'; return; endif; ?>
 <?php $mfg_demands = is_array($mfg_demands ?? null) ? $mfg_demands : []; ?>
 <?php $suppliers = is_array($suppliers ?? null) ? $suppliers : []; ?>
+<?php
+$procurementLocale = function_exists('current_lang') ? (string)current_lang() : 'en';
+if (!in_array($procurementLocale, ['en', 'ja', 'ne'], true)) {
+  $procurementLocale = 'en';
+}
+$procurementLabels = require APP_ROOT . '/apps/Procurement/Resources/lang/' . $procurementLocale . '.php';
+$organizationLabel = (string)($procurementLabels['proc.requests.form_organization_id'] ?? $procurementLabels['proc.operator.queue.filter.organization'] ?? '');
+?>
 
 <?php
 $chipClass = static function (string $state): string {
@@ -39,6 +47,7 @@ $chipClass = static function (string $state): string {
   <h3 class="u-style-d462248a40"><?= e(t('proc.requests.create_title')) ?></h3>
   <form method="post" action="/apps/procurement/requests/create" class="grid u-style-1a42931a01">
     <input type="hidden" name="csrf" value="<?= e(\App\Core\Auth::csrfToken()) ?>">
+    <label><?= e($organizationLabel) ?><input class="input" type="number" name="organization_id" min="1" required></label>
     <label><?= e(t('proc.requests.form_ref')) ?><input class="input" type="text" name="request_ref"></label>
     <label><?= e(t('proc.requests.form_product_id')) ?><input class="input" type="number" name="product_id" min="1" required></label>
     <label><?= e(t('proc.requests.form_qty')) ?><input class="input" type="number" name="requested_qty" min="0.01" step="0.01" required></label>
@@ -80,6 +89,7 @@ $chipClass = static function (string $state): string {
                 <?php if ($linkedId <= 0): ?>
                   <form class="u-style-1169661891" method="post" action="/apps/procurement/requests/intake/manufacturing">
                     <input type="hidden" name="csrf" value="<?= e(\App\Core\Auth::csrfToken()) ?>">
+                    <label><?= e($organizationLabel) ?><input class="input" type="number" name="organization_id" min="1" required></label>
                     <input type="hidden" name="demand_id" value="<?= (int)($d['id'] ?? 0) ?>">
                     <button class="btn" type="submit"><?= e(t('proc.requests.mfg_btn_import')) ?></button>
                   </form>

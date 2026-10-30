@@ -2,14 +2,20 @@
 declare(strict_types=1);
 
 use Apps\Procurement\Services\ProcurementOverviewService;
+use Apps\Procurement\Services\ProcurementOrganizationScope;
 
 require_once APP_ROOT . '/apps/Procurement/Services/ProcurementOverviewService.php';
+require_once APP_ROOT . '/apps/Procurement/Services/ProcurementOrganizationScope.php';
 
 $currentQuery = is_array($data['current_query'] ?? null) ? $data['current_query'] : [];
 $traceReference = is_string($currentQuery['view_ref'] ?? null) ? (string)$currentQuery['view_ref'] : '';
 $queueFilters = array_intersect_key($currentQuery, array_flip(['request_ref', 'status', 'receipt_status', 'needed_date', 'needed_from', 'needed_to']));
-$queue = ProcurementOverviewService::ownedOperatorRequests((string)($data['user_email'] ?? ''), 40, $queueFilters);
-$traceResult = ProcurementOverviewService::ownedOperatorRequestTrace((string)($data['user_email'] ?? ''), $traceReference);
+$organizationScope = ProcurementOrganizationScope::resolve($currentQuery['organization_id'] ?? null);
+$organizationId = (($organizationScope['allowed'] ?? false) === true && is_object($organizationScope['context'] ?? null))
+    ? (int)$organizationScope['context']->organizationId()
+    : null;
+$queue = ProcurementOverviewService::ownedOperatorRequests((string)($data['user_email'] ?? ''), 40, $queueFilters, $organizationId);
+$traceResult = ProcurementOverviewService::ownedOperatorRequestTrace((string)($data['user_email'] ?? ''), $traceReference, 50, $organizationId);
 $trace = is_array($traceResult['trace'] ?? null) ? $traceResult['trace'] : null;
 $traceQuery = [];
 foreach (['request_ref', 'status', 'receipt_status', 'needed_date', 'needed_from', 'needed_to'] as $traceFilterKey) {
@@ -17,6 +23,7 @@ foreach (['request_ref', 'status', 'receipt_status', 'needed_date', 'needed_from
         $traceQuery[$traceFilterKey] = (string)$queueFilters[$traceFilterKey];
     }
 }
+$traceQuery['organization_id'] = (string)($currentQuery['organization_id'] ?? '');
 $rows = (array)($queue['rows'] ?? []);
 $normalizedFilters = (array)($queue['filters'] ?? []);
 $invalidFilters = (array)($queue['invalid_filters'] ?? []);
@@ -122,6 +129,9 @@ $traceUrl = static function (string $reference, string $username, array $filters
     <?php endif; ?>
 
     <form method="get" action="/u/<?= e(rawurlencode((string)($data['username'] ?? ''))) ?>/procurement" aria-label="<?= e($tr('proc.operator.queue.filter.title', 'Filter my requests')) ?>">
+        <label><?= e($tr('proc.operator.queue.filter.organization', 'Organization ID')) ?>
+            <input type="number" name="organization_id" min="1" required value="<?= e((string)($currentQuery['organization_id'] ?? '')) ?>">
+        </label>
         <label><?= e($tr('proc.operator.queue.filter.reference', 'Reference')) ?>
             <input type="search" name="request_ref" maxlength="60" value="<?= e((string)($normalizedFilters['request_ref'] ?? '')) ?>">
         </label>

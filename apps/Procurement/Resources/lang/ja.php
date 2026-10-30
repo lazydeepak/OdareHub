@@ -47,6 +47,8 @@ return [
     'proc.operator.queue.filter.needed_to' => '必要日の終了',
     'proc.operator.queue.filter.apply' => '絞り込む',
     'proc.operator.queue.filter.clear' => 'クリア',
+    'proc.operator.queue.filter.organization' => '組織ID',
+    'proc.requests.form_organization_id' => '組織ID',
     'proc.operator.queue.filter.invalid' => '指定したフィルターは無効です。依頼は表示されません。',
     'proc.operator.queue.status.draft' => '下書き',
     'proc.operator.queue.status.approved' => '承認済み',

@@ -47,6 +47,8 @@ return [
     'proc.operator.queue.filter.needed_to' => 'आवश्यक मितिसम्म',
     'proc.operator.queue.filter.apply' => 'फिल्टर लागू गर्नुहोस्',
     'proc.operator.queue.filter.clear' => 'खाली गर्नुहोस्',
+    'proc.operator.queue.filter.organization' => 'संस्था ID',
+    'proc.requests.form_organization_id' => 'संस्था ID',
     'proc.operator.queue.filter.invalid' => 'दिइएको फिल्टर अमान्य छ। कुनै अनुरोध देखाइने छैन।',
     'proc.operator.queue.status.draft' => 'मस्यौदा',
     'proc.operator.queue.status.approved' => 'स्वीकृत',

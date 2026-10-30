@@ -5,6 +5,7 @@ namespace Apps\Procurement\Controllers;
 
 use App\Core\Auth;
 use Apps\Procurement\Services\ProcurementOverviewService;
+use Apps\Procurement\Services\ProcurementOrganizationScope;
 
 final class ProcurementDashboardController
 {
@@ -149,6 +150,8 @@ final class ProcurementDashboardController
         }
 
         try {
+            $organizationId = self::requireOrganizationId($_POST['organization_id'] ?? null);
+            $_POST['organization_id'] = $organizationId;
             ProcurementOverviewService::createRequest($_POST, (string)(Auth::user()['email'] ?? ''));
             self::redirect('/apps/procurement/requests', 'ok', 'Procurement request created.');
         } catch (\Throwable $e) {
@@ -166,7 +169,8 @@ final class ProcurementDashboardController
         }
 
         try {
-            $result = ProcurementOverviewService::intakeFromManufacturingDemand($demandId, (string)(Auth::user()['email'] ?? ''));
+            $organizationId = self::requireOrganizationId($_POST['organization_id'] ?? null);
+            $result = ProcurementOverviewService::intakeFromManufacturingDemand($demandId, (string)(Auth::user()['email'] ?? ''), $organizationId);
             if ((bool)($result['already_exists'] ?? false)) {
                 self::redirect('/apps/procurement/requests', 'ok', 'Manufacturing demand was already linked to an existing procurement request.');
             }
@@ -322,5 +326,15 @@ final class ProcurementDashboardController
     {
         header('Location: ' . $path . '?' . $key . '=' . rawurlencode($message));
         exit;
+    }
+
+    private static function requireOrganizationId($raw): int
+    {
+        $result = ProcurementOrganizationScope::resolve($raw);
+        $context = $result['context'] ?? null;
+        if (($result['allowed'] ?? false) !== true || !is_object($context) || !method_exists($context, 'organizationId')) {
+            throw new \RuntimeException('Authenticated organization context could not be verified.');
+        }
+        return (int)$context->organizationId();
     }
 }

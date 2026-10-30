@@ -47,6 +47,8 @@ return [
     'proc.operator.queue.filter.needed_to' => 'Needed to',
     'proc.operator.queue.filter.apply' => 'Apply filters',
     'proc.operator.queue.filter.clear' => 'Clear',
+    'proc.operator.queue.filter.organization' => 'Organization ID',
+    'proc.requests.form_organization_id' => 'Organization ID',
     'proc.operator.queue.filter.invalid' => 'The supplied filter is invalid. No requests are shown.',
     'proc.operator.queue.status.draft' => 'Draft',
     'proc.operator.queue.status.approved' => 'Approved',
