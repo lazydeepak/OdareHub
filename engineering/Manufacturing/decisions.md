@@ -774,3 +774,32 @@ earliest enforceable boundary for new Product ownership; Stage 5 is the
 earliest system-wide boundary after all 47 normal-user surfaces are closed.
 Evidence:
 `docs/architecture/ipm/ipm-005-product-organization-ownership-dependency-reconciliation.md`.
+
+### 2026-11-23 — IPM-006 Product organization ownership implementation
+
+**Decision status: Implemented in source; database acceptance remains blocked
+pending governed disposable MySQL evidence.**
+
+Manufacturing Products uses one Products-owned admission boundary,
+`ProductOrganizationScope`, which delegates selected-organization validation to
+the existing Platform authenticated organization-context resolver. The form,
+CSV import, and legacy Product-import commit paths all pass the resulting opaque
+`OrganizationMembershipContext` to `ProductCreationService`; raw request
+organization IDs are never accepted by the persistence service.
+
+The migration is additive and nullable. Ordinary creation assigns verified
+ownership; ordinary upsert preserves same-organization ownership and rejects
+legacy NULL-owned or differently owned existing Products. Form creation and
+import batches retain transaction rollback boundaries. Platform demo seeds and
+database-only fixtures remain explicitly outside ordinary-user admission.
+
+The implementation is active by default when the Products module runtime is
+loaded; no feature flag or inactive enforcement claim is made. The module
+migration must be installed/updated before ordinary Product creation is used.
+No installed database was migrated or activated during this session. Governed
+acceptance remains a separate prerequisite.
+
+Evidence: database-free ownership contract **26/26**, Product Item mapping
+contract **19/19**, isolated source-root safety **17/17**, architecture gates
+PASS, deployment readiness PASS, and the governed database probe
+INCONCLUSIVE/exit 2 without attested `OH_IPM` infrastructure.

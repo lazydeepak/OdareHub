@@ -31,6 +31,7 @@ require_once __DIR__ . '/Controllers/ProcessingOperationController.php';
 require_once __DIR__ . '/Controllers/ProductionOperationController.php';
 require_once __DIR__ . '/Services/HandoffBoardService.php';
 require_once __DIR__ . '/Services/ManufacturingLegacyImportService.php';
+require_once __DIR__ . '/modules/Products/Services/ProductOrganizationScope.php';
 require_once __DIR__ . '/Services/ProcessingOperationService.php';
 require_once __DIR__ . '/Services/ProductionOperationService.php';
 require_once __DIR__ . '/Routes/production_queue.php';

@@ -48,6 +48,7 @@ final class IsolatedSourceRootTestRunner
             'apps/Hospitality/Tests/probe_operator_slice9_no_show.php',
             'shared/Item/Foundation/Tests/probe_item_persistence_database.php',
             'apps/Manufacturing/modules/Products/Tests/probe_product_item_mapping_database.php',
+            'apps/Manufacturing/modules/Products/Tests/probe_product_organization_ownership_database.php',
         ];
     }
 

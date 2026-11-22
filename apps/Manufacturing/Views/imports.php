@@ -70,6 +70,10 @@ $previewTemplate = is_array($previewPayload['template'] ?? null) ? $previewPaylo
       <label class="muted mfg-filter-label"><?= e((string)t('mfg.io.field.import_file')) ?></label>
       <input class="input" type="file" name="import_file" accept=".csv,.xlsx,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" required>
     </div>
+    <div class="ui-block">
+      <label class="muted mfg-filter-label"><?= e((string)t('organization.title')) ?> <?= e((string)t('common.id')) ?></label>
+      <input class="input" type="number" min="1" name="organization_id">
+    </div>
     <div class="row">
       <button class="btn ok" type="submit"><?= e((string)t('mfg.io.action.preview_import')) ?></button>
     </div>

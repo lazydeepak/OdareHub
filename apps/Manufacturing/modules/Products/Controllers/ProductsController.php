@@ -11,6 +11,8 @@ use Plugins\Products\Services\PartEngineeringSchemaService;
 use Plugins\Products\Services\Part360Service;
 use Plugins\Products\Services\PartExecutionRouteResolver;
 use Plugins\Products\Services\PartsMasterSnapshotService;
+use Plugins\Products\Services\ProductOrganizationScope;
+use Plugins\Products\Services\ProductCreationService;
 use Plugins\Supply\Services\SupplyModel;
 
 require_once __DIR__ . '/../Services/Part360Service.php';
@@ -18,6 +20,8 @@ require_once __DIR__ . '/../Services/PartExecutionRouteResolver.php';
 require_once __DIR__ . '/../Services/PartItemRefService.php';
 require_once __DIR__ . '/../Services/PartEngineeringSchemaService.php';
 require_once __DIR__ . '/../Services/PartsMasterSnapshotService.php';
+require_once __DIR__ . '/../Services/ProductOrganizationScope.php';
+require_once __DIR__ . '/../Services/ProductCreationService.php';
 require_once APP_ROOT . '/apps/Manufacturing/modules/MaterialManagement/Services/MaterialSchemaService.php';
 
 final class ProductsController
@@ -93,7 +97,17 @@ final class ProductsController
     public static function create(array $input): void
     {
         $data = self::sanitize($input);
+        $data['organization_id'] = $input['organization_id'] ?? null;
         $_SESSION['products_old'] = $data;
+
+        $organization = ProductOrganizationScope::resolve($input['organization_id'] ?? null);
+        if (($organization['allowed'] ?? false) !== true
+            || !is_object($organization['context'] ?? null)
+            || !method_exists($organization['context'], 'organizationId')) {
+            self::flash('err', 'A valid organization membership selection is required.');
+            header('Location: /products/add');
+            exit;
+        }
 
         if ($data['parts_name'] === '' || $data['parts_number'] === '') {
             self::flash('err', 'Part name and part number are required.');
@@ -115,16 +129,7 @@ final class ProductsController
 
             self::appendSupplyColumns($columns, $data);
 
-            $fieldNames = array_map(
-                static fn(string $name): string => $name === 'lead' ? '`lead`' : $name,
-                array_keys($columns)
-            );
-            $fieldSql = implode(', ', $fieldNames);
-            $placeholders = implode(', ', array_fill(0, count($columns), '?'));
-            DB::query(
-                "INSERT INTO products ({$fieldSql}) VALUES ({$placeholders})",
-                array_values($columns)
-            );
+            ProductCreationService::create($columns, $organization['context']);
             unset($_SESSION['products_old']);
             self::flash('ok', 'Part created successfully.');
         } catch (\Throwable $e) {
@@ -581,8 +586,15 @@ final class ProductsController
         ]);
     }
 
-    public static function importCsv($file): void
+    public static function importCsv($file, mixed $requestedOrganizationId = null): void
     {
+        $organization = ProductOrganizationScope::resolve($requestedOrganizationId);
+        if (($organization['allowed'] ?? false) !== true
+            || !is_object($organization['context'] ?? null)
+            || !method_exists($organization['context'], 'organizationId')) {
+            self::flash('err', 'A valid organization membership selection is required for Product import.');
+            return;
+        }
         if (!is_array($file) || (int)($file['error'] ?? 1) !== 0) {
             self::flash('err', 'CSV upload failed.');
             return;
@@ -603,6 +615,8 @@ final class ProductsController
         $rowNo = 0;
         $inserted = 0;
         $skipped = 0;
+        $conn = DB::conn();
+        $conn->begin_transaction();
 
         while (($row = fgetcsv($fh)) !== false) {
             $rowNo++;
@@ -684,58 +698,21 @@ final class ProductsController
                     'default_supply_note' => $defaultSupplyNote,
                 ]);
 
-                $insertFields = array_keys($columns);
-                $insertSqlFields = array_map(
-                    static fn(string $name): string => $name === 'lead' ? '`lead`' : $name,
-                    $insertFields
-                );
-                $insertSql = implode(', ', $insertSqlFields);
-                $insertPlaceholders = implode(', ', array_fill(0, count($insertFields), '?'));
-
-                $upserts = ['parts_name', 'model', 'producer', 'lead', 'cycle_time', 'notes', 'is_active'];
-                if (isset($columns['supply_mode'])) {
-                    $upserts[] = 'supply_mode';
-                }
-                if (isset($columns['fulfillment_mode'])) {
-                    $upserts[] = 'fulfillment_mode';
-                }
-                if (isset($columns['requires_ipm_qc'])) {
-                    $upserts[] = 'requires_ipm_qc';
-                }
-                if (isset($columns['default_supplier'])) {
-                    $upserts[] = 'default_supplier';
-                }
-                if (isset($columns['stocked_at_ipm'])) {
-                    $upserts[] = 'stocked_at_ipm';
-                }
-                if (isset($columns['default_procurement_lead_days'])) {
-                    $upserts[] = 'default_procurement_lead_days';
-                }
-                if (isset($columns['default_supply_note'])) {
-                    $upserts[] = 'default_supply_note';
-                }
-
-                $updateExpr = [];
-                foreach ($upserts as $upsertField) {
-                    $dbField = $upsertField === 'lead' ? '`lead`' : $upsertField;
-                    $updateExpr[] = $dbField . '=VALUES(' . $dbField . ')';
-                }
-
-                DB::query(
-                    "INSERT INTO products ({$insertSql})
-                     VALUES ({$insertPlaceholders})
-                     ON DUPLICATE KEY UPDATE
-                     " . implode(",\n                     ", $updateExpr) . ",
-                     updated_at=NOW()",
-                    array_values($columns)
-                );
+                ProductCreationService::upsertOwned($columns, $organization['context']);
                 $inserted++;
             } catch (\Throwable $e) {
+                if (str_starts_with($e->getMessage(), 'Product ownership conflict')) {
+                    $conn->rollback();
+                    fclose($fh);
+                    self::flash('err', $e->getMessage());
+                    return;
+                }
                 $skipped++;
             }
         }
 
         fclose($fh);
+        $conn->commit();
         self::flash('ok', "Import complete: {$inserted} upserted, {$skipped} skipped.");
     }
 

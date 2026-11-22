@@ -25,6 +25,10 @@ $tt = static function (string $key): string {
       <label class="field-label">CSV File</label>
       <input class="input" type="file" name="csv" accept=".csv,text/csv" required>
     </div>
+    <div class="form-field-wide">
+      <label class="field-label"><?= e((string)$tt('organization.title')) ?> <?= e((string)$tt('common.id')) ?> *</label>
+      <input class="input" name="organization_id" type="number" min="1" required>
+    </div>
     <div class="form-actions">
       <button class="btn ok" type="submit"> <?= e($tt('common.import_action')) ?> </button>
       <a class="btn" href="/products"> <?= e($tt('common.cancel_action')) ?> </a>

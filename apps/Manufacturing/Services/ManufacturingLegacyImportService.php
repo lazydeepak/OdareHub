@@ -5,6 +5,11 @@ namespace Apps\Manufacturing\Services;
 
 use App\Core\DB;
 use App\Services\TabularImportReaderService;
+use Plugins\Products\Services\ProductOrganizationScope;
+use Plugins\Products\Services\ProductCreationService;
+
+require_once APP_ROOT . '/apps/Manufacturing/modules/Products/Services/ProductOrganizationScope.php';
+require_once APP_ROOT . '/apps/Manufacturing/modules/Products/Services/ProductCreationService.php';
 
 final class ManufacturingLegacyImportService
 {
@@ -83,11 +88,22 @@ final class ManufacturingLegacyImportService
     /**
      * @return array<string,mixed>
      */
-    public function previewImport(string $importType, string $path, string $sourceName): array
+    public function previewImport(string $importType, string $path, string $sourceName, mixed $requestedOrganizationId = null): array
     {
         $template = $this->templates()[$importType] ?? null;
         if (!is_array($template)) {
             throw new \RuntimeException('Unknown manufacturing import type.');
+        }
+
+        $organizationId = null;
+        if ($importType === 'products') {
+            $organization = ProductOrganizationScope::resolve($requestedOrganizationId);
+            if (($organization['allowed'] ?? false) !== true
+                || !is_object($organization['context'] ?? null)
+                || !method_exists($organization['context'], 'organizationId')) {
+                throw new \RuntimeException('A valid organization membership selection is required for Product import.');
+            }
+            $organizationId = (int)$organization['context']->organizationId();
         }
 
         $ext = strtolower(pathinfo($sourceName, PATHINFO_EXTENSION));
@@ -162,6 +178,7 @@ final class ManufacturingLegacyImportService
             'warnings' => $warnings,
             'warning_text' => implode(' ', $warnings),
             'sample_rows' => array_slice($previewRows, 0, 8),
+            'organization_id' => $organizationId,
         ];
     }
 
@@ -169,7 +186,7 @@ final class ManufacturingLegacyImportService
      * @param array<string,mixed> $preview
      * @return array<string,mixed>
      */
-    public function importPreview(array $preview): array
+    public function importPreview(array $preview, mixed $requestedOrganizationId = null): array
     {
         $importType = (string)($preview['import_type'] ?? '');
         $template = $this->templates()[$importType] ?? null;
@@ -179,6 +196,16 @@ final class ManufacturingLegacyImportService
         if ((string)($template['mode'] ?? '') !== 'ready') {
             throw new \RuntimeException('This import type is template-ready only and cannot be committed yet.');
         }
+        $organization = null;
+        if ($importType === 'products') {
+            $organization = ProductOrganizationScope::resolve($requestedOrganizationId);
+            if (($organization['allowed'] ?? false) !== true
+                || !is_object($organization['context'] ?? null)
+                || !method_exists($organization['context'], 'organizationId')) {
+                throw new \RuntimeException('A valid organization membership selection is required for Product import.');
+            }
+            $preview['organization_id'] = (int)$organization['context']->organizationId();
+        }
 
         $rows = array_values(array_filter((array)($preview['rows'] ?? []), static fn(array $row): bool => empty($row['errors'])));
         $conn = DB::conn();
@@ -187,7 +214,7 @@ final class ManufacturingLegacyImportService
             $imported = 0;
             foreach ($rows as $row) {
                 match ($importType) {
-                    'products' => $this->commitProductRow($row),
+                    'products' => $this->commitProductRow($row, $organization['context']),
                     'machines' => $this->commitMachineRow($row),
                     'daily_orders' => $this->commitDailyOrderRow($row),
                     'pre_orders' => $this->commitPreOrderRow($row),
@@ -449,14 +476,9 @@ final class ManufacturingLegacyImportService
     /**
      * @param array<string,mixed> $row
      */
-    private function commitProductRow(array $row): void
+    private function commitProductRow(array $row, \Apps\Platform\Services\OrganizationMembershipContext $context): void
     {
-        DB::query(
-            'INSERT INTO products (parts_name, parts_number, model, producer, `lead`, notes, is_active)
-             VALUES (?,?,?,?,?,?,?)
-             ON DUPLICATE KEY UPDATE parts_name=VALUES(parts_name), model=VALUES(model), producer=VALUES(producer), `lead`=VALUES(`lead`), notes=VALUES(notes), is_active=VALUES(is_active), updated_at=NOW()',
-            [$row['parts_name'], $row['parts_number'], $row['model'], $row['producer'], $row['lead'], $row['notes'], $row['is_active']]
-        );
+        ProductCreationService::upsertOwned($row, $context);
     }
 
     /**

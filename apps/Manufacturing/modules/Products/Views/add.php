@@ -13,6 +13,10 @@
   <form method="post" action="/products/add" class="form-grid">
     <input type="hidden" name="csrf" value="<?= e(\App\Core\Auth::csrfToken()) ?>">
     <div class="form-field-wide">
+      <label class="field-label"><?= e((string)t('organization.title')) ?> <?= e((string)t('common.id')) ?> *</label>
+      <input class="input" name="organization_id" type="number" min="1" required value="<?= e((string)($old['organization_id'] ?? '')) ?>">
+    </div>
+    <div class="form-field-wide">
       <label class="field-label"><?= e(t('module.products.part_name')) ?> *</label>
       <input class="input" name="parts_name" required value="<?= e((string)($old['parts_name'] ?? '')) ?>">
     </div>

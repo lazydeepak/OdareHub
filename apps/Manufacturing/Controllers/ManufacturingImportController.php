@@ -55,7 +55,12 @@ final class ManufacturingImportController
         $service = new ManufacturingLegacyImportService();
 
         try {
-            $preview = $service->previewImport($importType, $uploadPath, $name);
+            $preview = $service->previewImport(
+                $importType,
+                $uploadPath,
+                $name,
+                $_POST['organization_id'] ?? null
+            );
             $runId = $history->startPreview('manufacturing', $importType, $name, $previewToken, $preview);
             $payload = [
                 'preview_token' => $previewToken,
@@ -94,7 +99,10 @@ final class ManufacturingImportController
 
         $service = new ManufacturingLegacyImportService();
         try {
-            $result = $service->importPreview((array)($payload['preview'] ?? []));
+            $result = $service->importPreview(
+                (array)($payload['preview'] ?? []),
+                ($payload['preview']['organization_id'] ?? null)
+            );
             $history->completeImport((int)($payload['run_id'] ?? 0), $result);
             $history->deletePreviewPayload($previewToken);
             @unlink((string)($payload['uploaded_path'] ?? ''));

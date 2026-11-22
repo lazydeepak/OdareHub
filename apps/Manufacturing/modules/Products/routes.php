@@ -200,7 +200,7 @@ $importProducts = function() {
     Auth::requireAppAccess('manufacturing');
     Auth::bootSession();
     Auth::requireCsrf((string)($_POST['csrf'] ?? ''));
-    ProductsController::importCsv($_FILES['csv'] ?? null);
+    ProductsController::importCsv($_FILES['csv'] ?? null, $_POST['organization_id'] ?? null);
     header('Location: /apps/manufacturing/products/import');
     exit;
 };
@@ -232,4 +232,3 @@ $router->get('/apps/manufacturing/products/export', function() use ($view) {
     $view->render('Products::export.php', ['report' => $report]);
     return null;
 });
-

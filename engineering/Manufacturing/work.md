@@ -640,3 +640,36 @@ enforcement (Stage 3), Products-module closure (Stage 4), system-wide Product
 closure (Stage 5), and mapping activation (Stage 6). A mapping-only service or
 `organization_id` column would leave equivalent unrestricted bypasses and is
 therefore rejected.
+
+## 2026-11-23 — IPM-006 Product organization ownership implementation
+
+**Status: Implemented in source; not accepted pending governed disposable database verification.**
+
+- [x] Added nullable `products.organization_id` with index and restrictive
+  organization foreign key; no legacy backfill.
+- [x] Added the Products-owned `ProductOrganizationScope` adapter over the
+  existing Platform authenticated organization-context resolver.
+- [x] Routed the Products form, Products CSV import, and Manufacturing legacy
+  Product-import commit branch through the same resolver-backed admission and
+  `ProductCreationService`.
+- [x] Preserved legacy `NULL` ownership, rejected NULL-owned/cross-organization
+  claims, preserved same-organization ownership on updates, and retained
+  Product identity, `item_ref`, BOM, and Shared Item mapping boundaries.
+- [x] Kept Platform demo seed and database-only fixture inserts outside ordinary
+  user enforcement.
+- [x] Database-free ownership contract probe passed **26/26**; Product Item
+  mapping contract probe passed **19/19**; isolated source-root safety passed
+  **17/17**; architecture gates passed; deployment readiness passed in its
+  default read-only verification mode; PHP lint and diff hygiene passed.
+- [ ] Governed disposable MySQL acceptance remains unexecuted and correctly
+  returns **INCONCLUSIVE / exit 2** because attested `OH_IPM` repository
+  evidence is unavailable. No database assertion is accepted from this run.
+- [x] Runtime review confirms enforcement is active by default on the three
+  ordinary creation paths once the Products module is loaded. There is no
+  feature flag or silent fallback; module migration installation/update must
+  precede use of these paths. No installed database was migrated or activated
+  during this session.
+
+Evidence: `apps/Manufacturing/modules/Products/Tests/probe_product_organization_ownership_contract.php`,
+`apps/Manufacturing/modules/Products/Tests/probe_product_organization_ownership_database.php`,
+and the final IPM-006 closeout recorded in `AGENT-COMPLIANCE-CHECKLIST.md`.

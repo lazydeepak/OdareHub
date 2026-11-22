@@ -1,5 +1,78 @@
 # AGENT-COMPLIANCE-CHECKLIST
 
+## Session Summary (2026-11-23) — IPM-006 Product organization ownership closeout
+
+### Scope and runtime state
+
+Implemented the bounded Products organization-ownership boundary across the
+Products form, Products CSV import, and Manufacturing legacy Product-import
+commit branch. No IPM-007 work, database execution, activation, deployment,
+production operation, or `main` merge was performed.
+
+- Added nullable `products.organization_id`, an index, and restrictive FK
+  migration with no legacy backfill.
+- Added `ProductOrganizationScope` over the existing Platform authenticated
+  organization-context resolver.
+- Added `ProductCreationService` for atomic create and owner-preserving
+  upsert; NULL-owned and cross-organization existing Products cannot be
+  claimed.
+- All three ordinary paths resolve admission before persistence and use the
+  shared persistence service. Direct requests cannot bypass the controller
+  checks; missing, malformed, and unauthorized selections fail closed.
+- Runtime review: enforcement is active by default when the Products module is
+  loaded. There is no feature flag or inactive fallback. The Products module
+  migration must precede use of the active paths; no installed database was
+  migrated or activated during this session.
+- Platform demo seeds and database-only fixtures remain outside ordinary-user
+  enforcement. Product identity, `item_ref`, BOM, Shared Item, and mapping
+  contracts remain unchanged.
+
+### Changed files
+
+- `apps/Manufacturing/Controllers/ManufacturingImportController.php`
+- `apps/Manufacturing/Services/ManufacturingLegacyImportService.php`
+- `apps/Manufacturing/Views/imports.php`
+- `apps/Manufacturing/modules/Products/Controllers/ProductsController.php`
+- `apps/Manufacturing/modules/Products/Views/add.php`
+- `apps/Manufacturing/modules/Products/Views/import.php`
+- `apps/Manufacturing/modules/Products/routes.php`
+- `apps/Manufacturing/routes.php`
+- `apps/Manufacturing/modules/Products/Services/ProductCreationService.php`
+- `apps/Manufacturing/modules/Products/Services/ProductOrganizationScope.php`
+- `apps/Manufacturing/modules/Products/Tests/probe_product_organization_ownership_contract.php`
+- `apps/Manufacturing/modules/Products/Tests/probe_product_organization_ownership_database.php`
+- `apps/Manufacturing/modules/Products/migrations/015_product_organization_ownership.sql`
+- `scripts/testing/IsolatedSourceRootTestRunner.php`
+- `scripts/testing/probe_isolated_source_root_runner.php`
+
+No `app/Locale/*` file is present in the final diff.
+
+### Validation
+
+- Product ownership contract: **26/26**
+- Product Item mapping contract: **19/19**
+- Isolated source-root safety: **17/17**
+- Architecture gates: **PASS**
+- Core-lock and system-app checks: **PASS**
+- Studio deletion-family capability suite: **PASS**
+- Deployment readiness: **PASS** in default read-only verify mode
+- PHP lint: **PASS** for all changed PHP files
+- `git diff --check`: **PASS**
+- Governed Product ownership database probe: **INCONCLUSIVE / exit 2** before
+  Composer/bootstrap/SQL because attested `OH_IPM` evidence is missing. Its
+  migration, persistence, rollback, authorization, and negative database
+  assertions are unexecuted and remain acceptance blockers.
+
+### Required acceptance prerequisite
+
+Provide independently attested disposable `OH_IPM` MySQL infrastructure:
+repository/source-root evidence, fresh loopback-only process/socket/datadir,
+test-only credentials, and runner-owned cleanup evidence accepted by
+`DisposableDbTestEntryPointGuard`. Then run
+`apps/Manufacturing/modules/Products/Tests/probe_product_organization_ownership_database.php`
+through the governed isolated runner. Do not use installed, development,
+production, or incident database configuration.
+
 ## Session Summary (2026-11-23) — IPM-004 Product-to-Shared Item mapping completion
 
 Completed the bounded Products-owned Product-to-Shared Item mapping slice on
