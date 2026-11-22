@@ -21,6 +21,29 @@ ownership **26/26**, Item mapping **19/19**, Platform context **16/16**,
 membership authority **30/30**, and isolated source-root **17/17**. Database
 acceptance remains blocked by missing governed `OH_IPM` attestation.
 
+### 2026-11-23 — IPM-009 Product detail read boundary blocker
+
+**Decision status: BLOCKED — do not activate Part 360 through the read seam.**
+
+The canonical `/apps/manufacturing/products/360` route and `/products/360`
+compatibility alias reach the same `ProductsController::part360()` handler,
+but neither establishes a validated organization selection. The handler also
+builds a broad Part 360 projection: product-linked operational records,
+materials, molds, machines, and responsibility users. Current related
+migrations do not provide a uniform organization ownership contract for these
+secondary datasets, and the global material/machine/user reads cannot be
+treated as protected merely because the primary Product row is filtered.
+
+Do not infer organization from Product ownership, creator, assignment, or
+`item_ref`; do not add an unrestricted fallback. Keep Part 360 explicitly
+unmigrated until an owner-approved context contract and per-secondary-dataset
+authorization disposition exist.
+
+Evidence: `docs/architecture/ipm/ipm-009-product-detail-read-blocker.md`;
+detail blocker **20/20**; Product read **14/14**; QR **36/36**; ownership
+**26/26**; Item mapping **19/19**; Platform context **16/16**; membership
+authority **30/30**; isolated source-root **17/17**.
+
 ### 2026-10-30 — OH-AUTO4-MFG-002 dispatch lifecycle contract resolution
 
 **Decision status: BLOCKED — owner approval is required before implementation.**

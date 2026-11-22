@@ -144,6 +144,26 @@ ownership **26/26**, Item mapping **19/19**, Platform context **16/16**,
 membership authority **30/30**, isolated source-root **17/17**. Database
 acceptance remains pending governed `OH_IPM` infrastructure.
 
+## Session Summary (2026-11-23) — IPM-009 Product detail read boundary blocker
+
+Inspected the Products Part 360 detail operation and both route aliases. The
+canonical `/apps/manufacturing/products/360` route and `/products/360`
+compatibility redirect reach the same handler, but no validated organization
+selection is currently established or forwarded.
+
+The full Part 360 projection also reads product-linked operational records,
+molds/material mappings, global material and machine catalogs, and
+responsibility user data. Current related migrations do not provide a uniform
+organization ownership contract, so filtering only the primary Product would
+not satisfy the required complete detail boundary.
+
+No unsafe partial migration or unrestricted fallback was added. Part 360
+remains explicitly unmigrated. Detail blocker probe **20/20**; Product read
+**14/14**; QR **36/36**; ownership **26/26**; Item mapping **19/19**;
+Platform context **16/16**; membership authority **30/30**; isolated
+source-root **17/17**; architecture and read-only readiness passed.
+Database acceptance remains pending governed `OH_IPM` infrastructure.
+
 ## Session Summary (2026-11-23) — IPM-004 Product-to-Shared Item mapping completion
 
 Completed the bounded Products-owned Product-to-Shared Item mapping slice on

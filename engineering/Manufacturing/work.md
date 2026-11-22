@@ -24,6 +24,30 @@ adoption remains deferred pending caller context contracts.**
 
 The central seam is a foundation, not system-wide Product isolation.
 
+## 2026-11-23 — IPM-009 Product detail read boundary assessment
+
+**Status: Blocked — no safe Part 360 activation identified.**
+
+- [x] Confirmed canonical `GET /apps/manufacturing/products/360` and legacy
+  `GET /products/360` aliases reach `ProductsController::part360()`.
+- [x] Confirmed the route retains `products.360.view` ACL admission but does
+  not establish or forward a validated organization selection.
+- [x] Audited the full `Part360Service` projection rather than only its primary
+  Product lookup.
+- [x] Identified product-linked operational secondary queries plus global
+  material, machine, and responsibility-user catalog reads.
+- [x] Confirmed current related migrations do not provide a Product
+  organization ownership column for those secondary records.
+- [x] Did not force a partial migration or add an unrestricted fallback.
+- [x] Product detail blocker probe: **20/20**.
+- [ ] Owner-approved organization-context route contract.
+- [ ] Authorization disposition for every secondary Part 360 dataset.
+- [ ] Governed `OH_IPM` database acceptance.
+
+Evidence: `docs/architecture/ipm/ipm-009-product-detail-read-blocker.md`.
+The detail path remains explicitly unmigrated; IPM-008 QR adoption is
+unchanged.
+
 ## 2026-10-30 — OH-AUTO4-MFG-002 dispatch lifecycle contract resolution
 
 **Status: Blocked — no independently safe dispatch mutation identified.**
