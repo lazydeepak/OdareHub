@@ -76,6 +76,32 @@ Decision record: `docs/architecture/ipm/ipm-010-part360-organization-context-and
 Recommended next milestone: InjectionMolding module contract/scaffold and
 additive schema design, without Part 360 runtime wiring.
 
+## 2026-11-23 — IPM-011 InjectionMolding foundation and mold revision schema
+
+**Status: Complete — additive schema preparation; runtime revision management
+blocked.**
+
+- [x] Confirmed no prior InjectionMolding module existed.
+- [x] Added the normal Manufacturing module manifest, lifecycle hooks, empty
+  route entry point, and migration path; no new lifecycle framework was added.
+- [x] Confirmed canonical `part_molds.id` is `INT` and remains Products-owned.
+- [x] Confirmed `part_molds` has no authoritative organization ownership.
+- [x] Added additive `ipm_mold_revisions` with mandatory organization FK,
+  canonical mold FK, positive revision number, lifecycle states, release
+  evidence, effective-window check, indexes, and restrictive deletion.
+- [x] Preserved the no-duplicate-master rule; no Products, BOM, machine,
+  material, production, QC, dispatch, or Part 360 behavior changed.
+- [x] Kept revision mutation, release, supersession, runtime reads, and UI
+  unavailable because mold ownership is unresolved.
+- [x] Module foundation probe: **43/43**.
+- [ ] Governed `OH_IPM` migration/database acceptance.
+- [ ] Products mold organization-ownership decision before any revision service.
+
+Decision record:
+`docs/architecture/ipm/ipm-011-injection-molding-module-foundation-and-mold-revisions.md`.
+Recommended IPM-012: read-only revision contract preparation after the mold
+ownership dependency is accepted.
+
 ## 2026-10-30 — OH-AUTO4-MFG-002 dispatch lifecycle contract resolution
 
 **Status: Blocked — no independently safe dispatch mutation identified.**

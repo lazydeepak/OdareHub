@@ -77,6 +77,37 @@ Evidence: `docs/architecture/ipm/ipm-010-part360-organization-context-and-second
 IPM-010 probe **24/24**; prior Product/QR/ownership/mapping/context/membership
 and isolated-source-root evidence remains passing.
 
+### 2026-11-23 — IPM-011 InjectionMolding foundation and mold revision schema
+
+**Decision status: COMPLETE FOUNDATION — schema preparation only; runtime
+revision management remains blocked.**
+
+Create the Manufacturing-owned `InjectionMolding` module through the existing
+`plugin.json`, `migrations`, `install.php`, `update.php`, `uninstall.php`, and
+`PluginManager` lifecycle. The module has no active routes, mutation service,
+UI, Part 360 integration, BOM integration, recipe, production, genealogy,
+scheduling, costing, or maintenance workflow.
+
+The canonical mold master remains Products-owned `part_molds.id INT`. It has
+no authoritative `organization_id` or membership binding. Therefore
+`ipm_mold_revisions.organization_id INT NOT NULL` is a future authorization
+anchor, not proof that the referenced mold is organization-authorized. No
+ownership is inferred from Product, creator, assignment, `item_ref`, BOM, or
+Shared Item identity.
+
+The additive revision table uses a new `BIGINT UNSIGNED` key, required
+`mold_id` and `organization_id` foreign keys, `(mold_id, revision_no)`
+uniqueness, explicit draft/released/superseded/archived states, release
+evidence checks, effective-window validation, audit-user references, and
+`ON DELETE RESTRICT` for all identity references. Released immutability,
+overlap prevention, replacement relationships, and mutation authorization
+remain future service-level contracts.
+
+Evidence:
+`docs/architecture/ipm/ipm-011-injection-molding-module-foundation-and-mold-revisions.md`;
+module foundation probe **43/43**. `OH_IPM` database acceptance remains
+pending and no database or infrastructure operation occurred.
+
 ### 2026-10-30 — OH-AUTO4-MFG-002 dispatch lifecycle contract resolution
 
 **Decision status: BLOCKED — owner approval is required before implementation.**

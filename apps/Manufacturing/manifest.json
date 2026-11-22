@@ -19,6 +19,7 @@
     "bom"
   ],
   "legacy_bridge_plugins": [
+    "InjectionMolding",
     "Products",
     "Workflow",
     "Supply",

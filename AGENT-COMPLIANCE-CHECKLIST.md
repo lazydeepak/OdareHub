@@ -188,6 +188,25 @@ membership/isolated-source-root probes, architecture gates, deletion family,
 and read-only deployment readiness passed. No database-backed test,
 activation, deployment, route, schema, or runtime change occurred.
 
+## Session Summary (2026-11-23) — IPM-011 InjectionMolding foundation and mold revision schema
+
+Added the Manufacturing-owned `InjectionMolding` module foundation using the
+existing module discovery and PluginManager lifecycle. The module has an empty
+route entry point and no mutation API. Added the additive
+`ipm_mold_revisions` migration referencing the canonical Products
+`part_molds.id INT` master and Platform `org_companies.id`.
+
+Because `part_molds` has no authoritative organization ownership, the revision
+`organization_id` is explicitly schema preparation rather than runtime
+authorization. Revision creation, release, supersession, reads, Part 360
+integration, BOM integration, and UI remain unavailable. No duplicate mold
+master or unrelated workflow was introduced.
+
+Module foundation probe **43/43**; PHP lint, JSON validation, and diff hygiene
+passed. Governed `OH_IPM` database acceptance remains pending; no database,
+SQL execution, infrastructure provisioning, activation, deployment, or
+production operation occurred.
+
 ## Session Summary (2026-11-23) — IPM-004 Product-to-Shared Item mapping completion
 
 Completed the bounded Products-owned Product-to-Shared Item mapping slice on

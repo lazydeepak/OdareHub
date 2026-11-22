@@ -1,0 +1,39 @@
+{
+    "name": "InjectionMolding",
+    "display_name": "Injection Molding",
+    "suite": "manufacturing",
+    "group": "ipm",
+    "category": "business",
+    "display_order": 25,
+    "type": "business",
+    "version": "0.1.0",
+    "description": "Organization-owned injection molding revision foundation.",
+    "requires": [
+        "Base>=3.0.0",
+        "Products>=1.0.0"
+    ],
+    "entry": "routes.php",
+    "package_type": "module",
+    "owner_app": "manufacturing",
+    "module_key": "InjectionMolding",
+    "module_type": "business_entity",
+    "target_maturity_level": "L1",
+    "migrations_path": "migrations",
+    "required_tables": [
+        "ipm_mold_revisions"
+    ],
+    "declared_capabilities": [
+        "schema",
+        "migrations",
+        "lifecycle_hooks"
+    ],
+    "lifecycle_contract": {
+        "routes": "active_only",
+        "menus": "active_only",
+        "widgets": "active_only",
+        "reports": "active_only",
+        "dashboards": "active_only",
+        "schema": "installed_or_active"
+    },
+    "activation_contract_enforced": true
+}

@@ -1,6 +1,7 @@
 # IPM Module Boundary — InjectionMolding
 
-**Status:** Design baseline (IPM-002). No module is scaffolded, registered, or activated by this document.
+**Status:** Design baseline extended by IPM-011. The module foundation is
+scaffolded and migration-owned; runtime capabilities remain inactive.
 **Date:** 2026-11-17
 **Owner target:** `apps/Manufacturing/modules/InjectionMolding`
 **Companion:** `schema-ownership-contract.md`, `schema-proposal.sql`, `architecture-verification.md`.
@@ -9,7 +10,8 @@
 
 ## 1. Boundary decision (D5)
 
-A dedicated **Injection Molding domain boundary** is established as a Manufacturing-owned module, not a new top-level app.
+A dedicated **Injection Molding Manufacturing business module boundary** is
+established inside the Manufacturing app, not as a new top-level app.
 
 **Why:** mold revisions, cavity structures, process recipes, mold setup and mold maintenance are cohesive IPM capabilities; generic product, machine, BOM, production and quality ownership must stay where their existing consumers and tests live. Creating a second product/machine/BOM master would violate the no-duplicate-master rule and break every existing reference.
 
@@ -40,7 +42,7 @@ A dedicated **Injection Molding domain boundary** is established as a Manufactur
 - No procurement, sales, or costing behavior.
 - No user/identity/ACL logic; authorization is exclusively via the existing Platform organization context + ACL app permissions.
 
-## 2. Module manifest (target shape — not created)
+## 2. Module manifest (IPM-011 foundation shape)
 
 ```json
 {
@@ -52,25 +54,24 @@ A dedicated **Injection Molding domain boundary** is established as a Manufactur
   "display_order": 25,
   "type": "business",
   "version": "0.1.0",
-  "description": "Injection molding domain extension for OdareHub Manufacturing.",
+   "description": "Organization-owned injection molding revision foundation.",
   "requires": [
-    "Products>=1.0.0",
-    "Machines>=1.0.0",
-    "Bom>=1.0.0",
-    "ProductionEntries>=1.0.0",
-    "MaterialManagement>=1.0.0",
-    "QCEntries>=1.0.0",
-    "DispatchEntries>=1.0.0"
+     "Base>=3.0.0",
+     "Products>=1.0.0"
   ],
   "entry": "routes.php",
   "package_type": "module",
   "owner_app": "manufacturing",
   "module_key": "InjectionMolding",
-  "module_type": "business_domain",
-  "target_maturity_level": "L2",
-  "migrations_path": "migrations"
+   "module_type": "business_entity",
+   "target_maturity_level": "L1",
+   "migrations_path": "migrations",
+   "required_tables": ["ipm_mold_revisions"]
 }
 ```
+
+The checked-in manifest additionally declares only schema, migrations, and
+lifecycle-hook capabilities. Routes and mutation services remain absent.
 
 ## 3. Integration contracts
 
@@ -116,9 +117,15 @@ QC / Dispatch
 
 ## 7. Rollout sequence (within the IPM program)
 
-1. **Module skeleton + manifest + permissions** (docs, no runtime) — only after IPM-002 is accepted and owner authorizes scaffold.
-2. **Migrations 001–006** per `identity-and-tenant-migration-plan.md` Phase 5.
-3. **Read-only services + probes** (revision history, recipe lookup, lot trace read path).
-4. **Mutation services** behind organization-context authorization + CSRF (pattern from Hospitality/Procurement operator surfaces).
-5. **UI** under `/apps/manufacturing/ipm/*` and operator surface contributions — separately authorized.
-6. **Part360 integration** (display released mold revision + active recipe; no duplication of Part360).
+1. **Module skeleton + manifest + migration 001** — completed by IPM-011 as
+   schema preparation only; no runtime capability is activated.
+2. **Read-only services + probes** — future, after Products mold ownership
+   evidence and owner approval.
+3. **Additional IPM schemas** (recipe, production context, genealogy, and
+   maintenance) — separately authorized after their ownership contracts.
+4. **Mutation services** behind organization-context authorization + CSRF
+   (pattern from Hospitality/Procurement operator surfaces).
+5. **UI** under `/apps/manufacturing/ipm/*` and operator surface
+   contributions — separately authorized.
+6. **Part360 integration** (display released mold revision + active recipe; no
+   duplication of Part360).
