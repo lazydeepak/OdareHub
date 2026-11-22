@@ -107,7 +107,7 @@ PHP
         FAILED=$((FAILED + 1))
         return
     }
-    "$MYSQLD_BIN" --no-defaults --basedir="$MYSQL_BASEDIR" --datadir="$data" --socket="$socket" --pid-file="$pidfile" --log-error="$errorlog" --bind-address=127.0.0.1 --port="$port" --skip-name-resolve --skip-log-bin --secure-file-priv=NULL >"$root/server.stdout" 2>&1 &
+    "$MYSQLD_BIN" --no-defaults --basedir="$MYSQL_BASEDIR" --datadir="$data" --socket="$socket" --pid-file="$pidfile" --log-error="$errorlog" --bind-address=127.0.0.1 --port="$port" --skip-name-resolve --skip-log-bin --mysqlx=0 --secure-file-priv=NULL >"$root/server.stdout" 2>&1 &
     pid=$!
     ready=0
     for _ in $(seq 1 120); do
@@ -129,7 +129,7 @@ PHP
         return
     fi
 
-    if ! "$PHP_BIN" -r 'require $argv[1]; try { DisposableDbTestConfigurationGuard::authorize(["repo"=>$argv[2],"app_root"=>$argv[3],"resource_root"=>$argv[4],"host"=>"127.0.0.1","port"=>$argv[5],"name"=>$argv[6],"user"=>$argv[7]]); echo "configuration-guard=PASS\n"; } catch (Throwable $e) { fwrite(STDERR, "configuration-guard=FAIL\n"); exit(1); }' \
+    if ! "$PHP_BIN" -r 'require $argv[1]; try { DisposableDbTestConfigurationGuard::authorize(["repo"=>$argv[2],"app_root"=>$argv[3],"resource_root"=>$argv[4],"host"=>"127.0.0.1","port"=>$argv[5],"name"=>$argv[6],"user"=>$argv[7]]); echo "configuration-guard=PASS\n"; } catch (Throwable $e) { fwrite(STDERR, "configuration-guard=FAIL: " . $e->getMessage() . "\n"); exit(1); }' \
         "$REPO/scripts/testing/DisposableDbTestConfigurationGuard.php" "$REPO" "$app_root" "$root" "$port" "$db" "$user"
     then
         echo "SUITE FAIL $label: disposable configuration identity rejected before SQL" >&2
@@ -174,6 +174,9 @@ SQL
         rc=$?
     elif [ "$prefix" = "OH_EXACT" ]; then
         OH_EXACT_REPO="$REPO" OH_EXACT_APP_ROOT="$app_root" OH_EXACT_DB_PID="$pid" OH_EXACT_DB_SOCKET="$socket" OH_EXACT_DB_DATADIR="$data" OH_EXACT_DB_RESOURCE_ROOT="$root" OH_EXACT_DB_PORT="$port" OH_EXACT_DB_NAME="$db" OH_EXACT_DB_USER="$user" "$PHP_BIN" "$app_root/$probe"
+        rc=$?
+    elif [ "$prefix" = "OH_IPM" ]; then
+        OH_IPM_REPO="$REPO" OH_IPM_APP_ROOT="$app_root" OH_IPM_DB_PID="$pid" OH_IPM_DB_SOCKET="$socket" OH_IPM_DB_DATADIR="$data" OH_IPM_DB_RESOURCE_ROOT="$root" OH_IPM_DB_PORT="$port" OH_IPM_DB_NAME="$db" OH_IPM_DB_USER="$user" "$PHP_BIN" "$app_root/$probe"
         rc=$?
     else
         OH_MFG_REPO="$REPO" OH_MFG_APP_ROOT="$app_root" OH_MFG_DB_PID="$pid" OH_MFG_DB_SOCKET="$socket" OH_MFG_DB_DATADIR="$data" OH_MFG_DB_RESOURCE_ROOT="$root" OH_MFG_DB_PORT="$port" OH_MFG_DB_NAME="$db" OH_MFG_DB_USER="$user" "$PHP_BIN" "$app_root/$probe"
@@ -239,6 +242,9 @@ case "${OH_TEST_ONLY:-}" in
         ;;
     manufacturing-bom)
         run_disposable_probe "manufacturing-bom" "OH_MFG_BOM" "apps/Manufacturing/modules/Bom/Tests/probe_bom_contract.php"
+        ;;
+    ipm-product-item-mapping)
+        run_disposable_probe "ipm-map" "OH_IPM" "apps/Manufacturing/modules/Products/Tests/probe_product_item_mapping_database.php"
         ;;
     exact-step-migrations)
         run_disposable_probe "exact-step-migrations" "OH_EXACT" "platform/Updates/tests/probe_controlled_exact_step_migrations.php"

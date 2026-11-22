@@ -707,3 +707,39 @@ What this enables, constrains, or requires next.
 
 **Evidence**
 Relevant validation, source references, or implementation links.
+
+### 2026-11-23 — IPM-004 Product mapping cardinality and tenant boundary
+**Status:** Accepted for bounded schema; runtime mutation deferred
+
+**Context**
+Products has a nullable `item_ref` compatibility field. The Products service
+rejects duplicate references, while the BOM module resolves opaque integer
+refs through Products. The Shared Items extension contract says one Shared
+Item may be presented in different Manufacturing contexts. Products has no
+authoritative organization ownership contract.
+
+**Decision**
+Use a Products-owned many-to-one mapping: `product_id` is unique, while
+`item_id` is not. Enforce both exact-type foreign keys with `RESTRICT` deletes.
+Do not add tenant fields, infer organization ownership, create Shared Items,
+backfill legacy rows, or add a runtime mapping mutation path.
+
+**Consequences**
+The schema supports multiple Manufacturing representations of one canonical
+Shared Item without changing Product or BOM behavior. A future one-to-one
+constraint requires stronger evidence and an explicit owner decision. Runtime
+writes and tenant-scoped reads remain unavailable until Product organization
+ownership is established through the Platform authenticated organization
+context contract.
+
+**Evidence**
+`PartItemRefService::validateItemRef()`, the Shared Items extension contract,
+`BomService` resolution joins,
+`apps/Manufacturing/modules/Products/migrations/014_product_item_map.sql`,
+and `docs/architecture/ipm/ipm-004-product-item-mapping-completion.md`.
+
+Verification evidence: Product mapping contract probe **19/19** and the
+governed disposable mapping run passed. The runner uses `--no-defaults`,
+loopback-only binding, temporary attested resources, and `--mysqlx=0` only for
+the isolated MySQL 9.6 process; installed and production configuration remain
+untouched.

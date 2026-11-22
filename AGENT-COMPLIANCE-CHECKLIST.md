@@ -1,5 +1,38 @@
 # AGENT-COMPLIANCE-CHECKLIST
 
+## Session Summary (2026-11-23) — IPM-004 Product-to-Shared Item mapping completion
+
+Completed the bounded Products-owned Product-to-Shared Item mapping slice on
+the existing `ipm` branch. The migration adds
+`manufacturing_product_item_map` with `UNIQUE(product_id)`, a non-unique
+indexed `item_id` for many-to-one reverse lookup, exact `products.id` and
+`shared_items.item_id` foreign keys, and `ON DELETE RESTRICT`. Existing
+`products.item_ref` and BOM resolution remain unchanged; no backfill,
+automatic creation, tenant column, generic identity map, or runtime mutation
+route was added.
+
+Verification passed: static mapping contract **19/19**; isolated source-root
+safety **17/17**; disposable authorizer **24/24**; complete IPM database probe
+**18/18**; aggregate architecture gates **PASS**; deletion family **28/28**;
+deployment readiness **PASS** in read-only verify mode. The database probe
+covered migration apply/replay, exact types, lifecycle eligibility, FK and
+restrictive-delete behavior, many-to-one mapping, duplicate Product
+remapping, reverse collection lookup, missing references, rollback,
+concurrent attempts, and absence of inferred tenant ownership.
+
+The governed runner uses a fresh runner-owned loopback MySQL instance with
+`--no-defaults` and `--mysqlx=0`; disabling X Plugin prevents MySQL 9.6's
+separate wildcard X Protocol listener from violating the unchanged disposable
+authorization guard. Installed/development/production database configuration
+was not changed or accessed.
+
+No Core/Auth/ACL, production database, deployment, activation, or `main`
+operation occurred. Remaining limitation: runtime mapping mutation and
+tenant-scoped mapping reads await an authoritative Product organization
+ownership contract. Recommended next milestone: IPM-005 organization-bound
+Product mapping authorization and read/write contract, beginning with an
+owner-approved Product organization identity decision.
+
 ## Session Summary (2026-10-30) — OH-AUTO4-PROC-001 mutation dependency reconciliation
 
 Verified HEAD/origin parity at

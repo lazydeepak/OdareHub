@@ -570,3 +570,34 @@ review because their helpers include legacy compatibility ALTER operations.
 
 Focused remaining-boundary probe: 20/20. OH-AUTO1-047 probe: 14/14. PHP lint,
 ownership/Core-lock checks, and diff hygiene pass. No database or SQL execution.
+
+## 2026-11-23 — IPM-004 Product-to-Shared Item mapping
+
+**Status:** Bounded schema and verification complete; runtime mutation blocked by
+missing Product organization authority.
+
+Inspection established that `PartItemRefService` rejects duplicate
+`products.item_ref` values, but the Shared Items extension contract explicitly
+allows one Shared Item to be presented in different Manufacturing contexts.
+The repository has no Product variant/revision/customer-specific identity
+model that proves those representations are separate canonical Items.
+
+Added the Products-owned `014_product_item_map.sql` migration with a unique
+`product_id`, non-unique `item_id`, database foreign keys, and restrictive
+deletes. Added database-free contract and guarded disposable-database probes.
+No runtime mapping service was added because Products has no authoritative
+organization ownership or Platform organization-context integration. Existing
+BOM refs and resolution remain unchanged.
+
+Final verification: contract probe **19/19**; guarded disposable runner passed
+the authorizer **24/24** and the complete IPM mapping probe, including
+apply/replay, exact types, lifecycle eligibility, reverse collection,
+many-to-one mapping, duplicate-product rejection, missing references,
+rollback, concurrent attempts, restrictive deletion, and tenant-column
+absence. The disposable MySQL command uses `--no-defaults`, loopback binding,
+temporary runner-owned resources, and `--mysqlx=0` so MySQL 9.6's wildcard X
+Protocol listener cannot violate the existing authorization boundary. No
+installed or production configuration is changed.
+
+Evidence is recorded in
+`docs/architecture/ipm/ipm-004-product-item-mapping-completion.md`.
