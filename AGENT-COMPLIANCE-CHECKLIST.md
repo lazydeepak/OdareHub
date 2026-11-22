@@ -95,6 +95,38 @@ Plan: `docs/architecture/ipm/ipm-007-product-access-closure-preparation.md`.
 No database, production, deployment, activation, merge-to-`main`, or IPM-007
 runtime operation occurred.
 
+## Session Summary (2026-11-23) — IPM-007 QR Product scan boundary
+
+Implemented the first bounded Product access-closure slice without expanding
+to the remaining 46 future bypass surfaces.
+
+- Preserved public `GET /qr/product/scan` registration and the existing
+  `product_id`/`part_number` payload format.
+- Added Products-owned `ProductScanAdmissionService` over the existing
+  Platform-backed membership resolver.
+- Product detail SQL now occurs only after verified organization admission and
+  includes the Product owner predicate.
+- Anonymous, missing-context, malformed, nonexistent, NULL-owned, and
+  cross-organization cases use one generic unavailable response.
+- Existing scan-result view and admitted action-link continuation remain
+  unchanged; anonymous QR URLs remain parseable but do not disclose details.
+- Focused QR boundary probe: **33/33**.
+- Product ownership contract: **26/26**.
+- Product Item mapping contract: **19/19**.
+- PHP lint: **PASS**; `git diff --check`: **PASS**.
+- Governed database acceptance remains pending and no database-backed tenant
+  isolation claim is made.
+
+Changed implementation files:
+
+- `apps/Manufacturing/modules/Products/Services/ProductScanAdmissionService.php`
+- `apps/Platform/modules/QRCode/Controllers/QRCodeController.php`
+- `apps/Platform/modules/QRCode/routes.php`
+- `apps/Manufacturing/modules/Products/Tests/probe_product_scan_organization_boundary.php`
+
+No deployment, activation, infrastructure provisioning, or next-slice
+implementation occurred.
+
 ## Session Summary (2026-11-23) — IPM-004 Product-to-Shared Item mapping completion
 
 Completed the bounded Products-owned Product-to-Shared Item mapping slice on

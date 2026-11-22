@@ -823,3 +823,26 @@ consumer edits; and keeps legacy NULL rows intact without inferring
 ownership. The first slice requires a database-free contract probe before any
 runtime change and governed `OH_IPM` acceptance before deployment or
 activation.
+
+### 2026-11-23 — IPM-007 QR Product scan boundary implementation
+
+**Decision status: First bounded slice implemented; database acceptance pending;
+remaining Product access closure not authorized.**
+
+The public QR route remains reachable and retains its existing
+`product_id`/`part_number` payload. It no longer performs an unscoped Product
+lookup. `ProductScanAdmissionService` delegates organization admission to the
+existing `ProductOrganizationScope` and Platform membership resolver, then
+requires `products.organization_id` to match the verified opaque context.
+
+Anonymous requests, missing or invalid context, NULL-owned Products,
+cross-organization Products, and nonexistent or malformed identities all
+receive the same generic unavailable result. Authenticated action links remain
+available only when the owner-filtered Product detail is admitted. The
+request organization value is never treated as proof and no public token or
+new tenancy framework was introduced.
+
+Evidence: QR boundary probe **33/33**, Product ownership contract **26/26**,
+Product Item mapping contract **19/19**, and PHP lint. Governed database
+acceptance remains unexecuted and is still required for persistence, migration,
+authorization, enumeration, and response compatibility claims.

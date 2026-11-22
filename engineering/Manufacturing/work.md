@@ -697,3 +697,30 @@ Plan: `docs/architecture/ipm/ipm-007-product-access-closure-preparation.md`.
 IPM-006 remains source-implemented and active by default, with database
 acceptance pending; this plan does not treat that pending gate as permission to
 activate or deploy.
+
+## 2026-11-23 — IPM-007 QR Product scan boundary implementation
+
+**Status: First bounded access slice implemented; database acceptance pending;
+remaining Product access closure not started.**
+
+- [x] Preserved the public `GET /qr/product/scan` route and existing
+  `product_id`/`part_number` QR payload format.
+- [x] Added Products-owned `ProductScanAdmissionService` using
+  `ProductOrganizationScope` and the existing Platform membership resolver.
+- [x] Owner-filtered Product detail lookup by verified organization context;
+  NULL-owned and cross-organization Products fail closed.
+- [x] Anonymous, missing-context, malformed, nonexistent, and unauthorized
+  scans use the same generic unavailable response.
+- [x] Preserved the existing scan result view and authenticated action-link
+  continuation for admitted Product details.
+- [x] Focused QR boundary probe passed **33/33**; Product ownership contract
+  remained **26/26**; Product Item mapping contract remained **19/19**; PHP
+  lint and diff hygiene passed.
+- [ ] Governed database execution remains pending; same-organization,
+  cross-organization, NULL-owner, migration, and database-backed response
+  assertions are not accepted without `OH_IPM` attestation.
+
+The optional `organization_id` request value is resolver input only. Existing
+anonymous QR URLs remain parseable but no longer disclose organization-owned
+Product details without authenticated membership-validated context. No other
+Product consumer or future bypass surface was changed.

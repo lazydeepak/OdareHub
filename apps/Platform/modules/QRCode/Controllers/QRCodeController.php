@@ -6,6 +6,9 @@ namespace Plugins\QRCode\Controllers;
 use App\Core\DB;
 use App\Core\View;
 use Plugins\Coverage\Services\CoverageService;
+use Plugins\Products\Services\ProductScanAdmissionService;
+
+require_once APP_ROOT . '/apps/Manufacturing/modules/Products/Services/ProductScanAdmissionService.php';
 
 final class QRCodeController
 {
@@ -51,23 +54,32 @@ final class QRCodeController
         ]);
     }
 
-    public static function scanProduct(View $view, int $productId, string $partNumber): void
+    public static function scanProduct(
+        View $view,
+        int $productId,
+        string $partNumber,
+        mixed $requestedOrganizationId = null
+    ): void
     {
         if (!self::tableExists('products')) {
             $view->render('QRCode::scan_result.php', [
                 'pageTitle' => 'QR Scan',
                 'product' => null,
-                'error' => 'Products module is not available for QR scan resolution.',
+                'error' => 'QR scan is unavailable.',
             ]);
             return;
         }
 
-        $product = self::findProduct($productId, $partNumber);
+        $product = ProductScanAdmissionService::resolve(
+            $productId,
+            $partNumber,
+            $requestedOrganizationId
+        );
         if (!$product) {
             $view->render('QRCode::scan_result.php', [
                 'pageTitle' => 'QR Scan',
                 'product' => null,
-                'error' => 'Product not found for scanned QR code.',
+                'error' => 'QR scan is unavailable.',
             ]);
             return;
         }

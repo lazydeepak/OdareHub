@@ -28,7 +28,14 @@ $router->get('/qr/product/label', function () use ($view) {
 
 $router->get('/qr/product/scan', function () use ($view) {
     Auth::bootSession();
-    QRCodeController::scanProduct($view, (int)($_GET['product_id'] ?? 0), (string)($_GET['part_number'] ?? ''));
+    $rawProductId = $_GET['product_id'] ?? null;
+    $rawPartNumber = $_GET['part_number'] ?? null;
+    QRCodeController::scanProduct(
+        $view,
+        is_int($rawProductId) || is_string($rawProductId) ? (int)$rawProductId : 0,
+        is_string($rawPartNumber) ? $rawPartNumber : '',
+        $_GET['organization_id'] ?? null
+    );
     return null;
 });
 

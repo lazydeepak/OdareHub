@@ -1,6 +1,6 @@
 # IPM-007 Product Access-Closure Preparation
 
-**Status:** Implementation-ready preparation; no runtime enforcement authorized.
+**Status:** First QR boundary implemented; remaining closure not authorized.
 **Date:** 2026-11-23
 **Prerequisite evidence:** `docs/architecture/ipm/ipm-005-product-organization-ownership-dependency-reconciliation.md`
 **Source baseline:** `de7a0d7cdb78cf61d4f532a435d3fbe2569a6e9e`
@@ -20,8 +20,9 @@ database-independent; runtime acceptance and activation remain dependent on
 the governed `OH_IPM` database result and the owner decisions listed below.
 
 The 47 future bypasses remain classified as unscoped legacy surfaces, not
-confirmed current cross-organization violations. No Product read or mutation
-closure is implemented by this document.
+confirmed current cross-organization violations. Only the bounded QR scan
+disclosure boundary described below is implemented; no other Product read or
+mutation closure is claimed.
 
 ## 2. First coherent slice: public QR Product scan
 
@@ -35,27 +36,28 @@ calls `findProduct()` before rendering the Product result. The current lookup
 accepts a Product ID plus part number and therefore cannot prove Product
 organization ownership.
 
-### Safe first-slice decision
+### Safe first-slice decision and implementation
 
-Prepare a fail-closed QR scan admission contract. Until an approved public
-scan credential/policy exists, an unscoped public lookup must not return a
-Product. Do not infer authorization from the Product ID, part number,
-`item_ref`, BOM references, Shared Item identity, an unverified session, or a
-QR URL generated before Product ownership was established.
+The route remains public for QR identification compatibility, but an unscoped
+public lookup does not return Product details. The implementation uses a
+Products-owned scan admission service. A caller-provided `organization_id` is
+only input to the existing authenticated membership resolver; it is not
+authorization evidence. Do not infer authorization from the Product ID, part
+number, `item_ref`, BOM references, Shared Item identity, an unverified
+session, or a QR URL generated before Product ownership was established.
 
-The first independently testable implementation slice, once separately
-authorized, is:
+The implemented first slice is:
 
-1. Add a Products-owned read-admission interface that accepts an opaque
-   organization context or an explicitly approved scan credential, never a raw
-   request organization ID.
-2. Make `QRCodeController::scanProduct()` obtain and validate that admission
-   before `findProduct()` or any Product SQL. Missing, malformed, expired,
-   spoofed, NULL-owned, cross-organization, and ambiguous evidence must return
-   the existing not-found/unavailable result without Product disclosure.
-3. Keep the route and view contract stable unless the owner-approved policy
-   requires an explicit authenticated or signed-scan entry point.
-4. Add database-free contract coverage before any database-backed acceptance.
+1. `ProductScanAdmissionService` accepts an opaque organization context
+   produced by `ProductOrganizationScope`; the raw request value is only
+   resolver input.
+2. `QRCodeController::scanProduct()` obtains and validates that admission
+   before Product SQL. Missing, malformed, spoofed, NULL-owned,
+   cross-organization, and ambiguous evidence return one generic unavailable
+   result without Product disclosure.
+3. The public route, QR payload, and admitted success view remain stable.
+4. Database-free contract coverage proves the boundary before database-backed
+   acceptance.
 
 The default implementation posture is **deny unscoped public scans**, not
 silently expose legacy NULL-owned Products. A signed or otherwise bounded
@@ -63,20 +65,15 @@ public scan token is a separate owner decision and must not be improvised.
 
 ### Actual first-slice files
 
-Preparation and later implementation are bounded to:
+The implementation is bounded to:
 
 - `apps/Platform/modules/QRCode/routes.php`
 - `apps/Platform/modules/QRCode/Controllers/QRCodeController.php`
-- an existing Products-owned read-admission service or a narrowly approved
-  Products-owned adapter under
-  `apps/Manufacturing/modules/Products/Services/`
-- a focused contract probe under `apps/Platform/modules/QRCode/Tests/` or the
-  Products test boundary, subject to test-ownership approval
-- a focused architecture boundary gate only if the new cross-owner contract
-  requires one
+- `apps/Manufacturing/modules/Products/Services/ProductScanAdmissionService.php`
+- `apps/Manufacturing/modules/Products/Tests/probe_product_scan_organization_boundary.php`
 
-No `products` read query should be edited before the admission contract,
-NULL-owner behavior, public-scan policy, and adapter owner are approved.
+No other Product read query was edited. The remaining public scan credential
+decision and the other 46 future bypasses remain outside this slice.
 
 ### First-slice acceptance criteria
 
