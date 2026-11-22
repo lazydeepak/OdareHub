@@ -48,6 +48,34 @@ Evidence: `docs/architecture/ipm/ipm-009-product-detail-read-blocker.md`.
 The detail path remains explicitly unmigrated; IPM-008 QR adoption is
 unchanged.
 
+## 2026-11-23 — IPM-010 Part 360 context and secondary ownership contract
+
+**Status: Complete — implementation-ready decision; Part 360 remains blocked.**
+
+- [x] Reused the existing `ProductOrganizationScope` → Platform membership
+  resolver path; no duplicate context or session mechanism is needed.
+- [x] Confirmed direct Part 360 requests must fail closed when explicit
+  organization selection or current membership evidence is absent.
+- [x] Defined organization switching as per-request re-resolution; legacy
+  NULL-owned Products remain unavailable to scoped reads.
+- [x] Classified every Part 360 secondary source as Product-linked,
+  relationship-only, legacy-global, shared-catalog candidate, or independently
+  authorized identity data.
+- [x] Identified exact blockers for orders, production, QC, dispatch, handoff,
+  molds/material mappings, materials, machines, and responsibility users.
+- [x] Preserved `item_ref`, BOM, Shared Item, Product, machine, and material
+  identity semantics; no duplicate masters or speculative tenant predicates.
+- [x] Confirmed full Part 360 closure is not required before the
+  InjectionMolding module scaffold/read-only foundation.
+- [x] IPM-010 contract probe: **24/24**.
+- [ ] Part 360 context admission implementation and owner approval.
+- [ ] Per-secondary-dataset ownership policy and complete projection proof.
+- [ ] Governed `OH_IPM` database acceptance.
+
+Decision record: `docs/architecture/ipm/ipm-010-part360-organization-context-and-secondary-ownership.md`.
+Recommended next milestone: InjectionMolding module contract/scaffold and
+additive schema design, without Part 360 runtime wiring.
+
 ## 2026-10-30 — OH-AUTO4-MFG-002 dispatch lifecycle contract resolution
 
 **Status: Blocked — no independently safe dispatch mutation identified.**

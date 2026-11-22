@@ -164,6 +164,30 @@ Platform context **16/16**; membership authority **30/30**; isolated
 source-root **17/17**; architecture and read-only readiness passed.
 Database acceptance remains pending governed `OH_IPM` infrastructure.
 
+## Session Summary (2026-11-23) — IPM-010 Part 360 context and secondary ownership
+
+Completed the bounded IPM-010 architecture decision. The existing
+Products-owned `ProductOrganizationScope` over Platform membership validation
+is the proposed Part 360 context mechanism; no duplicate resolver, session
+framework, inferred ownership, or unrestricted fallback was added.
+
+The secondary matrix classifies all Part 360 sources. Product-linked
+operational rows lack an approved inherited organization contract; handoff
+tracking is polymorphic; molds/material mappings are legacy-unowned; materials
+and machines are global-master candidates; and responsibility includes an
+available-user directory not constrained by Product organization. Part 360
+therefore remains blocked and was not partially filtered.
+
+Full Part 360 closure is not required before InjectionMolding development.
+The recommended next milestone is the existing Manufacturing-owned
+InjectionMolding module contract/scaffold and additive `ipm_*` schema design,
+without Part 360 wiring or duplicate masters.
+
+IPM-010 contract probe **24/24**; prior Product/QR/ownership/mapping/context/
+membership/isolated-source-root probes, architecture gates, deletion family,
+and read-only deployment readiness passed. No database-backed test,
+activation, deployment, route, schema, or runtime change occurred.
+
 ## Session Summary (2026-11-23) — IPM-004 Product-to-Shared Item mapping completion
 
 Completed the bounded Products-owned Product-to-Shared Item mapping slice on

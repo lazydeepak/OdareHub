@@ -44,6 +44,39 @@ detail blocker **20/20**; Product read **14/14**; QR **36/36**; ownership
 **26/26**; Item mapping **19/19**; Platform context **16/16**; membership
 authority **30/30**; isolated source-root **17/17**.
 
+### 2026-11-23 — IPM-010 Part 360 organization context and secondary ownership
+
+**Decision status: COMPLETE CONTRACT — Part 360 activation remains blocked.**
+
+Reuse `ProductOrganizationScope` and the existing Platform
+`AuthenticatedOrganizationContextResolver`. Part 360 must receive an explicit
+selected organization only as resolver input, re-resolve it on every request,
+and pass only the opaque membership context to `ProductReadService` and future
+scoped projections. Missing, malformed, unauthorized, switched, NULL-owned,
+cross-organization, and nonexistent cases fail closed with a generic outcome.
+No second resolver, session framework, inferred Product ownership, creator,
+assignment, `item_ref`, BOM, or Shared Item authorization is allowed.
+
+The secondary matrix classifies product-linked orders/production/QC/dispatch
+rows, polymorphic handoff rows, Product-owned but legacy-unowned molds/maps,
+global materials/machines, and identity/assignment-backed responsibility data.
+Product linkage alone is not an authoritative inherited organization contract.
+Global catalogs and available-user data cannot enter a tenant-safe response
+without an approved shared/independent authorization policy. The current
+Part360 response must not be partially filtered or silently degraded.
+
+Full Part 360 closure is not a prerequisite for InjectionMolding development.
+Proceed with the already-defined Manufacturing-owned `InjectionMolding` module
+contract/scaffold and additive `ipm_*` schema design, requiring mandatory
+organization ownership on new IPM tables and preserving existing Products,
+Machines, BOM, MaterialManagement, QC, and Dispatch masters. Defer Part 360
+integration until its complete projection has a per-source authorization
+disposition and governed database proof.
+
+Evidence: `docs/architecture/ipm/ipm-010-part360-organization-context-and-secondary-ownership.md`;
+IPM-010 probe **24/24**; prior Product/QR/ownership/mapping/context/membership
+and isolated-source-root evidence remains passing.
+
 ### 2026-10-30 — OH-AUTO4-MFG-002 dispatch lifecycle contract resolution
 
 **Decision status: BLOCKED — owner approval is required before implementation.**
