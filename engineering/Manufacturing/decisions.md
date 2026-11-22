@@ -990,3 +990,32 @@ supersession, archival, and revision routes remain unavailable.
 Evidence:
 `docs/architecture/ipm/ipm-012-mold-ownership-contract-and-revision-activation-readiness.md`;
 IPM-012 contract probe **38/38**; no database or runtime change.
+
+### 2026-11-23 — IPM-013 Product Mold Ownership Schema and Admission Foundation
+
+**Decision status: PREPARATORY FOUNDATION COMPLETE — enforcement deferred.**
+
+Added Products migration `016_part_molds_organization_ownership.sql` with
+nullable `part_molds.organization_id`, an ownership index, and a restrictive
+organization FK. Existing NULL rows are preserved; no backfill or inference
+from Product, creator, assignment, or revision organization is performed.
+
+Added `ProductMoldOwnership` as a database-free Products component. Organization
+selection delegates to the existing Platform membership resolver through
+`ProductOrganizationScope`; mold admission requires the resulting opaque
+`OrganizationMembershipContext` and exact mold-owner equality. Missing,
+malformed, NULL-owned, and cross-organization rows fail closed without
+disclosing the mold row.
+
+The component is intentionally not wired into mold handlers, aliases, Part 360,
+runtime DDL, or revision routes. Future revision consistency still requires
+authoritative mold ownership, revision-owner equality, transactional row locks,
+restrictive deletion, and an explicit ownership-change policy.
+
+The obsolete IPM-010 scaffold assertion was corrected without weakening its
+Part 360 protection checks; IPM-010 now passes **24/24**.
+
+Evidence:
+`docs/architecture/ipm/ipm-013-product-mold-ownership-foundation.md`;
+Product mold ownership probe **45/45**; IPM-011 **43/43**; IPM-012 **38/38**;
+no database or runtime activation.

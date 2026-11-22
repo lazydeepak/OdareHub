@@ -9125,3 +9125,24 @@ operation occurred.
 - **Verification:** IPM-012 contract probe **38/38**; no schema, route,
   revision workflow, Part 360, database, deployment, or activation change.
   Governed `OH_IPM` database acceptance remains pending.
+
+# IPM-013 Product Mold Ownership Foundation (2026-11-23)
+
+- **Architecture law:** Products remains the canonical mold master owner;
+  ownership admission must consume Platform membership evidence and must not
+  infer ownership from Product, creator, assignment, or revision data.
+- **Migration:** Added Products migration `016_part_molds_organization_ownership.sql`
+  with nullable `part_molds.organization_id`, indexed ownership, and
+  restrictive organization FK. No backfill or migration execution occurred.
+- **Admission:** Added database-free `ProductMoldOwnership`; valid opaque
+  membership context plus exact mold organization match is required. NULL,
+  malformed, missing, and cross-organization ownership deny without mold
+  disclosure.
+- **Compatibility:** Existing mold handlers, aliases, Part 360, runtime DDL,
+  revision routes, and IPM-011 migration remain unchanged.
+- **Regression:** IPM-010 obsolete scaffold expectation corrected;
+  IPM-010 **24/24**, IPM-011 **43/43**, IPM-012 **38/38**, mold ownership
+  foundation **45/45**.
+- **Limitations:** No database, migration, runtime authorization activation,
+  revision workflow, Part 360 authorization, deployment, or infrastructure
+  operation occurred.

@@ -858,3 +858,26 @@ Decision record:
 Recommended IPM-013: additive Products-owned `part_molds.organization_id`
 schema preparation and a database-free `ProductMoldOwnership` admission
 contract, without revision activation.
+
+## 2026-11-23 — IPM-013 Product Mold Ownership Schema and Admission Foundation
+
+**Status: Implementation foundation complete; runtime enforcement and revision
+activation remain deferred.**
+
+- [x] Added Products migration `016_part_molds_organization_ownership.sql`
+  with nullable `organization_id`, organization index, and restrictive FK.
+- [x] Preserved legacy NULL ownership with no backfill or inferred ownership.
+- [x] Added database-free `ProductMoldOwnership` admission over the existing
+  Platform membership context and Products organization adapter.
+- [x] Denied missing, malformed, NULL-owned, and cross-organization molds
+  without returning the denied mold row.
+- [x] Corrected the obsolete IPM-010 scaffold expectation; IPM-010 now passes
+  **24/24**.
+- [x] Verified IPM-011, IPM-012, Product, Platform, and isolated source-root
+  boundaries.
+- [ ] Migration execution, runtime handler wiring, runtime DDL retirement,
+  revision APIs, Part 360 authorization, and governed `OH_IPM` acceptance
+  remain deferred.
+
+Decision record:
+`docs/architecture/ipm/ipm-013-product-mold-ownership-foundation.md`.

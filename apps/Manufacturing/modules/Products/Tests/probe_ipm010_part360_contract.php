@@ -52,7 +52,7 @@ $check(!str_contains($molds, 'organization_id'), 'Product mold schema has no aut
 $check(str_contains($molds, 'product_id INT NOT NULL'), 'mold records relate directly to Product identity');
 $check(str_contains($ipmBoundary, 'Every `ipm_*` table carries `organization_id INT NOT NULL`'), 'future IPM-owned records have an explicit tenant contract');
 $check(str_contains($ipmBoundary, 'ownership stays with Products'), 'future IPM boundary does not duplicate the mold master');
-$check(!is_dir($root . '/apps/Manufacturing/modules/InjectionMolding'), 'InjectionMolding runtime module is not yet scaffolded');
+$check(is_dir($root . '/apps/Manufacturing/modules/InjectionMolding'), 'authorized InjectionMolding foundation is scaffolded');
 $check(str_contains($ipmBoundary, 'Part360 integration'), 'future IPM integration is additive and separately sequenced');
 
 echo "IPM-010 Part 360 contract probe: {$passed}/" . ($passed + $failed) . " assertions passed\n";
