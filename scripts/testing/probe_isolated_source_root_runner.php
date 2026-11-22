@@ -21,8 +21,11 @@ $temporary = sys_get_temp_dir() . '/oh-auto1-044-probe-' . bin2hex(random_bytes(
 $repo = $temporary . '/fixture-repo';
 $outside = $temporary . '/outside';
 mkdir($repo . '/app', 0700, true);
+mkdir($repo . '/apps', 0700, true);
 mkdir($repo . '/platform', 0700, true);
 mkdir($repo . '/plugins', 0700, true);
+mkdir($repo . '/shared', 0700, true);
+mkdir($repo . '/scripts/testing', 0700, true);
 mkdir($repo . '/vendor/composer', 0700, true);
 mkdir($repo . '/vendor/acme/runtime/src', 0700, true);
 mkdir($repo . '/vendor/acme/runtime/tests', 0700, true);
@@ -59,8 +62,8 @@ $prepared = null;
 try {
     $prepared = IsolatedSourceRootTestRunner::prepare($repo);
     $manifest = $prepared['manifest'];
-    $check(count($manifest['entry_points']) === 29, 'all 29 guarded entry points declared');
-    $check(count(array_intersect($manifest['entry_points'], IsolatedSourceRootTestRunner::databaseEntryPoints())) === 29, 'entry-point manifest matches authority list');
+    $check(count($manifest['entry_points']) === 30, 'all 30 guarded entry points declared');
+    $check(count(array_intersect($manifest['entry_points'], IsolatedSourceRootTestRunner::databaseEntryPoints())) === 30, 'entry-point manifest matches authority list');
     $check(!is_file($prepared['source_root'] . '/storage/db_config.php'), 'installed database config excluded');
     $check(!is_file($prepared['source_root'] . '/app/.env') && !is_file($prepared['source_root'] . '/app/credentials.txt'), 'credential-bearing files excluded');
     $check(is_file($prepared['source_root'] . '/vendor/acme/runtime/src/Runtime.php') && !is_file($prepared['source_root'] . '/vendor/acme/runtime/tests/RuntimeTest.php'), 'vendor runtime retained while test tree excluded');
@@ -114,6 +117,8 @@ $cases = static function () use ($temporary, $outside, $removeFixtureTree): arra
         mkdir($root . '/apps', 0700, true);
         mkdir($root . '/platform', 0700, true);
         mkdir($root . '/plugins', 0700, true);
+        mkdir($root . '/shared', 0700, true);
+        mkdir($root . '/scripts/testing', 0700, true);
         file_put_contents($root . '/composer.json', "{}\n");
         if ($dependencies) {
             mkdir($root . '/vendor/composer', 0700, true);

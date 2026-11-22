@@ -17,7 +17,7 @@ Method: static inspection of migrations, services, manifests, and contracts in `
 | F3 | Machines carry injection-molding specs: `clamping_force_ton`, `shot_capacity_g`, `tie_bar_spacing_mm`, `platen_size_mm`, `min/max_mold_height_mm`, `preferred_materials`, `machine_group`, `machine_type` | `Machines/migrations/002_machine_specs.sql` |
 | F4 | `part_material_map`: qty per part, usage, `yield_parts_per_kg`, `scrap_pct`, effective windows, uniques on (product, material) pairs | `tools/restore/live-schema.sql` (part_material_map), live implementation in Products module |
 | F5 | `manufacturing_bom` / `manufacturing_bom_line` exist; version/revision/status; **no FKs from lines to items**; lines FK→bom with CASCADE; opaque INT refs validated by `BomService` against `products`; **DDL co-declared byte-identically in Products/013 and Bom/001**; `BomService::ensureSchema()` also issues runtime `CREATE TABLE IF NOT EXISTS` (BOM triple declaration) | `Products/migrations/013_add_manufacturing_bom.sql`, `Bom/migrations/001_bom_contract.sql`, `Bom/BomService.php` lines 68–105 |
-| F6 | `shared_items` table **does not exist** anywhere (schema, migration, runtime). `ItemIdentityService` is JSON-file-backed (`/tmp/shared-items-store.json`); `ItemIdentityContract` exists; `probe_item_identity.php` is DB-free; Composer `Shared\` PSR-4 mapping **absent** from `composer.json` | `shared/Item/Foundation/**`, `composer.json` (no matching key) |
+| F6 | IPM-003 now provides a Shared-owned `shared_items` migration, Composer `Shared\` mapping, MySQL repository, and database service. The JSON `ItemIdentityService` remains preserved as a DB-free compatibility implementation; disposable database verification is recorded separately. | `apps/Shared/**`, `shared/Item/Foundation/**`, `composer.json` |
 | F7 | Shared Parties: `parties` BIGINT PK, DB-wide, no tenant columns, `NO_AUTOMATIC_DEDUPE` service, committed (`001_create_parties.sql`, `PartyService.php`) | `apps/Parties/**` |
 | F8 | Platform Organization: `org_companies` INT PK; `org_user_memberships` BIGINT PK, generated active-uniqueness key, full FK set to users/org_companies, validity CHECK constraints; fail-closed `AuthenticatedOrganizationContextResolver`; Procurement adopts the same pattern via `ProcurementOrganizationScope` | `Organization/migrations/001,004,006`, `Platform/Services/AuthenticatedOrganizationContextResolver.php`, `Procurement/Services/ProcurementOrganizationScope.php` |
 | F9 | Procurement tenant pattern: committed migration `20261031_000001_add_request_organization_ownership.sql` adds **nullable** `organization_id INT` + FK, **no backfill of legacy rows**, comment "Existing rows remain NULL/unowned; no creator, email, or provenance backfill" | `apps/Procurement/migrations/20261031_000001_add_request_organization_ownership.sql` |
@@ -93,11 +93,18 @@ Method: static inspection of migrations, services, manifests, and contracts in `
 
 ## 6. Recommendation — first implementation slice
 
-**IPM-003 (recommended): Shared Foundation persistence + identity-map migration, disposable-verified.**
+**IPM-003 (completed bounded slice): Shared Foundation persistence only.**
 
-Scope: `shared_items` + `shared_item_identity_map` migrations as a Shared-owned app lifecycle step; `probe_item_identity.php` extended (DB mode behind the existing disposable attestation); zero change to Manufacturing.
+Scope: one `shared_items` migration as a Shared-owned app lifecycle step, Composer
+autoloading, a database repository/service, and a disposable-only probe. The generic
+`shared_item_identity_map`, Product mapping, tenant migration, BOM identity changes,
+and IPM tables remain deferred. Manufacturing behavior is unchanged.
 
-Rationale: every downstream phase (identity reconciliation, tenant backfill, IPM tables) consumes `shared_items` and the map ledger. It is the smallest slice that is independently verifiable end-to-end with existing runner-owned tooling, reversible (two new tables, zero legacy impact), and unblocks all IPM schema work without exposing production data.
+Rationale: persistence is now independently verifiable end-to-end without introducing
+cross-domain identity or legacy-data mutation. The migration ledger records the SQL
+checksum and skips an applied migration on replay; the existing ledger does not
+revalidate a changed checksum on an already-applied row, which remains a general
+application migration-service limitation and is not widened by this slice.
 
 Proposed follow-on sequence thereafter: IPM-004 read-only Manufacturing identity/tenant audit on disposable restore → IPM-005 IPM module scaffold + migrations 001–006 → IPM-006 lot genealogy read path → IPM-007 Part360/mold-revision UI (separately authorized).
 

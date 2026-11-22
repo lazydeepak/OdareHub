@@ -8800,3 +8800,34 @@ operator-atomic contract. Created
 and updated Manufacturing records. No code, route, schema, migration,
 database, Core/Auth/ACL, browser, HTTP, activation, deployment, or live-test
 change occurred. Unrelated dirty artifacts were preserved.
+
+## Session Summary (2026-11-23) — IPM-003 Shared Item persistence
+
+Implemented the bounded Shared Item persistence slice on the existing `ipm`
+branch. `apps/Shared` now owns migration registration through the existing app
+manifest/lifecycle fields; `shared/Item/Foundation` owns the repository,
+database-backed identity service, and contracts; Composer owns the `Shared\`
+PSR-4 mapping. The inert Shared entry declares no routes, permissions, hooks,
+widgets, modules, tenant activation, or licensing surface.
+
+Added one additive `shared_items` migration with global `code_ref` uniqueness,
+BIGINT UNSIGNED identity, canonical status/category/metadata fields, and no
+Manufacturing, tenant, Core-user, Product mapping, identity-map, BOM, or IPM
+schema. The historical JSON `ItemIdentityService` and its **19/19** probe were
+preserved unchanged.
+
+Extended the existing isolated source-root runner to stage `shared/` and the
+existing `scripts/testing` guard tree. No new runner or guard bypass was added.
+Shared persistence contract probe **32/32**, source-root probe **17/17**, and
+fresh runner-owned loopback MySQL migration/repository probe **17/17** passed.
+The disposable probe verified migration apply/replay/ledger checksum, create,
+ID read-back, exact ID/code lookup, pagination, status transitions, invalid
+transition rejection, duplicate rollback, forbidden-field rejection, and
+concurrent duplicate protection. No installed/development/production database
+was accessed or changed.
+
+The existing `AppMigrationService` records checksums and skips applied rows on
+replay but does not reject a changed checksum for an already-applied row; this
+pre-existing general limitation was documented and not changed. No Core,
+Manufacturing, tenant, production database, deployment, activation, or `main`
+operation occurred.

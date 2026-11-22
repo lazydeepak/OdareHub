@@ -1,0 +1,22 @@
+{
+  "id": "shared",
+  "app_key": "shared",
+  "package_type": "bundle",
+  "name": "Shared Foundation",
+  "version": "0.1.0",
+  "type": "system",
+  "min_core_version": "3.0.0",
+  "dependencies": [],
+  "entry": "routes.php",
+  "migrations_path": "migrations",
+  "permissions": [],
+  "can_disable": false,
+  "can_uninstall": false,
+  "can_export": true,
+  "shared_contract": {
+    "kind": "shared_app",
+    "consumers": [
+      "manufacturing"
+    ]
+  }
+}

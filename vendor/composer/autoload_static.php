@@ -116,6 +116,7 @@ class ComposerStaticInitdaadbf481fd36e323c12f985ae256dd6
             'Symfony\\Component\\Routing\\' => 26,
             'Symfony\\Component\\HttpFoundation\\' => 33,
             'Svg\\' => 4,
+            'Shared\\' => 7,
             'Sabberworm\\CSS\\' => 15,
         ),
         'R' =>
@@ -203,6 +204,10 @@ class ComposerStaticInitdaadbf481fd36e323c12f985ae256dd6
         'Svg\\' =>
         array (
             0 => __DIR__ . '/..' . '/dompdf/php-svg-lib/src/Svg',
+        ),
+        'Shared\\' =>
+        array (
+            0 => __DIR__ . '/../..' . '/shared',
         ),
         'Sabberworm\\CSS\\' =>
         array (

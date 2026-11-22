@@ -46,6 +46,7 @@ final class IsolatedSourceRootTestRunner
             'apps/Hospitality/Tests/probe_operator_slice7_add_charge.php',
             'apps/Hospitality/Tests/probe_operator_slice8_cancel.php',
             'apps/Hospitality/Tests/probe_operator_slice9_no_show.php',
+            'shared/Item/Foundation/Tests/probe_item_persistence_database.php',
         ];
     }
 
@@ -83,7 +84,7 @@ final class IsolatedSourceRootTestRunner
 
         try {
             $copied = [];
-            foreach (['app', 'apps', 'platform', 'plugins'] as $directory) {
+            foreach (['app', 'apps', 'platform', 'plugins', 'shared', 'scripts/testing'] as $directory) {
                 self::copyTree($repository . '/' . $directory, $sourceRoot . '/' . $directory, $repository, $copied);
             }
             self::copyFile($repository . '/composer.json', $sourceRoot . '/composer.json', $repository, $copied);

@@ -8,6 +8,7 @@
       "App\\": "app/",
       "Apps\\": "apps/",
       "Platform\\": "platform/",
+      "Shared\\": "shared/",
       "Plugins\\Workflow\\Services\\": "apps/Manufacturing/modules/Workflow/Services/"
     }
   },

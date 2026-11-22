@@ -4,11 +4,11 @@ Canonical branch: work/shared-items-impl (from 316b806). Integrated to `main` 20
 explicit user authorization as the minimal Shared Items slice (contract + identity
 foundation + reference adoption).
 Reference: session-d-shared-app-suite-extension-contract @ c886b89 (governance/reference; not rewritten)
-Status: COMMITTED MINIMAL SLICE — contract + `shared/Item/Foundation` identity service +
-reference adoption (`products.item_ref` migration 012; Manufacturing-owned BOM foundation
-migration 013). Sections 4/5/8 "not executed" statements refer to the original Session A
-contract phase and are superseded by the slice recorded here; no `shared_items` DB table
-was created (identity store remains test/verification JSON until a runtime consumer lands).
+Status: IMPLEMENTED PERSISTENCE SLICE — contract + JSON compatibility service +
+Shared-owned `shared_items` migration/repository/service. Manufacturing reference adoption
+(`products.item_ref` migration 012; Manufacturing-owned BOM foundation migration 013)
+remains unchanged. The migration is disposable-verified only; no installed or production
+database was changed.
 
 ---
 
@@ -113,9 +113,13 @@ This avoids duplicating `items` inside Manufacturing or forcing Manufacturing to
 
 ---
 
-## 4. Minimal Schema Proposal (Design Only — No DB Mutation)
+## 4. Minimal Schema and Migration Contract
 
-Table proposal (reference for future implementation, not executed):
+The following schema is now owned by `apps/Shared/migrations/` and is executed through
+the existing `AppMigrationService` ledger. The migration is additive and idempotent.
+The SQL below remains the contract reference; the migration file is the executable source.
+
+Table definition:
 
 ```sql
 CREATE TABLE IF NOT EXISTS shared_items (

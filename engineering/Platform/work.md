@@ -1,4 +1,26 @@
 # Platform — Work
+## 2026-11-23 — IPM-003 Shared Item persistence boundary
+
+**Status: Implemented and disposable-verified on the `ipm` branch.**
+
+- [x] Established `apps/Shared` as the existing app-lifecycle migration owner
+  with no permissions, routes, hooks, widgets, modules, tenant activation, or
+  licensing surface.
+- [x] Added the additive `shared_items` migration and Composer `Shared\` PSR-4
+  mapping; no installed database or production database was changed.
+- [x] Added the MySQL repository and database-backed identity service while
+  preserving the JSON compatibility service and historical 19/19 probe.
+- [x] Extended the existing isolated source-root staging to include `shared/`
+  and the existing `scripts/testing` guard tree. No new runner or guard bypass
+  was added.
+- [x] Contract probe **32/32**, JSON probe **19/19**, source-root probe
+  **17/17**, and disposable migration/repository probe **17/17** passed.
+- [ ] Migration checksum mismatch rejection on an already-applied ledger row
+  remains a pre-existing `AppMigrationService` limitation; no general Core
+  migration-service change was introduced.
+- [ ] Product mapping, tenant migration, BOM identity, IPM schema, and
+  installed/production database execution remain deferred.
+
 ## 2026-10-26 — OH-AUTO3-ORG-CONTEXT-001 authenticated organization context resolver
 
 **Status: Platform-only resolver implemented; focused acceptance pending governed gates and commit.**
