@@ -803,3 +803,23 @@ Evidence: database-free ownership contract **26/26**, Product Item mapping
 contract **19/19**, isolated source-root safety **17/17**, architecture gates
 PASS, deployment readiness PASS, and the governed database probe
 INCONCLUSIVE/exit 2 without attested `OH_IPM` infrastructure.
+
+### 2026-11-23 — IPM-007 Product access-closure preparation
+
+**Decision status: Planning accepted; runtime enforcement not authorized.**
+
+The next bounded milestone is Product access-closure preparation, not mold
+revision. The first independently testable slice is the public
+`GET /qr/product/scan` boundary because IPM-005 identified it as the one
+confirmed public Product disclosure path and one of the 47 unscoped future
+bypasses. The safe default is to deny unscoped public Product lookup until an
+owner-approved authenticated or signed/opaque scan policy exists.
+
+The implementation-ready sequence is recorded in
+`docs/architecture/ipm/ipm-007-product-access-closure-preparation.md`.
+It preserves Product, BOM, Shared Item, `item_ref`, assignment, and operator
+scope contracts; requires a Products-owned read-admission seam before direct
+consumer edits; and keeps legacy NULL rows intact without inferring
+ownership. The first slice requires a database-free contract probe before any
+runtime change and governed `OH_IPM` acceptance before deployment or
+activation.

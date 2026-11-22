@@ -73,6 +73,28 @@ test-only credentials, and runner-owned cleanup evidence accepted by
 through the governed isolated runner. Do not use installed, development,
 production, or incident database configuration.
 
+## Session Summary (2026-11-23) — IPM-007 Product access-closure preparation
+
+Prepared the next bounded, database-independent Product access-closure
+milestone without starting runtime enforcement or mold-revision work.
+
+- Reused `docs/architecture/ipm/ipm-005-product-organization-ownership-dependency-reconciliation.md`
+  rather than repeating the 71-file inventory.
+- Selected public `GET /qr/product/scan` as the first coherent slice because
+  it has no organization or Product-owner admission and is the confirmed
+  public Product disclosure path.
+- Defined a fail-closed default for unscoped scans; no public token,
+  authenticated scan policy, ACL field, or ownership inference was invented.
+- Recorded the actual QR route/controller files, required Products-owned read
+  admission dependency, static/database-free probe expectations, governed
+  database assertions, and staged closure sequence.
+- Deferred all runtime changes pending owner approval of scan policy and
+  adapter ownership.
+
+Plan: `docs/architecture/ipm/ipm-007-product-access-closure-preparation.md`.
+No database, production, deployment, activation, merge-to-`main`, or IPM-007
+runtime operation occurred.
+
 ## Session Summary (2026-11-23) — IPM-004 Product-to-Shared Item mapping completion
 
 Completed the bounded Products-owned Product-to-Shared Item mapping slice on

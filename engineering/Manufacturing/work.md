@@ -673,3 +673,27 @@ therefore rejected.
 Evidence: `apps/Manufacturing/modules/Products/Tests/probe_product_organization_ownership_contract.php`,
 `apps/Manufacturing/modules/Products/Tests/probe_product_organization_ownership_database.php`,
 and the final IPM-006 closeout recorded in `AGENT-COMPLIANCE-CHECKLIST.md`.
+
+## 2026-11-23 — IPM-007 Product access-closure preparation
+
+**Status: Implementation-ready planning; no runtime Product access enforcement
+was started.**
+
+- [x] Reused the completed IPM-005 48-surface evidence; no second broad
+  inventory was performed.
+- [x] Selected `/qr/product/scan` as the first coherent slice because it is the
+  confirmed public Product disclosure path and has no organization or Product
+  owner admission.
+- [x] Defined the default safe posture as fail-closed denial of unscoped
+  public scans; no signed-token or authenticated scan policy was invented.
+- [x] Defined the first-slice files, central read-admission dependency,
+  database-free probe expectations, governed database assertions, and stop
+  conditions.
+- [x] Sequenced Products read/selector closure, Products mutation closure,
+  direct Manufacturing consumers, Shell/QR consumers, and legacy/dependent-row
+  classification without changing runtime code.
+
+Plan: `docs/architecture/ipm/ipm-007-product-access-closure-preparation.md`.
+IPM-006 remains source-implemented and active by default, with database
+acceptance pending; this plan does not treat that pending gate as permission to
+activate or deploy.
