@@ -127,6 +127,23 @@ Changed implementation files:
 No deployment, activation, infrastructure provisioning, or next-slice
 implementation occurred.
 
+## Session Summary (2026-11-23) — IPM-008 central Product read boundary
+
+Added the smallest reusable Products-owned read seam after the accepted QR
+boundary. `ProductReadService` accepts only validated opaque organization
+context and provides owner-filtered ID, part-number, and QR identity reads.
+QR admission now delegates its Product lookup to this seam.
+
+Only QR adopted the seam. The inventory found **43 runtime files / 74
+pre-existing Product query sites** outside tests; Products detail/list/search,
+selectors, BOM, Data Exchange, Shell, and operational consumers remain
+deferred because they do not uniformly supply validated organization context.
+
+Verification: Product read boundary **14/14**, QR boundary **36/36**, Product
+ownership **26/26**, Item mapping **19/19**, Platform context **16/16**,
+membership authority **30/30**, isolated source-root **17/17**. Database
+acceptance remains pending governed `OH_IPM` infrastructure.
+
 ## Session Summary (2026-11-23) — IPM-004 Product-to-Shared Item mapping completion
 
 Completed the bounded Products-owned Product-to-Shared Item mapping slice on

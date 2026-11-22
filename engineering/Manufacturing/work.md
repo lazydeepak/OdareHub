@@ -1,5 +1,29 @@
 # Manufacturing — Work
 
+## 2026-11-23 — IPM-008 central Product read boundary
+
+**Status: Bounded foundation implemented; QR adoption verified; broader read
+adoption remains deferred pending caller context contracts.**
+
+- [x] Inventoried Product reads: **43 runtime files / 74 pre-existing query
+  sites** outside tests.
+- [x] Added Products-owned `ProductReadService` with context-only ID,
+  part-number, and QR identity lookup methods.
+- [x] Applied `organization_id` predicates at every central lookup SQL branch.
+- [x] Refactored QR admission to delegate Product lookup to the central seam.
+- [x] Preserved the public QR route, payload, anonymous generic failure, and
+  admitted success response.
+- [x] Product read boundary probe: **14/14**; QR boundary probe: **36/36**.
+- [x] Product ownership **26/26**, Item mapping **19/19**, Platform context
+  **16/16**, membership authority **30/30**, isolated source-root **17/17**.
+- [ ] Products detail/list/search, selectors, BOM, Data Exchange, Shell and
+  operational consumers remain un migrated because validated organization
+  context is not uniformly available.
+- [ ] Governed database acceptance remains pending; no operational tenant
+  isolation claim is made.
+
+The central seam is a foundation, not system-wide Product isolation.
+
 ## 2026-10-30 — OH-AUTO4-MFG-002 dispatch lifecycle contract resolution
 
 **Status: Blocked — no independently safe dispatch mutation identified.**

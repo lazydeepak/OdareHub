@@ -1,5 +1,26 @@
 # Manufacturing — Decisions
 
+### 2026-11-23 — IPM-008 central Product read boundary
+
+**Decision status: Bounded foundation implemented; broader activation deferred.**
+
+Use `ProductReadService` as the Products-owned organization-aware read seam.
+Its public methods accept only `OrganizationMembershipContext`, never a raw
+organization ID, and apply the owner predicate in every Product lookup.
+`ProductScanAdmissionService` remains responsible for converting QR request
+input into validated context and delegates the actual read to the central seam.
+
+Only QR Product scanning adopts the seam. Existing Products detail/list/search,
+selector, BOM, Data Exchange, Shell, and operational reads are not migrated
+until their callers provide an explicit, membership-validated organization
+context compatible with their existing assignment and aggregate semantics.
+NULL-owned legacy rows are not assigned or exposed by tenant-scoped reads.
+
+Evidence: Product read boundary **14/14**, QR boundary **36/36**, Product
+ownership **26/26**, Item mapping **19/19**, Platform context **16/16**,
+membership authority **30/30**, and isolated source-root **17/17**. Database
+acceptance remains blocked by missing governed `OH_IPM` attestation.
+
 ### 2026-10-30 — OH-AUTO4-MFG-002 dispatch lifecycle contract resolution
 
 **Decision status: BLOCKED — owner approval is required before implementation.**

@@ -6,7 +6,9 @@ $controllerPath = $root . '/apps/Platform/modules/QRCode/Controllers/QRCodeContr
 $routesPath = $root . '/apps/Platform/modules/QRCode/routes.php';
 $viewPath = $root . '/apps/Platform/modules/QRCode/Views/scan_result.php';
 $servicePath = $root . '/apps/Manufacturing/modules/Products/Services/ProductScanAdmissionService.php';
+$readPath = $root . '/apps/Manufacturing/modules/Products/Services/ProductReadService.php';
 $service = (string)file_get_contents($servicePath);
+$read = (string)file_get_contents($readPath);
 $controller = (string)file_get_contents($controllerPath);
 $routes = (string)file_get_contents($routesPath);
 $view = (string)file_get_contents($viewPath);
@@ -40,11 +42,14 @@ $check(str_contains($controller, "'error' => 'QR scan is unavailable.'"), 'missi
 $check(substr_count($controller, "'error' => 'QR scan is unavailable.'") >= 2, 'table and lookup failures share generic error');
 $check($scanMethod !== '' && !str_contains($scanMethod, 'header('), 'scan failures do not redirect or vary by authorization');
 $check(str_contains($service, 'ProductOrganizationScope::resolve($requestedOrganizationId)'), 'admission delegates to existing organization resolver');
+$check(str_contains($service, 'ProductReadService::findByQrIdentity('), 'QR admission delegates Product reads to central read seam');
+$check(str_contains($service, "require_once __DIR__ . '/ProductReadService.php';"), 'QR admission loads Products-owned read seam');
 $check(str_contains($service, 'OrganizationMembershipContext'), 'admission requires opaque membership context');
-$check(str_contains($service, 'organization_id=?'), 'Product lookup applies organization ownership predicate');
-$check(str_contains($service, 'parts_number=? AND organization_id=?'), 'part-number lookup is owner-scoped');
+$check(str_contains($read, 'organization_id=?'), 'central Product lookup applies organization ownership predicate');
+$check(str_contains($read, 'parts_number=? AND organization_id=?'), 'central part-number lookup is owner-scoped');
+$check(str_contains($read, 'OrganizationMembershipContext $context'), 'central read seam accepts only opaque organization context');
 $check(str_contains($service, 'ProductOrganizationScope::resolve'), 'anonymous or invalid context fails before Product SQL');
-$check(!preg_match('/SELECT \* FROM products\s+WHERE id=\? LIMIT 1/s', $service), 'no unscoped Product identity lookup remains in scan service');
+$check(!preg_match('/SELECT \* FROM products\s+WHERE id=\? LIMIT 1/s', $read), 'no unscoped Product identity lookup remains in central read seam');
 $check(str_contains($service, 'mixed $requestedOrganizationId'), 'raw organization input is treated only as resolver input');
 $check(str_contains($controller, "'scanUrl' =>"), 'Product label scan URL contract remains present');
 $check(str_contains($view, "'/login?redirect='"), 'existing authenticated action continuation remains');
@@ -58,8 +63,8 @@ $check(str_contains($routes, '$router->post(\'/qr/stock/add\''), 'QR stock mutat
 $check(str_contains($routes, '$router->get(\'/qr/report\''), 'QR report route remains registered');
 $check(str_contains($routes, '$router->get(\'/qr/export\''), 'QR export route remains registered');
 $check(!str_contains($scanMethod, 'DB::'), 'scan controller performs no secondary Product query');
-$check(substr_count($service, 'SELECT * FROM products') === 3, 'scan service has only bounded Product lookup branches');
-$check(substr_count($service, 'organization_id=?') === 3, 'every scan Product lookup includes ownership filtering');
+$check(substr_count($read, 'SELECT * FROM products') === 2, 'central read seam has only bounded Product lookup branches');
+$check(substr_count($read, 'organization_id=?') === 2, 'every central Product lookup includes ownership filtering');
 
 echo "Product QR organization boundary probe: {$passed}/" . ($passed + $failed) . " assertions passed\n";
 exit($failed === 0 ? 0 : 1);
