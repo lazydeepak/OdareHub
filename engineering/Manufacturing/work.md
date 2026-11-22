@@ -601,3 +601,42 @@ installed or production configuration is changed.
 
 Evidence is recorded in
 `docs/architecture/ipm/ipm-004-product-item-mapping-completion.md`.
+
+## 2026-11-23 — IPM-005 Product organization ownership dependency reconciliation
+
+**Status: Bounded audit complete; implementation blocked pending owner decisions.**
+
+- [x] Verified the clean `ipm` baseline and remote parity at
+  `faff5b8da2c9ef63ccb1a222e5708fefe63b7937`.
+- [x] Audited Product schema/install/creation/import/mutation paths and confirmed
+  there is no authoritative Product organization identity or creation policy.
+- [x] Compared Product access with the existing Platform authenticated
+  organization resolver and Procurement organization-scope adapter.
+- [x] Enumerated 71 Manufacturing PHP files with direct Product SQL or
+  Product-backed verification/query paths, plus Shell and Platform consumers.
+- [x] Confirmed Product app access, assignment, role, and ACL checks do not prove
+  organization membership.
+- [x] Confirmed IPM-004 mapping foreign keys prove identity existence only and
+  cannot authorize a Product-side cross-organization operation.
+- [x] Grouped the 71-file reference inventory into **48 distinct enforcement
+  surfaces**: 20 Products, 20 Manufacturing consumers, 5 Shell consumers, 2
+  Platform QR consumers, and 1 non-user maintenance path.
+- [x] Distinguished **0 confirmed current cross-organization violations** from
+  **47 confirmed normal-user unscoped runtime surfaces** and one unverified
+  maintenance path; `/qr/product/scan` is the one confirmed public Product
+  disclosure surface.
+- [x] Preserved Products, BOM, Shared Item, mapping, schema, database, and
+  runtime behavior; no implementation or database operation was performed.
+
+Dependency reconciliation:
+`docs/architecture/ipm/ipm-005-product-organization-ownership-dependency-reconciliation.md`.
+
+The recommended ownership contract is explicit selected organization membership
+for new Product creation/import, nullable legacy NULL ownership with
+organization-scoped deny, immutable ordinary ownership, explicit audited
+reassignment only, and mapping authorization derived from Product ownership.
+The closure plan distinguishes schema preparation (Stage 1), new-record
+enforcement (Stage 3), Products-module closure (Stage 4), system-wide Product
+closure (Stage 5), and mapping activation (Stage 6). A mapping-only service or
+`organization_id` column would leave equivalent unrestricted bypasses and is
+therefore rejected.

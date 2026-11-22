@@ -743,3 +743,34 @@ governed disposable mapping run passed. The runner uses `--no-defaults`,
 loopback-only binding, temporary attested resources, and `--mysqlx=0` only for
 the isolated MySQL 9.6 process; installed and production configuration remain
 untouched.
+
+### 2026-11-23 — IPM-005 Product organization ownership dependency
+
+**Status: Bounded audit complete; implementation blocked pending owner decision.**
+
+Products has no organization column, no organization-aware create/import
+contract, and no Product-owned adapter over the Platform authenticated
+organization context. Existing Manufacturing app access, Product assignment,
+role checks, and `products.360.view` authorization do not establish tenant
+ownership.
+
+The repository-wide audit found 71 Manufacturing PHP files with direct Product
+SQL or Product-backed verification/query paths. Grouping aliases and shared
+callers produced 48 distinct enforcement surfaces: 20 Products operations, 20
+Manufacturing consumers, 5 Shell consumers, 2 Platform QR consumers, and one
+non-user maintenance path. Forty-seven normal-user surfaces are confirmed
+unscoped by organization membership. This is not evidence of a current
+cross-organization violation because Product ownership is not modeled; it is
+confirmed evidence that those surfaces would bypass a future ownership
+boundary. `/qr/product/scan` is the one confirmed public Product disclosure
+surface.
+
+No Product ownership was inferred, no legacy NULL row was backfilled, and no
+runtime mapping path was added. The recommended contract requires explicit
+selected organization membership for new Products, organization-scoped denial
+of legacy NULL rows, immutable ordinary ownership, separately audited
+reassignment, and Product-owner-derived mapping authorization. Stage 3 is the
+earliest enforceable boundary for new Product ownership; Stage 5 is the
+earliest system-wide boundary after all 47 normal-user surfaces are closed.
+Evidence:
+`docs/architecture/ipm/ipm-005-product-organization-ownership-dependency-reconciliation.md`.

@@ -8864,3 +8864,30 @@ replay but does not reject a changed checksum for an already-applied row; this
 pre-existing general limitation was documented and not changed. No Core,
 Manufacturing, tenant, production database, deployment, activation, or `main`
 operation occurred.
+
+# IPM-005 Product organization ownership dependency reconciliation (2026-11-23)
+
+- **Architecture law:** organization ownership must be authoritative and
+  authorization must fail closed; a foreign key or Product ID is not tenant
+  authority.
+- **Owner:** Manufacturing owns Product semantics and Product-owned admission;
+  Platform owns authenticated organization context. No ownership transfer or
+  duplicate tenancy resolver was introduced.
+- **Result:** bounded audit complete, implementation blocked pending owner
+  decisions. The 71-file reference inventory collapses to 48 distinct
+  enforcement surfaces: 47 normal-user runtime surfaces are confirmed
+  organization-unscoped and one maintenance path is not externally reachable.
+  There are 0 confirmed current cross-organization violations because Product
+  ownership is not modeled; `/qr/product/scan` is the one confirmed public
+  Product disclosure surface.
+- **Decision:** do not add a partial `organization_id`, mapping service, mapping
+  route, legacy backfill, or speculative Product ownership. Record required
+  owner decisions and staged closure in
+  `docs/architecture/ipm/ipm-005-product-organization-ownership-dependency-reconciliation.md`.
+- **Validation:** clean `ipm` baseline and remote parity; source inventory and
+  contract review completed; no database, SQL, runtime, deployment, activation,
+  branch, worktree, or merge-to-`main` operation occurred.
+- **Closure plan:** Stage 1 is schema preparation only; Stage 3 is the earliest
+  enforceable boundary for new Product ownership; Stage 5 is the earliest
+  system-wide Product boundary; Stage 6 activates Product-to-Shared Item
+  mapping only after that closure.
