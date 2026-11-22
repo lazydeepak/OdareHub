@@ -826,3 +826,35 @@ The optional `organization_id` request value is resolver input only. Existing
 anonymous QR URLs remain parseable but no longer disclose organization-owned
 Product details without authenticated membership-validated context. No other
 Product consumer or future bypass surface was changed.
+
+## 2026-11-23 — IPM-012 mold ownership contract and revision activation readiness
+
+**Status: Complete — contract-only closeout; ownership implementation and
+revision activation remain deferred.**
+
+- [x] Confirmed the canonical Products-owned `part_molds.id INT` master and
+  Product-scoped `UNIQUE(product_id, mold_code)` identity.
+- [x] Recorded that `part_molds` has no authoritative organization owner and
+  selected Option A: future nullable `part_molds.organization_id`.
+- [x] Confirmed both ordinary creation aliases converge on
+  `ProductsController::createMold()` and both deletion aliases converge on
+  `ProductsController::deleteMold()`.
+- [x] Preserved existing Manufacturing app access, CSRF, and lead/admin
+  assignment checks as prerequisites; future membership validation is
+  additional, not a replacement.
+- [x] Named `PartEngineeringSchemaService::ensureSchema()` callers, separating
+  `Products/install.php` preparation from runtime mold, Part 360, and
+  neighboring Product callers.
+- [x] Defined nullable legacy handling, revision/mold organization matching,
+  transactional row-lock requirements, restrictive deletion, and
+  unresolved NULL-owner behavior.
+- [x] Defined preparatory and enforcement stages without adding a revision API,
+  workflow, UI, Part 360 authorization, or duplicate master.
+- [ ] Additive ownership migration, bounded mutation admission, runtime-DDL
+  retirement, and governed `OH_IPM` database acceptance remain future work.
+
+Decision record:
+`docs/architecture/ipm/ipm-012-mold-ownership-contract-and-revision-activation-readiness.md`.
+Recommended IPM-013: additive Products-owned `part_molds.organization_id`
+schema preparation and a database-free `ProductMoldOwnership` admission
+contract, without revision activation.

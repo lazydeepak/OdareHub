@@ -9098,3 +9098,30 @@ operation occurred.
   enforceable boundary for new Product ownership; Stage 5 is the earliest
   system-wide Product boundary; Stage 6 activates Product-to-Shared Item
   mapping only after that closure.
+
+# IPM-012 Mold Ownership Contract (2026-11-23)
+
+- **Architecture law:** canonical mold ownership must be authoritative;
+  revision organization is not proof of ownership of the referenced mold.
+- **Owner:** Manufacturing/Products owns mold identity and future ownership;
+  Platform continues to own authenticated organization membership context.
+- **Decision:** Option A — future nullable `part_molds.organization_id`, with
+  no inferred ownership or automatic backfill. Option B requires an
+  owner-approved shared-mold relation contract.
+- **Handlers:** `createMold()` is reached by
+  `/apps/manufacturing/products/molds/add` and `/products/molds/add`;
+  `deleteMold()` is reached by
+  `/apps/manufacturing/products/molds/delete` and
+  `/products/molds/delete`. Existing app access, CSRF, and lead/admin
+  assignment checks remain required; organization membership admission is
+  additional.
+- **DDL dependency:** `Products/install.php` is preparation; current runtime
+  callers include mold create/delete, neighboring Product engineering writes,
+  and `Part360Service::build()`. Runtime DDL removal requires migration and
+  installation compatibility proof.
+- **Consistency:** future revisions must match the authoritative mold owner
+  under transaction/row-lock checks; NULL-owned legacy molds and revisions
+  referencing them remain preserved but denied by organization-scoped APIs.
+- **Verification:** IPM-012 contract probe **38/38**; no schema, route,
+  revision workflow, Part 360, database, deployment, or activation change.
+  Governed `OH_IPM` database acceptance remains pending.

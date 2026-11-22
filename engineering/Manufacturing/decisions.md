@@ -954,3 +954,39 @@ Evidence: QR boundary probe **33/33**, Product ownership contract **26/26**,
 Product Item mapping contract **19/19**, and PHP lint. Governed database
 acceptance remains unexecuted and is still required for persistence, migration,
 authorization, enumeration, and response compatibility claims.
+
+### 2026-11-23 — IPM-012 mold ownership contract and revision activation readiness
+
+**Decision status: COMPLETE CONTRACT — implementation and revision activation
+deferred.**
+
+Select Option A: `part_molds.organization_id` is the future authoritative
+owner. The canonical master remains Products-owned, has `INT` identity, and is
+currently Product-scoped by `UNIQUE(product_id, mold_code)`. No repository
+evidence supports legitimate multi-organization sharing of one physical mold.
+Option B requires a separate owner-approved shared-mold relation contract.
+
+The two creation aliases
+`/apps/manufacturing/products/molds/add` and `/products/molds/add` converge on
+`ProductsController::createMold()`. The two deletion aliases
+`/apps/manufacturing/products/molds/delete` and `/products/molds/delete`
+converge on `ProductsController::deleteMold()`. Existing app access, CSRF, and
+lead/admin assignment checks remain mandatory; future validated organization
+membership admission is additive. Neither handler currently persists or checks
+mold ownership.
+
+`PartEngineeringSchemaService::ensureSchema()` currently runs from the mold
+create/delete handlers, neighboring Product engineering writes,
+`Part360Service::build()`, and `Products/install.php`. The install hook is
+preparation; runtime callers must be retired only after migration and
+installation compatibility proof.
+
+Future revision operations must match `ipm_mold_revisions.organization_id` to
+the authoritative mold owner under transaction/row-lock protection. Existing
+NULL-owned molds and revisions referencing them remain preserved but denied by
+organization-scoped APIs; no ownership is inferred or backfilled. Release,
+supersession, archival, and revision routes remain unavailable.
+
+Evidence:
+`docs/architecture/ipm/ipm-012-mold-ownership-contract-and-revision-activation-readiness.md`;
+IPM-012 contract probe **38/38**; no database or runtime change.
