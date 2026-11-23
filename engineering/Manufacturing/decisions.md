@@ -1019,3 +1019,36 @@ Evidence:
 `docs/architecture/ipm/ipm-013-product-mold-ownership-foundation.md`;
 Product mold ownership probe **45/45**; IPM-011 **43/43**; IPM-012 **38/38**;
 no database or runtime activation.
+
+### 2026-11-23 — IPM-014 Governed Database Qualification and Mold Admission
+
+**Decision status: SOURCE ADMISSION QUALIFIED — RUNTIME ENFORCEMENT BLOCKED.**
+
+No owner-controlled `OH_IPM` disposable-database evidence is present:
+repository/source-root identity, resource root, loopback process/socket/datadir,
+test credentials, configuration identity, and cleanup attestation are all
+missing. No database entry point was run. Installed, development, production,
+and incident database targets remain prohibited.
+
+The existing `ProductMoldOwnership` component is sufficient as the
+database-free admission foundation. It requires an opaque
+membership-validated `OrganizationMembershipContext`; explicit creation
+selection supplies the future owner value, while existing mold admission
+requires exact organization equality. NULL-owned legacy molds, malformed or
+spoofed selections, missing context, and cross-organization molds fail closed
+without disclosure.
+
+Runtime activation is intentionally withheld. The current mold form does not
+provide explicit organization context, deletion receives only mold/product
+identifiers, and Part 360 does not establish validated organization context.
+Activating one handler or inferring ownership from Product, creator,
+assignment, session, or revision data would create a partial authorization
+path. Both canonical and compatibility aliases, existing app/CSRF/lead-admin
+checks, seven runtime schema callers, Part 360, and inactive revision routes
+remain unchanged.
+
+Evidence:
+`docs/architecture/ipm/ipm-014-governed-database-qualification-and-mold-admission.md`;
+IPM-014 source probe **37/37**; IPM-013 **45/45**; no database execution.
+Next eligible milestone: IPM-015 after owner-controlled `OH_IPM` evidence and
+explicit organization-context delivery are supplied.

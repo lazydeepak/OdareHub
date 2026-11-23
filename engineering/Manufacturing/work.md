@@ -881,3 +881,25 @@ activation remain deferred.**
 
 Decision record:
 `docs/architecture/ipm/ipm-013-product-mold-ownership-foundation.md`.
+
+## 2026-11-23 — IPM-014 Governed Database Qualification and Mold Admission
+
+**Status: Source admission qualified; runtime enforcement and database
+qualification blocked.**
+
+- [x] Inspected the clean IPM checkout at `e0a669f`; no pre-existing IPM-014
+  implementation was present.
+- [x] Confirmed no owner-controlled `OH_IPM` authorization evidence is present;
+  no database probe, provisioning, bootstrap, or SQL was run.
+- [x] Reused `ProductMoldOwnership` for explicit membership context,
+  creation-ownership derivation, and existing-mold admission.
+- [x] Added source-boundary coverage for both canonical and compatibility mold
+  aliases, existing app/CSRF/lead-admin checks, NULL ownership, spoofing,
+  cross-organization denial, and inactive runtime wiring.
+- [x] Preserved all seven runtime `ensureSchema()` callers and inactive
+  revision workflows.
+- [ ] Activate `createMold()`/`deleteMold()` only after explicit organization
+  context delivery and governed disposable migration qualification.
+
+Decision record:
+`docs/architecture/ipm/ipm-014-governed-database-qualification-and-mold-admission.md`.

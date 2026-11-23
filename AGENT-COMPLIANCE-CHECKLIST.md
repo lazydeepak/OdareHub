@@ -9146,3 +9146,24 @@ operation occurred.
 - **Limitations:** No database, migration, runtime authorization activation,
   revision workflow, Part 360 authorization, deployment, or infrastructure
   operation occurred.
+
+# IPM-014 Governed Database Qualification and Mold Admission (2026-11-23)
+
+- **Qualification:** No owner-controlled `OH_IPM` repository, isolated source
+  root, disposable process/socket/datadir, credentials, configuration, or
+  cleanup attestation was present. Database qualification was **BLOCKED / NOT
+  RUN** before Composer/bootstrap/SQL.
+- **Safe source work:** Added `probe_ipm014_mold_admission_boundary.php` and
+  confirmed the existing `ProductMoldOwnership` foundation covers explicit
+  membership context, creation-owner derivation, existing-mold admission,
+  NULL-owned legacy denial, spoofing, cross-organization denial, and
+  non-disclosure.
+- **Runtime boundary:** `createMold()` and `deleteMold()` remain inactive for
+  ownership enforcement because current form/request paths do not deliver
+  validated organization context. Canonical and compatibility aliases,
+  app/CSRF/lead-admin checks, seven runtime schema callers, Part 360, and
+  revision workflows remain unchanged.
+- **Validation:** IPM-014 source probe **37/37**; IPM-013 **45/45**; IPM-010
+  **24/24**; IPM-011 **43/43**; IPM-012 **38/38**; no database operation.
+- **Next eligible milestone:** IPM-015 after owner-controlled `OH_IPM`
+  qualification evidence and explicit organization-context delivery approval.
