@@ -114,6 +114,7 @@ $check(!preg_match('/UPDATE\\s+part_molds.*organization_id/is', $migration), 'mo
 $check(!str_contains($migration, 'CREATE TABLE'), 'mold ownership migration does not duplicate the mold master');
 
 $service = (string)file_get_contents($root . '/apps/Manufacturing/modules/Products/Services/ProductMoldOwnership.php');
+$mutationAdmission = (string)file_get_contents($root . '/apps/Manufacturing/modules/Products/Services/ProductMoldMutationAdmission.php');
 $controller = (string)file_get_contents($root . '/apps/Manufacturing/modules/Products/Controllers/ProductsController.php');
 $routes = (string)file_get_contents($root . '/apps/Manufacturing/modules/Products/routes.php');
 $part360 = (string)file_get_contents($root . '/apps/Manufacturing/modules/Products/Services/Part360Service.php');
@@ -122,7 +123,9 @@ $check(str_contains($service, 'OrganizationMembershipContext $context'), 'mold a
 $check(!str_contains($service, 'organization_id = ?'), 'ownership component has no raw organization authorization query');
 $check(!str_contains($service, 'Auth::user'), 'ownership component does not fall back to session identity');
 $check(!str_contains($service, 'DB::'), 'ownership component is database-independent');
-$check(!str_contains($controller, 'ProductMoldOwnership::') && !str_contains($routes, 'ProductMoldOwnership::') && !str_contains($part360, 'ProductMoldOwnership::'), 'ownership admission remains unused by runtime handlers');
+$check(str_contains($mutationAdmission, 'ProductMoldOwnership::'), 'mutation admission reuses the ownership foundation');
+$check(str_contains($controller, 'ProductMoldMutationAdmission::isRuntimeActivationEnabled()'), 'runtime handlers remain behind an explicit inactive gate');
+$check(!str_contains($routes, 'ProductMoldOwnership::') && !str_contains($part360, 'ProductMoldOwnership::'), 'aliases and Part 360 do not bypass the mutation boundary');
 
 $ipmMigration = (string)file_get_contents($root . '/apps/Manufacturing/modules/InjectionMolding/migrations/001_create_ipm_mold_revisions.sql');
 $check(str_contains($ipmMigration, 'organization_id INT NOT NULL'), 'revision organization remains mandatory');

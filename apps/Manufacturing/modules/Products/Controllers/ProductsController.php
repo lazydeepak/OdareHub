@@ -13,6 +13,7 @@ use Plugins\Products\Services\PartExecutionRouteResolver;
 use Plugins\Products\Services\PartsMasterSnapshotService;
 use Plugins\Products\Services\ProductOrganizationScope;
 use Plugins\Products\Services\ProductCreationService;
+use Plugins\Products\Services\ProductMoldMutationAdmission;
 use Plugins\Supply\Services\SupplyModel;
 
 require_once __DIR__ . '/../Services/Part360Service.php';
@@ -22,6 +23,7 @@ require_once __DIR__ . '/../Services/PartEngineeringSchemaService.php';
 require_once __DIR__ . '/../Services/PartsMasterSnapshotService.php';
 require_once __DIR__ . '/../Services/ProductOrganizationScope.php';
 require_once __DIR__ . '/../Services/ProductCreationService.php';
+require_once __DIR__ . '/../Services/ProductMoldMutationAdmission.php';
 require_once APP_ROOT . '/apps/Manufacturing/modules/MaterialManagement/Services/MaterialSchemaService.php';
 
 final class ProductsController
@@ -205,10 +207,21 @@ final class ProductsController
 
     public static function createMold(array $input): void
     {
-        PartEngineeringSchemaService::ensureSchema();
-
         $productId = (int)($input['product_id'] ?? 0);
         self::assertCanEditLeadSections(Auth::user(), $productId, 'Only the assigned lead or an admin can update tooling for this part.');
+
+        $moldAdmission = null;
+        if (ProductMoldMutationAdmission::isRuntimeActivationEnabled()) {
+            $moldAdmission = ProductMoldMutationAdmission::admitCreation($input);
+            if (($moldAdmission['allowed'] ?? false) !== true) {
+                self::flash('err', 'Mold ownership context is unavailable.');
+                header('Location: /products/360?id=' . $productId);
+                exit;
+            }
+        }
+
+        PartEngineeringSchemaService::ensureSchema();
+
         $moldCode = trim((string)($input['mold_code'] ?? ''));
         $moldName = trim((string)($input['mold_name'] ?? ''));
         if ($productId <= 0 || $moldCode === '' || $moldName === '') {
@@ -218,14 +231,22 @@ final class ProductsController
         }
 
         try {
+            $organizationPrefix = '';
+            $organizationValues = [];
+            if (is_array($moldAdmission)) {
+                $organizationPrefix = 'organization_id, ';
+                $organizationValues[] = (int)($moldAdmission['organization_id'] ?? 0);
+            }
+            $placeholderCount = is_array($moldAdmission) ? 18 : 17;
+
             DB::query(
                 "INSERT INTO part_molds (
-                    product_id, mold_code, mold_name, cavity_count, is_family_mold, tool_weight_kg,
+                    {$organizationPrefix}product_id, mold_code, mold_name, cavity_count, is_family_mold, tool_weight_kg,
                     mold_width_mm, mold_height_mm, mold_thickness_mm, min_clamp_ton_required,
                     min_shot_g_required, runner_type, cycle_time_sec, preferred_machine_group,
                     preferred_machine_type, status, notes
-                ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
-                [
+                ) VALUES (" . implode(',', array_fill(0, $placeholderCount, '?')) . ")",
+                array_merge($organizationValues, [
                     $productId,
                     $moldCode,
                     $moldName,
@@ -243,7 +264,7 @@ final class ProductsController
                     trim((string)($input['preferred_machine_type'] ?? '')) ?: null,
                     trim((string)($input['status'] ?? 'active')) ?: 'active',
                     trim((string)($input['notes'] ?? '')),
-                ]
+                ])
             );
             self::flash('ok', 'Mold saved.');
         } catch (\Throwable $e) {
@@ -254,12 +275,49 @@ final class ProductsController
         exit;
     }
 
-    public static function deleteMold(int $moldId, int $productId): void
+    public static function deleteMold(int $moldId, int $productId, mixed $requestedOrganizationId = null): void
     {
-        PartEngineeringSchemaService::ensureSchema();
         self::assertCanEditLeadSections(Auth::user(), $productId, 'Only the assigned lead or an admin can update tooling for this part.');
+
+        $moldAdmission = null;
+        if (ProductMoldMutationAdmission::isRuntimeActivationEnabled()) {
+            if ($moldId <= 0 || $productId <= 0) {
+                self::flash('err', 'Mold ownership context is unavailable.');
+                header('Location: /products/360?id=' . max(0, $productId));
+                exit;
+            }
+
+            $mold = DB::fetchOne(
+                'SELECT id, product_id, organization_id FROM part_molds WHERE id=? LIMIT 1',
+                [$moldId]
+            );
+            if (!$mold || (int)($mold['product_id'] ?? 0) !== $productId) {
+                self::flash('err', 'Mold ownership context is unavailable.');
+                header('Location: /products/360?id=' . $productId);
+                exit;
+            }
+
+            $moldAdmission = ProductMoldMutationAdmission::admitDeletion(
+                $mold,
+                $requestedOrganizationId
+            );
+            if (($moldAdmission['allowed'] ?? false) !== true) {
+                self::flash('err', 'Mold ownership context is unavailable.');
+                header('Location: /products/360?id=' . $productId);
+                exit;
+            }
+        }
+
+        PartEngineeringSchemaService::ensureSchema();
         if ($moldId > 0) {
-            DB::query('DELETE FROM part_molds WHERE id=? LIMIT 1', [$moldId]);
+            if (is_array($moldAdmission)) {
+                DB::query(
+                    'DELETE FROM part_molds WHERE id=? AND product_id=? AND organization_id=? LIMIT 1',
+                    [$moldId, $productId, (int)($moldAdmission['context']->organizationId() ?? 0)]
+                );
+            } else {
+                DB::query('DELETE FROM part_molds WHERE id=? LIMIT 1', [$moldId]);
+            }
             self::flash('ok', 'Mold removed.');
         }
         header('Location: /products/360?id=' . max(0, $productId));

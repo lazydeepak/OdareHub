@@ -9167,3 +9167,27 @@ operation occurred.
   **24/24**; IPM-011 **43/43**; IPM-012 **38/38**; no database operation.
 - **Next eligible milestone:** IPM-015 after owner-controlled `OH_IPM`
   qualification evidence and explicit organization-context delivery approval.
+
+# IPM-015 Mold Ownership Admission Implementation (2026-11-23)
+
+- **Architecture law:** Mold mutation ownership belongs to Products and must
+  reuse the existing Platform membership context; no duplicate resolver,
+  ownership framework, or mold master was added.
+- **Implementation:** Added `ProductMoldMutationAdmission` and source-complete
+  guarded integration for creation and deletion. Creation derives ownership
+  from validated context and rejects client ownership fields. Deletion checks
+  Product identity, exact mold ownership, and owner-scopes the delete.
+- **Preserved:** Manufacturing app access, CSRF, lead/admin assignment,
+  canonical/compatibility aliases, Part 360, existing runtime DDL callers,
+  mold relationships, and inactive revision workflows.
+- **Activation:** Runtime gate remains literal `false`; no database,
+  migration, infrastructure, deployment, or production operation occurred.
+- **Validation:** IPM-015 **36/36**; IPM-014 **40/40**; IPM-013 **47/47**;
+  IPM-010 **24/24**; IPM-011 **43/43**; IPM-012 **38/38**; Product ownership
+  **26/26**; Product detail **20/20**; Product read **14/14**; QR **36/36**;
+  Platform context **16/16**; membership **30/30**; isolated source-root
+  **17/17**.
+- **Remaining blockers:** Owner-controlled `OH_IPM` qualification, Migration
+  016 schema/FK/index/rollback proof, runtime DDL compatibility, explicit
+  organization delivery in every mutation caller, and authenticated alias
+  acceptance. Revision workflows remain deferred.

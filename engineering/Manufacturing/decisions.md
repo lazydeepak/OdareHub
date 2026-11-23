@@ -1052,3 +1052,34 @@ Evidence:
 IPM-014 source probe **37/37**; IPM-013 **45/45**; no database execution.
 Next eligible milestone: IPM-015 after owner-controlled `OH_IPM` evidence and
 explicit organization-context delivery are supplied.
+
+### 2026-11-23 — IPM-015 Mold Ownership Admission Implementation
+
+**Decision status: SOURCE IMPLEMENTATION COMPLETE — RUNTIME ACTIVATION
+BLOCKED.**
+
+Use `ProductMoldMutationAdmission` as the Products-owned mutation seam. It
+reuses `ProductMoldOwnership` and the existing Platform membership context.
+Creation accepts only an explicit membership selection and derives the stored
+owner from the opaque context; client-supplied mold/owner organization fields
+are rejected. Deletion reads only the target identity and owner, checks Product
+identity, admits exact organization ownership, and uses an owner-scoped delete
+predicate. Denials are generic and do not return the protected row.
+
+Both canonical and compatibility aliases converge on the same handlers and
+retain app access, CSRF, and lead/admin assignment checks. Part 360, existing
+runtime schema callers, mold relationships, and inactive revision workflows
+remain unchanged.
+
+The handler integration is guarded by the literal
+`ProductMoldMutationAdmission::isRuntimeActivationEnabled(): false`. This is
+intentional: no owner-controlled `OH_IPM` database evidence is available, the
+current mold form does not provide explicit organization context, and the
+runtime `ensureSchema()` compatibility path remains unresolved. No partial
+handler activation or ownership backfill is authorized.
+
+Evidence:
+`docs/architecture/ipm/ipm-015-mold-ownership-admission-implementation.md`;
+IPM-015 **36/36**; IPM-014 **40/40**; IPM-013 **47/47**; IPM-010–012 pass;
+no database execution. Next milestone is governed Migration 016 qualification
+and authenticated runtime acceptance, not revision activation.

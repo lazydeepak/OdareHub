@@ -89,6 +89,7 @@ $controller = (string)file_get_contents($products . '/Controllers/ProductsContro
 $routes = (string)file_get_contents($products . '/routes.php');
 $part360 = (string)file_get_contents($products . '/Services/Part360Service.php');
 $schema = (string)file_get_contents($products . '/Services/PartEngineeringSchemaService.php');
+$mutationAdmission = (string)file_get_contents($products . '/Services/ProductMoldMutationAdmission.php');
 $migration = (string)file_get_contents($products . '/migrations/016_part_molds_organization_ownership.sql');
 
 $check(substr_count($routes, "post('/apps/manufacturing/products/molds/add'") === 1
@@ -100,8 +101,11 @@ $check(substr_count($routes, "post('/apps/manufacturing/products/molds/delete'")
 $check(substr_count($routes, "Auth::requireCsrf((string)(\$_POST['csrf'] ?? ''))") >= 2, 'both mutation aliases retain CSRF admission');
 $check(str_contains($controller, 'self::assertCanEditLeadSections(Auth::user(), $productId'), 'creation retains lead/admin assignment admission');
 $check(str_contains($controller, 'self::assertCanEditLeadSections(Auth::user(), $productId'), 'deletion retains lead/admin assignment admission');
-$check(!str_contains($controller, 'ProductMoldOwnership::'), 'runtime handlers remain inactive without complete context coverage');
-$check(!str_contains($routes, 'ProductMoldOwnership::'), 'compatibility aliases do not bypass inactive admission');
+$check(str_contains($controller, 'ProductMoldMutationAdmission::isRuntimeActivationEnabled()'), 'runtime handlers use an explicit inactive admission gate');
+$check(str_contains($mutationAdmission, 'ProductMoldOwnership::resolveOrganization'), 'runtime admission reuses the existing ownership resolver');
+$check(str_contains($mutationAdmission, 'ProductMoldOwnership::admit'), 'runtime admission reuses the existing mold admission');
+$check(str_contains($mutationAdmission, 'return false;'), 'runtime activation remains disabled without qualification');
+$check(!str_contains($routes, 'ProductMoldOwnership::'), 'compatibility aliases do not bypass the handler boundary');
 $check(!str_contains($part360, 'ProductMoldOwnership::'), 'Part 360 remains outside the mold admission slice');
 $check(str_contains($controller, 'PartEngineeringSchemaService::ensureSchema()'), 'existing runtime schema compatibility call remains unchanged');
 $check(str_contains($schema, 'CREATE TABLE IF NOT EXISTS part_molds'), 'runtime schema compatibility authority remains documented');

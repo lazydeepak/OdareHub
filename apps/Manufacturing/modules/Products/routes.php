@@ -72,7 +72,11 @@ $deleteProductMold = function() {
     Auth::requireAppAccess('manufacturing');
     Auth::bootSession();
     Auth::requireCsrf((string)($_POST['csrf'] ?? ''));
-    ProductsController::deleteMold((int)($_POST['mold_id'] ?? 0), (int)($_POST['product_id'] ?? 0));
+    ProductsController::deleteMold(
+        (int)($_POST['mold_id'] ?? 0),
+        (int)($_POST['product_id'] ?? 0),
+        $_POST['organization_id'] ?? null
+    );
     return null;
 };
 $router->post('/apps/manufacturing/products/molds/delete', $deleteProductMold);

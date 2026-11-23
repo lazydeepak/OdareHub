@@ -903,3 +903,27 @@ qualification blocked.**
 
 Decision record:
 `docs/architecture/ipm/ipm-014-governed-database-qualification-and-mold-admission.md`.
+
+## 2026-11-23 — IPM-015 Mold Ownership Admission Implementation
+
+**Status: Source implementation complete; runtime activation intentionally
+disabled pending governed database qualification.**
+
+- [x] Added Products-owned `ProductMoldMutationAdmission`, reusing
+  `ProductMoldOwnership` and the existing Platform membership context.
+- [x] Implemented source-complete creation admission: explicit membership
+  selection, context-derived ownership, and client ownership-field rejection.
+- [x] Implemented source-complete deletion admission: owner-scoped target read,
+  exact Product/mold ownership checks, non-disclosure, and owner-scoped delete.
+- [x] Preserved app access, CSRF, lead/admin assignment checks, canonical and
+  compatibility aliases, Part 360, runtime DDL call sites, and inactive
+  revision workflows.
+- [x] Added focused IPM-015 coverage: **36/36**.
+- [x] Updated IPM-014, Product ownership, and IPM-012 regressions for the
+  guarded source integration.
+- [ ] Enable the literal runtime gate only after Migration 016 disposable
+  qualification, runtime schema compatibility proof, explicit organization
+  context delivery, and authenticated alias acceptance.
+
+Decision record:
+`docs/architecture/ipm/ipm-015-mold-ownership-admission-implementation.md`.

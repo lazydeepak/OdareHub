@@ -53,12 +53,14 @@ $check(str_contains($moldMigration, 'id INT AUTO_INCREMENT PRIMARY KEY'), 'canon
 $check(str_contains($moldMigration, 'UNIQUE KEY uniq_part_mold_code (product_id, mold_code)'), 'canonical mold identity is Product-scoped');
 $check(!str_contains($moldMigration, 'organization_id'), 'canonical mold currently has no organization ownership column');
 $check(str_contains($productsRoutes, "ProductsController::createMold(\$_POST)"), 'mold creation aliases converge on one handler');
-$check(str_contains($productsRoutes, "ProductsController::deleteMold((int)(\$_POST['mold_id'] ?? 0), (int)(\$_POST['product_id'] ?? 0))"), 'mold deletion aliases converge on one handler');
+$check(str_contains($productsRoutes, 'ProductsController::deleteMold(')
+    && str_contains($productsRoutes, "\$_POST['organization_id'] ?? null"),
+    'mold deletion aliases converge on one handler with future context forwarding');
 $check(substr_count($productsRoutes, "post('/apps/manufacturing/products/molds/add'") === 1 && substr_count($productsRoutes, "post('/products/molds/add'") === 1, 'both mold creation aliases remain registered');
 $check(substr_count($productsRoutes, "post('/apps/manufacturing/products/molds/delete'") === 1 && substr_count($productsRoutes, "post('/products/molds/delete'") === 1, 'both mold deletion aliases remain registered');
 $check(substr_count($productsRoutes, "Auth::requireCsrf((string)(\$_POST['csrf'] ?? ''))") >= 2, 'mold mutation aliases retain CSRF admission');
 $check(str_contains($productsController, 'public static function createMold(array $input): void'), 'ordinary mold creation handler exists');
-$check(str_contains($productsController, 'public static function deleteMold(int $moldId, int $productId): void'), 'ordinary mold deletion handler exists');
+$check(str_contains($productsController, 'public static function deleteMold(int $moldId, int $productId, mixed $requestedOrganizationId = null): void'), 'ordinary mold deletion handler exists');
 $check(str_contains($productsController, 'self::assertCanEditLeadSections(Auth::user(), $productId'), 'ordinary mold mutations use existing lead/admin assignment check');
 $check(str_contains($productsController, 'INSERT INTO part_molds'), 'creation currently writes the mold master directly');
 $check(str_contains($productsController, 'DELETE FROM part_molds WHERE id=? LIMIT 1'), 'deletion currently lacks owner-scoped predicate');
